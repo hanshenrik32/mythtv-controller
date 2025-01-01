@@ -4263,6 +4263,9 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     int pline=0;
     bool show_round_corner=false;
 
+
+    std::string temprgtxt1;
+
     int cx=100+xof;                 // pos x
     int cy=80+yof;                  // pos y
     int dx=buttonsizex-20;          // siz y
@@ -4600,17 +4603,18 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
             glEnd();
           }
         }
-
         glPopMatrix();
       }
       // draw numbers in group
       if (stack[i+sofset]->feed_group_antal>1) {
         // show numbers in group
-        snprintf(temptxt,sizeof(temptxt),"Feeds %-4d",stack[i+sofset]->feed_group_antal);
-        drawText(temptxt, xof+22,yof+14, 0.3f,1);
+        temprgtxt1 = fmt::v8::format("Feeds {}",stack[i+sofset]->feed_group_antal);
+        drawText(temprgtxt1.c_str(), xof+22,yof+14, 0.3f,1);
       }
-      // show text of element
-      drawText(stack[i+sofset]->feed_showtxt, xof+20,yof-10, 0.4f,1);
+      // show text 20 of elements in string
+      temprgtxt1 = fmt::v8::format("{:^20}",stack[i+sofset]->feed_showtxt);
+      temprgtxt1.resize(20);
+      drawText(temprgtxt1.c_str(), xof+20,yof-10, 0.4f,1);
       // next button
       i++;
       xof+=(buttonsizex+10);

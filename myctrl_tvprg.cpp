@@ -4526,23 +4526,17 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   std::string temprgtxt1;
   // new ver 2
   switch (configland) {
-    case 0: // snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
-            temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 0: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 1: // snprintf(temprgtxt,65,"Prg navn : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
-            temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 1: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 2: // snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
-            temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 2: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 3: // snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
-            temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 3: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 4: // snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
-            temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 4: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
     default:    
-          // snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
           temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
   }
   drawText(temprgtxt1.c_str(), 700,525, 0.4f,1);
