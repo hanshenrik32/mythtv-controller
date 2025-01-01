@@ -322,28 +322,28 @@ void film_oversigt_typem::softstopmovie() {
 
 // ****************************************************************************************
 //
-// Play streams from path
+// Play streams from path and update db abount nr of play
 // 
 //
 // ****************************************************************************************
 
 int film_oversigt_typem::playmovie(int nr) {
-    MYSQL *conn;
-    MYSQL_RES *res;
-    MYSQL_ROW row;
-    std::string updatedbplayed;
-    char *database = (char *) "mythtvcontroller";
-    conn=mysql_init(NULL);
-    if (conn) {
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-      updatedbplayed = fmt::v8::format("update videometadata set playcount=playcount+1 where filename like '{}'",this->filmoversigt[nr].getfilmfilename());
-      mysql_query(conn,updatedbplayed.c_str());
-      res = mysql_store_result(conn);
-      mysql_close(conn);
-    }
-    film_is_playing=true;                                       // set play flag
-    vlc_controller::playmedia(this->filmoversigt[nr].getfilmfilename());
-    return(1);
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  std::string updatedbplayed;
+  char *database = (char *) "mythtvcontroller";
+  conn=mysql_init(NULL);
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    updatedbplayed = fmt::v8::format("update videometadata set playcount=playcount+1 where filename like '{}'",this->filmoversigt[nr].getfilmfilename());
+    mysql_query(conn,updatedbplayed.c_str());
+    res = mysql_store_result(conn);
+    mysql_close(conn);
+  }
+  film_is_playing=true;                                       // set play flag
+  vlc_controller::playmedia(this->filmoversigt[nr].getfilmfilename());
+  return(1);
 }
 
 // ****************************************************************************************
