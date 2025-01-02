@@ -4042,18 +4042,11 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
       glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
       glEnd(); //End quadrilateral coordinates
-      glPopMatrix();
-      
+      glPopMatrix();     
       strcpy(temptxt,"Playlist name :");
       strcat(temptxt,keybuffer);
       drawText(temptxt, xof+20.0f,yof+10.0f+5.0f, 0.4f,1);
-      showcoursornow(330,460+5,strlen(keybuffer));
-
-      /*
-      glPushMatrix();
-      showcoursornow(330,460+5,strlen(keybuffer));
-      glPopMatrix();
-      */
+      showcoursornow(266,460+5,strlen(keybuffer));
     }
   }
   
@@ -10691,9 +10684,9 @@ void handleKeypress(unsigned char key, int x, int y) {
             tidal_oversigt.delete_record_in_view((tidalknapnr-1)+tidal_selected_startofset);
           }
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-              if (key==32) {
-                dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
-              }
+            if (key==32) {
+              dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
+            }
           }
           // hvis vi ikke gør andre ting
           if ((ask_save_playlist==false) || (save_ask_save_playlist==false)) {
@@ -15328,7 +15321,12 @@ int main(int argc, char** argv) {
 
     // Initialiser FreeType med en TrueType-skrifttype
 
-    if (!initFreeType("/usr/share/fonts/truetype/lato/Lato-Black.ttf")) {
+    // /usr/share/fonts/truetype/lato/Lato-Black.ttf
+    // /usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf
+
+    // /usr/share/fonts/truetype/fonts-gujr-extra/aakar-medium.ttf
+
+    if (!initFreeType("/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf")) {
         return -1;
     }
 
