@@ -12,7 +12,7 @@
 #include <sys/types.h>                                    // listdir.c
 #include <dirent.h>
 #include <stdio.h>
-
+#include <fmt/format.h>
 
 #include "myctrl_music.h"
 #include "myctrl_mplaylist.h"
@@ -1219,6 +1219,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   bool stop=false;
   char *base,*right_margin;
   int length;
+  std::string temptxt1;
   sofset=(_mangley/40)*8;
   while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
     // do new line (if not first line)
@@ -1283,10 +1284,13 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     strcpy(temptxt,musicoversigt[i+sofset].album_name);      	// album navn
     lastslash=strrchr(temptxt,'/');
     if (lastslash) strcpy(temptxt,lastslash+1);
-    temptxt[16]=0;
-    drawText(temptxt, xof+4, yof, 0.4f,1);
-    if (strlen(musicoversigt[i+sofset].album_name)>16) {
-      drawText(temptxt+16, xof+4, yof+20, 0.4f,1);
+    temptxt1 = fmt::v8::format("{:^18}",temptxt);
+    temptxt1.resize(18);
+    drawText(temptxt1.c_str(), xof+4, yof, 0.4f,1);
+    if (strlen(musicoversigt[i+sofset].album_name)>18) {
+      temptxt1 = fmt::v8::format("{:^18}",temptxt+18);
+      temptxt1.resize(18);
+      drawText(temptxt1.c_str(), xof+4, yof-20, 0.4f,1);
     }
 
     /*

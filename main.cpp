@@ -15327,7 +15327,8 @@ int main(int argc, char** argv) {
 
 
     // Initialiser FreeType med en TrueType-skrifttype
-    if (!initFreeType("/usr/share/fonts/truetype/teluguvijayam/Mandali-Regular.ttf")) {
+
+    if (!initFreeType("/usr/share/fonts/truetype/lato/Lato-Black.ttf")) {
         return -1;
     }
 

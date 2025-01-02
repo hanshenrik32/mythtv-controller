@@ -12,7 +12,8 @@
 
 #include "myctrl_glprint.h"
 
-#define MAX_CHARS 128
+// #define MAX_CHARS 128
+#define MAX_CHARS 255
 Character characters[MAX_CHARS];
 
 // FreeType skrifttypehåndtering
