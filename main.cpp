@@ -4042,18 +4042,11 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
       glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
       glEnd(); //End quadrilateral coordinates
-      glPopMatrix();
-      
+      glPopMatrix();     
       strcpy(temptxt,"Playlist name :");
       strcat(temptxt,keybuffer);
       drawText(temptxt, xof+20.0f,yof+10.0f+5.0f, 0.4f,1);
-      showcoursornow(330,460+5,strlen(keybuffer));
-
-      /*
-      glPushMatrix();
-      showcoursornow(330,460+5,strlen(keybuffer));
-      glPopMatrix();
-      */
+      showcoursornow(266,460+5,strlen(keybuffer));
     }
   }
   
@@ -5600,12 +5593,14 @@ void display() {
             #if defined USE_SDL_MIXER
             #endif
             drawText("Song Name ",(orgwinsizex/4)+20, (orgwinsizey/2)+120, 0.4f ,1);
-            sprintf(temptxt," %-30s",aktivsongname);
-            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+120, 0.4f,1);
-            drawText("Station ",(orgwinsizex/4)+20, (orgwinsizey/2)+80, 0.4f,1);
-            sprintf(temptxt," %s",radiooversigt.get_station_name(aktiv_radio_station));
-            temptxt[39]=0;
-            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+80, 0.4f,1);
+            std::string temptxt1;
+            temptxt1 = fmt::v8::format("{:38}",aktivsongname);
+            temptxt1.resize(38);
+            drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+120, 0.4f,1);
+            drawText("Station ",(orgwinsizex/4)+20, (orgwinsizey/2)+80, 0.4f,1);            
+            temptxt1 = fmt::v8::format(" {:38}",radiooversigt.get_station_name(aktiv_radio_station));
+            temptxt1.resize(38);
+            drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+80, 0.4f,1);
             radio_playtime_hour=(radio_playtime/60)/60;
             radio_playtime_min=(radio_playtime/60);
             radio_playtime_sec=radio_playtime-(radio_playtime_min*60);
@@ -5614,12 +5609,12 @@ void display() {
             sprintf(temptxt,"%s",music_timename[1]);       // 1 = danish
             temptxt[40]=0;
             drawText(temptxt,(orgwinsizex/4)+20, (orgwinsizey/2)+60, 0.4f,1);
-            sprintf(temptxt," %02d:%02d:%02d ",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
-            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+60, 0.4f,1);
+            temptxt1 = fmt::v8::format(" {:02}:{:02}:{:02}",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
+            drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+60, 0.4f,1);
             drawText("Bitrate ",(orgwinsizex/4)+20, (orgwinsizey/2)+40, 0.4f,1);
             frequency=192;
-            sprintf(temptxt," %3.0f Kbits",frequency);
-            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+40, 0.4f,1);
+            temptxt1 = fmt::v8::format(" {:3.0f} Kbits",frequency);
+            drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+40, 0.4f,1);
             drawText("Status ",(orgwinsizex/4)+20, (orgwinsizey/2)+20, 0.4f,1);
             sprintf(temptxt," %-20s",aktivsongstatus);
             drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+20, 0.4f,1);
@@ -10691,9 +10686,9 @@ void handleKeypress(unsigned char key, int x, int y) {
             tidal_oversigt.delete_record_in_view((tidalknapnr-1)+tidal_selected_startofset);
           }
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-              if (key==32) {
-                dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
-              }
+            if (key==32) {
+              dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
+            }
           }
           // hvis vi ikke gør andre ting
           if ((ask_save_playlist==false) || (save_ask_save_playlist==false)) {
@@ -15327,7 +15322,13 @@ int main(int argc, char** argv) {
 
 
     // Initialiser FreeType med en TrueType-skrifttype
-    if (!initFreeType("/usr/share/fonts/truetype/teluguvijayam/Mandali-Regular.ttf")) {
+
+    // /usr/share/fonts/truetype/lato/Lato-Black.ttf
+    // /usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf
+
+    // /usr/share/fonts/truetype/fonts-gujr-extra/aakar-medium.ttf
+
+    if (!initFreeType("/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf")) {
         return -1;
     }
 

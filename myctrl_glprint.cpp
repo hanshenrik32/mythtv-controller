@@ -1,3 +1,6 @@
+#ifndef MYCTRL_GLPRINT
+#define MYCTRL_GLPRINT
+
 //
 // opengl fast print
 //
@@ -12,7 +15,8 @@
 
 #include "myctrl_glprint.h"
 
-#define MAX_CHARS 128
+// #define MAX_CHARS 128
+#define MAX_CHARS 255
 Character characters[MAX_CHARS];
 
 // FreeType skrifttypehåndtering
@@ -170,3 +174,4 @@ void drawText(const char *text, float x, float y, float scale,int color) {
 }
 
 
+#endif

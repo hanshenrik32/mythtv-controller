@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 #include <string>
+#include <fmt/format.h>
+
 // json parser
 #include "json-parser/json.h"
 // global def
@@ -175,7 +177,7 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
       // from spotify servers
       // is callback call from by login page index.html or spotify_index.html (login/index.html have the callback url as callback from spotify )
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
-        if (debugmode) fprintf(stdout,"Got reply server : %s \n", (mg_str) hm->uri);
+        // if (debugmode) fprintf(stdout,"Got reply server : %s \n", (mg_str) hm->uri);
         // get code pointer ( uri.p = pointer to url )
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get sptify code from server
@@ -188,9 +190,11 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
           }
           user_token[codel-4]='\0';
         }
-        snprintf(sql,sizeof(sql),"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+        // snprintf(sql,sizeof(sql),"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+        std::string sql1;
+        sql1 = fmt::v8::format("curl -X POST -H 'Authorization: Basic {}' -d grant_type=authorization_code -d code={} -d redirect_uri=http://localhost:8000/callback/ -d client_id={} -d client_secret={} -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
         //printf("sql curl : %s \n ",sql);
-        curl_error=system(sql);
+        curl_error=system(sql1.c_str());
         if (curl_error==0) {
           curl_error=system(sed);
           if (curl_error==0) {
@@ -4058,24 +4062,25 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   }
   // search string is now coded to web call
   curl_error=0;
+  std::string call1;
   switch(type) {
             // search artist name
-    case 0: snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 0: call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search album name
-    case 1: snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 1: call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search playlist name
-    case 2: snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 2: call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search track/song name
-    case 3: snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 3: call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // default search artist name
-    default:snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    default:call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
   }
-  curl_error=system(call);
+  curl_error=system(call1.c_str());
   if (curl_error!=0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
     printf("call= %s \n",call);
@@ -4399,6 +4404,7 @@ bool spotify_class::reset_amin_in_viewer() {
   anim_viewer=true;
   anim_viewer_search=true;
   anim_angle=180.0f;
+  return(1);
 }
 
 // ****************************************************************************************

@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <fmt/format.h>
 
 #include "myctrl_radio.h"
 #include "utility.h"
@@ -613,8 +614,11 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
           }
         }
         // print radios station name
-        strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
-        drawText(temptxt, xof+2, yof-18, 0.4f,1);
+        // strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
+        std::string temptxt1;
+        temptxt1 = fmt::v8::format("{:^24}",stack[i+sofset]->station_name);
+        temptxt1.resize(24);
+        drawText(temptxt1.c_str(), xof+2, yof-18, 0.4f,1);
         xof=xof+buttonsize+6;
         i++;
     }
