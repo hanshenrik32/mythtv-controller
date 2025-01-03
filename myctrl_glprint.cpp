@@ -1,3 +1,6 @@
+#ifndef MYCTRL_GLPRINT
+#define MYCTRL_GLPRINT
+
 //
 // opengl fast print
 //
@@ -171,3 +174,4 @@ void drawText(const char *text, float x, float y, float scale,int color) {
 }
 
 
+#endif
