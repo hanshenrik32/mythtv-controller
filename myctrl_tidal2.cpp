@@ -911,6 +911,7 @@ bool tidal_class::delete_record_in_view(int tidalknapnr) {
     }
   }
   if (conn) mysql_close(conn);
+  return(1);
 }
 
 
