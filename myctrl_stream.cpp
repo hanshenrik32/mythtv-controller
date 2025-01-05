@@ -301,8 +301,8 @@ int stream_class::loadrssfile(bool updaterssfile) {
     }
   }
 
-  printf("set_update_rss %d configrssguidelastupdate = %ld time = %ld \n",set_update_rss,configrssguidelastupdate,time(NULL));
-
+  if (updaterssfile==true) set_update_rss=true; // force update
+  if (set_update_rss) printf("set_update_rss %d configrssguidelastupdate = %ld time = %ld \n",set_update_rss,configrssguidelastupdate,time(NULL));
   if ((conn) && (set_update_rss)) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL IS NULL");
@@ -3769,24 +3769,30 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
 //      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes,ANY_VALUE(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
-      snprintf(sqlselect,sizeof(sqlselect),"select (internetcontentarticles.feedtitle) as feedtitle,(internetcontentarticles.path) as path,(internetcontentarticles.title) as title,(internetcontentarticles.description) as description,(internetcontentarticles.url) as url,(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,(internetcontent.thumbnail) as thumbnail,(internetcontentarticles.time) as nroftimes,(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
+      sqlselect1 = "select (internetcontentarticles.feedtitle) as feedtitle,(internetcontentarticles.path) as path,(internetcontentarticles.title) as title,(internetcontentarticles.description) as description,(internetcontentarticles.url) as url,(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,(internetcontent.thumbnail) as thumbnail,(internetcontentarticles.time) as nroftimes,(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC";
       getart=0;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      snprintf(sqlselect,sizeof(sqlselect),"select (feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),count(path),(paththumb),(mediaURL),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
-      strcat(sqlselect,art);
-      strcat(sqlselect,"' GROUP BY title ORDER BY id");
+      // snprintf(sqlselect,sizeof(sqlselect),"select (feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),count(path),(paththumb),(mediaURL),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
+      sqlselect1 = "select (feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),count(path),(paththumb),(mediaURL),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '";
+      sqlselect1 = sqlselect1 + art;
+      sqlselect1 = sqlselect1 + "' GROUP BY title ORDER BY id";      
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      snprintf(sqlselect,sizeof(sqlselect),"select feedtitle as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),(paththumb),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NULL and feedtitle like '");
-      strcat(sqlselect,art);
-      strcat(sqlselect,"' AND path like '");
-      strcat(sqlselect,fpath);
-      strcat(sqlselect,"' ORDER BY abs(title) desc"); // ASC
+      // snprintf(sqlselect,sizeof(sqlselect),"select feedtitle as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),(paththumb),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NULL and feedtitle like '");
+      sqlselect1 = "select feedtitle as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),(paththumb),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NULL and feedtitle like '";
+      // strcat(sqlselect,art);
+      sqlselect1 = sqlselect1 + art;
+      sqlselect1 = sqlselect1 + "' AND path like '";
+      sqlselect1 = sqlselect1 + fpath;
+      sqlselect1 = sqlselect1 + "' ORDER BY abs(title) desc";
+      // strcat(sqlselect,"' AND path like '");
+      // strcat(sqlselect,fpath);
+      // strcat(sqlselect,"' ORDER BY abs(title) desc"); // ASC
       getart=2;
     }
 
     printf("\n");
-    printf("SQL SELECT ****************************** : %s\n",sqlselect);
+    printf("SQL SELECT ****************************** : %s\n",sqlselect1.c_str());
     printf("\n");
 
     this->type=getart;					// husk sql type
@@ -3798,9 +3804,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       antalrss_feeds=get_antal_rss_feeds_sources(conn);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      if (mysql_query(conn,sqlselect)!=0) {
+      if (mysql_query(conn,sqlselect1.c_str())!=0) {
         printf("mysql insert error.\n");
-        printf("SQL %s \n",sqlselect);
+        printf("SQL %s \n",sqlselect1.c_str());
       }
       res = mysql_store_result(conn);
       if (res) {
