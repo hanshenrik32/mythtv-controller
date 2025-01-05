@@ -5165,7 +5165,6 @@ void display() {
     glEnd();
     // tidal play info icon
     glEnable(GL_BLEND);
-    // if (tidal_oversigt.get_texture(tidalknapnr))
     if (tidal_oversigt.tidal_aktiv_cover_image_url()) {
       //do file exist and have we not loaded it before then load it.
       if ((tidal_oversigt.get_tidal_aktiv_cover_image()==0) && (tidal_oversigt.aktiv_song_tidal_icon==0)) {

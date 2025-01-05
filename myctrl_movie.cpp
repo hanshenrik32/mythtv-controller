@@ -865,7 +865,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                         if (mysql_error(conn)) {
                           write_logfile(logfile,(char *) "Mysql error 'insert into videometadata'");
                         }
-                        sprintf(sqlselect,"insert into videopathinfo(intid, path, contenttype, collectionref , recurse) values (0,'%s',0,0,0)",thismoviepathdir);
+                        sprintf(sqlselect,"insert into videopathinfo(intid, path, contenttype, collectionref , recurse) values (0,'%s',0,0,0)",thismoviepathdir.c_str());
                         mysql_query(conn,sqlselect);
                         res = mysql_store_result(conn);
                         if (mysql_error(conn)) {

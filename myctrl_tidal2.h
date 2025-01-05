@@ -198,10 +198,10 @@ class tidal_class {
     bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; return(true); }
     GLuint get_tidal_aktiv_cover_image() { return(tidal_aktiv_song[tidal_aktiv_song_nr].cover_image); };
     GLuint set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song[tidal_aktiv_song_nr].cover_image=img; };
-    char *tidal_aktiv_cover_image_url() { return(tidal_aktiv_song[tidal_aktiv_song_nr].cover_image_url); };
+    char *tidal_aktiv_cover_image_url() { return(tidal_aktiv_song[0].cover_image_url); };                                 // Only use icon 0 
     // new
     int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
-    int total_aktiv_songs() { return(tidal_aktiv_song_antal); };
+    int total_aktiv_songs() { return(tidal_aktiv_song_antal); };                                                          // # of songs in playlist
 
     int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
     GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
