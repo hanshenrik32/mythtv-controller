@@ -580,22 +580,19 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   int a;
   char *dirpath;
   dirpath=(char *) malloc(4096);
-  // strcpy(dirpath,"/home/hans/Music/");
-  /*
-  if (strcmp(configmusicpath,"")==0) {
+  std::string dirpath1;
+  strcpy(dirpath,"");
+  if (strcmp(configdefaultmusicpath,"")==0) {
     printf("No music patch in config file\nUSe default homedir/Music");        
-  } else strcpy(dirpath,configmusicpath);
-  */  
+  } else dirpath1 = configdefaultmusicpath;
   char filetype[10];
   char songname[1024];
   int dbexist=0;                                                                // use to check db exist
   bool dirfindes=false;
-  clean_music_oversigt();                                               				// clear music oversigt
-
-  strcpy(dirpath,"/data2/music");
-  dirp=opendir(dirpath);
+  clean_music_oversigt();                                               				// clear music oversigt 
+  dirp=opendir(dirpath1.c_str());
   if (dirp==NULL) {
-    printf("Open dir error ->%s<-\n",dirpath);
+    printf("Open dir error ->%s<-\n",dirpath1.c_str());
     return 1;
   }
   conn=mysql_init(NULL);
@@ -656,7 +653,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
       musicoversigt[0].oversigttype=-1;			// type -1 = playlist
       i++;
       if (dirp) {
-        printf("Music update/Loading directory %s\n",dirpath);
+        printf("Music update/Loading directory %s\n",dirpath1.c_str());
         write_logfile(logfile,(char *) "update/Loading directory ");
         // create db over all dirs in start path
         while(de = readdir(dirp)) {
@@ -705,7 +702,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
               snprintf(sqlselect2,sizeof(sqlselect2),"insert into music_artists values (%d,'%s')",0,de->d_name);
               mysql_query(conn,sqlselect2);
               res = mysql_store_result(conn);
-              i++; 
+              i++;
             }
           }
         }
@@ -720,11 +717,11 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
             // snprintf(debuglogdata,4090,"Checking dir %s/%s ",dirpath,row[1]);
             // write_logfile((char *) debuglogdata);
             dirid=atoi(row[0]);
-            snprintf(checkdir,sizeof(checkdir),"%s/%s",dirpath,row[1]);
+            snprintf(checkdir,sizeof(checkdir),"%s/%s",dirpath1.c_str(),row[1]);
             dirp1=opendir(checkdir);
             // error handler
             if (dirp1==NULL) {
-              printf("Open dir error ->%s<-\n",dirpath);
+              printf("Open dir error ->%s<-\n",checkdir);
               return 1;
               exit(0);
             }
@@ -870,7 +867,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   }
   musicoversigt_antal=i-1;
   if (conn) mysql_close(conn);
-  free(dirpath);  
+  // free(dirpath);  
 
   strcpy(music_db_update_loader,"");
   write_logfile(logfile,(char *) "Done update music directory ");
