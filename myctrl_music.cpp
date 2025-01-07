@@ -665,11 +665,9 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
             //  exit(1);
             //}
 
-            if (de->d_type==DT_DIR) {  
-              
+            if (de->d_type==DT_DIR) {
               printf("Checking directory %20s \n" , de->d_name);
-
-                dirfindes=false;
+              dirfindes=false;
               conn2=mysql_init(NULL);
               if (conn2) {
                 mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
@@ -947,8 +945,9 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
         strcat(tmptxt1,row[1]);
         strcat(tmptxt1,"/front.jpg");
         // check for some file types to convert to cover
-        findcoverfile(tmptxt,fundetpath);			// return fundetpath = picture found
+        findcoverfile(tmptxt,fundetpath);			// return fundetpath = picture found        
         if (file_exists(fundetpath)) {
+          /*
           strcpy(convert_command,"/usr/bin/convert -scale 128 ");
           strcat(convert_command,"\"");
           strcat(convert_command,fundetpath);
@@ -965,6 +964,11 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
             system(convert_command);
             if (debugmode) printf("Do Convert scale image %s to 128*128 \n",row[1]);
           }
+          */
+          strcpy(tmptxt,configmusicpath);
+          strcat(tmptxt,row[1]);
+          strcat(tmptxt,"/");
+          strcat(tmptxt,"cover.jpg");
           strcpy(icon_file,tmptxt);		// gem icon file name
         } else {
           strcpy(icon_file,"");			// no icon
