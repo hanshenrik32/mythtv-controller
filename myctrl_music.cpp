@@ -302,6 +302,7 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     char tmptxt3[512];                  // ny cover som skal loades
     char husk_tmptxt3[250];             // husk ny cover
     char sqlselect[512];
+    std::string sqlselect1;
     int i;
     char parent_id[200];
     // mysql vars
@@ -313,7 +314,12 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     strcpy(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where directory_id=");
     strcat(sqlselect,tmptxt);
     strcat(sqlselect," and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id order by name");
-//    if (debugmode) printf("SQLSELECT = %s  \n ",sqlselect);
+
+    sqlselect1 = "select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where directory_id=";
+    sqlselect1 = sqlselect1 + tmptxt;
+    sqlselect1 = sqlselect1 + " and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id order by name";
+
+    printf("SQLSELECT = %s  \n ",sqlselect1.c_str());
     conn=mysql_init(NULL);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
@@ -574,18 +580,19 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   int a;
   char *dirpath;
   dirpath=(char *) malloc(4096);
-  strcpy(dirpath,"/home/hans/Music/");
+  // strcpy(dirpath,"/home/hans/Music/");
   /*
   if (strcmp(configmusicpath,"")==0) {
     printf("No music patch in config file\nUSe default homedir/Music");        
   } else strcpy(dirpath,configmusicpath);
-  */
+  */  
   char filetype[10];
   char songname[1024];
   int dbexist=0;                                                                // use to check db exist
   bool dirfindes=false;
   clean_music_oversigt();                                               				// clear music oversigt
 
+  strcpy(dirpath,"/data2/music");
   dirp=opendir(dirpath);
   if (dirp==NULL) {
     printf("Open dir error ->%s<-\n",dirpath);
@@ -727,7 +734,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
             if (conn2) {
               mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
               sqlselect1=fmt::v8::format("select artist_id from music_artists where artist_name like '{}'",row[1]);
-              mysql_query(conn2,sqlselect.c_str());
+              mysql_query(conn2,sqlselect1.c_str());
               res2 = mysql_store_result(conn2);
               if (res2) {
                 while ((row2 = mysql_fetch_row(res2)) != NULL) {
@@ -1204,6 +1211,130 @@ int musicoversigt_class::load_music_oversigt_playlists(char *playlistname) {
   return(!(fault));
 }
 
+
+
+// *****************************************************************************
+//
+// load icons
+//
+// *****************************************************************************
+
+
+void musicoversigt_class::opdatere_music_oversigt_icons() {
+  unsigned int i;
+  char tmpfilename[2000];
+  for(i=0;i<antal_music_oversigt;i++) {
+    musicoversigt[i].textureId=0;
+  }
+    i=0;
+  while (i<antal_music_oversigt) {
+    strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
+    if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
+      // load covers file into opengl as textures (png/jpg)
+
+      // MAKE CRASH crash
+
+      //musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
+    } else {
+      musicoversigt[i].textureId=0;
+    }
+    i++;
+  }
+}
+
+
+// *****************************************************************************
+//
+// clean all
+//
+// *****************************************************************************
+
+
+void musicoversigt_class::clean_music_oversigt() {
+  unsigned int i=0;
+  while (i<antal_music_oversigt) {
+    strcpy(musicoversigt[i].album_name,"");
+    strcpy(musicoversigt[i].album_path,"");
+    strcpy(musicoversigt[i].album_coverfile,"");
+    musicoversigt[i].textureId=0;
+    musicoversigt[i].directory_id=0;                        // husk directory id
+    musicoversigt[i].parent_id=0;
+    musicoversigt[i].album_id=0;
+    musicoversigt[i].artist_id=0;
+    musicoversigt[i].oversigttype=0;
+    i++;
+  }
+  antal_music_oversigt=0;
+  do_play=false;
+}
+
+
+
+// *****************************************************************************
+//
+// Load playlist info
+//
+// *****************************************************************************
+
+
+int musicoversigt_class::opdatere_music_oversigt_playlists() {
+    char sqlselect[512];
+    unsigned int i;
+    // mysql vars
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    char database[256];
+    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
+    clean_music_oversigt();
+    write_logfile(logfile,(char *) "Opdatere music oversigt fra database.");
+    i=0;
+    strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlist where hostname='' or playlist_name like 'default_playlist_storage'");
+    strcpy(musicoversigt[0].album_name,"   BACK");
+    strcpy(musicoversigt[0].album_path,"");
+    strcpy(musicoversigt[0].album_coverfile,"");
+    musicoversigt[0].textureId=0;
+    musicoversigt[0].directory_id=0;			// husk directory id
+    musicoversigt[0].parent_id=0;
+    musicoversigt[0].album_id=0;
+    musicoversigt[0].artist_id=0;
+    musicoversigt[0].oversigttype=0;
+    i++;
+    write_logfile(logfile,(char *) "Loading playlists from internal db.");
+    try {
+      conn=mysql_init(NULL);
+      // Connect to database
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
+          strcpy(musicoversigt[i].album_name,row[1]);
+          strcpy(musicoversigt[i].album_path,"");
+          musicoversigt[i].directory_id=atoi(row[0]);			// husk playlist_id
+          musicoversigt[i].parent_id=0;
+          musicoversigt[i].album_id=0;
+          musicoversigt[i].artist_id=0;
+          musicoversigt[i].oversigttype=-1;
+          i++;
+        }        	// end while
+      } else {
+        printf("SQL DATBASE ERROR\n");
+        i=0;
+      }
+      if (debugmode & 2) printf("Fundet antal %d playlists. \n",i);
+      musicoversigt_antal=i;						// antal i oversigt
+      mysql_close(conn);
+    }
+    catch (...) {
+      write_logfile(logfile,(char *) "Error process playlist.");
+    }
+    return(i);
+}
+
+
 // ****************************************************************************************
 //
 // Show music overview
@@ -1373,128 +1504,6 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     sprintf(temptxt,"Error no music loaded in db");
     drawText(temptxt, (orgwinsizex/3)+30, 275.0f, 0.4f,1);
   }
-}
-
-
-// *****************************************************************************
-//
-// load icons
-//
-// *****************************************************************************
-
-
-void musicoversigt_class::opdatere_music_oversigt_icons() {
-  unsigned int i;
-  char tmpfilename[2000];
-  for(i=0;i<antal_music_oversigt;i++) {
-    musicoversigt[i].textureId=0;
-  }
-    i=0;
-  while (i<antal_music_oversigt) {
-    strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
-    if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
-      // load covers file into opengl as textures (png/jpg)
-
-      // MAKE CRASH crash
-
-      //musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
-    } else {
-      musicoversigt[i].textureId=0;
-    }
-    i++;
-  }
-}
-
-
-// *****************************************************************************
-//
-// clean all
-//
-// *****************************************************************************
-
-
-void musicoversigt_class::clean_music_oversigt() {
-  unsigned int i=0;
-  while (i<antal_music_oversigt) {
-    strcpy(musicoversigt[i].album_name,"");
-    strcpy(musicoversigt[i].album_path,"");
-    strcpy(musicoversigt[i].album_coverfile,"");
-    musicoversigt[i].textureId=0;
-    musicoversigt[i].directory_id=0;                        // husk directory id
-    musicoversigt[i].parent_id=0;
-    musicoversigt[i].album_id=0;
-    musicoversigt[i].artist_id=0;
-    musicoversigt[i].oversigttype=0;
-    i++;
-  }
-  antal_music_oversigt=0;
-  do_play=false;
-}
-
-
-
-// *****************************************************************************
-//
-// Load playlist info
-//
-// *****************************************************************************
-
-
-int musicoversigt_class::opdatere_music_oversigt_playlists() {
-    char sqlselect[512];
-    unsigned int i;
-    // mysql vars
-    MYSQL *conn;
-    MYSQL_RES *res;
-    MYSQL_ROW row;
-    char database[256];
-    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-    clean_music_oversigt();
-    write_logfile(logfile,(char *) "Opdatere music oversigt fra database.");
-    i=0;
-    strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlist where hostname='' or playlist_name like 'default_playlist_storage'");
-    strcpy(musicoversigt[0].album_name,"   BACK");
-    strcpy(musicoversigt[0].album_path,"");
-    strcpy(musicoversigt[0].album_coverfile,"");
-    musicoversigt[0].textureId=0;
-    musicoversigt[0].directory_id=0;			// husk directory id
-    musicoversigt[0].parent_id=0;
-    musicoversigt[0].album_id=0;
-    musicoversigt[0].artist_id=0;
-    musicoversigt[0].oversigttype=0;
-    i++;
-    write_logfile(logfile,(char *) "Loading playlists from internal db.");
-    try {
-      conn=mysql_init(NULL);
-      // Connect to database
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
-          strcpy(musicoversigt[i].album_name,row[1]);
-          strcpy(musicoversigt[i].album_path,"");
-          musicoversigt[i].directory_id=atoi(row[0]);			// husk playlist_id
-          musicoversigt[i].parent_id=0;
-          musicoversigt[i].album_id=0;
-          musicoversigt[i].artist_id=0;
-          musicoversigt[i].oversigttype=-1;
-          i++;
-        }        	// end while
-      } else {
-        printf("SQL DATBASE ERROR\n");
-        i=0;
-      }
-      if (debugmode & 2) printf("Fundet antal %d playlists. \n",i);
-      musicoversigt_antal=i;						// antal i oversigt
-      mysql_close(conn);
-    }
-    catch (...) {
-      write_logfile(logfile,(char *) "Error process playlist.");
-    }
-    return(i);
 }
 
 
