@@ -583,8 +583,9 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   std::string dirpath1;
   strcpy(dirpath,"");
   if (strcmp(configdefaultmusicpath,"")==0) {
-    printf("No music patch in config file\nUSe default homedir/Music");        
-  } else dirpath1 = configdefaultmusicpath;
+    printf("No music patch in config file\nUSe default homedir/Music");
+    dirpath1 = "~/Music/"
+  } else dirpath1 = configdefaultmusicpath;                                     // get path from config file
   char filetype[10];
   char songname[1024];
   int dbexist=0;                                                                // use to check db exist
