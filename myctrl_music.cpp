@@ -310,9 +310,14 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     MYSQL_ROW row;
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     snprintf(tmptxt,sizeof(tmptxt),"%ld",find_dir_id);
-    sqlselect = "select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where directory_id=";
+    // sqlselect = "select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_albums,music_artists where directory_id=";
+    // sqlselect = sqlselect + tmptxt;
+    // sqlselect = sqlselect + " and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id order by name";
+
+    sqlselect = "select song_id,filename,directory_id,album_id,name,0,artist_name,length from music_songs left join music_artists on music_artists.artist_id=music_songs.artist_id WHERE directory_id=";
     sqlselect = sqlselect + tmptxt;
-    sqlselect = sqlselect + " and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id order by name";
+    sqlselect = sqlselect + " order by name";
+
     // printf("SQLSELECT = %s  \n ",sqlselect.c_str());
     conn=mysql_init(NULL);
     // Connect to database
@@ -327,11 +332,9 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     if (res) {
       while (((row = mysql_fetch_row(res)) != NULL) && (i<MAX_IN_PLAYLIST)) {
         if (global_use_internal_music_loader_system) {
-          //if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
           snprintf(debuglogdata,sizeof(debuglogdata),"Found song song_id:%4s Artist id:%4s Filename:%40s",row[0],row[5],row[1]);
           write_logfile(logfile,(char *) debuglogdata);
         } else {
-          //if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
           snprintf(debuglogdata,sizeof(debuglogdata),"Found song song_id:%4s Artist id:%4s Filename:%40s",row[0],row[5],row[1]);
           write_logfile(logfile,(char *) debuglogdata);
         }
@@ -348,7 +351,8 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
         } else {
           texture=0;
         }
-        if ((music_list_select_array[i]==true)) aktiv_playlist.m_add_playlist(tmptxt,row[0],row[5],row[3],row[4],row[6],row[7],0,texture);      // add (gem) info i playlist
+        //                                                                           song_id,artistid,album_name,name,artist_name,length
+        if ((music_list_select_array[i]==true)) aktiv_playlist.m_add_playlist(tmptxt,row[0],row[5],row[4],row[4],row[6],row[7],0,texture);      // add (gem) info i playlist
         i++;
       }
     }
@@ -755,7 +759,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                       if (conn2) {
                         mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
                         // sprintf(sqlselect1,"select album_id from music_albums where album_name like '%s'",de->d_name);
-                        sqlselect1=fmt::v8::format("select album_id from music_albums where album_name like '%s'",de->d_name);
+                        sqlselect1=fmt::v8::format("select album_id from music_albums where album_name like '{}'",de->d_name);
 
                         mysql_query(conn2,sqlselect1.c_str());
                         res2 = mysql_store_result(conn2);

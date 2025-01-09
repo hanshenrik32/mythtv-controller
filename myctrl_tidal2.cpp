@@ -3720,7 +3720,7 @@ int tidal_class::load_tidal_iconoversigt() {
         } else {
           // else load normal from disk
           if ((stack[nr]->textureId==NULL) && (stack[nr]->feed_gfx_url)) {
-            if (strcmp( stack[nr]->feed_gfx_url , "" )!=0) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
+            if (strlen( stack[nr]->feed_gfx_url)>0) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
           }
         }
       }
