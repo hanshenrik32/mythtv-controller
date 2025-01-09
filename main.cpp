@@ -3557,6 +3557,9 @@ void display() {
       glPushMatrix();
       //aktivfont.selectfont("DejaVu Sans");
       film_oversigt.show_film_oversigt(_fangley,fknapnr);
+
+      printf("fknapnr = %d _fangley = %d \n",fknapnr,_fangley);
+
       glPopMatrix();
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else if (vis_stream_oversigt) {
@@ -8015,8 +8018,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // we have a select mouse/touch
         if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-          fknapnr=(GLuint) names[i*4+3]-99;			                                // get movie id
-          fprintf(stderr,"Film selected=%d\n",fknapnr);                                 //
+          fknapnr=(GLuint) names[i*4+3]-119;			                                // get movie id
+          // fprintf(stderr,"Film selected=%d names[i*4+3] = %d \n",fknapnr,names[i*4+3]);                                 //
           // write debug log
           sprintf(debuglogdata,"Film selected=%d",fknapnr);                                 //
           write_logfile(logfile,(char *) debuglogdata);
@@ -8038,8 +8041,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           stopmovie = true;
         }
         if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-          fknapnr=(GLuint) names[i*4+3]-99;                       // hent filmknap nr
-          fprintf(stderr,"Film new selected=%d\n",fknapnr);
+          fknapnr=(GLuint) names[i*4+3]-119;                       // hent filmknap nr
+          // fprintf(stderr,"Film new selected=%d names[i*4+3] = %d \n",fknapnr,names[i*4+3]);
           fundet = true;
         }
       }

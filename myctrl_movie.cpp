@@ -64,6 +64,7 @@ extern int orgwinsizex;
 extern GLuint _textureId9_askbox;
 
 
+
 // ****************************************************************************************
 //
 // constructor
@@ -1254,7 +1255,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
+        glLoadName(120+i+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
@@ -1267,7 +1268,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glBlendFunc(GL_ONE, GL_ONE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
+        glLoadName(120+i+sofset);
         glBegin(GL_QUADS); //Begin quadrilateral coordinates
         glTexCoord2f(0, 0); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
@@ -1284,7 +1285,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
+        glLoadName(120+i+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
@@ -1445,7 +1446,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);                           //
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+film_nr+sofset);
+        glLoadName(120+film_nr+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
@@ -1458,7 +1459,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glBlendFunc(GL_ONE, GL_ONE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+film_nr+sofset);
+        glLoadName(120+film_nr+sofset);
         glBegin(GL_QUADS); //Begin quadrilateral coordinates
         glTexCoord2f(0, 0); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
@@ -1475,7 +1476,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+film_nr+sofset);
+        glLoadName(120+film_nr+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
