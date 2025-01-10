@@ -74,22 +74,21 @@ extern char localuserhomedir[4096];
 // ****************************************************************************************
 
 void hent_dir_id(char *path,char *parent_id,char *dirid) {
-    // mysql stuf
     char database[256];
-    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-    char sqlselect[256];
+    std::string sqlselect;
+    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");    
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    strcpy(sqlselect,"select parent_id,path from music_directories where directory_id=");
-    strcat(sqlselect,dirid);
+    sqlselect = "select parent_id,path from music_directories where directory_id=";
+    sqlselect = sqlselect + dirid;
     conn=mysql_init(NULL);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
+    mysql_query(conn,sqlselect.c_str());
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
@@ -145,6 +144,7 @@ unsigned int hent_parent_dir_id(int dirid) {
 // ****************************************************************************************
 //
 // check about cd cover to created from
+// return fundetnavn variable hvis det er fundet.
 //
 // ****************************************************************************************
 
@@ -187,23 +187,21 @@ int findcoverfile(char *path,char *fundetnavn) {
 
 int get_artistid(char *artistname) {
     // mysql stuf
-    char database[256];
-    char sqlselect[1024];
     // mysql vars
     MYSQL *conn2;
     MYSQL_RES *res2;
     MYSQL_ROW row2;
+    char *database = (char *) "mythtvcontroller";
     int artistid=0;
-    char sqlselect1[1024];
+    std::string sqlselect;
     // hent atrist id
     try {
       conn2=mysql_init(NULL);
       if (conn2) {
         mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         artistid=0;
-        // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
-        snprintf(sqlselect1,sizeof(sqlselect1),"select artist_id from music_artists where artist_name like '%s'",artistname);
-        mysql_query(conn2,sqlselect1);
+        sqlselect = fmt::v8::format("select artist_id from music_artists where artist_name like '{}'",artistname);
+        mysql_query(conn2,sqlselect.c_str());
         res2 = mysql_store_result(conn2);
         if (res2) {
           while ((row2 = mysql_fetch_row(res2)) != NULL) {
@@ -269,7 +267,6 @@ bool global_use_internal_music_loader_system_exist() {
   MYSQL_RES *res;
   MYSQL_ROW row;
   bool dbexist=false;
-  char sqlselect[50];
   conn=mysql_init(NULL);
   // Connect to database
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
@@ -310,14 +307,16 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     MYSQL_ROW row;
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     snprintf(tmptxt,sizeof(tmptxt),"%ld",find_dir_id);
+    // old ver
     // sqlselect = "select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_albums,music_artists where directory_id=";
     // sqlselect = sqlselect + tmptxt;
     // sqlselect = sqlselect + " and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id order by name";
-
+    // 
+    // 
+    // new ver works in mariadb
     sqlselect = "select song_id,filename,directory_id,album_id,name,0,artist_name,length from music_songs left join music_artists on music_artists.artist_id=music_songs.artist_id WHERE directory_id=";
     sqlselect = sqlselect + tmptxt;
     sqlselect = sqlselect + " order by name";
-
     // printf("SQLSELECT = %s  \n ",sqlselect.c_str());
     conn=mysql_init(NULL);
     // Connect to database
@@ -592,7 +591,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    // test fpom musik table exist
+    // test about musik table exist
     mysql_query(conn,"SHOW TABLES LIKE 'music_albums'");
     res = mysql_store_result(conn);
     if (res) {
@@ -603,25 +602,27 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
     //
     // if database not exist do dir scan and create tables for music
     //
-    write_logfile(logfile,(char *) "Creating database for music if not exist.");
-    sqlselect="create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)";
-    mysql_query(conn,sqlselect.c_str());
-    res = mysql_store_result(conn);
-    sqlselect="create table IF NOT EXISTS music_albums(album_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_id int, album_name varchar(255) ,year int, compilation int)";
-    mysql_query(conn,sqlselect.c_str());
-    res = mysql_store_result(conn);
-    sqlselect="create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time int, stop_time int, eq_preset varchar(255),relative_volume int, sample_rate int, bitrate int,bpm int, directory_id int)";
-    mysql_query(conn,sqlselect.c_str());
-    res = mysql_store_result(conn);
-    sqlselect="create table IF NOT EXISTS music_artists(artist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_name varchar(255))";
-    mysql_query(conn,sqlselect.c_str());
-    res = mysql_store_result(conn);
-        sqlselect="create table IF NOT EXISTS music_genres(genre_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(255))";
-    mysql_query(conn,sqlselect.c_str());
-    res = mysql_store_result(conn);
-    sqlselect="create table IF NOT EXISTS music_playlist(playlist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, playlist_name varchar(255),playlist_songs text,last_accessed datetime,length int,songcount int,hostname varchar(64))";
-    mysql_query(conn,sqlselect.c_str());
-    res = mysql_store_result(conn);
+    if (!(dbexist)) {
+      write_logfile(logfile,(char *) "Creating database for music if not exist.");
+      sqlselect="create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)";
+      mysql_query(conn,sqlselect.c_str());
+      res = mysql_store_result(conn);
+      sqlselect="create table IF NOT EXISTS music_albums(album_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_id int, album_name varchar(255) ,year int, compilation int)";
+      mysql_query(conn,sqlselect.c_str());
+      res = mysql_store_result(conn);
+      sqlselect="create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time int, stop_time int, eq_preset varchar(255),relative_volume int, sample_rate int, bitrate int,bpm int, directory_id int)";
+      mysql_query(conn,sqlselect.c_str());
+      res = mysql_store_result(conn);
+      sqlselect="create table IF NOT EXISTS music_artists(artist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_name varchar(255))";
+      mysql_query(conn,sqlselect.c_str());
+      res = mysql_store_result(conn);
+          sqlselect="create table IF NOT EXISTS music_genres(genre_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(255))";
+      mysql_query(conn,sqlselect.c_str());
+      res = mysql_store_result(conn);
+      sqlselect="create table IF NOT EXISTS music_playlist(playlist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, playlist_name varchar(255),playlist_songs text,last_accessed datetime,length int,songcount int,hostname varchar(64))";
+      mysql_query(conn,sqlselect.c_str());
+      res = mysql_store_result(conn);
+    }
     if (true) {
       // Empty old musicdb, and build new.
       sqlselect="TRUNCATE table music_songs";
@@ -760,7 +761,6 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                         mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
                         // sprintf(sqlselect1,"select album_id from music_albums where album_name like '%s'",de->d_name);
                         sqlselect1=fmt::v8::format("select album_id from music_albums where album_name like '{}'",de->d_name);
-
                         mysql_query(conn2,sqlselect1.c_str());
                         res2 = mysql_store_result(conn2);
                         if (res2) {
@@ -825,7 +825,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                       strcat(songname,de->d_name);
                       sqlselect1 = fmt::v8::format("insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
                                                                   ({},    '{}',      '{}',    {},    {},        {},       {},       {},    {},     {},      {},     '{}',                 '{}',                   '{}',                   '{}',    '{}',        {},   '{}',        '{}',    {},         {},          {},          {},          {},        '{}',       {},             {},          {},      {},     {})", \
-                                                                  0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "1970-01-01 00:00:00",   "1970-01-01 00:00:00","1970-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,dirid);
+                                                                  0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "1970-01-01 00:00:00",   "1970-01-01 00:00:00","1970-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0, dirid);
 
                       conn1=mysql_init(NULL);
                       if (conn1) {
@@ -851,7 +851,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   musicoversigt_antal=i-1;
   if (conn) mysql_close(conn);
   strcpy(music_db_update_loader,"");
-  write_logfile(logfile,(char *) "Done update music directory ");
+  write_logfile(logfile,(char *) "MUSIC Done update music directory.");
   if (i) return 0; else return 1;
 }
 
@@ -866,7 +866,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
 int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     char fundetpath[512];
     char convert_command[512];
-    char sqlselect[512];
+    std::string sqlselect;
     char dirname[256];
     unsigned int i;
     // mysql vars
@@ -879,15 +879,14 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     char tmptxt1[512];
     // select the right db to update from
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-
     clean_music_oversigt();
-
     if (debugmode & 1) printf("Opdatere music oversigt fra database : %s \n",database);
     sprintf(debuglogdata,"Opdatere music oversigt fra database : %s ",database);
     write_logfile(logfile,(char *) debuglogdata);
     i=0;
     if (directory_id==0) {			// hent fra starten top music directory
-      strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
+      // strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
+      sqlselect = "select directory_id,path,parent_id from music_directories where parent_id=0 order by path";
       strcpy(musicoversigt[i].album_name,"PLAYLIST");
       strcpy(musicoversigt[i].album_path,"");
       strcpy(musicoversigt[i].album_coverfile,"");
@@ -899,7 +898,8 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
       musicoversigt[i].oversigttype=-1;			// type -1 = playlist
       i++;
     } else {
-      sprintf(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=%d",directory_id);		 // dir id in mythtv mysql
+      // sprintf(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=%d",directory_id);		 // dir id in mythtv mysql
+      sqlselect = fmt::v8::format("select directory_id,path,parent_id from music_directories where parent_id={}",directory_id);     
       strcpy(musicoversigt[i].album_name,"   BACK");
       strcpy(musicoversigt[i].album_path,"");
       strcpy(musicoversigt[i].album_coverfile,"");
@@ -916,7 +916,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
+    mysql_query(conn,sqlselect.c_str());
     res = mysql_store_result(conn);
     if (res) {
       while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
@@ -992,7 +992,8 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
 
 int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int search_art) {
     char convert_command[512];
-    char sqlselect[1000];
+    // char sqlselect[1000];
+    std::string sqlselect;
     char dirname[256];
     unsigned int i;
     // mysql vars
@@ -1003,21 +1004,19 @@ int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int s
     char icon_file[512];
     char tmptxt[512];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-
     clean_music_oversigt();
-
     write_logfile(logfile,(char *) "Opdatere music oversigt fra database.");
     i=0;
     if (strcmp(searchtxt,"")==0) {			// hent fra starten top music directory
-      strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
+      sqlselect = "select directory_id,path,parent_id from music_directories where parent_id=0 order by path";
     } else {
       if (search_art==0) {
-        strcpy(sqlselect,"select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id)  where music_artists.artist_name like '%");
+        sqlselect = "select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id)  where music_artists.artist_name like '%";
       } else {
-        strcpy(sqlselect,"select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id)  where music_songs.name like '%");
+        sqlselect = "select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id)  where music_songs.name like '%";
       }
-      strcat(sqlselect,searchtxt);
-      strcat(sqlselect,"%' group by directory_id");
+      sqlselect = sqlselect + searchtxt;
+      sqlselect = sqlselect + "%' group by directory_id";
       strcpy(musicoversigt[i].album_name,(char *) "   BACK");
       strcpy(musicoversigt[i].album_path,(char *) "");
       strcpy(musicoversigt[i].album_coverfile,(char *) "");
@@ -1035,7 +1034,7 @@ int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int s
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
+    mysql_query(conn,sqlselect.c_str());
     res = mysql_store_result(conn);
     if (res) {
       while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
@@ -1125,7 +1124,7 @@ int musicoversigt_class::save_music_oversigt_playlists(char *playlistname) {
       strcat(sqlselect,temptxt);
       strcat(sqlselect," ");
       i++;
-    }        	// end while
+    } // end while
     snprintf(temptxt,sizeof(temptxt),"','%s',%d,%d,'%s')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
     sqlselect2 = fmt::v8::format("','{}',{},{},'{}')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
     strcat(sqlselect,temptxt);
