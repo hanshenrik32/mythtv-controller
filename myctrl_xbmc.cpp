@@ -4,6 +4,8 @@
 #include "myctrl_xbmc.h"
 #include <string.h>
 #include <libxml/parser.h>
+#include <string.h>
+#include <fmt/format.h>
 
 extern char localuserhomedir[4096];
 extern char configdefaultmusicpath[256];                      // internal db for music
@@ -193,6 +195,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   char fullcovertxt[1024];
   char *coverpointer;
   char filetodownload[2048];
+  std::string ssqlselect;
   for(int i=0; i<argc; i++) {
     // file path
     fundet=false;
@@ -339,11 +342,12 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   fundet=false;
   // create record if not exist
   // do check if exist
-  sprintf(sqlselect,"select title from videometadata where title like '%s' and filename like '%s' limit 1",movietitle,moviepath1);
+  // sprintf(sqlselect,"select title from videometadata where title like '%s' and filename like '%s' limit 1",movietitle,moviepath1);
+  ssqlselect = fmt::v8::format("select title from videometadata where title like '{}' and filename like '{}' limit 1",movietitle,moviepath1);
   conn1=mysql_init(NULL);
   if (conn1) {
     mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
-    mysql_query(conn1,sqlselect);
+    mysql_query(conn1,ssqlselect.c_str());
     res = mysql_store_result(conn1);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
@@ -353,13 +357,20 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   // create if not exist
   if (!(fundet)) {
     if (debugmode & 512) printf("Import kodi title %40s\n",movietitle);
+    /* old
     sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
                                               (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
                                               movietitle,moviesubtitle,movieplot,movieimdb,movieyear,movieuserrating,movielength ,moviepath1,filetodownload);
+    */
+    // new
+    ssqlselect = fmt::v8::format("insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
+                                              (0,'{}','{}','','director','','{}','','{}',0,'',{},'2016-12-31',{:2.5f},{},0,0,0,0,'{}','hash','{}',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+                                              movietitle,moviesubtitle,movieplot,movieimdb,movieyear,movieuserrating,movielength ,moviepath1,filetodownload);
+
     conn=mysql_init(NULL);
     if (conn) {
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
-      mysql_query(conn,sqlselect);
+      mysql_query(conn,ssqlselect.c_str());
       res = mysql_store_result(conn);
       if ((mysql_error(conn)) && (debugmode & 512)) printf("%s\n",mysql_error(conn));
       mysql_close(conn);
@@ -413,6 +424,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   int n=0;
   int nn;
   char *tt;
+  std::string ssqlselect;
 
   /*
   musicoversigt[0].textureId=0;
@@ -615,13 +627,17 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   sted[aaa-1]=0;
   strcat(temp,filename1);
   if (debugmode & 512) printf("Import kodi song %40s \n",songname);
+  /* old
   sprintf(sqlselect,"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
                 (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
                 0,      temp,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,directoryid);
+  */
+  // new
+  ssqlselect = fmt::v8::format("insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values ({},    '{}',      '{}',    {},    {},        {},       {},       {},    {},     {},      {},     '{}',                 '{}',                   '{}',                   '{}',    '{}',        {},   '{}',        '{}',    {},         {},          {},          {},          {},        '{}',       {},             {},          {},      {},     {})", 0,      temp,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,directoryid);
   conn=mysql_init(NULL);
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
-    mysql_query(conn,sqlselect);
+    mysql_query(conn,ssqlselect.c_str());
     res = mysql_store_result(conn);
     mysql_close(conn);
   }
