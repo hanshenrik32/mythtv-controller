@@ -13,6 +13,7 @@
 #include <mysql.h>
 #include <sstream>
 #include <iostream>
+#include <fmt/format.h>
 #include "text3d.h"
 #include "readjpg.h"
 #include "utility.h"
@@ -184,7 +185,7 @@ int find_storagegroupfile(char *filename) {
 
 
 int recorded_overigt::opdatere_recorded_oversigt() {
-  char sqlselect[1024];
+  std::string sqlselect;
   char title[128];
   int n,nn;
   // mysql vars
@@ -202,15 +203,14 @@ int recorded_overigt::opdatere_recorded_oversigt() {
       write_logfile(logfile,(char *) "Update recorded programs from database.");
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
       mysql_query(conn,"set NAMES 'utf8'");
-      strcpy(sqlselect,"create table IF NOT EXISTS recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int,stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)");
-      mysql_query(conn,sqlselect);
+      sqlselect = "create table IF NOT EXISTS recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int,stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)";
+      mysql_query(conn,sqlselect.c_str());
       res = mysql_store_result(conn);
-      strcpy(sqlselect,"create table IF NOT EXISTS recordedprogram(chanid int(10) unsigned,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description text,category varchar(64),category_type varchar(64),airdate year(4),stars float unsigned,previouslyshown tinyint(4),title_pronounce varchar(128),stereo tinyint(1),subtitled tinyint(1),hdtv tinyint(1),closecaptioned tinyint(1),partnumber int,parttotal int,seriesid varchar(12),originalairdate date,showtype varchar(30),colorcode  varchar(20),syndicatedepisodenumber varchar(20),programid varchar(64),manualid int(10) unsigned,generic tinyint(1),listingsource int(11),first tinyint(1),last tinyint(1),audioprop varchar(20),subtitletypes varchar(20),videoprop varchar(20))");
-      mysql_query(conn,sqlselect);
+      sqlselect = "create table IF NOT EXISTS recordedprogram(chanid int(10) unsigned,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description text,category varchar(64),category_type varchar(64),airdate year(4),stars float unsigned,previouslyshown tinyint(4),title_pronounce varchar(128),stereo tinyint(1),subtitled tinyint(1),hdtv tinyint(1),closecaptioned tinyint(1),partnumber int,parttotal int,seriesid varchar(12),originalairdate date,showtype varchar(30),colorcode  varchar(20),syndicatedepisodenumber varchar(20),programid varchar(64),manualid int(10) unsigned,generic tinyint(1),listingsource int(11),first tinyint(1),last tinyint(1),audioprop varchar(20),subtitletypes varchar(20),videoprop varchar(20))";
+      mysql_query(conn,sqlselect.c_str());
       res = mysql_store_result(conn);
-
-      strcpy(sqlselect,"select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc");
-      mysql_query(conn,sqlselect);
+      sqlselect = "select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc";
+      mysql_query(conn,sqlselect.c_str());
       res = mysql_store_result(conn);
       n=-1;
       nn=0;
