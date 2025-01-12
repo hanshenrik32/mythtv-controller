@@ -16,11 +16,9 @@
 #include <IL/ilut.h>
 #include <math.h>
 #include <ctype.h>
-//#include <ical.h>
 #include <libical/ical.h>
 #include <libxml/parser.h>
 #include <fmt/format.h>
-
 #include "utility.h"
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
@@ -31,13 +29,9 @@
 
 extern char localuserhomedir[4096];                                             // user homedir
 extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
-
-
 extern const char *dbname;                                                      // internal database name in mysql (music,movie,radio)
-
 extern FILE *logfile;
 extern char debuglogdata[1024];                                // used by log system
-
 extern GLuint setuptvgraberback;
 extern bool tv_guide_firsttime_update;
 extern float configdefaulttvguidefontsize;                                     // font size in tvguide
@@ -88,6 +82,20 @@ float prgtypeRGB[]={    0.7f,0.7f,0.7f,               // 0 - none
                         1.0f,0.6f,0.0f,               // 9 - Sci-Fi
                         0.1f,0.2f,0.1f,               // 10 - Series
                         0.8f,0.2f,0.8f};              // 11 - Adult
+
+
+const char *prgtypee[]={"Unknown",
+                        "children",
+                        "Sport",
+                        "Cartoon",
+                        "News",
+                        "Movie",
+                        "Nature",
+                        "Documentary",
+                        "Entertainment",
+                        "Sci-Fi",
+                        "Serie",
+                        "Adult"};
 
 
 // bruges ikke af show_tvoversigt
@@ -382,6 +390,7 @@ int tv_oversigt::saveparsexmltvdb() {
   } else {
     write_logfile(logfile,(char *) "Error write tvguidedb.dat to disk.");
   }
+  return(1);
 }
 
 // ****************************************************************************************
@@ -409,6 +418,7 @@ int tv_oversigt::loadparsexmltvdb() {
   } else {
     write_logfile(logfile,(char *) "Error loading tvguidedb.dat from disk.");
   }
+  return(1);
 }
 
 // ****************************************************************************************
@@ -4408,22 +4418,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
 }
 
 
-
-
-const char *prgtypee[]={"Unknown",
-                        "children",
-                        "Sport",
-                        "Cartoon",
-                        "News",
-                        "Movie",
-                        "Nature",
-                        "Documentary",
-                        "Entertainment",
-                        "Sci-Fi",
-                        "Serie",
-                        "Adult"};
-
-
 // ****************************************************************************************
 //
 // viser et prgrams record info.
@@ -4437,9 +4431,7 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   struct tm prgtidinfo;
   time_t prgtid;
   time_t aktueltid;
-
   struct tm *timeinfo;
-
   int xpos,ypos,xsiz,ysiz;
   int antalrec=0;
   // windows background
@@ -4545,15 +4537,11 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   }
   if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].recorded) strcat(temprgtxt," Set to record");
   drawText(temprgtxt1.c_str(), 700,450, 0.4f,1);
-
-
   // new ver 6
   if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type<=10)
   sprintf(temprgtxt,"Type     : %-10s",prgtypee[tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type]);
   else sprintf(temprgtxt,"Type     : %d nr  ",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type);
   drawText(temprgtxt, 700,425, 0.4f,1);
-
-
   // new ver 7
   switch (configland) {
     case 0: temprgtxt1 = fmt::v8::format("Description : ");

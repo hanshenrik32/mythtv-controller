@@ -12,6 +12,8 @@
 #include <string.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <iostream>
+#include <sstream>
 
 #include "myctrl_glprint.h"
 
@@ -172,6 +174,45 @@ void drawText(const char *text, float x, float y, float scale,int color) {
     glEnable(GL_BLEND);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
+
+
+// ****************************************************************************************
+//
+// Funktion to draw lines of text in screen.
+//
+// ****************************************************************************************
+void drawLinesOfText(const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color) {
+    std::istringstream stream(text);
+    std::string word;
+    std::string currentLine;
+    int yoffset=0;
+    int lines=1;
+    while (stream >> word) {
+        // Check if adding the word exceeds the maximum width
+        if (currentLine.length() + word.length() + 1 > maxWidth) {
+            // std::cout << currentLine << std::endl; // Print the current line
+            drawText(currentLine.c_str(), x, y+yoffset, scale, color);
+            lines++;
+            yoffset-=20;
+            currentLine = word; // Start a new line with the current word
+        } else {
+            if (!currentLine.empty()) {
+                currentLine += " "; // Add a space before the next word
+            }
+            currentLine += word; // Add the word to the current line
+        }
+        if (maxlines>0) {
+            if (lines>=maxlines) break;
+        }
+    }
+
+    // Print any remaining text in the current line
+    if (!currentLine.empty()) {
+        // std::cout << currentLine << std::endl;
+        drawText(currentLine.c_str(), x, y+yoffset, scale, color);
+    }
+}
+
 
 
 #endif

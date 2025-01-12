@@ -1122,7 +1122,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
 // ****************************************************************************************
 
 int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
-    char sqlselect[4000];
+    // char sqlselect[4000];
+    std::string sqlselect;
     char mainsqlselect[2000];
     unsigned int i;
     int filmantal=0;
@@ -1143,8 +1144,8 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test table exist
-      sprintf(sqlselect,"SHOW TABLES LIKE 'videometadata'");
-      mysql_query(conn,sqlselect);
+      sqlselect = "SHOW TABLES LIKE 'videometadata'";
+      mysql_query(conn,sqlselect.c_str());
       res = mysql_store_result(conn);
       if (res) {
         while ((res) && ((row = mysql_fetch_row(res)) != NULL)) {
@@ -1387,7 +1388,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   bool cover3d=false;
   char *lastslash;
   float xvgaz=0.0f;
-  char temptxt[200];
   unsigned int sofset=0;
   int bonline=8;
   float boffset;
@@ -1406,7 +1406,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int buttonsizey=180;
   int xof=5;
   int yof=orgwinsizey-(buttonsizey);
-  std:string temptxt1;
+  std:string temptxt;
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
     movie_oversigt_gfx_loading=true;
@@ -1484,50 +1484,14 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
       }
-   
-      /*
-      // not in use
-      strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());                              // album navn
-      int subtitlelength=strlen(filmoversigt[film_nr+sofset].getfilmtitle());                       // get title length
-      lastslash=strrchr(temptxt,'/');
-      if (lastslash) strcpy(temptxt,lastslash+1);
-      float linof=0.0f;
-      int maxWidth=16;
-      int sted=0;
-      int ll=0;
-      while((sted<(int) subtitlelength) && (linof>-20.0f)) {
-        std::istringstream stream(filmoversigt[film_nr+sofset].getfilmtitle());
-        std::string word, line;
-        while (stream >> word) {
-          if (line.length() + word.length() + 1 > maxWidth) {
-            drawText(line.c_str(), 14.00f+xpos, 114.0f+ypos+linof, 0.4f);
-            line = word;
-            linof-=20.0f;
-            ll++;
-          } else {
-            if (!line.empty()) line += ' ';
-            line += word;
-          }
-        }
-        if (!line.empty()) {
-          drawText(line.c_str(), 14.00f+xpos, 114.0f+ypos+linof, 0.4f);
-          linof-=20.0f;
-          ll++;
-        }
-      }
-      */
-      // strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());                              // album navn      
-      // temptxt[16]=0;
-      float xoff=0.0f;
-
-      temptxt1 = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle());
-      temptxt1.resize(20);
-      drawText(temptxt1.c_str(), 14.00f+xpos+xoff, 114.0f+ypos, 0.4f,1);
+      temptxt = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle());                // get first 20 charts to show
+      temptxt.resize(20);
+      drawText(temptxt.c_str(), 14.00f+xpos, 114.0f+ypos, 0.4f,1);
       if (strlen(filmoversigt[film_nr+sofset].getfilmtitle())>20) {
-        strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle()+20);                              // album navn
-        temptxt1 = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle()+20);
-        temptxt1.resize(20);
-        drawText(temptxt1.c_str(), 14.00f+xpos+xoff, 114.0f+ypos-20.0f, 0.4f,1);
+        temptxt = filmoversigt[film_nr+sofset].getfilmtitle()+20;                              // get next line to show
+        temptxt = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle()+20);
+        temptxt.resize(20);
+        drawText(temptxt.c_str(), 14.00f+xpos, 114.0f+ypos-20.0f, 0.4f,1);
       }
     }
     // next button
@@ -1551,9 +1515,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 400.0, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
     glEnd();
-    sprintf(temptxt,"No movie info from %s backend.",configbackend);
-    strcat(temptxt,configmysqlhost);    
-    drawText(temptxt, 10.00f+xpos, 40.0f+ypos, 0.4f,1);
+    temptxt = "No movie info from backend.";    
+    drawText(temptxt.c_str(), 10.00f+xpos, 40.0f+ypos, 0.4f,1);
     glPopMatrix();
   }
 }

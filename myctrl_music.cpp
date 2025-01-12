@@ -1171,9 +1171,9 @@ int musicoversigt_class::load_music_oversigt_playlists(char *playlistname) {
     playlistarray_string=row[2];    // playlist string have id's
     while((pos=playlistarray_string.find(' ')) != std::string::npos) {
       songid=playlistarray_string.substr(0,pos);
-      printf("SONGID = %s \n",songid);
+      printf("SONGID = %s \n",songid.c_str());
       playlistarray_string.erase(0,pos+1);
-    }   
+    }
 
     /*
     while (i<aktiv_playlist.numbers_in_playlist()) {
