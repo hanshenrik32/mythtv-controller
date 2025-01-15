@@ -869,12 +869,13 @@ int tidal_class::get_access_token(char *loginbase64) {
 // ****************************************************************************************
 
 
-bool tidal_class::delete_record_in_view(int tidalknapnr) {
+bool tidal_class::delete_record_in_view(long tidalknapnr) {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   int n;
-  char sql_delete[8192];
+  std::string sql_delete;
+  std::string tmptxt;
   n=tidalknapnr;
   conn = mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
@@ -890,24 +891,30 @@ bool tidal_class::delete_record_in_view(int tidalknapnr) {
     antalplaylists--;  
     // clean up in db to.
     if (atoi(stack[tidalknapnr]->playlistid)>0) {
-      sprintf(sql_delete,"delete from mythtvcontroller.tidalcontentplaylist where playlistid=%s limit 1",stack[tidalknapnr]->playlistid);
-      mysql_query(conn,sql_delete);
+      sql_delete = fmt::v8::format("delete from mythtvcontroller.tidalcontentplaylist where playlistid='{}' limit 1",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete.c_str());
       res = mysql_store_result(conn);
       // delete files from playlist in disk
-      sprintf(sql_delete,"select playpath from mythtvcontroller.tidalcontent where playlistid=%s",stack[tidalknapnr]->playlistid);
-      mysql_query(conn,sql_delete);
+      sql_delete = fmt::v8::format("select playpath from mythtvcontroller.tidalcontent where playlistid='{}'",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete.c_str());
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
           printf("Song file to delete : %s \n",row[0]);
+          tmptxt = fmt::v8::format("Song file to delete :{}",row[0]);
+          write_logfile(logfile,(char *) tmptxt.c_str());
           remove(row[0]);
         }
-      }     
-      sprintf(sql_delete,"delete from mythtvcontroller.tidalcontent where playlistid=%s",stack[tidalknapnr]->playlistid);
-      mysql_query(conn,sql_delete);
+      } else {
+        printf("Tidal No song to delete on playlist %s \n",stack[tidalknapnr]->playlistid);
+        tmptxt = fmt::v8::format("Tidal No song to delete on playlist: {}",stack[tidalknapnr]->playlistid);
+        write_logfile(logfile,(char *) tmptxt.c_str());
+      }
+      sql_delete = fmt::v8::format("delete from mythtvcontroller.tidalcontent where playlistid='{}'",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete.c_str());
       res = mysql_store_result(conn);
-      sprintf(sql_delete,"Tidal delete playlist %s ",stack[tidalknapnr]->playlistid);
-      write_logfile(logfile,(char *) sql_delete);
+      sql_delete = fmt::v8::format("Tidal delete playlist {}",stack[tidalknapnr]->playlistid);
+      
     }
   }
   if (conn) mysql_close(conn);
