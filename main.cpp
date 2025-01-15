@@ -3557,9 +3557,7 @@ void display() {
       glPushMatrix();
       //aktivfont.selectfont("DejaVu Sans");
       film_oversigt.show_film_oversigt(_fangley,fknapnr);
-
-      printf("fknapnr = %d _fangley = %d \n",fknapnr,_fangley);
-
+      // printf("fknapnr = %d _fangley = %d \n",fknapnr,_fangley);
       glPopMatrix();
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else if (vis_stream_oversigt) {
@@ -3601,7 +3599,7 @@ void display() {
     }
     #endif
 
-
+    // Tidal stuf
     #ifdef ENABLE_TIDAL
     if (vis_tidal_oversigt) { 
       if (do_show_tidal_search_oversigt==false) {
@@ -3707,52 +3705,6 @@ void display() {
     }   
     if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
       keybufferopenwin=true;                                                    // open input window
-    }
-    if (((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) && (ask_save_playlist)) {
-      glPushMatrix();
-      glEnable(GL_TEXTURE_2D);
-      glEnable(GL_BLEND);
-      if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdradiosearch);
-      else if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch);
-      else if (vis_film_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmoviesearch);
-      #ifdef ENABLE_SPOTIFY
-      if (vis_spotify_oversigt) {
-        if (spotify_oversigt.search_playlist_song==0) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1);
-        else glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch);
-      }
-      #endif
-      #ifdef ENABLE_TIDAL
-      if ((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) {
-        if (ask_save_playlist) {
-          // ask for filename to save
-          glBindTexture(GL_TEXTURE_2D,_textureIplaylistsave);
-        } else {
-          // ask for search string
-          if (tidal_oversigt.search_playlist_song==0) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1);
-          else glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch);
-        }
-      }
-      #endif
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-      glTranslatef(50, 50, 0.0f);
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
-      glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 100.0, 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 100.0, 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
-      glEnd(); //End quadrilateral coordinates
-      glPopMatrix();
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glTranslatef(80, 70, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glScalef(20.5, 20.5, 1.0);
-      // ask for filename to save or normal search function.
-      if (((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) && (ask_save_playlist)) drawText(playlistfilename,80, 70, 0.4f,1);  else drawText(keybuffer,80, 70, 0.4f,1);
-      glPopMatrix();
     }
   }
   
@@ -4052,7 +4004,35 @@ void display() {
       showcoursornow(266,460+5,strlen(keybuffer));
     }
   }
-  
+
+  // 
+  if (vis_tidal_oversigt) {
+    if (ask_save_playlist) {
+      xof = 500;
+      yof = 600;
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+      glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS); // draw ask box
+      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
+      glEnd(); //End quadrilateral coordinates
+      glPopMatrix();     
+      strcpy(temptxt,"Playlist name :");
+      strcat(temptxt,keybuffer);
+      drawText(temptxt, xof+20.0f,yof+10.0f+5.0f, 0.4f,1);
+      showcoursornow(266,460+5,strlen(keybuffer));
+    }
+  }
+
   // save playlist to file
   if ((vis_music_oversigt) && (save_ask_save_playlist)) {
     musicoversigt.save_music_oversigt_playlists(playlistfilename);
@@ -4063,10 +4043,12 @@ void display() {
     strcpy(playlistfilename,"");
     keybufferindex=0;
   }
-
   #ifdef ENABLE_TIDAL
   // save playlist to db
   if ((vis_tidal_oversigt) && (save_ask_save_playlist)) {
+
+    printf("**************************************************** Save Tidal PLAY list %s\n",playlistfilename);
+
     tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid,playlistfileartistname);
     save_ask_save_playlist=false;
     ask_save_playlist=false;
@@ -11680,8 +11662,15 @@ void handleKeypress(unsigned char key, int x, int y) {
               else if (vis_tidal_oversigt) write_logfile(logfile,(char *) "Enter key pressed in vis show tidal\n");
               write_logfile(logfile,(char *) "Start search....");
               // set save flag of playlist
-              if (ask_save_playlist) {
-                save_ask_save_playlist = true;
+              if (vis_tidal_oversigt) {
+                if (ask_save_playlist) {
+                  save_ask_save_playlist = true;
+                }
+              }
+              if (vis_spotify_oversigt) {
+                if (ask_save_playlist) {
+                  save_ask_save_playlist = true;
+                }
               }
               if (vis_radio_oversigt) {
                 rknapnr=0;

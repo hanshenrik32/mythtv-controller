@@ -4828,7 +4828,9 @@ void earlyrecorded::getrecordprogram(char *mysqlhost,char *mysqluser,char *mysql
 // ****************************************************************************************
 //
 // viser liste over tv programmer som skal optages.
+//
 // do not work
+//
 // ****************************************************************************************
 
 void earlyrecorded::showtvreclist() {
