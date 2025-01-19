@@ -3975,6 +3975,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   char *gfxshortnamepointer;
   char gfxshortname[200];
   char temptxt[200];
+  std::string temptxt1;
   char word[200];
   static char downloadfilename_last[1024];
   int antal_loaded=0;
@@ -4093,6 +4094,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
         glPopMatrix();
         // show text of element
         strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+        // temptxt1 = fmt::v8::format("{:^20}",stack[i+sofset]->feed_showtxt);
         temptxt[16]=0;
         drawText(temptxt, xof+30,yof-20, 0.4f,1);
         if (strlen(stack[i+sofset]->feed_showtxt)>16) {
@@ -4336,6 +4338,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
       glPopMatrix();
       // show text of element
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+      /*
       temptxt[16]=0;
       drawText(temptxt, xof+20,yof-20, 0.4f,1);
       if (strlen(stack[i+sofset]->feed_showtxt)>16) {
@@ -4343,6 +4346,8 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
         drawText(temptxt, xof+20,yof, 0.4f,1);
         temptxt[16]=0;
       }
+      */      
+      drawLinesOfText(temptxt, xof+20, yof-20, 0.4f , 16, 2 , 1);
       // next button
       i++;
       xof+=(buttonsize+10);

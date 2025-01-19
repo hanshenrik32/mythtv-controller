@@ -183,33 +183,39 @@ void drawText(const char *text, float x, float y, float scale,int color) {
 // ****************************************************************************************
 void drawLinesOfText(const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color) {
     std::istringstream stream(text);
+    if (!stream) {
+        // Handle the case where the input string is empty or not a valid stream.
+        return;
+    }
     std::string word;
     std::string currentLine;
-    int yoffset=0;
-    int lines=1;
-    while (stream >> word) {
-        // Check if adding the word exceeds the maximum width
-        if (currentLine.length() + word.length() + 1 > maxWidth) {
-            // std::cout << currentLine << std::endl; // Print the current line
-            drawText(currentLine.c_str(), x, y+yoffset, scale, color);
-            lines++;
-            yoffset-=20;
-            currentLine = word; // Start a new line with the current word
-        } else {
-            if (!currentLine.empty()) {
-                currentLine += " "; // Add a space before the next word
-            }
-            currentLine += word; // Add the word to the current line
+    int yoffset = 0;
+    int lines = 1;
+    while (std::getline(stream, word)) {
+        if (currentLine.empty()) {
+            // Add a space before the next word
+            currentLine += ' ';
         }
-        if (maxlines>0) {
-            if (lines>=maxlines) break;
+        currentLine += word;
+        if (currentLine.length() + word.length() + 1 > maxWidth) {
+            drawText(currentLine.c_str(), x, y + yoffset, scale, color);
+            lines++;
+            yoffset -= 20;
+            // Start a new line with the current word
+            currentLine.clear();
+            currentLine = word;
+            if (lines >= maxlines) {
+                break;
+            }
         }
     }
-
-    // Print any remaining text in the current line
     if (!currentLine.empty()) {
-        // std::cout << currentLine << std::endl;
-        drawText(currentLine.c_str(), x, y+yoffset, scale, color);
+        // Print any remaining text in the current line
+        if (lines < maxlines) drawText(currentLine.c_str(), x, y + yoffset, scale, color);
+    }
+    // Check for maxlines and break if necessary
+    if (maxlines > 0 && lines >= maxlines) {
+        return;
     }
 }
 

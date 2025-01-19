@@ -1303,80 +1303,10 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
       }
-      strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
+      strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // movie title     
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
-      temptxt[14]=0;
-      drawText(temptxt, 14.00f+xpos, 110.0f+ypos, 0.4f,1);
-      // old print disabled
-      /*
-      glPushMatrix();
-      if (strlen(temptxt)<=14) {
-        ofs=(strlen(temptxt)/2)*12;
-        glTranslatef(xpos+(100-ofs), ypos+120 ,0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(20.0, 20.0, 1.0);
-        glcRenderString(temptxt);
-      } else {
-        glTranslatef(xpos+(60-ofs), ypos+120 ,0.0f);
-        glScalef(20.0, 20.0, 1.0);
-        glDisable(GL_TEXTURE_2D);
-        ofs=(strlen(temptxt)/2)*9;
-        // show movie title
-        float ytextofset=0.0f;
-        int ii,j,k,pos;
-        int xof,yof;
-        ii=pos=0;
-        char word[16000];
-        while((1) && (ytextofset<=10.0)) {		// max 2 linier
-          j=0;
-          while(!isspace(temptxt[ii])) {
-            if (temptxt[ii]=='\0') break;
-            word[j]=temptxt[ii];
-            ii++;
-            j++;
-          }
-          word[j]='\0';	// j = word length
-          if (j>13) {		// print char by char
-            k=0;
-            while(word[k]!='\0') {
-              if (pos>=13) {
-                if ( k != 0 ) glcRenderChar('-');
-                pos=0;
-                ytextofset+=15.0f;
-                ofs=0;
-                glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
-                glRasterPos2f(0.0f, 0.0f);
-                glScalef(14.0, 14.0, 1.0);
-              }
-              glcRenderChar(word[k]);
-              pos++;
-              k++;
-            }
-          } else {
-            if (pos+j>13) {	// word doesn't fit line
-              ytextofset+=15.0f;
-              pos=0;
-              ofs=(int) (strlen(word)/2)*9;
-              glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
-              glRasterPos2f(0.0f, 0.0f);
-              glScalef(14.0, 14.0, 1.0);
-            }
-            glcRenderString(word);
-            pos+=j;
-          }
-          if (pos<12) {
-            glcRenderChar(' ');
-            pos++;
-          }
-          if (temptxt[ii]=='\0') break;
-          ii++;	// skip space
-        }
-      }
-      glEnable(GL_TEXTURE_2D);
-      glPopMatrix();
-      */
+      drawLinesOfText(temptxt, 14.00f+xpos, 110.0f+ypos, 0.4f , 12, 2 , 1);
     }
     xpos+=205;
     i++;
@@ -1494,6 +1424,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glEnd();
       }
       temptxt = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle());                // get first 20 charts to show
+      // temptxt = fmt::v8::format("{}",filmoversigt[film_nr+sofset].getfilmtitle());                // get first 20 charts to show    
+      /*
       temptxt.resize(20);
       drawText(temptxt.c_str(), 14.00f+xpos, 114.0f+ypos, 0.4f,1);
       if (strlen(filmoversigt[film_nr+sofset].getfilmtitle())>20) {
@@ -1502,6 +1434,9 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         temptxt.resize(20);
         drawText(temptxt.c_str(), 14.00f+xpos, 114.0f+ypos-20.0f, 0.4f,1);
       }
+      */
+      
+      drawLinesOfText(temptxt, 14.00f+xpos, 114.0f+ypos, 0.38f , 20, 2 , 1);
     }
     // next button
     xpos+=buttonsize;                                                // 205

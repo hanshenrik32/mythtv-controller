@@ -4104,10 +4104,14 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     int bonline=8;                                                              // antal pr linie
     float boffset;
     char gfxfilename[200];
+    std::string gfxfilename1;
     char downloadfilename[200];
+    std::string downloadfilename1;
     char downloadfilenamelong[1024];
+    std::string downloadfilenamelong1;
     char *gfxshortnamepointer;
     char gfxshortname[200];
+    std::string gfxshortname1;
     char temptxt[200];
     char word[200];
     static char downloadfilename_last[1024];
@@ -4134,45 +4138,56 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     int loop;
     if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
-      if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
-      else strcpy(gfxfilename,"");
+      if (stack[stream_oversigt_loaded_nr]) {
+        strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
+        gfxfilename1 = stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv;
+      } else {
+        strcpy(gfxfilename,"");
+        gfxfilename1 = "";
+      }
       strcpy(gfxshortname,"");
-      gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file
+      gfxshortname1 = "";
+      gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file     
       if (gfxshortnamepointer) {
         strcpy(gfxshortname,gfxshortnamepointer);
+        gfxshortname1 = gfxshortnamepointer;
       }
       // load texture if none loaded
       // get_texture return 0 if not loaded
       if (get_texture(stream_oversigt_loaded_nr)==0) {
-        if (strcmp(gfxfilename,"")!=0) {
-          // check om der findes en downloaded icon
-          strcpy(downloadfilenamelong,"");
-          strcat(downloadfilenamelong,gfxfilename);
-          if (strcmp(downloadfilename_last,gfxfilename)!=0) {
-            // check om filen findes i cache dir eller i mythtv netvision dir
-            if (file_exists(gfxfilename)) {
-              texture=loadTexture ((char *) gfxfilename);
-              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-              last_texture=texture;
+        if (strlen(gfxfilename)<200) {
+          if (strcmp(gfxfilename1.c_str(),"")!=0) {
+            // check om der findes en downloaded icon
+            strcpy(downloadfilenamelong,"");
+            downloadfilenamelong1 = "";
+            downloadfilenamelong1 = downloadfilenamelong1 + gfxfilename1;
+            strcat(downloadfilenamelong,gfxfilename);
+            if (strcmp(downloadfilename_last,gfxfilename1.c_str())!=0) {
+              // check om filen findes i cache dir eller i mythtv netvision dir
+              if (file_exists(gfxfilename1.c_str())) {
+                texture=loadTexture ((char *) gfxfilename1.c_str());
+                if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+                last_texture=texture;
+                antal_loaded+=1;
+              } else if (file_exists(downloadfilenamelong1.c_str())) {
+                // er det ikke samme texture som sidst loaded så load it
+                // else set last used
+                texture=loadTexture ((char *) downloadfilenamelong1.c_str());
+                if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+                last_texture=texture;
+                antal_loaded+=1;
+              } else texture=0;
+            } else {
+              if (last_texture) set_texture(stream_oversigt_loaded_nr,last_texture);
               antal_loaded+=1;
-            } else if (file_exists(downloadfilenamelong)) {
-              // er det ikke samme texture som sidst loaded så load it
-              // else set last used
-              texture=loadTexture ((char *) downloadfilenamelong);
-              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-              last_texture=texture;
-              antal_loaded+=1;
-            } else texture=0;
-          } else {
-            if (last_texture) set_texture(stream_oversigt_loaded_nr,last_texture);
-            antal_loaded+=1;
-            std::string temptxt2;
-            temptxt2 = fmt::v8::format("RSS stream graphic download file {}",downloadfilenamelong);
-            write_logfile(logfile,(char *) temptxt2.c_str());
+              std::string temptxt2;
+              temptxt2 = fmt::v8::format("RSS stream graphic download file {}",downloadfilenamelong);
+              write_logfile(logfile,(char *) temptxt2.c_str());
+            }
+            // husk last file name
+            strcpy(downloadfilename_last,downloadfilenamelong1.c_str());
           }
-          // husk last file name
-          strcpy(downloadfilename_last,downloadfilenamelong);
-        }     
+        }
       }
       // downloading ?
       if (stream_oversigt_loaded_nr==this->streamantal()) {
