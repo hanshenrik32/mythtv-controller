@@ -27,6 +27,9 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
+LIBFMT:=$(shell find /usr/lib/x86_64-linux-gnu/ -name 'libfmt.so')
+
+
 ifeq ($(LBITS),64)
 	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/x86_64/ -name 'libfmod.so')
 	CFLAGS = -pthread -m64
