@@ -4093,6 +4093,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
         glEnd();        
         glPopMatrix();
         // show text of element
+        /*
         strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
         // temptxt1 = fmt::v8::format("{:^20}",stack[i+sofset]->feed_showtxt);
         temptxt[16]=0;
@@ -4102,6 +4103,10 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
           temptxt[16]=0;
           drawText(temptxt, xof+30,yof-40, 0.4f,1);
         }
+        */
+
+        drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+30,yof-20,0.38f,20,2,1);
+
         // next button
         i++;
         xof+=(buttonsize+10);

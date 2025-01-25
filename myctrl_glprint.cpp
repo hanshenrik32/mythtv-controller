@@ -193,7 +193,7 @@ void drawLinesOfText(const std::string& text, float x, float y, float scale,int 
         // Check if adding the word exceeds the maximum width then print the line
         if (currentLine.length() + word.length() + 1 > maxWidth) {
             if (currentLine.length()>0) {
-                formattext = fmt::v8::format("{:^24}",currentLine);
+                formattext = fmt::v8::format("{:^{}s}",currentLine,maxWidth);
                 drawText(formattext.c_str(), x, y + yoffset, scale, color);
                 currentLine = word; // Start a new line with the current word
                 linecount++;
@@ -213,7 +213,7 @@ void drawLinesOfText(const std::string& text, float x, float y, float scale,int 
     if (linecount<=maxlines) {
         if (!currentLine.empty()) {
             if (currentLine.length()>maxWidth) currentLine.resize(maxWidth);
-            formattext = fmt::v8::format("{:^24}",currentLine);
+            formattext = fmt::v8::format("{:^{}s}",currentLine,maxWidth);
             drawText(formattext.c_str(), x, y + yoffset, scale, color);
         }
     }

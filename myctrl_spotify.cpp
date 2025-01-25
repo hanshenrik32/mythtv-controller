@@ -4566,6 +4566,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
+      /*
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       base=temptxt;
       length=strlen(temptxt);                               // get length
@@ -4601,6 +4602,8 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         base = right_margin+1;
         if (pline>=2) break;
       }
+      */
+      drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+20,yof-10,0.38f,20,2,1);
       glPopMatrix();
       // next button
       i++;
@@ -4796,7 +4799,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       glDisable(GL_TEXTURE_2D);
       glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glRasterPos2f(0.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);      
       glDisable(GL_TEXTURE_2D);
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       base=temptxt;

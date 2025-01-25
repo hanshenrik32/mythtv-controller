@@ -1345,7 +1345,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int buttonsizey=180;
   int xof=5;
   int yof=orgwinsizey-(buttonsizey);
-  std:string temptxt;
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
     movie_oversigt_gfx_loading=true;
@@ -1423,20 +1422,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
       }
-      temptxt = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle());                // get first 20 charts to show
-      // temptxt = fmt::v8::format("{}",filmoversigt[film_nr+sofset].getfilmtitle());                // get first 20 charts to show    
-      /*
-      temptxt.resize(20);
-      drawText(temptxt.c_str(), 14.00f+xpos, 114.0f+ypos, 0.4f,1);
-      if (strlen(filmoversigt[film_nr+sofset].getfilmtitle())>20) {
-        temptxt = filmoversigt[film_nr+sofset].getfilmtitle()+20;                              // get next line to show
-        temptxt = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle()+20);
-        temptxt.resize(20);
-        drawText(temptxt.c_str(), 14.00f+xpos, 114.0f+ypos-20.0f, 0.4f,1);
-      }
-      */
-      
-      drawLinesOfText(temptxt, 14.00f+xpos, 114.0f+ypos, 0.38f , 20, 2 , 1);
+      // show movie name
+      drawLinesOfText(filmoversigt[film_nr+sofset].getfilmtitle(),14.00f+xpos,114.0f+ypos,0.38f,22,2,1);
     }
     // next button
     xpos+=buttonsize;                                                // 205
@@ -1459,8 +1446,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 400.0, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
     glEnd();
-    temptxt = "No movie info from backend.";    
-    drawText(temptxt.c_str(), 10.00f+xpos, 40.0f+ypos, 0.4f,1);
+    drawText("No movie info from backend.", 10.00f+xpos, 40.0f+ypos, 0.4f,1);
     glPopMatrix();
   }
 }
