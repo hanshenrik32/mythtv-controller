@@ -14,6 +14,7 @@
 #include FT_FREETYPE_H
 #include <iostream>
 #include <sstream>
+#include <fmt/format.h>
 
 #include "myctrl_glprint.h"
 
@@ -185,34 +186,37 @@ void drawLinesOfText(const std::string& text, float x, float y, float scale,int 
     std::istringstream stream(text);
     std::string word;
     std::string currentLine;
-    int yoffset=0;
-    int lines=1;
+    std::string formattext;
+    float yoffset=0.0f;
+    int linecount=0;
     while (stream >> word) {
-        // Check if adding the word exceeds the maximum width
+        // Check if adding the word exceeds the maximum width then print the line
         if (currentLine.length() + word.length() + 1 > maxWidth) {
-            // std::cout << currentLine << std::endl; // Print the current line
-            drawText(currentLine.c_str(), x, y+yoffset, scale, color);
-            lines++;
-            yoffset-=20;
-            currentLine = word; // Start a new line with the current word
+            if (currentLine.length()>0) {
+                formattext = fmt::v8::format("{:^{}s}",currentLine,maxWidth);
+                drawText(formattext.c_str(), x, y + yoffset, scale, color);
+                currentLine = word; // Start a new line with the current word
+                linecount++;
+                yoffset-=20.0f;
+            } else {
+                currentLine = word; // Start a new line with the current word
+            }
         } else {
             if (!currentLine.empty()) {
                 currentLine += " "; // Add a space before the next word
             }
             currentLine += word; // Add the word to the current line
         }
-        if (maxlines>0) {
-            if (lines>=maxlines) break;
+        if (linecount>maxlines) break;
+    }
+    // Print any remaining text in the current line
+    if (linecount<=maxlines) {
+        if (!currentLine.empty()) {
+            if (currentLine.length()>maxWidth) currentLine.resize(maxWidth);
+            formattext = fmt::v8::format("{:^{}s}",currentLine,maxWidth);
+            drawText(formattext.c_str(), x, y + yoffset, scale, color);
         }
     }
-
-    // Print any remaining text in the current line
-    if (!currentLine.empty()) {
-        // std::cout << currentLine << std::endl;
-        drawText(currentLine.c_str(), x, y+yoffset, scale, color);
-    }
 }
-
-
 
 #endif
