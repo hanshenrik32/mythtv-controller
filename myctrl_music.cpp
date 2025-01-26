@@ -1405,19 +1405,8 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
     glEnd();
     glPopMatrix();
-    strcpy(temptxt,musicoversigt[i+sofset].album_name);      	// album navn
-    lastslash=strrchr(temptxt,'/');
-    if (lastslash) strcpy(temptxt,lastslash+1);
-    temptxt1 = fmt::v8::format("{:^18}",temptxt);
-    temptxt1.resize(18);
-    drawText(temptxt1.c_str(), xof+4, yof, 0.4f,1);
-    if (strlen(musicoversigt[i+sofset].album_name)>18) {
-      temptxt1 = fmt::v8::format("{:^18}",temptxt+18);
-      temptxt1.resize(18);
-      drawText(temptxt1.c_str(), xof+4, yof-20, 0.4f,1);
-    }
-
-    /*
+    drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 0.4f,18,5,1,true);
+    /* // old print stuf
     glPushMatrix();
     glTranslatef(xof, yof ,0.0f);
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);				//

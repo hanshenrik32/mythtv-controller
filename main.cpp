@@ -5232,33 +5232,18 @@ void display() {
       if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
         else drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
     }
-
-    /*
-    if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
-      strcpy(temptxt1,tidal_oversigt.tidal_playlistname);
-      *(temptxt1+46)=0;
-      glcRenderString(temptxt1);
-    } else {
-      strcpy(temptxt,(char *) tidal_oversigt.get_tidal_artistname(tidalknapnr));
-      glcRenderString(temptxt);
-    }
-    */
-    // glcRenderString(tidal_oversigt.tidal_playlistname);
     // show tidal songname
     drawText("Songname ", 520.0f, 620.0f, 0.4f,1);
-
     // show tidal songname value
     sprintf(temptxt1,"%s",(char *) tidal_oversigt.tidal_aktiv_song_name());
     temptxt1[40]=0;
     drawText(temptxt1, 520.0f+textofset, 620.0f, 0.4f,1);
-
     // show tidal artist
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
       drawText("Artist    ", 520.0f, 600.0f, 0.4f,1);
     } else {
       drawText("Album     ", 520.0f, 600.0f, 0.4f,1);
     }
-
     // show artist value/or none
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
       sprintf(temptxt1,"%s",(char *) tidal_oversigt.tidal_aktiv_artist_name());

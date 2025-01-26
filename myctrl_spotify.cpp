@@ -4603,7 +4603,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         if (pline>=2) break;
       }
       */
-      drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+20,yof-10,0.38f,20,2,1);
+      drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+20,yof-10,0.38f,20,2,1,true);
       glPopMatrix();
       // next button
       i++;

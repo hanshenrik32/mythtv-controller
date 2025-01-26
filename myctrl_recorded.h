@@ -10,6 +10,7 @@
 
 class recorded_oversigt_type {		// data types from mythtv ver 0.22
     private:
+        char channel[128+1];
         char title[128+1];				    // program title
         char subtitle[128+1];				// sub title (desc)
         char recordedpath[255+1];			// recorded file path
@@ -19,8 +20,8 @@ class recorded_oversigt_type {		// data types from mythtv ver 0.22
     public:
         std::string start_prg_image;             // image string to file from recorded tv
         recorded_oversigt_type();
-        void put_recorded(char *tit,char *subtit,char *startdag,char *enddag,char *filepath,char *desc);
-        void get_recorded(int recnr,char *tit,char *subtit,char *startdag,char *enddag,char *desc);
+        void put_recorded(char *tit,char *subtit,char *startdag,char *enddag,char *filepath,char *desc,char *channr);
+        void get_recorded(int recnr,char *tit,char *subtit,char *startdag,char *enddag,char *desc,char *channr);
         void get_recorded_filepath(char *filepath);
 };
 
