@@ -1,7 +1,7 @@
 C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wno-return-type -Wno-format-truncation -pthread -m64 -O0 -ggdb -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2
+CFLAGS = -Wno-return-type -Wno-format-truncation -pthread -m64 -O0 -ggdb -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2 -Wreturn-type
 LDFLAGS= 
 
 PROG       = mythtv-controller
@@ -25,9 +25,13 @@ BUILD_NUMBER_FILE=build-number.txt
 
 LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 
-LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
+LIBICAL := $(shell find /usr/lib/ -name 'libical.so')
 
-LIBFMT:=$(shell find /usr/lib/x86_64-linux-gnu/ -name 'libfmt.so')
+ifeq ($(LBITS),64)
+	LIBFMT := $(shell find /usr/lib/x86_64-linux-gnu/ -name 'libfmt.so')
+else 
+	LIBFMT := $(shell find /usr/lib/i386-linux-gnu/ -name 'libfmt.so')
+endif
 
 
 ifeq ($(LBITS),64)
@@ -36,7 +40,7 @@ ifeq ($(LBITS),64)
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
 	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/x86/ -name 'libfmod.so')
-        CFLAGS = -pthread -m32
+    CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
 
@@ -58,7 +62,7 @@ SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl -lfreetype
+	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl -lfreetype 
 endif
 
 all:

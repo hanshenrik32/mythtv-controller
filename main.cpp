@@ -39,6 +39,7 @@
 #include <pthread.h>                      // multi thread support
 #include <sstream>
 #include <fmt/format.h>
+#include <vector>
 
 // type used
 using namespace std;
@@ -2000,8 +2001,15 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
 unsigned int hent_antal_dir_songs(int dirid) {
     char tmpfilename[200];
     char sqlselect[512];
+    std::string sqlselect1;
+    std::string imgpath;
+    std::string diridpath;
+    std::string checkpath;
     char tmptxt[200];
+    vector<string> pathlist;
     unsigned int i,ii;
+    int parentdir_id;
+    int iii;
     GLuint textureId;
     // mysql vars
     MYSQL *conn;
@@ -2017,64 +2025,118 @@ unsigned int hent_antal_dir_songs(int dirid) {
     strcpy(sqlselect,"SELECT song_id,name,artist_id FROM music_songs where directory_id=");
     sprintf(tmptxt,"%d order by name limit %d",dirid,dirliste_size);
     strcat(sqlselect,tmptxt);
-    conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    i=0;
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        dirmusic.pushsong(row[1],row[2]);
-        i++;
-      }
-    }
-    // hent aktiv dir id info
-    strcpy(sqlselect,"SELECT path FROM music_directories where directory_id=");
-    sprintf(tmptxt,"%d limit 1",dirid);
-    strcat(sqlselect,tmptxt);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
-        sprintf(tmptxt,"%s",row[0]);
-        strcat(tmpfilename,tmptxt);
-        strcat(tmpfilename,"/mythcFront.jpg");
-        if (file_exists(tmpfilename)) {
-          dirmusic.textureId=loadTexture((char *) tmpfilename);
-        } else {
-          dirmusic.textureId=0;
+    if (dirid>0) {
+      conn=mysql_init(NULL);
+      // Connect to database
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      i=0;
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          dirmusic.pushsong(row[1],row[2]);
+          i++;
         }
       }
-    }
-    // hent dirs info til visning samt covers data i 3d format
-    strcpy(sqlselect,"SELECT directory_id,path FROM music_directories where parent_id=");
-    sprintf(tmptxt,"%d limit 100",dirid);
-    strcat(sqlselect,tmptxt);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    ii=0;
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        dirmusic.pushdir(row[1],row[0]);
-        if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
-        sprintf(tmptxt,"%s",row[1]);
-        strcat(tmpfilename,tmptxt);
-        strcat(tmpfilename,"/mythcFront.jpg");
-        if (file_exists(tmpfilename)) {
-          textureId = loadTexture((char *) tmpfilename);		// load texture to opengl
-        } else {
-          //                printf("Music cover file load error \n");
-          textureId=0;
+      // hent aktiv dir id info in music db
+      strcpy(sqlselect,"SELECT path,parent_id FROM music_directories where directory_id=");
+      sprintf(tmptxt,"%d limit 1",dirid);
+      strcat(sqlselect,tmptxt);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          pathlist.push_back(row[0]);
+          parentdir_id = atoi(row[1]);
+          diridpath = row[0];
         }
-        dirmusic.settexture(textureId,ii);				// set directory texture
-        ii++;
+        // er det et subdir ? if yes make full path
+        if (parentdir_id>0) {
+          do {
+            sqlselect1 = fmt::v8::format("SELECT path,parent_id FROM music_directories where directory_id={} limit 1",parentdir_id);
+            mysql_query(conn,sqlselect1.c_str());
+            res = mysql_store_result(conn);
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              pathlist.push_back(row[0]);
+              parentdir_id = atoi(row[1]);
+            }
+          } while(parentdir_id>0);
+          iii=pathlist.size();
+          if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
+          imgpath=tmpfilename; // start path
+          while(iii) { 
+            imgpath = imgpath + pathlist[iii-1];
+            imgpath = imgpath + "/";
+            iii--;
+          }
+          std::string huskpath;
+          huskpath = imgpath;
+          imgpath = imgpath + "cover.jpg";
+          cout << "Path " << imgpath << "\n";
+          if (file_exists(imgpath.c_str())) {
+            dirmusic.textureId=loadTexture((char *) imgpath.c_str());
+          } else {
+            // check if Front.jpg exist from old config
+            huskpath = huskpath + "Front.jpg";
+            if (file_exists(huskpath.c_str())) {
+               dirmusic.textureId=loadTexture((char *) huskpath.c_str());
+            } else {
+              dirmusic.textureId=0;
+            }
+          }
+        }
       }
+      // hent dirs info til visning samt covers data
+      strcpy(sqlselect,"SELECT directory_id,path FROM music_directories where parent_id=");
+      sprintf(tmptxt,"%d limit 100",dirid);
+      strcat(sqlselect,tmptxt);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      ii=0;
+      if (res) {
+        pathlist.clear();                                 // clear array again
+        // rowl over dirs in dir
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          pathlist.push_back(row[1]);                     // gem dir
+          dirmusic.pushdir(row[1],row[0]);
+          ii++;
+        }
+        iii=pathlist.size();
+        ii=0;
+        if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
+        if (dirmusic.gettexture(ii)==0) {
+          while(iii) { 
+            checkpath = tmpfilename;
+            checkpath = checkpath + diridpath;
+            checkpath = checkpath + "/";
+            checkpath = checkpath + pathlist[iii-1];
+            checkpath = checkpath + "/";
+            checkpath = checkpath + "cover.jpg";
+            if (file_exists(checkpath.c_str())) {
+              textureId = 0;
+              // textureId = loadTexture((char *) checkpath.c_str());		// load texture to opengl
+            } else {
+              checkpath = tmpfilename;
+              checkpath = checkpath + diridpath;
+              checkpath = checkpath + "/";
+              checkpath = checkpath + pathlist[iii-1];
+              checkpath = checkpath + "/";
+              checkpath = checkpath + "Front.jpg";
+              if (file_exists(checkpath.c_str())) {
+                textureId = 0;
+                // textureId = loadTexture((char *) checkpath.c_str());		// load texture to opengl
+              } else textureId=0;
+            }
+            dirmusic.settexture(textureId,ii);				                  // set directory texture
+            ii++;
+            iii--;        
+          }
+        }
+      }
+      mysql_close(conn);
     }
-    mysql_close(conn);
     return(i);		// antal sange fundet i dir id
 }
 
@@ -3946,7 +4008,7 @@ void display() {
       sprintf(temptxt,music_nomberofsongs[configland],dirmusic.numbersinlist(),temptxt1);
       drawText(temptxt,560.0f, 950.0f, 0.4f,1);
 
-
+      // show song select text (songs name)
       i = 0;
       if (dirmusic.numbersindirlist()==0) dirmusiclistemax=16; else dirmusiclistemax=8;		// hvis ingen dir mere plads til flere sange i sangliste
       //
@@ -3966,9 +4028,8 @@ void display() {
         if (i<12) songname_show_256[54]=0; else songname_show_256[35]=0;
         snprintf(temptxt1,sizeof(temptxt1),"%-45s",songname_show_256);
         temptxt1[45]='\0';
-        if (i==do_show_play_open_select_line) glColor4f(textcolor[0],textcolor[1],textcolor[2],1.0f);
-          else glColor4f(selecttextcolor[0],selecttextcolor[1],selecttextcolor[2],1.0f);
-        drawText(temptxt1, 560.0f+50.0f, 850.0f -ofset, 0.4f,1);
+        if (i==do_show_play_open_select_line) drawText(temptxt1, 560.0f+50.0f, 850.0f -ofset, 0.4f,2);
+        else drawText(temptxt1, 560.0f+50.0f, 850.0f -ofset, 0.4f,1);
         if (aktiv==true) drawText ("[X]", 560.0f, 850.0f -ofset, 0.4f,1); 
           else drawText("[  ]", 560.0f, 850.0f -ofset, 0.4f,1);
         i++;
@@ -4768,7 +4829,8 @@ void display() {
         glColor3f(1.0f, 1.0f, 1.0f);
         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
         glBlendFunc(GL_ONE, GL_ONE);
-        textureId=aktiv_playlist.get_textureid(do_play_music_aktiv_table_nr-1);		// get cd texture opengl id
+        // textureId=aktiv_playlist.get_textureid(do_play_music_aktiv_table_nr-1);		// get cd texture opengl id
+        textureId=dirmusic.textureId;
         if (textureId==0) textureId=_texture_nocdcover;		                       				// hvis ingen texture (music cover) set default (box2.bmp) / use default if no cover
         glBindTexture(GL_TEXTURE_2D, textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -5272,10 +5334,8 @@ void display() {
     glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+170+200,     555-20 , 0.0);
     glEnd();
     glPopMatrix();
-    
     // show playtime as gfx box
     drawText("playtime  ", 520.0f, 540.0f, 0.4f,1);
-
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
     unsigned int ms;
@@ -5409,7 +5469,6 @@ void display() {
       glEnd();
       sprintf(temptxt,"Name      %-20s",stream_playing_name);
       drawText(temptxt,(orgwinsizex/4)+20,(orgwinsizey/2)+96, 0.4f,1);
-
       // play position
       if (streamoversigt.stream_is_playing) playtime=streamoversigt.getstream_pos()*1000;
       else playtime=0;
@@ -5658,14 +5717,15 @@ void display() {
     if (result!=FMOD_OK) fprintf(stderr,"Error DSP %s\n",FMOD_ErrorString(result));
     int length = fft->length/2;
     int numChannels = fft->numchannels;
+    int gangefaktor=12;
     // crash if only 1 channel
     if ((fft) && (result==FMOD_OK)) {
       // new ver 4
       for (int i=0; i<fft->length; i++) {
         float spectum_value;
         if (numChannels==1) 
-          spectum_value=(fft->spectrum[0][i]*40);
-        else spectum_value=(fft->spectrum[0][i]*40)+(fft->spectrum[1][i]*40);
+          spectum_value=(fft->spectrum[0][i]*gangefaktor);
+        else spectum_value=(fft->spectrum[0][i]*gangefaktor)+(fft->spectrum[1][i]*gangefaktor);
         spectrum[i] = spectum_value;
         spectrum_left[i] = spectum_value;
         spectrum_right[i] = spectum_value;
@@ -8275,30 +8335,28 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 } else {
                   printf("********************** Playlist selected \n");
 
-                    if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
-                    // playlist loader
-                    // 
-                    // do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1);
-                    //
-                    do_play_music_aktiv_nr=mknapnr-1;
+                  if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
+                  // playlist loader
+                  // 
+                  // do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1);
+                  //
+                  do_play_music_aktiv_nr=mknapnr-1;
 
-                    if (debugmode & 2) fprintf(stderr,"playlist nr %d  \n",do_play_music_aktiv_nr);
-                    if (do_play_music_aktiv_nr>0) {
-                      antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
-                    } else antal_songs=0;
-                    // write debug log
-                    sprintf(debuglogdata,"Found numbers of songs:%2d",antal_songs);
-                    write_logfile(logfile,(char *) debuglogdata);
-                    if (antal_songs==0) {
-                      ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
-                    } else {
-                      ask_open_dir_or_play_aopen = false;
-                    }
-                    if (do_play_music_aktiv_nr) {                               // er der et dirid/playlistid
-                      ask_open_dir_or_play = true;                              // yes ask om de skal spilles
-                    } else ask_open_dir_or_play = true;
-
-
+                  if (debugmode & 2) fprintf(stderr,"playlist nr %d  \n",do_play_music_aktiv_nr);
+                  if (do_play_music_aktiv_nr>0) {
+                    antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
+                  } else antal_songs=0;
+                  // write debug log
+                  sprintf(debuglogdata,"Found numbers of songs:%2d",antal_songs);
+                  write_logfile(logfile,(char *) debuglogdata);
+                  if (antal_songs==0) {
+                    ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
+                  } else {
+                    ask_open_dir_or_play_aopen = false;
+                  }
+                  if (do_play_music_aktiv_nr) {                               // er der et dirid/playlistid
+                    ask_open_dir_or_play = true;                              // yes ask om de skal spilles
+                  } else ask_open_dir_or_play = true;
                 }
               }
               // stream stuf open stram and show rss feeds
@@ -8619,14 +8677,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               fprintf(stderr,"No Music loaded/found by internal loader.\n");
               write_logfile(logfile,(char *) "No Music loaded/found by internal loader.");
             }
-            /*
-            // old ver
-            if (opdatere_music_oversigt_nodb(musicoversigt[mknapnr].album_path,musicoversigt)==0) {
-              // no update posible
-              fprintf(stderr,"No Music loaded/found by internal loader.\n");
-              write_logfile("No Music loaded/found by internal loader.");
-            }
-            */
           }
         }
         /// reset mouse/key pos in vis_music_oversigt
@@ -13579,8 +13629,6 @@ void *datainfoloader_music(void *data) {
       // build new db (internal db loader)
       // mew ver
      musicoversigt.opdatere_music_oversigt_nodb();
-      // old ver
-      //opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
       if (debugmode & 2) fprintf(stderr,"Done update db from datasource.\n");
       write_logfile(logfile,(char *) "Done update db from datasource.");
       global_use_internal_music_loader_system = true;
@@ -13607,21 +13655,10 @@ void *datainfoloader_music(void *data) {
     }
   } else {
     if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
-
     // New ver
    musicoversigt.opdatere_music_oversigt_nodb();
-
-    // update music db from disk
-    // old
-    //if (opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt)==0) {
-    //   if (debugmode & 2) fprintf(stderr,"No music db loaded\n");
-    //}
-
     // new ver
    musicoversigt.opdatere_music_oversigt(0);
-
-    // old ver
-    //opdatere_music_oversigt(musicoversigt,0);                                   // load the db again
   }
   do_update_music=false;
   // write debug log

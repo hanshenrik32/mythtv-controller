@@ -3849,6 +3849,7 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
 
 unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].endtime_unix);
+  else return(0);
 }
 
 // ****************************************************************************************
@@ -3860,6 +3861,7 @@ unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg
 
 unsigned long tv_oversigt::getprogram_startunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].starttime_unix);
+  else return(0);
 }
 
 // ****************************************************************************************
