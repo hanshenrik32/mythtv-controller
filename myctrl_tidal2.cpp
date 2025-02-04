@@ -4105,7 +4105,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
         }
         */
 
-        drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+30,yof-20,0.38f,20,2,1);
+        drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+30,yof-20,0.38f,20,2,1,true);
 
         // next button
         i++;
@@ -4352,7 +4352,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
         temptxt[16]=0;
       }
       */      
-      drawLinesOfText(temptxt, xof+20, yof-20, 0.4f , 16, 2 , 1);
+      drawLinesOfText(temptxt, xof+20, yof-20, 0.4f , 16, 2 , 1,true);
       // next button
       i++;
       xof+=(buttonsize+10);

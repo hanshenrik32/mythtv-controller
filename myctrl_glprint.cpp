@@ -182,7 +182,7 @@ void drawText(const char *text, float x, float y, float scale,int color) {
 // Funktion to draw lines of text in screen.
 //
 // ****************************************************************************************
-void drawLinesOfText(const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color) {
+void drawLinesOfText(const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
     std::istringstream stream(text);
     std::string word;
     std::string currentLine;
@@ -193,7 +193,8 @@ void drawLinesOfText(const std::string& text, float x, float y, float scale,int 
         // Check if adding the word exceeds the maximum width then print the line
         if (currentLine.length() + word.length() + 1 > maxWidth) {
             if (currentLine.length()>0) {
-                formattext = fmt::v8::format("{:^{}s}",currentLine,maxWidth);
+                if (center) formattext = fmt::v8::format("{:^{}s}",currentLine,maxWidth);
+                else formattext = fmt::v8::format("{}",currentLine);
                 drawText(formattext.c_str(), x, y + yoffset, scale, color);
                 currentLine = word; // Start a new line with the current word
                 linecount++;
@@ -213,7 +214,8 @@ void drawLinesOfText(const std::string& text, float x, float y, float scale,int 
     if (linecount<=maxlines) {
         if (!currentLine.empty()) {
             if (currentLine.length()>maxWidth) currentLine.resize(maxWidth);
-            formattext = fmt::v8::format("{:^{}s}",currentLine,maxWidth);
+            if (center) formattext = fmt::v8::format("{:^{}s}",currentLine,maxWidth);
+            else formattext = fmt::v8::format("{}",currentLine);
             drawText(formattext.c_str(), x, y + yoffset, scale, color);
         }
     }

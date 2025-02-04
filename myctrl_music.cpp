@@ -866,7 +866,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
 int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     char fundetpath[512];
     char convert_command[512];
-    std::string sqlselect;
+    char tmpfilename[1024];
+    std::string sqlselect;    
     char dirname[256];
     unsigned int i;
     // mysql vars
@@ -952,13 +953,32 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
           strcat(tmptxt,row[1]);
           strcat(tmptxt,"/");
           strcat(tmptxt,"cover.jpg");
-          strcpy(icon_file,tmptxt);		// gem icon file name
+          if (!(file_exists(tmptxt))) {
+            strcpy(tmptxt,configmusicpath);
+            strcat(tmptxt,row[1]);
+            strcat(tmptxt,"/");
+            strcat(tmptxt,"Front.jpg");
+          }
+          strcpy(icon_file,fundetpath);		// gem icon file name
         } else {
           strcpy(icon_file,"");			// no icon
         }
         strcpy(musicoversigt[i].album_name,dirname);
         strcpy(musicoversigt[i].album_path,"");
         strcpy(musicoversigt[i].album_coverfile,icon_file);
+        
+        // måske crash
+        std::string tmp123;
+        if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
+        tmp123 = tmpfilename;
+        tmp123 = tmp123 + row[1];
+        tmp123 = tmp123 + "/";
+        tmp123 = tmp123 + "cover.jpg";
+        if (strlen(tmp123.c_str())>0) {
+          if (file_exists(tmp123.c_str())) {
+            // musicoversigt[i].textureId = loadTexture((char *) tmp123.c_str());
+          }
+        }
         musicoversigt[i].directory_id=atoi(row[0]);			// husk directory id
         musicoversigt[i].parent_id=atoi(row[2]);
         musicoversigt[i].album_id=0;
@@ -1209,15 +1229,13 @@ void musicoversigt_class::opdatere_music_oversigt_icons() {
   for(i=0;i<antal_music_oversigt;i++) {
     musicoversigt[i].textureId=0;
   }
-    i=0;
+  i=0;
   while (i<antal_music_oversigt) {
     strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
     if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
       // load covers file into opengl as textures (png/jpg)
-
       // MAKE CRASH crash
-
-      //musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
+      // musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
     } else {
       musicoversigt[i].textureId=0;
     }
@@ -1405,19 +1423,8 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
     glEnd();
     glPopMatrix();
-    strcpy(temptxt,musicoversigt[i+sofset].album_name);      	// album navn
-    lastslash=strrchr(temptxt,'/');
-    if (lastslash) strcpy(temptxt,lastslash+1);
-    temptxt1 = fmt::v8::format("{:^18}",temptxt);
-    temptxt1.resize(18);
-    drawText(temptxt1.c_str(), xof+4, yof, 0.4f,1);
-    if (strlen(musicoversigt[i+sofset].album_name)>18) {
-      temptxt1 = fmt::v8::format("{:^18}",temptxt+18);
-      temptxt1.resize(18);
-      drawText(temptxt1.c_str(), xof+4, yof-20, 0.4f,1);
-    }
-
-    /*
+    drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 0.4f,18,5,1,true);
+    /* // old print stuf
     glPushMatrix();
     glTranslatef(xof, yof ,0.0f);
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);				//

@@ -1306,7 +1306,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
       strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // movie title     
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
-      drawLinesOfText(temptxt, 14.00f+xpos, 110.0f+ypos, 0.4f , 12, 2 , 1);
+      drawLinesOfText(temptxt, 14.00f+xpos, 110.0f+ypos, 0.4f,12,2,1,true);
     }
     xpos+=205;
     i++;
@@ -1423,7 +1423,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glEnd();
       }
       // show movie name
-      drawLinesOfText(filmoversigt[film_nr+sofset].getfilmtitle(),14.00f+xpos,114.0f+ypos,0.38f,22,2,1);
+      drawLinesOfText(filmoversigt[film_nr+sofset].getfilmtitle(),14.00f+xpos,114.0f+ypos,0.38f,22,2,1,true);
     }
     // next button
     xpos+=buttonsize;                                                // 205

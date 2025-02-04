@@ -59,7 +59,7 @@ recorded_oversigt_type::recorded_oversigt_type() {
 //
 // ****************************************************************************************
 
-void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,char *enddag,char *filepath,char *desc)
+void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,char *enddag,char *filepath,char *desc,char *channr)
 
 {
   strcpy(title,tit);
@@ -67,6 +67,7 @@ void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,
   strcpy(recordedpath,filepath);
   strcpy(startdato,startdag);
   strcpy(enddato,enddag);
+  strcpy(channel,channr);
   strncpy(description,desc,200);
   description[199]=0;
 }
@@ -75,7 +76,7 @@ void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,
 //
 // ****************************************************************************************
 
-void recorded_oversigt_type::get_recorded(int recnr,char *tit,char *subtit,char *startdag,char *enddag,char *desc)
+void recorded_oversigt_type::get_recorded(int recnr,char *tit,char *subtit,char *startdag,char *enddag,char *desc,char *channr)
 
 {
   strcpy(tit,title);
@@ -83,6 +84,7 @@ void recorded_oversigt_type::get_recorded(int recnr,char *tit,char *subtit,char 
   strcpy(startdag,startdato);
   strcpy(enddag,enddato);
   strcpy(desc,description);
+  strcpy(channr,channel);
 }
 
 // ****************************************************************************************
@@ -194,6 +196,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
   MYSQL_ROW row;
   char *database = (char *) "mythtvcontroller";                                          // old ver mythconverg
   char filename[512];
+  std::string filename1;
   int storagegroupused=0;
   //gotoxy(10,17);
   // Connect to database
@@ -209,7 +212,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
       sqlselect = "create table IF NOT EXISTS recordedprogram(chanid int(10) unsigned,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description text,category varchar(64),category_type varchar(64),airdate year(4),stars float unsigned,previouslyshown tinyint(4),title_pronounce varchar(128),stereo tinyint(1),subtitled tinyint(1),hdtv tinyint(1),closecaptioned tinyint(1),partnumber int,parttotal int,seriesid varchar(12),originalairdate date,showtype varchar(30),colorcode  varchar(20),syndicatedepisodenumber varchar(20),programid varchar(64),manualid int(10) unsigned,generic tinyint(1),listingsource int(11),first tinyint(1),last tinyint(1),audioprop varchar(20),subtitletypes varchar(20),videoprop varchar(20))";
       mysql_query(conn,sqlselect.c_str());
       res = mysql_store_result(conn);
-      sqlselect = "select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc";
+      sqlselect = "select title,subtitle,starttime,endtime,basename,description,chanid from recorded order by title,starttime desc";
       mysql_query(conn,sqlselect.c_str());
       res = mysql_store_result(conn);
       n=-1;
@@ -217,22 +220,25 @@ int recorded_overigt::opdatere_recorded_oversigt() {
       strcpy(title,"");
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
-          if (strcmp(title,row[0])!=0) {
-            n++;
-            nn=0;
-            strcpy(title,row[0]);
-          } else {
-            if (n==-1) n++;
-            nn++;
-          }
-          // printf("title=%s n=%d nn=%d  \n",title,n,nn);
-          if (row[4]) strcpy(filename,row[4]); else strcpy(filename,"");
-          storagegroupused=find_storagegroupfile(filename);						// hent storage group info
-          if (storagegroupused==0) strcpy(filename,row[4]);
-          if ((n<40) && (nn<200)) {
-            recordoversigt.programs[n].put_recorded_top(title);
-            recordoversigt.programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],filename,row[5]);
-            recordoversigt.programs[n].prg_antal++;
+          if (row[0]) {
+            if (strcmp(title,row[0])!=0) {
+              n++;
+              nn=0;
+              strcpy(title,row[0]);
+            } else {
+              if (n==-1) n++;
+              nn++;
+            }
+            // printf("title=%s n=%d nn=%d  \n",title,n,nn);
+            if (row[4]) strcpy(filename,row[4]); else strcpy(filename,"");
+            if (row[4]) filename1=row[4]; else filename1="";
+            storagegroupused=find_storagegroupfile((char *) filename1.c_str());						// hent storage group info
+            if ((storagegroupused==0) && (row[4])) strcpy(filename,row[4]);
+            if ((n<40) && (nn<200)) {
+              recordoversigt.programs[n].put_recorded_top(title);
+              recordoversigt.programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],(char *) filename1.c_str(),row[5],row[6]);
+              recordoversigt.programs[n].prg_antal++;
+            }
           }
         }        	// end while
       } else {
@@ -313,6 +319,8 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   char startdato[40];
   char slutdato[40];
   char desc[200];			// desc
+  std::string desc1;            // desc
+  char channel[100];			// channel
   float yofset=0.5f;
   float yof=0.0f;
   char temptxt[256];
@@ -381,14 +389,28 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   glEnd();
   // main start off text in window
   while ((i<=recordoversigt.top_antal()) && (i<11)) { 				// vis max
-    recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc);
+    recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc,channel);
     // hvis valgte
     if (i+startofset==valgtnr+startofset) {
-      strcpy(temptxt,title);
+      if (strlen(channel)==1) {
+        strcpy(temptxt,"0");
+        strcat(temptxt,channel);
+      } else {
+        strcpy(temptxt,channel);  
+      }
+      strcat(temptxt," ");
+      strcat(temptxt,title);      
       if (visvalgtnrtype==1) drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,2);
         else drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,3);
     } else {
-      strcpy(temptxt,title);
+      if (strlen(channel)==1) {
+        strcpy(temptxt,"0");
+        strcat(temptxt,channel);
+      } else {
+        strcpy(temptxt,channel);  
+      }
+      strcat(temptxt," ");
+      strcat(temptxt,title);
       drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,1);
     }
     i++;
@@ -396,7 +418,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   i=0;
   // show sub (epsiode)
   while ((i<recordoversigt.programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max
-    recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc);
+    recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc,channel);
     strcpy(temptxt,subtitle);					// get sub title
     if (strcmp(temptxt,"")==0) strcpy(temptxt,desc);                // Hvis der ikke er nogle subtitle bruge description i stedet
     if (i+startofset==subvalgtnr+startofset) {
@@ -406,7 +428,8 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     }
     i++;
   }
-  recordoversigt.programs[valgtnr+startofset].recorded_programs[subvalgtnr+substartofset].get_recorded(subvalgtnr,title,subtitle,startdato,slutdato,desc);
+  recordoversigt.programs[valgtnr+startofset].recorded_programs[subvalgtnr+substartofset].get_recorded(subvalgtnr,title,subtitle,startdato,slutdato,desc,channel);
+  desc1=desc;
   // show prg start date
   strcpy(temptxt,startdato);
   temptxt[10]=0;
@@ -436,29 +459,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     if (flipflop>48) flipflop=0;  
   }  
   // show desc
-  int subtitlelength=strlen(desc);                       // get desc length
-  float linof=0.0f;
-  int maxWidth=70;
-  int sted=0;
-  int ll=0;
-  std::istringstream stream(desc);
-  std::string word, line;
-  while ((stream >> word) && (linof>-120.0f)) {
-    if (line.length() + word.length() + 1 > maxWidth) {
-      drawText(line.c_str(), 220.0f+480.0f, 290.0f+linof, 0.4f,1);
-      line = word;
-      linof-=20.0f;
-      ll++;
-    } else {
-      if (!line.empty()) line += ' ';
-      line += word;
-    }
-  }
-  if (!line.empty()) {
-    drawText(line.c_str(), 220.0f+480.0f, 290.0f+linof, 0.4f,1);
-    linof-=20.0f;
-    ll++;
-  }
+  drawLinesOfText(desc1.c_str(), 700.0f, 290.0f, 0.4f,68,5,1,false);
   // show image from recorded if exist
   if (programs[valgtnr].recorded_programs->start_prg_image.length()>0) {
     glEnable(GL_TEXTURE_2D);
