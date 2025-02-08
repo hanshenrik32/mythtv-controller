@@ -3076,7 +3076,7 @@ void display() {
           start = clock();
           _angle++;
           //mybox.settexture(musicoversigt);
-          mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
+           mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
           if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
           break;
       case PICTURE3D:
