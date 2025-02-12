@@ -15145,16 +15145,16 @@ int main(int argc, char** argv) {
     if (tidalok) {   
       // login ok load playlistes from file
       // get users playlists if not loaded before      
-      tidal_oversigt.get_users_playlist_plus_favorite(false);
+      // tidal_oversigt.get_users_playlist_plus_favorite(false);
 
       // load from file
-      tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
+      // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
       // ** my playliste default first time load
       // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
-      /*
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",false);     // Maroon 5     
+
+      // tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
       // tidal_oversigt.tidal_get_artists_all_albums((char *) "9706",false);       // pink floyd
@@ -15164,7 +15164,7 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skeikkex
 
       tidal_oversigt.tidal_get_album_by_artist("34363343");  // U2
-      */
+
       
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
@@ -15351,7 +15351,6 @@ int main(int argc, char** argv) {
     if (!initFreeType("/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf")) {
         return -1;
     }
-
 
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
