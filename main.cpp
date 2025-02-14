@@ -15155,15 +15155,20 @@ int main(int argc, char** argv) {
       // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
 
       // tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",false);        // Gnags
+      sleep(3);
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",false);       // Norah Jones
+      sleep(3);
       // tidal_oversigt.tidal_get_artists_all_albums((char *) "9706",false);       // pink floyd
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",true);       // tears for fears
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skeikkex
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",false);       // tears for fears
+      sleep(3);
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",false);       // Rihanna
+      sleep(3);
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",false);       // Skeikkex
+      sleep(3);
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",false);       // Skeikkex
 
-      tidal_oversigt.tidal_get_album_by_artist("34363343");  // U2
+      // tidal_oversigt.tidal_get_album_by_artist("34363343");  // U2
 
       
 
