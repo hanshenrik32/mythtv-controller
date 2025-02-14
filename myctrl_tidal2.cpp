@@ -2746,6 +2746,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
                 strcpy(stack[antal]->playlisturl ,playlisturl.c_str());
                 strcpy(stack[antal]->feed_gfx_url,gfxurl.c_str());
                 strcpy(stack[antal]->type_of_media , "ALBUM" );
+                stack[antal]->type=1;                                             // playlist type
                 get_webfilename(downloadfilename,(char *) gfxurl.c_str());
                 strcpy(downloadfilenamelong,localuserhomedir);
                 strcat(downloadfilenamelong,"/tidal_gfx/");
