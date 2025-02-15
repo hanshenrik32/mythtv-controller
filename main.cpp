@@ -3076,7 +3076,7 @@ void display() {
           start = clock();
           _angle++;
           //mybox.settexture(musicoversigt);
-          mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
+           mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
           if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
           break;
       case PICTURE3D:
@@ -4828,7 +4828,7 @@ void display() {
         glEnable(GL_TEXTURE_2D);
         glColor3f(1.0f, 1.0f, 1.0f);
         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         // textureId=aktiv_playlist.get_textureid(do_play_music_aktiv_table_nr-1);		// get cd texture opengl id
         textureId=dirmusic.textureId;
         if (textureId==0) textureId=_texture_nocdcover;		                       				// hvis ingen texture (music cover) set default (box2.bmp) / use default if no cover
@@ -15145,32 +15145,31 @@ int main(int argc, char** argv) {
     if (tidalok) {   
       // login ok load playlistes from file
       // get users playlists if not loaded before      
-      tidal_oversigt.get_users_playlist_plus_favorite(false);
+      // tidal_oversigt.get_users_playlist_plus_favorite(false);
 
       // load from file
-      tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
+      // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
       // ** my playliste default first time load
-      // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
+
+
       /*
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",false);     // Maroon 5     
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
       // tidal_oversigt.tidal_get_artists_all_albums((char *) "9706",false);       // pink floyd
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",true);       // tears for fears
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skeikkex
-
-      tidal_oversigt.tidal_get_album_by_artist("34363343");  // U2
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skilex
       */
-      
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
+      // load default file
+      tidal_oversigt.get_artist_from_file("");
 
-      tidal_oversigt.opdatere_tidal_oversigt(0);
-      printf("Tidal file load from tidal_playlists.txt OK.\n");
+      tidal_oversigt.opdatere_tidal_oversigt(0);      
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
@@ -15351,7 +15350,6 @@ int main(int argc, char** argv) {
     if (!initFreeType("/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf")) {
         return -1;
     }
-
 
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func

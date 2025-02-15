@@ -123,6 +123,8 @@ bool tidal_process_duration=false;
 // used by playlist json passer
 
 bool tidal_process_resource=false;
+bool tidal_process_attributes=false;
+
 bool tidal_process_imagecover=false;
 bool tidal_process_releasedate=false;
 bool tidal_process_artist=false;
@@ -943,12 +945,50 @@ int tidal_class::get_playlist_from_file(char *filename) {
       if (playlisttxt) {
         if (*playlisttxt='#') {
           get_users_album((char *) playlisttxt);                                      // download album to db (works if users have a account (enable or not))
+          // tidal_oversigt.tidal_get_artists_all_albums((char *) playlisttxt,true);       //
         }
       }
     }
     fclose(fp);
   }
   if (playlisttxt) free(playlisttxt);
+  if (readok) return(1); else return(0);
+}
+
+
+// ****************************************************************************************
+//
+// use tidal_artistlists.txt to download.
+// download all record json info and update db from artistid from the file
+//
+// ****************************************************************************************
+
+
+int tidal_class::get_artist_from_file(char *filename) {
+  FILE *fp;
+  char *artistidtxt=NULL;
+  ssize_t read;
+  size_t len=0;
+  bool readok=false;
+  if (strlen(filename)==0) {
+    fp=fopen("tidal_artistlists.txt","r");
+  } else {
+    fp=fopen(filename,"r");
+  }
+  if (fp) {
+    readok=true;
+    while ((read = getline(&artistidtxt , &len, fp)) != -1) {
+      artistidtxt[strcspn(artistidtxt,"\n")]=0;                                   // remove \n from string
+      if (artistidtxt) {
+        if (*artistidtxt!='#') {
+          if (tidal_get_artists_all_albums((char *) artistidtxt,true)) sleep(3);          
+        }
+      }
+    }
+    readok=true;
+    fclose(fp);
+  }
+  if (artistidtxt) free(artistidtxt);
   if (readok) return(1); else return(0);
 }
 
@@ -1246,9 +1286,11 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
   char *devid=NULL;
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://openapi.tidal.com/artists/";
+  // old url="https://openapi.tidal.com/artists/"; // old ver
+  url="https://openapi.tidal.com/v2/artists/";
   url= url + artistid;
-  url= url + "/albums?countryCode=US&offset=0&limit=100";
+  // old url= url + "/albums?countryCode=US&offset=0&limit=100";
+  url= url + "?countryCode=US&offset=0&limit=100&include=albums";
   userfilename = localuserhomedir;
   userfilename = userfilename + "/";
   userfilename = userfilename + "tidal_artist_playlist_";
@@ -1267,6 +1309,7 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
     curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
@@ -1324,7 +1367,8 @@ int tidal_class::tidal_get_album_items(char *albumid) {
   char *devid=NULL;
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://openapi.tidal.com/albums/";
+  // url="https://openapi.tidal.com/albums/";
+  url="https://openapi.tidal.com/v2/albums/";
   url=url + albumid;
   url=url + "/items?countryCode=US&offset=0&limit=100";
   userfilename = localuserhomedir;
@@ -1345,6 +1389,7 @@ int tidal_class::tidal_get_album_items(char *albumid) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
     curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
@@ -1382,7 +1427,18 @@ void tidal_class::process_object_playlist_tidal_get_artists_all_albums(json_valu
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     // print_depth_shift(depth);
-    //printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
+    // printf("x=%d depth=%d object[%d].name = %s    \n ",x,depth, x, value->u.object.values[x].name);
+
+    // new
+    if (strcmp(value->u.object.values[x].name , "attributes")==0) {
+      tidal_process_resource=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "id" )==0) {
+      tidal_process_id=true;
+    }
+
+
+    // all under old
     if (strcmp(value->u.object.values[x].name , "href" )==0) {
       tidal_process_href=true;
     }
@@ -1448,7 +1504,11 @@ void tidal_class::process_array_playlist_tidal_get_artists_all_albums(json_value
 // ****************************************************************************************
 
 void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int depth,int x) {
-    std::string artist="";
+    static std::string artist="";
+    static std::string release_date="";
+    static std::string playlistname="";
+    static std::string playlisturl="";
+    static std::string gfxurl="";
     std::string convertcommand;
     char tempname[1024];
     int j;
@@ -1459,6 +1519,7 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
     static int iconnr=0;
     MYSQL_RES *res;
     MYSQL_ROW row;
+    static int setimg=0;
     if (value == NULL) return;
     if (value->type != json_object) {
       //print_depth_shift(depth);
@@ -1482,7 +1543,75 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
         //if (debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
         break;
       case json_string:        
-        // printf("string: %s\n", value->u.string.ptr);
+        // printf("string: %s depth = %d x = %d \n", value->u.string.ptr,depth,x);
+        if (tidal_process_title) {
+          tidal_process_title = false;
+        }
+        if (tidal_process_resource) {
+          if ((antal==-1) && (depth==6) && (x==0)) {
+            artist=value->u.string.ptr;
+            tidal_process_resource=false;           
+          }
+          if ((playlistname.length()==0) && ( depth == 7 ) && ( x == 0 )) {
+            playlistname=value->u.string.ptr;
+          }
+          if (( depth == 10 ) && ( x == 0 )) {
+            playlisturl=value->u.string.ptr;
+          }
+        }
+        if ( tidal_process_id ) {
+          if (( depth == 5 ) && ( x == 3 )) {
+            // printf("Set Playlist id %s \n",value->u.string.ptr);
+            // new record
+            antalplaylists++;
+            antal++;
+            stack[antal]=new (struct tidal_oversigt_type);    
+            // set playlistid + artist
+            // update rec and go to next rec
+            if (stack[antal]) {              
+              strcpy(tidal_playlistid,value->u.string.ptr);
+              strcpy(stack[antal]->playlistid,value->u.string.ptr);
+              strcpy(stack[antal]->feed_showtxt,playlistname.c_str());
+              strcpy(stack[antal]->feed_artist,artist.c_str());
+              strcpy(stack[antal]->feed_release_date ,release_date.c_str());
+              strcpy(stack[antal]->playlisturl ,playlisturl.c_str());
+              strcpy(stack[antal]->feed_gfx_url,gfxurl.c_str());
+              strcpy(stack[antal]->type_of_media , "ALBUM" );
+              get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+              strcpy(downloadfilenamelong,localuserhomedir);
+              strcat(downloadfilenamelong,"/tidal_gfx/");
+              strcat(downloadfilenamelong,tidal_playlistid);
+              strcat(downloadfilenamelong,".jpg");
+              // download image
+              tidal_download_image((char *) gfxurl.c_str(),downloadfilenamelong);
+              // update gfx file name
+              strcpy(stack[antal]->feed_gfx_url, downloadfilenamelong);
+              stack[antal]->type=1;                                             // playlist type
+              playlistname="";
+              release_date="";
+              playlisturl="";
+              gfxurl="";
+              setimg = 0;
+            }
+          }
+          tidal_process_id=false;
+        }
+        // set image
+        if ((antal>=0) && ( depth == 10 ) && ( x == 0 )) {
+          // get cover file url
+          if ((setimg==4) && (gfxurl.length()==0)) {
+            // printf("Set Image string: %s\n", value->u.string.ptr);
+            gfxurl=value->u.string.ptr;            
+          }
+          setimg++;
+        }      
+        // release date
+        if (( depth == 7 ) && ( x == 6 )) {
+          // printf("Set release date : %s\n", value->u.string.ptr);
+          release_date = value->u.string.ptr ;          
+        }
+
+        /*
         // 1.
         if (tidal_process_resource) {
           antalplaylists++;
@@ -1612,6 +1741,7 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
         if (tidal_process_track_nr) {
           tidal_process_track_nr=false;
         }
+        */
         break;
       case json_boolean:
         //if (debug_json) fprintf(stdout,"bool: %d\n", value->u.boolean);
@@ -1642,7 +1772,19 @@ inline bool file_exists(const std::string& name) {
 //
 // ****************************************************************************************
 
-
+std::string escapeSingleQuotesOss(const std::string& input) {
+  std::ostringstream oss;
+  
+  for (char c : input) {
+      if (c == '\'') {
+          oss << "''"; // Escape apostrof
+      } else {
+          oss << c;
+      }
+  }
+  
+  return oss.str();
+}
 
 int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   int httpcode;
@@ -1663,7 +1805,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   bool playlistexist;
   int recnr=0;
   bool dbexist=false;
-  int create_new_record_antal;
+  int create_new_record_antal=0;
   int created_playlist;
   std::string sqll;
   // process json artist file after create file name
@@ -1672,13 +1814,12 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   tidal_artis_playlist_file = localuserhomedir;
   tidal_artis_playlist_file = tidal_artis_playlist_file + "/";
   tidal_artis_playlist_file = tidal_artis_playlist_file + "tidal_artist_playlist_";
-  // tidal_artis_playlist_file = "tidal_artist_playlist_";
   tidal_artis_playlist_file = tidal_artis_playlist_file + artistid;
   tidal_artis_playlist_file = tidal_artis_playlist_file + ".json";
   if ((!(file_exists(tidal_artis_playlist_file))) || (force)) {
     // download artist album json file
     // filename is tidal_artist_playlist_{playlistid}.json
-    httpcode=tidal_get_album_by_artist(artistid);                                       // (download all albums in in one json file)
+    httpcode=tidal_get_album_by_artist(artistid);                                       // (download all albums in in one json file by artistid)
     if ((httpcode==200) || (httpcode==207)) {
       stat(tidal_artis_playlist_file.c_str(), &filestatus);                             // get file info
       file_size = filestatus.st_size;                                                   // get filesize
@@ -1779,18 +1920,20 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                     for(int i=0;i<strlen(p);i++) {
                       if (*(p+i)=='\"') (*(p+i))='\'';
                     }
-                    sqll = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"";
-                    sqll = sqll + stack[recnr]->feed_showtxt;                 // playlist name
-                    sqll = sqll + "\",'";
+                    std::string showtext = stack[recnr]->feed_showtxt;                    
+                    sqll = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (";
+                    sqll = sqll + "'";
+                    sqll = sqll + escapeSingleQuotesOss(stack[recnr]->feed_showtxt);                 // playlist name
+                    sqll = sqll + "','";
                     sqll = sqll + stack[recnr]->feed_gfx_url;                 // cover
                     sqll = sqll + "','";
                     sqll = sqll + stack[recnr]->playlistid;                   // playlist id 0
                     sqll = sqll + "','";
                     sqll = sqll + stack[recnr]->feed_release_date;            // dato
                     sqll = sqll + "',";
-                    sqll = sqll + "\"";
+                    sqll = sqll + "'";
                     sqll = sqll + p;
-                    sqll = sqll + "\",0)";
+                    sqll = sqll + "',0)";
                     strcpy(stack[recnr]->feed_artist,"");                   // reset to get data again else it will ignore it.
                     if (mysql_query(conn,sqll.c_str())!=0) {
                       write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
@@ -1817,6 +1960,8 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
           printf("Error write file.\n");
         }
       }
+    } else {
+      write_logfile(logfile,"Tidal return http code 404.");
     }
   }
   // sample
@@ -2463,7 +2608,15 @@ void tidal_class::process_object_tidal_search_result(json_value* value, int dept
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     // print_depth_shift(depth);
-    // printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
+    printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
+    // new
+    if (strcmp(value->u.object.values[x].name , "attributes")==0) {      
+      tidal_process_attributes=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "id" )==0) {
+      tidal_process_id=true;
+    }
+
     if (strcmp(value->u.object.values[x].name , "href" )==0) {
       tidal_process_href=true;
     }
@@ -2531,7 +2684,6 @@ void tidal_class::process_array_tidal_search_result(json_value* value, int depth
 
 
 void tidal_class::process_tidal_search_result(json_value* value, int depth,int x) {
-    std::string artist="";
     char tempname[1024];
     int n;
     int dircreatestatus;
@@ -2541,6 +2693,15 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
     static int iconnr=0;
     MYSQL_RES *res;
     MYSQL_ROW row;
+    static int setimg=0;
+    static std::string artist="";
+    static std::string release_date="";
+    static std::string playlistname="";
+    static std::string playlistid="";
+    static std::string playlisturl="";
+    static std::string title="";
+    static std::string gfxurl="";
+
     if (value == NULL) return;
     if (value->type != json_object) {
       //print_depth_shift(depth);
@@ -2564,8 +2725,94 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
         //if (debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
         break;
       case json_string:        
-        // printf("string: %s\n", value->u.string.ptr);
+        printf("string: %s\n", value->u.string.ptr);
         // 1.
+        if (tidal_process_attributes) {
+          printf("%s depth = %d x = %d \n ",value->u.string.ptr ,depth,x);
+          if ((depth==7) && (x==0)) {
+            // title
+            if (playlistname.length()==0) playlistname = value->u.string.ptr;
+          }
+          /*
+          if ((depth==9) && (x==0)) {
+            // gfx 160x160
+            if ((setimg==4) && (gfxurl.length()==0)) {
+              gfxurl= value->u.string.ptr;
+                // strcpy( stack[antal]->feed_release_date , value->u.string.ptr );
+            }
+            setimg++;
+          }
+          */
+          tidal_process_attributes=false; 
+        }
+
+        if ( tidal_process_id ) {
+          if ((depth==7) && (x==6)) {
+            // dato 
+            release_date = value->u.string.ptr;
+          }
+          if ((depth==10) && (x==0)) {
+            // gfx 160x160
+            if ((setimg==5) && (gfxurl.length()==0)) {
+              gfxurl = value->u.string.ptr;
+            }
+            // playurl
+            if ((setimg==7) && (playlisturl.length()==0)) {
+              playlisturl = value->u.string.ptr;
+            }
+            setimg++;
+          }
+          if ((depth==9) && (x==0)) {
+            playlistid = value->u.string.ptr;
+          }
+          // update rec
+          if (playlistname.length()>0) {
+            if (( depth == 11 ) && ( x == 0 )) {
+              antalplaylists++;
+              antal++;
+              stack[antal]=new (struct tidal_oversigt_type);    
+              // set playlistid + artist
+              // update rec and go to next rec
+              if (stack[antal]) {
+                size_t lastSlash = playlisturl.find_last_of('/');
+                playlistid = (lastSlash != std::string::npos) ? playlisturl.substr(lastSlash + 1) : "";
+                strcpy(stack[antal]->playlistid,playlistid.c_str());
+                strcpy(stack[antal]->feed_showtxt,playlistname.c_str());
+                strcpy(stack[antal]->feed_artist,artist.c_str());
+                strcpy(stack[antal]->feed_release_date ,release_date.c_str());
+                strcpy(stack[antal]->playlisturl ,playlisturl.c_str());
+                strcpy(stack[antal]->feed_gfx_url,gfxurl.c_str());
+                strcpy(stack[antal]->type_of_media , "ALBUM" );
+                stack[antal]->type=1;                                             // playlist type
+                get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+                strcpy(downloadfilenamelong,localuserhomedir);
+                strcat(downloadfilenamelong,"/tidal_gfx/");
+                strcat(downloadfilenamelong,playlistid.c_str());
+                strcat(downloadfilenamelong,".jpg");
+                // download image
+                tidal_download_image((char *) gfxurl.c_str(),downloadfilenamelong);
+                // update gfx file name
+                strcpy(stack[antal]->feed_gfx_url, downloadfilenamelong);
+                stack[antal]->textureId = 0;
+                stack[antal]->type = 2;                                             // playlist type
+                playlistname = "";
+                release_date = "";
+                playlisturl = "";
+                gfxurl = "";
+                setimg = 0;
+              }
+            }
+          }
+          
+        }
+
+        if (tidal_process_title) {
+          tidal_process_title= false;
+        }
+
+        
+        // 1.
+        /*
         if (tidal_process_resource) {
           iconnr=0;
           antalplaylists++;
@@ -2703,6 +2950,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
         if (tidal_process_track_nr) {
           tidal_process_track_nr=false;
         }
+        */
         break;
       case json_boolean:
         //if (debug_json) fprintf(stdout,"bool: %d\n", value->u.boolean);
@@ -2797,16 +3045,24 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     else searchbuffer=searchbuffer+"%20";
     n++;
   }
-  url="curl -X GET 'https://openapi.tidal.com/search?query=";
-  url=url + searchbuffer;
+
+  https://openapi.tidal.com/v2/searchresults/dire%20straits/relationships/albums?countryCode=US&include=albums
+
+  // old url="curl -X GET 'https://openapi.tidal.com/search?query=";
+  url="curl -X GET 'https://openapi.tidal.com/v2/searchresults/";
+  url=url + searchbuffer;  
   switch (type) {
-    case 0: url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+    case 0: // old url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            url=url + "/relationships/albums?countryCode=US&include=albums' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             break;
-    case 1: url=url + "&type=ARTISTS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+    case 1: // old url=url + "&type=ARTISTS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             break;
-    case 2: url=url + "&type=TRACKS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+    case 2: // old url=url + "&type=TRACKS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             break;
-    default:url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+    default:// old url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
   }
   error=system(url.c_str());
   // if no error we have json file have the search result
@@ -3988,6 +4244,8 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   static bool timefirsttime=false;
   struct timeval lasttime;
   struct timeval tim;
+  static bool gfx_loaded=false;
+  static int gfx_loadnr=0;
   if (timefirsttime==false) {
     timefirsttime=true;
     tim.tv_usec=0;
@@ -4003,132 +4261,100 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   if (strcmp(tidaltoken,"")) {
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       // load texture if not loaded
-      
       if (this->texture_loaded==false) {
         if (stack[i+sofset]->textureId==0) {        
           if (file_exists(stack[i+sofset]->feed_gfx_url)) {
             stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
           }
         }
+        gfx_loadnr++;
+        // stop loading more if all is loaded
+        if (gfx_loadnr>=antalplaylists) texture_loaded=true;
       }
-      if (true) {
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(buttonsizey+20);
-          xof=0;
-        }
-        if (i+1==(int) stream_key_selected) {
-          buttonsizey=200.0f;
-          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        } else {
-          buttonsizey=180.0f;
-          glColor4f(0.8f, 0.8f, 0.8f,1.0f);
-        }
-        // stream icon
-        glPushMatrix();
-
-        if (anim_angle>360) {
-          anim_angle=180.0f;
-          anim_viewer=false;
-        } else {
-          if (anim_viewer) {
-            gettimeofday(&tim,NULL);
-            if (lasttime.tv_usec==0) {
-              lasttime.tv_usec=tim.tv_usec;
+      if (((i % bonline)==0) && (i>0)) {
+        yof=yof-(buttonsizey+20);
+        xof=0;
+      }
+      if (i+1==(int) stream_key_selected) {
+        buttonsizey=200.0f;
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      } else {
+        buttonsizey=180.0f;
+        glColor4f(0.8f, 0.8f, 0.8f,1.0f);
+      }
+      // stream icon
+      glPushMatrix();
+      if (anim_angle>360) {
+        anim_angle=180.0f;
+        anim_viewer=false;
+      } else {
+        if (anim_viewer) {
+          gettimeofday(&tim,NULL);
+          if (lasttime.tv_usec==0) {
+            lasttime.tv_usec=tim.tv_usec;
+          } else {
+            if (tim.tv_usec>(lasttime.tv_usec+100)) {
+              anim_angle+=0.50;
             } else {
-              if (tim.tv_usec>(lasttime.tv_usec+100)) {
-                anim_angle+=0.50;
-              } else {
-                anim_viewer=false;
-                anim_angle=0.0f;
-              }
+              anim_viewer=false;
+              anim_angle=0.0f;
             }
-          } else anim_angle=0.0f;
+          }
+        } else anim_angle=0.0f;
+      }
+      glTranslatef(xof+20+(buttonsize/2),yof-10,0);
+      glRotatef(anim_angle,0.0f,1.0f,0.0f);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(100+i+sofset);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
+      glEnd();                
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      if (stack[i+sofset]->textureId) {
+        if ((i+sofset)==0) {
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+            glBindTexture(GL_TEXTURE_2D,_textureIdback);
+          } else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        } else {
+          glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        }        
+      } else {
+        if ((i+sofset)==0) {
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+            glBindTexture(GL_TEXTURE_2D,_textureIdback);            
+          } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        } else {
+          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
         }
-        glTranslatef(xof+20+(buttonsize/2),yof-10,0);
-        glRotatef(anim_angle,0.0f,1.0f,0.0f);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
+      }
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(100+i+sofset);
+      glBegin(GL_QUADS);
+      if (tema==5) {
         glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
         glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
         glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
-        glEnd();                
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        if (stack[i+sofset]->textureId) {
-          if ((i+sofset)==0) {
-            if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdback);
-            } else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-          } else {
-            glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-          }        
-        } else {
-          if ((i+sofset)==0) {
-            if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdback);            
-            } else glBindTexture(GL_TEXTURE_2D,normal_icon);
-          } else {
-            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
-          }
-        }
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        if (tema==5) {
-          glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
-        } else {
-          glTexCoord2f(0, 0); glVertex3f( 12-(buttonsize/2), 12, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( 12-(buttonsize/2),buttonsizey-22, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( buttonsize-12-(buttonsize/2), buttonsizey-22 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( buttonsize-12-(buttonsize/2), 12 , 0.0);
-        }
-        glEnd();        
-        glPopMatrix();
-        // show text of element
-        /*
-        strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-        // temptxt1 = fmt::v8::format("{:^20}",stack[i+sofset]->feed_showtxt);
-        temptxt[16]=0;
-        drawText(temptxt, xof+30,yof-20, 0.4f,1);
-        if (strlen(stack[i+sofset]->feed_showtxt)>16) {
-          strcpy(temptxt,stack[i+sofset]->feed_showtxt+16);        // text to show
-          temptxt[16]=0;
-          drawText(temptxt, xof+30,yof-40, 0.4f,1);
-        }
-        */
-
-        drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+30,yof-20,0.38f,20,2,1,true);
-
-        // next button
-        i++;
-        xof+=(buttonsize+10);
       } else {
-        glTranslatef(xof+20+(buttonsize/2),yof-10,0);
-        glRotatef(anim_angle,0.0f,1.0f,0.0f);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize*4), 10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize*4),buttonsizey*4, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize*4), buttonsizey*4 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize*4), 10 , 0.0);
-        glEnd();
-        glcRenderString("Loading textures.");
-
-        // drawText("Loading textures.", xof+20+(buttonsize/2),yof-10, 0.4f,1);
-
+        glTexCoord2f(0, 0); glVertex3f( 12-(buttonsize/2), 12, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( 12-(buttonsize/2),buttonsizey-22, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( buttonsize-12-(buttonsize/2), buttonsizey-22 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( buttonsize-12-(buttonsize/2), 12 , 0.0);
       }
+      glEnd();        
+      glPopMatrix();
+      drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+30,yof-20,0.38f,20,2,1,true);
+
+      // next button
+      i++;
+      xof+=(buttonsize+10);
     }
   } else {
       // No tidal account
@@ -4183,7 +4409,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   static int stream_oversigt_loaded_done=0;
   GLuint texture;
   static GLuint last_texture;
-  static bool texture_loaded=false;
+  // static bool texture_loaded=false;
   char *base,*right_margin;
   int length,width;
   int pline=0;
@@ -4194,6 +4420,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   static time_t rawtime;
   static time_t last_rawtime=0;
   static bool gfx_loaded=false;
+  static int gfx_loadnr=0;
   static bool doneloadsearch=false;
   rawtime=time(NULL);                                                         // hent now time
   if (timefirsttime==false) {
@@ -4258,8 +4485,21 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
       doneloadsearch=true;
       load_tidal_iconoversigt();
     }
-
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
+      // load texture
+      
+      printf("nr %d antal %d \n",gfx_loadnr,antalplaylists);
+
+      if (this->texture_loaded==false) {
+        if (stack[i+sofset]->textureId==0) {        
+          if (file_exists(stack[i+sofset]->feed_gfx_url)) {
+            stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
+          }
+          gfx_loadnr++;
+        }
+        // stop loading more if all is loaded
+        // if (gfx_loadnr>=antalplaylists) texture_loaded=true;
+      }
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
         xof=0;

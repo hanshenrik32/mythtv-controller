@@ -38,7 +38,9 @@ vlc_controller::vlc_controller() {
 //
 // ****************************************************************************************
 vlc_controller::~vlc_controller() {
-  if (vlc_inst) libvlc_release(vlc_inst);
+  if (vlc_inst) {
+    if (is_playing) libvlc_release(vlc_inst);
+  }
 }
 
 // ****************************************************************************************
