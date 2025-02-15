@@ -3948,7 +3948,6 @@ int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {
   char auth_kode[1024];
   std::string response_string;
   std::string response_val;
-  std::string userid;
   std::string url;
   int httpCode;
   CURLcode res;
@@ -3959,10 +3958,13 @@ int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {
   strcat(auth_kode,tidaltoken);
   CURL *curl = curl_easy_init();
 
-  userid="12";
+  // userid="12";
+  url = "ttps://openapi.tidal.com/v2/playlists/me?include=items";
+  /*
   url = "https://api.tidal.com/v1/users/";
   url = url + userid;
   url = url + "/playlistsAndFavoritePlaylists?countryCode=US";
+  */
   printf("Get users playlist and favorite playlist's \n\n");
   write_logfile(logfile,(char *) "tidal Get users playlist and favorite playlist");
   if (curl) {    
