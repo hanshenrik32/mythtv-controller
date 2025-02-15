@@ -15167,7 +15167,9 @@ int main(int argc, char** argv) {
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // load default file
-      tidal_oversigt.get_artist_from_file("");
+      if (checkartistdbexist()==false) {
+        tidal_oversigt.get_artist_from_file("");
+      }
 
       tidal_oversigt.opdatere_tidal_oversigt(0);      
     } else {

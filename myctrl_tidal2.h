@@ -258,3 +258,5 @@ class tidal_class {
 
 int tidal_download_image(char *imgurl,char *filename);      // not in use
 #endif
+
+bool checkartistdbexist();
