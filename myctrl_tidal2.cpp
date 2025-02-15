@@ -981,8 +981,7 @@ int tidal_class::get_artist_from_file(char *filename) {
       artistidtxt[strcspn(artistidtxt,"\n")]=0;                                   // remove \n from string
       if (artistidtxt) {
         if (*artistidtxt!='#') {
-          tidal_get_artists_all_albums((char *) artistidtxt,true);
-          sleep(3);          
+          if (tidal_get_artists_all_albums((char *) artistidtxt,true)) sleep(3);          
         }
       }
     }
@@ -4245,6 +4244,8 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   static bool timefirsttime=false;
   struct timeval lasttime;
   struct timeval tim;
+  static bool gfx_loaded=false;
+  static int gfx_loadnr=0;
   if (timefirsttime==false) {
     timefirsttime=true;
     tim.tv_usec=0;
@@ -4260,132 +4261,100 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   if (strcmp(tidaltoken,"")) {
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       // load texture if not loaded
-      
       if (this->texture_loaded==false) {
         if (stack[i+sofset]->textureId==0) {        
           if (file_exists(stack[i+sofset]->feed_gfx_url)) {
             stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
           }
         }
+        gfx_loadnr++;
+        // stop loading more if all is loaded
+        if (gfx_loadnr>=antalplaylists) texture_loaded=true;
       }
-      if (true) {
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(buttonsizey+20);
-          xof=0;
-        }
-        if (i+1==(int) stream_key_selected) {
-          buttonsizey=200.0f;
-          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        } else {
-          buttonsizey=180.0f;
-          glColor4f(0.8f, 0.8f, 0.8f,1.0f);
-        }
-        // stream icon
-        glPushMatrix();
-
-        if (anim_angle>360) {
-          anim_angle=180.0f;
-          anim_viewer=false;
-        } else {
-          if (anim_viewer) {
-            gettimeofday(&tim,NULL);
-            if (lasttime.tv_usec==0) {
-              lasttime.tv_usec=tim.tv_usec;
+      if (((i % bonline)==0) && (i>0)) {
+        yof=yof-(buttonsizey+20);
+        xof=0;
+      }
+      if (i+1==(int) stream_key_selected) {
+        buttonsizey=200.0f;
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      } else {
+        buttonsizey=180.0f;
+        glColor4f(0.8f, 0.8f, 0.8f,1.0f);
+      }
+      // stream icon
+      glPushMatrix();
+      if (anim_angle>360) {
+        anim_angle=180.0f;
+        anim_viewer=false;
+      } else {
+        if (anim_viewer) {
+          gettimeofday(&tim,NULL);
+          if (lasttime.tv_usec==0) {
+            lasttime.tv_usec=tim.tv_usec;
+          } else {
+            if (tim.tv_usec>(lasttime.tv_usec+100)) {
+              anim_angle+=0.50;
             } else {
-              if (tim.tv_usec>(lasttime.tv_usec+100)) {
-                anim_angle+=0.50;
-              } else {
-                anim_viewer=false;
-                anim_angle=0.0f;
-              }
+              anim_viewer=false;
+              anim_angle=0.0f;
             }
-          } else anim_angle=0.0f;
+          }
+        } else anim_angle=0.0f;
+      }
+      glTranslatef(xof+20+(buttonsize/2),yof-10,0);
+      glRotatef(anim_angle,0.0f,1.0f,0.0f);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(100+i+sofset);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
+      glEnd();                
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      if (stack[i+sofset]->textureId) {
+        if ((i+sofset)==0) {
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+            glBindTexture(GL_TEXTURE_2D,_textureIdback);
+          } else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        } else {
+          glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        }        
+      } else {
+        if ((i+sofset)==0) {
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+            glBindTexture(GL_TEXTURE_2D,_textureIdback);            
+          } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        } else {
+          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
         }
-        glTranslatef(xof+20+(buttonsize/2),yof-10,0);
-        glRotatef(anim_angle,0.0f,1.0f,0.0f);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
+      }
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(100+i+sofset);
+      glBegin(GL_QUADS);
+      if (tema==5) {
         glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
         glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
         glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
-        glEnd();                
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        if (stack[i+sofset]->textureId) {
-          if ((i+sofset)==0) {
-            if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdback);
-            } else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-          } else {
-            glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-          }        
-        } else {
-          if ((i+sofset)==0) {
-            if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdback);            
-            } else glBindTexture(GL_TEXTURE_2D,normal_icon);
-          } else {
-            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
-          }
-        }
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        if (tema==5) {
-          glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
-        } else {
-          glTexCoord2f(0, 0); glVertex3f( 12-(buttonsize/2), 12, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( 12-(buttonsize/2),buttonsizey-22, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( buttonsize-12-(buttonsize/2), buttonsizey-22 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( buttonsize-12-(buttonsize/2), 12 , 0.0);
-        }
-        glEnd();        
-        glPopMatrix();
-        // show text of element
-        /*
-        strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-        // temptxt1 = fmt::v8::format("{:^20}",stack[i+sofset]->feed_showtxt);
-        temptxt[16]=0;
-        drawText(temptxt, xof+30,yof-20, 0.4f,1);
-        if (strlen(stack[i+sofset]->feed_showtxt)>16) {
-          strcpy(temptxt,stack[i+sofset]->feed_showtxt+16);        // text to show
-          temptxt[16]=0;
-          drawText(temptxt, xof+30,yof-40, 0.4f,1);
-        }
-        */
-
-        drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+30,yof-20,0.38f,20,2,1,true);
-
-        // next button
-        i++;
-        xof+=(buttonsize+10);
       } else {
-        glTranslatef(xof+20+(buttonsize/2),yof-10,0);
-        glRotatef(anim_angle,0.0f,1.0f,0.0f);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize*4), 10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize*4),buttonsizey*4, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize*4), buttonsizey*4 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize*4), 10 , 0.0);
-        glEnd();
-        glcRenderString("Loading textures.");
-
-        // drawText("Loading textures.", xof+20+(buttonsize/2),yof-10, 0.4f,1);
-
+        glTexCoord2f(0, 0); glVertex3f( 12-(buttonsize/2), 12, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( 12-(buttonsize/2),buttonsizey-22, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( buttonsize-12-(buttonsize/2), buttonsizey-22 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( buttonsize-12-(buttonsize/2), 12 , 0.0);
       }
+      glEnd();        
+      glPopMatrix();
+      drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+30,yof-20,0.38f,20,2,1,true);
+
+      // next button
+      i++;
+      xof+=(buttonsize+10);
     }
   } else {
       // No tidal account
@@ -4451,6 +4420,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   static time_t rawtime;
   static time_t last_rawtime=0;
   static bool gfx_loaded=false;
+  static int gfx_loadnr=0;
   static bool doneloadsearch=false;
   rawtime=time(NULL);                                                         // hent now time
   if (timefirsttime==false) {
@@ -4517,12 +4487,18 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     }
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       // load texture
+      
+      printf("nr %d antal %d \n",gfx_loadnr,antalplaylists);
+
       if (this->texture_loaded==false) {
         if (stack[i+sofset]->textureId==0) {        
           if (file_exists(stack[i+sofset]->feed_gfx_url)) {
             stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
           }
+          gfx_loadnr++;
         }
+        // stop loading more if all is loaded
+        // if (gfx_loadnr>=antalplaylists) texture_loaded=true;
       }
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
