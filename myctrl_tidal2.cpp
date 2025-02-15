@@ -2736,7 +2736,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
               stack[antal]=new (struct tidal_oversigt_type);    
               // set playlistid + artist
               // update rec and go to next rec
-              if (stack[antal]) {              
+              if (stack[antal]) {
                 size_t lastSlash = playlisturl.find_last_of('/');
                 playlistid = (lastSlash != std::string::npos) ? playlisturl.substr(lastSlash + 1) : "";
                 strcpy(stack[antal]->playlistid,playlistid.c_str());
@@ -2756,11 +2756,12 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
                 tidal_download_image((char *) gfxurl.c_str(),downloadfilenamelong);
                 // update gfx file name
                 strcpy(stack[antal]->feed_gfx_url, downloadfilenamelong);
-                stack[antal]->type=1;                                             // playlist type
-                playlistname="";
-                release_date="";
-                playlisturl="";
-                gfxurl="";
+                stack[antal]->textureId = 0;
+                stack[antal]->type = 2;                                             // playlist type
+                playlistname = "";
+                release_date = "";
+                playlisturl = "";
+                gfxurl = "";
                 setimg = 0;
               }
             }
@@ -4401,7 +4402,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   static int stream_oversigt_loaded_done=0;
   GLuint texture;
   static GLuint last_texture;
-  static bool texture_loaded=false;
+  // static bool texture_loaded=false;
   char *base,*right_margin;
   int length,width;
   int pline=0;
@@ -4476,8 +4477,15 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
       doneloadsearch=true;
       load_tidal_iconoversigt();
     }
-
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
+      // load texture
+      if (this->texture_loaded==false) {
+        if (stack[i+sofset]->textureId==0) {        
+          if (file_exists(stack[i+sofset]->feed_gfx_url)) {
+            stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
+          }
+        }
+      }
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
         xof=0;
