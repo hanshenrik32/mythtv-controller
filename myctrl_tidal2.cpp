@@ -945,12 +945,51 @@ int tidal_class::get_playlist_from_file(char *filename) {
       if (playlisttxt) {
         if (*playlisttxt='#') {
           get_users_album((char *) playlisttxt);                                      // download album to db (works if users have a account (enable or not))
+          // tidal_oversigt.tidal_get_artists_all_albums((char *) playlisttxt,true);       //
         }
       }
     }
     fclose(fp);
   }
   if (playlisttxt) free(playlisttxt);
+  if (readok) return(1); else return(0);
+}
+
+
+// ****************************************************************************************
+//
+// use tidal_artistlists.txt to download.
+// download all record json info and update db from artistid from the file
+//
+// ****************************************************************************************
+
+
+int tidal_class::get_artist_from_file(char *filename) {
+  FILE *fp;
+  char *artistidtxt=NULL;
+  ssize_t read;
+  size_t len=0;
+  bool readok=false;
+  if (strlen(filename)==0) {
+    fp=fopen("tidal_artistlists.txt","r");
+  } else {
+    fp=fopen(filename,"r");
+  }
+  if (fp) {
+    readok=true;
+    while ((read = getline(&artistidtxt , &len, fp)) != -1) {
+      artistidtxt[strcspn(artistidtxt,"\n")]=0;                                   // remove \n from string
+      if (artistidtxt) {
+        if (*artistidtxt!='#') {
+          tidal_get_artists_all_albums((char *) artistidtxt,true);
+          sleep(3);          
+        }
+      }
+    }
+    readok=true;
+    fclose(fp);
+  }
+  if (artistidtxt) free(artistidtxt);
   if (readok) return(1); else return(0);
 }
 
@@ -1776,13 +1815,12 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   tidal_artis_playlist_file = localuserhomedir;
   tidal_artis_playlist_file = tidal_artis_playlist_file + "/";
   tidal_artis_playlist_file = tidal_artis_playlist_file + "tidal_artist_playlist_";
-  // tidal_artis_playlist_file = "tidal_artist_playlist_";
   tidal_artis_playlist_file = tidal_artis_playlist_file + artistid;
   tidal_artis_playlist_file = tidal_artis_playlist_file + ".json";
   if ((!(file_exists(tidal_artis_playlist_file))) || (force)) {
     // download artist album json file
     // filename is tidal_artist_playlist_{playlistid}.json
-    httpcode=tidal_get_album_by_artist(artistid);                                       // (download all albums in in one json file)
+    httpcode=tidal_get_album_by_artist(artistid);                                       // (download all albums in in one json file by artistid)
     if ((httpcode==200) || (httpcode==207)) {
       stat(tidal_artis_playlist_file.c_str(), &filestatus);                             // get file info
       file_size = filestatus.st_size;                                                   // get filesize

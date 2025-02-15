@@ -15152,30 +15152,24 @@ int main(int argc, char** argv) {
       // get_playlist_from_file use get_users_album(albumid) to download files
       
       // ** my playliste default first time load
-      // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
 
-      // tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",false);        // Gnags
-      sleep(3);
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",false);       // Norah Jones
-      sleep(3);
+
+      /*
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
       // tidal_oversigt.tidal_get_artists_all_albums((char *) "9706",false);       // pink floyd
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",false);       // tears for fears
-      sleep(3);
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",false);       // Rihanna
-      sleep(3);
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",false);       // Skeikkex
-      sleep(3);
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",false);       // Skeikkex
-
-      // tidal_oversigt.tidal_get_album_by_artist("34363343");  // U2
-
-      
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",true);       // tears for fears
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skilex
+      */
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
+      // load default file
+      tidal_oversigt.get_artist_from_file("");
 
-      tidal_oversigt.opdatere_tidal_oversigt(0);
-      printf("Tidal file load from tidal_playlists.txt OK.\n");
+      tidal_oversigt.opdatere_tidal_oversigt(0);      
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
