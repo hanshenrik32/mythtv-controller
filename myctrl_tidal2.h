@@ -219,7 +219,7 @@ class tidal_class {
 
     int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
     int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
-    
+   
     
     int load_tidal_iconoversigt();                                                                  // load all icons
     int get_access_token(char *loginbase64);                                                        // get token

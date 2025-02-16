@@ -9069,7 +9069,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (tidalknapnr>0)) {
           // rember name of playlist to save it later if needed and user press 'S' for save playlist this it is in use.
           strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
-          keybufferindex=strlen(playlistfilename);          
+          keybufferindex=strlen(playlistfilename);
           ask_open_dir_or_play_tidal=false;                                                               // close widow again
           switch (tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
             case 0: fprintf(stderr,"button nr %d play tidal playlist %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));

@@ -146,6 +146,8 @@ define('MPD_TIDAL_URL','tidal://track/');
 */
 
 
+// #define TIDAL_ALBUM_URL 'https://openapi.tidal.com/v2/albums/';
+
 // web port
 static const char *s_http_port = "8100";
 static struct mg_serve_http_opts s_http_server_opts;
@@ -1393,6 +1395,7 @@ int tidal_class::tidal_get_album_items(char *albumid) {
   auth_kode=auth_kode + tidaltoken;
   // url="https://openapi.tidal.com/albums/";
   url="https://openapi.tidal.com/v2/albums/";
+  // url=TIDAL_ALBUM_URL;
   url=url + albumid;
   url=url + "/items?countryCode=US&offset=0&limit=100";
   userfilename = localuserhomedir;
@@ -2618,16 +2621,6 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
             // title
             if (playlistname.length()==0) playlistname = value->u.string.ptr;
           }
-          /*
-          if ((depth==9) && (x==0)) {
-            // gfx 160x160
-            if ((setimg==4) && (gfxurl.length()==0)) {
-              gfxurl= value->u.string.ptr;
-                // strcpy( stack[antal]->feed_release_date , value->u.string.ptr );
-            }
-            setimg++;
-          }
-          */
           tidal_process_attributes=false; 
         }
 
@@ -2930,24 +2923,21 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     else searchbuffer=searchbuffer+"%20";
     n++;
   }
-
-  https://openapi.tidal.com/v2/searchresults/dire%20straits/relationships/albums?countryCode=US&include=albums
-
-  // old url="curl -X GET 'https://openapi.tidal.com/search?query=";
+    // old url="curl -X GET 'https://openapi.tidal.com/search?query=";
   url="curl -X GET 'https://openapi.tidal.com/v2/searchresults/";
-  url=url + searchbuffer;  
+  url=url + searchbuffer;
   switch (type) {
-    case 0: // old url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + "/relationships/albums?countryCode=US&include=albums' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            // albums
+    case 0: url=url + "/relationships/albums?countryCode=US&include=albums' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             break;
-    case 1: // old url=url + "&type=ARTISTS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            // artist
+    case 1: url=url + "/relationships/artists?countryCode=US&include=artists'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             break;
-    case 2: // old url=url + "&type=TRACKS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            // tracks
+    case 2: url=url + "/relationships/tracks?countryCode=US&include=tracks'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             break;
-    default:// old url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            // default albums
+    default:url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
   }
   error=system(url.c_str());
   // if no error we have json file have the search result
