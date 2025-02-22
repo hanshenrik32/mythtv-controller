@@ -6500,7 +6500,7 @@ void display() {
         sound->release();           // stop last playing song
         tidal_oversigt.tidal_next_play();   // play next song
       }
-      if (vis_music_oversigt) {
+      if ((vis_music_oversigt) || (musicoversigt.get_music_is_playing()==true)) {
         musicoversigt.update_afspillinger_music_song(aktivplay_music_path);				// Set aktive sang antal played +1 og set dagsdato til lastplayed mysql felt
         if (do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) {			// er der flere sange i playliste
           do_play_music_aktiv_table_nr++;								// auto next song
@@ -6508,6 +6508,7 @@ void display() {
           #if defined USE_FMOD_MIXER
           // fmod
           sound->release();           // stop last playing song
+          musicoversigt.set_music_is_playing(false);
           ERRCHECK(result,do_play_music_aktiv_table_nr);
           if (debugmode & 2) fprintf(stderr,"Auto1 Next song %s \n",aktivplay_music_path);
           // start load song to play buffer
