@@ -252,6 +252,9 @@ class tidal_class {
     bool delete_record_in_view(long tidalknapnr);
     int get_users_playlist_plus_favorite(bool cleandb);
 
+    void set_tidal_playing_flag(bool flag);
+    bool get_tidal_playing_flag();
+
     // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
     // void thread_convert_m4a_to_flac(void *path);
 };

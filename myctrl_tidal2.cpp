@@ -353,26 +353,26 @@ bool tidal_class::reset_amin_in_viewer() {
 tidal_class::tidal_class() : antal(0) {
   int port_cnt, n;
   int err = 0;
-  anim_angle=180.0f;
-  anim_viewer=true;
-  for(int i=0;i<maxantal;i++) stack[i]=0;
-  stream_optionselect=0;							                                        // selected line in stream options
-  tidal_oversigt_loaded=false;
-  tidal_oversigt_loaded_nr=0;
-  antal=0;
-  type=0;
-  searchtype=0;
-  search_loaded=false;                                                        // load icobn gfx afload search is loaded done by thread.
-  tidal_aktiv_song_antal=0;                                                   //
-  gfx_loaded=false;			                                                      // gfx loaded default false
-  tidal_is_playing=false;                                                     // is we playing any media
-  tidal_is_pause=false;                                                       // is player on pause
-  show_search_result=false;                                                   // are we showing search result in view
-  antalplaylists=0;                                                           // antal playlists
-  loaded_antal=0;                                                             // antal loaded
-  search_playlist_song=0;
-  texture_loaded=false;
-  tidal_aktiv_song_nr=0;
+  anim_angle = 180.0f;
+  anim_viewer = true;
+  for(int i=0;i<maxantal;i++) stack[i]= 0 ;
+  stream_optionselect = 0;							                                        // selected line in stream options
+  tidal_oversigt_loaded = false;
+  tidal_oversigt_loaded_nr = 0;
+  antal = 0;
+  type = 0;
+  searchtype = 0;
+  search_loaded = false;                                                        // load icobn gfx afload search is loaded done by thread.
+  tidal_aktiv_song_antal = 0;                                                   //
+  gfx_loaded = false;			                                                      // gfx loaded default false
+  tidal_is_playing = false;                                                     // is we playing any media
+  tidal_is_pause = false;                                                       // is player on pause
+  show_search_result = false;                                                   // are we showing search result in view
+  antalplaylists = 0;                                                           // antal playlists
+  loaded_antal = 0;                                                             // antal loaded
+  search_playlist_song = 0;
+  texture_loaded = false;
+  tidal_aktiv_song_nr = 0;
   //strcpy(tidal_aktiv_song[0].release_date,"");
   //  gfile(logfile,(char *) "Starting web server on port 8100");       //
   //printf("Starting tidal web server on port %s \n",s_http_port);
@@ -383,9 +383,9 @@ tidal_class::tidal_class() : antal(0) {
   c = mg_bind(&mgr, s_http_port, ev_handler);                               // setup http req handler
   mg_set_protocol_http_websocket(c);                                        //
   */
-  active_tidal_device=-1;                                                   // active tidal device -1 = no dev is active
-  active_default_play_device=active_tidal_device;                           //
-  aktiv_song_tidal_icon=0;                                                  //
+  active_tidal_device = -1;                                                   // active tidal device -1 = no dev is active
+  active_default_play_device = active_tidal_device;                           //
+  aktiv_song_tidal_icon = 0;                                                  //
   strcpy(tidal_client_id,"");                                               //
   strcpy(tidal_secret_id,"");                                               //
   strcpy(tidaltoken,"");                                                    //
@@ -395,8 +395,8 @@ tidal_class::tidal_class() : antal(0) {
   strcpy(active_default_play_device_name,"");
   strcpy(overview_show_band_name,"");                                         //
   strcpy(overview_show_cd_name,"");                                           //
-  tidal_device_antal=0;
-  tidal_update_loaded_begin=false;                                          // true then we are update the stack data
+  tidal_device_antal = 0;
+  tidal_update_loaded_begin = false;                                          // true then we are update the stack data
 }
 
 // ****************************************************************************************
@@ -775,7 +775,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
           // write to log file
           if (stack[antal]) {
             // strcpy(tidal_playlistname , value->u.string.ptr);
-            sprintf(tempname,"Tidal playlistname : %s", value->u.string.ptr);
+            // sprintf(tempname,"Tidal playlistname : %s", value->u.string.ptr);
             //write_logfile(logfile,(char *) tempname);
           }
         }
@@ -1803,11 +1803,6 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                 if ( playlistexist == false ) {
                   // only albums for now
                   if (strcmp(stack[recnr]->type_of_media,"ALBUM")==0) {
-                    char p[2048];
-                    strcpy(p,stack[recnr]->feed_artist);
-                    for(int i=0;i<strlen(p);i++) {
-                      if (*(p+i)=='\"') (*(p+i))='\'';
-                    }
                     std::string showtext = stack[recnr]->feed_showtxt;                    
                     sqll = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (";
                     sqll = sqll + "'";
@@ -1818,9 +1813,8 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                     sqll = sqll + stack[recnr]->playlistid;                   // playlist id 0
                     sqll = sqll + "','";
                     sqll = sqll + stack[recnr]->feed_release_date;            // dato
-                    sqll = sqll + "',";
-                    sqll = sqll + "'";
-                    sqll = sqll + p;
+                    sqll = sqll + "','";
+                    sqll = sqll + stack[recnr]->feed_artist;
                     sqll = sqll + "',0)";
                     strcpy(stack[recnr]->feed_artist,"");                   // reset to get data again else it will ignore it.
                     if (mysql_query(conn,sqll.c_str())!=0) {
@@ -3128,7 +3122,10 @@ int tidal_class::tidal_next_play() {
     result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
     result = sndsystem->createSound(tidal_aktiv_song[tidal_aktiv_song_nr].playurl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
     if (result==FMOD_OK) {
-      if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
+      if (sound) {
+        result = sndsystem->playSound(sound,NULL, false, &channel);
+        set_tidal_playing_flag(true);
+      }
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
       logstring="Tidal play song : ";
       logstring = logstring + tidal_aktiv_song[tidal_aktiv_song_nr].playurl;
@@ -3154,7 +3151,10 @@ int tidal_class::tidal_last_play() {
     result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
     result = sndsystem->createSound(tidal_aktiv_song[tidal_aktiv_song_nr].playurl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
     if (result==FMOD_OK) {
-      if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
+      if (sound) {
+        result = sndsystem->playSound(sound,NULL, false, &channel);
+        set_tidal_playing_flag(true);
+      }
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
       logstring="Tidal play song : ";
       logstring = logstring + tidal_aktiv_song[tidal_aktiv_song_nr].playurl;
@@ -3199,7 +3199,25 @@ char *tidal_class::get_tidal_playlistid(int nr) {
   if (nr < antal) return (stack[nr]->playlistid); else return (NULL);
 }
 
+// ****************************************************************************************
+//
+// return play status
+//
+// ****************************************************************************************
 
+bool tidal_class::get_tidal_playing_flag() {
+  return(tidal_is_playing);
+}
+
+// ****************************************************************************************
+//
+// set play status
+//
+// ****************************************************************************************
+
+void tidal_class::set_tidal_playing_flag(bool flag) {
+  tidal_is_playing=flag;
+}
 
 // *********************************************************************************************************
 //
@@ -3783,7 +3801,10 @@ int tidal_class::tidal_play_now_song(char *playlist_song,int tidalknapnr,bool no
     result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
     result = sndsystem->createSound(playlist_song, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
     if (result==FMOD_OK) {
-      if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);                       // start play
+      if (sound) {
+        result = sndsystem->playSound(sound,NULL, false, &channel);                       // start play
+        set_tidal_playing_flag(true);
+      }
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile
     }
     strcpy(tidal_aktiv_song[0].song_name,stack[tidalknapnr]->feed_showtxt);
@@ -3823,6 +3844,7 @@ int tidal_class::tidal_do_we_play() {
 
 int tidal_class::tidal_pause_play() {
   sound->release();                                                                       // stop last playing song 
+  set_tidal_playing_flag(false);
   return(1);
 }
 
