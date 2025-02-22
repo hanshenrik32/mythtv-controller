@@ -1267,6 +1267,7 @@ void musicoversigt_class::clean_music_oversigt() {
   }
   antal_music_oversigt=0;
   do_play=false;
+  music_is_playing=false;
 }
 
 

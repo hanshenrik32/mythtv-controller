@@ -36,6 +36,7 @@ class musicoversigt_class {
     void clean_music_oversigt();
     music_oversigt_type musicoversigt[MAX_MUSIC_OVERSIGT_SIZE+1];
     bool do_play;
+    bool music_is_playing;                                                // do we play ?
   public:
     bool play() { return(do_play);}    
     // load covers
@@ -62,6 +63,8 @@ class musicoversigt_class {
     int play_songs(bool setplay) { do_play=setplay; return(1); }
     bool play_songs_status() { return(do_play); }
     int update_afspillinger_music_song(char *filename);
+    void set_music_is_playing(bool flag) { music_is_playing = flag; }
+    bool get_music_is_playing() { return(music_is_playing); }
 };
 
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);

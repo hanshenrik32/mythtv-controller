@@ -317,6 +317,7 @@ bool do_play_music_aktiv_play = false;                    //
 bool do_play_music_aktiv = false;                         //
 bool do_stop_music_all = false;                           //
 char aktivplay_music_path[1024];                          //
+// std::string aktivplay_music_path1="";
 
 bool hent_radio_search = false;                           // skal vi søge efter music
 bool hent_film_search = false;                            // skal vi søge efter film title
@@ -4316,7 +4317,7 @@ void display() {
           snd = 0;                                // set play new flag
         }
         write_logfile(logfile,(char *) "Tidal start play song");
-        tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+        tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);        
       }
       // try play search result
       if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==2) {
@@ -4427,6 +4428,7 @@ void display() {
         // if play URL
         if (strcmp(radiooversigt.get_stream_url(rknapnr-1),"")!=0) {
           strcpy(aktivplay_music_path,radiooversigt.get_stream_url(rknapnr-1));
+
           // write debug log
           sprintf(debuglogdata,"play radio path = %s ",aktivplay_music_path);
           write_logfile(logfile,(char *) debuglogdata);
@@ -4452,7 +4454,7 @@ void display() {
           // play online radio by sdl
           #if defined USE_SDL_MIXER
           //if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
-          sdlmusicplayer=Mix_LoadMUS(aktivplay_music_path);
+          sdlmusicplayer=Mix_LoadMUS(aktivplay_music_path));
           Mix_PlayMusic(sdlmusicplayer, 0);
           if (!(sdlmusicplayer)) {
             fprintf(stderr,"Error load music. %s\n",aktivplay_music_path);
@@ -4638,8 +4640,8 @@ void display() {
               // aktiv_playlist = class to control music to play
               // (indenholder array til playliste samt hvor mange der er i playliste) 
               // aktivplay_music_path = string til den sang som skal spilles nu
-              aktiv_playlist.m_play_playlist(aktivplay_music_path,0);			// hent første sang i playlist
-              printf("aktivplay_music_path = %s \n",aktivplay_music_path);
+              aktiv_playlist.m_play_playlist((char *) aktivplay_music_path,0);			// hent første sang i playlist
+              printf("aktivplay_music_path = %s \n",(char *) aktivplay_music_path);
               if (strcmp(configsoundoutport,"STREAM")!=0) {
                 result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
                 ERRCHECK(result,do_play_music_aktiv_table_nr);
@@ -6492,13 +6494,13 @@ void display() {
     #endif
     if (playing==false) {
       //
-      // auto next aktiv song
+      // Tidal auto next aktiv song
       //    
-      if ((vis_tidal_oversigt) && (snd)) {
+      if (((vis_tidal_oversigt) || (tidal_oversigt.get_tidal_playing_flag())) && (snd)) {
         sound->release();           // stop last playing song
         tidal_oversigt.tidal_next_play();   // play next song
       }
-      if (vis_music_oversigt) {
+      if ((vis_music_oversigt) || (musicoversigt.get_music_is_playing()==true)) {
         musicoversigt.update_afspillinger_music_song(aktivplay_music_path);				// Set aktive sang antal played +1 og set dagsdato til lastplayed mysql felt
         if (do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) {			// er der flere sange i playliste
           do_play_music_aktiv_table_nr++;								// auto next song
@@ -6506,6 +6508,7 @@ void display() {
           #if defined USE_FMOD_MIXER
           // fmod
           sound->release();           // stop last playing song
+          musicoversigt.set_music_is_playing(false);
           ERRCHECK(result,do_play_music_aktiv_table_nr);
           if (debugmode & 2) fprintf(stderr,"Auto1 Next song %s \n",aktivplay_music_path);
           // start load song to play buffer
@@ -6514,12 +6517,13 @@ void display() {
             ERRCHECK(result,do_play_music_aktiv_table_nr);
           } else {
             sprintf(aktivplay_music_path,"%s/mythweb/music/stream?i=%d",configmysqlhost,aktiv_playlist.get_songid(do_play_music_aktiv_table_nr-1));
-            result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
+            result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);            
             ERRCHECK(result,do_play_music_aktiv_table_nr);
           }
           if (result==0) {
             // start play song
             result = sndsystem->playSound(sound,NULL,false, &channel);
+            musicoversigt.set_music_is_playing(true);
             ERRCHECK(result,do_play_music_aktiv_table_nr);
             if (sndsystem) channel->setVolume(configsoundvolume);
             dsp = 0;
@@ -6536,7 +6540,7 @@ void display() {
           #if defined USE_SDL_MIXER
           // aktivplay_music_path = next song to play
           if (debugmode & 2) fprintf(stderr,"Auto1 Next song %s \n",aktivplay_music_path);
-          sdlmusicplayer = Mix_LoadMUS(aktivplay_music_path);
+          sdlmusicplayer = Mix_LoadMUS(aktivplay_music_path));
           Mix_PlayMusic(sdlmusicplayer, 0);
           if (!(sdlmusicplayer)) ERRCHECK_SDL(Mix_GetError(),do_play_music_aktiv_table_nr);
           #endif
@@ -6546,6 +6550,7 @@ void display() {
           do_play_music_aktiv_table_nr = 1;
           #if defined USE_FMOD_MIXER
           result = sound->release();          		                            // stop last played sound on soundsystem fmod
+          musicoversigt.set_music_is_playing(false);
           ERRCHECK(result,do_play_music_aktiv_table_nr);
           #endif
           #if defined USE_SDL_MIXER
@@ -6566,6 +6571,7 @@ void display() {
       aktiv_playlist.m_play_playlist(aktivplay_music_path,do_play_music_aktiv_table_nr-1);			// hent aktive sang i playliste
       #if defined USE_FMOD_MIXER
       sound->release();							// stop last playing song
+      musicoversigt.set_music_is_playing(false);
       if (strcmp(configsoundoutport,"STREAM")!=0) {
         result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
         ERRCHECK(result,do_play_music_aktiv_table_nr-1);
@@ -6576,6 +6582,7 @@ void display() {
       }
       if (result==0) {
         result = sndsystem->playSound( sound,NULL,false, &channel);
+        musicoversigt.set_music_is_playing(true);
         ERRCHECK(result,do_play_music_aktiv_table_nr-1);
         if (sndsystem) channel->setVolume(configsoundvolume);
         dsp=0;
@@ -6621,6 +6628,7 @@ void display() {
       }
       if (result==0) {
         result = sndsystem->playSound(sound, NULL,false, &channel);
+        musicoversigt.set_music_is_playing(true);
         ERRCHECK(result,do_play_music_aktiv_table_nr);
         if (sndsystem) channel->setVolume(configsoundvolume);
         dsp=0;
@@ -6685,9 +6693,6 @@ void display() {
   glutSwapBuffers();
 }
 // end display()
-
-
-
 
 
 
@@ -9069,7 +9074,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (tidalknapnr>0)) {
           // rember name of playlist to save it later if needed and user press 'S' for save playlist this it is in use.
           strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
-          keybufferindex=strlen(playlistfilename);          
+          keybufferindex=strlen(playlistfilename);
           ask_open_dir_or_play_tidal=false;                                                               // close widow again
           switch (tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
             case 0: fprintf(stderr,"button nr %d play tidal playlist %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
@@ -15167,7 +15172,9 @@ int main(int argc, char** argv) {
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // load default file
-      tidal_oversigt.get_artist_from_file("");
+      if (checkartistdbexist()==false) {
+        tidal_oversigt.get_artist_from_file("");
+      }
 
       tidal_oversigt.opdatere_tidal_oversigt(0);      
     } else {

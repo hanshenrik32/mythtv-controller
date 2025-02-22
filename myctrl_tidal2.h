@@ -219,7 +219,7 @@ class tidal_class {
 
     int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
     int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
-    
+   
     
     int load_tidal_iconoversigt();                                                                  // load all icons
     int get_access_token(char *loginbase64);                                                        // get token
@@ -252,9 +252,14 @@ class tidal_class {
     bool delete_record_in_view(long tidalknapnr);
     int get_users_playlist_plus_favorite(bool cleandb);
 
+    void set_tidal_playing_flag(bool flag);
+    bool get_tidal_playing_flag();
+
     // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
     // void thread_convert_m4a_to_flac(void *path);
 };
 
 int tidal_download_image(char *imgurl,char *filename);      // not in use
 #endif
+
+bool checkartistdbexist();
