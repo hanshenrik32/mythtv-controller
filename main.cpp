@@ -4656,6 +4656,7 @@ void display() {
               }
               if (result==FMOD_OK) {
                 result = sndsystem->playSound( sound,NULL,false, &channel);
+                musicoversigt.set_music_is_playing(true);
                 ERRCHECK(result,do_play_music_aktiv_table_nr);
                 if (sndsystem) channel->setVolume(configsoundvolume);
               } else {
@@ -6548,9 +6549,9 @@ void display() {
           do_zoom_music_cover = true;				                                  // show music cover info til timeout showtimeout
         } else {				                                    		              // else slet playliste (reset player)
           do_play_music_aktiv_table_nr = 1;
-          #if defined USE_FMOD_MIXER
-          result = sound->release();          		                            // stop last played sound on soundsystem fmod
           musicoversigt.set_music_is_playing(false);
+          #if defined USE_FMOD_MIXER
+          result = sound->release();          		                            // stop last played sound on soundsystem fmod          
           ERRCHECK(result,do_play_music_aktiv_table_nr);
           #endif
           #if defined USE_SDL_MIXER
