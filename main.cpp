@@ -15140,9 +15140,10 @@ int main(int argc, char** argv) {
         case 256:fprintf(stderr,"Tv program stuf.\n");
                 break;
         case 512:fprintf(stderr,"Media importer.\n");
-                break;
       }
-    }    
+    }
+    
+    
     #ifdef ENABLE_TIDAL
     bool tidalok;
     // login tidal
