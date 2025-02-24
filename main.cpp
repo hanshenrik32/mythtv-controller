@@ -4393,7 +4393,7 @@ void display() {
       write_logfile(logfile,(char *) "Stop music player.");
       if (snd==0) {
         snd = 1;
-        sprintf(debuglogdata,"Start playing radio station url %s ",radiooversigt.get_stream_url(rknapnr-1));
+        sprintf(debuglogdata,"Start playing radio station url %s",radiooversigt.get_stream_url(rknapnr-1));
         write_logfile(logfile,(char *) debuglogdata);
         if (snd == 0) {
             #if defined USE_FMOD_MIXER
@@ -15140,14 +15140,12 @@ int main(int argc, char** argv) {
         case 256:fprintf(stderr,"Tv program stuf.\n");
                 break;
         case 512:fprintf(stderr,"Media importer.\n");
-                break;
       }
     }
-    
     #ifdef ENABLE_TIDAL
     bool tidalok;
     // login tidal
-    tidalok=tidal_oversigt.get_access_token((char *) "TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
+    tidalok=tidal_oversigt.get_access_token((char *) "your access token");
     if (tidalok) {   
       // login ok load playlistes from file
       // get users playlists if not loaded before      
