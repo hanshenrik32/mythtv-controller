@@ -15157,8 +15157,8 @@ int main(int argc, char** argv) {
       
       // ** my playliste default first time load
 
-
       /*
+      test
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
@@ -15172,9 +15172,8 @@ int main(int argc, char** argv) {
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // load default file
       if (checkartistdbexist()==false) {
-        tidal_oversigt.get_artist_from_file("");
+        tidal_oversigt.get_artist_from_file((char *) "");
       }
-
       tidal_oversigt.opdatere_tidal_oversigt(0);      
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
