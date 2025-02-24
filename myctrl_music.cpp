@@ -995,6 +995,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
       antal_music_oversigt=i-1;
       if (debugmode & 2) printf(" %d CD Covers loaded.\n",antal_music_oversigt);
     }
+    
     musicoversigt_antal=i;						// antal i oversigt
     mysql_close(conn);
     return(i);
