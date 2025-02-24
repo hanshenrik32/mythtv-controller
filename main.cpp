@@ -15142,8 +15142,7 @@ int main(int argc, char** argv) {
         case 512:fprintf(stderr,"Media importer.\n");
                 break;
       }
-    }
-    
+    }    
     #ifdef ENABLE_TIDAL
     bool tidalok;
     // login tidal
