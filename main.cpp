@@ -4393,7 +4393,7 @@ void display() {
       write_logfile(logfile,(char *) "Stop music player.");
       if (snd==0) {
         snd = 1;
-        sprintf(debuglogdata,"Start playing radio station url %s ",radiooversigt.get_stream_url(rknapnr-1));
+        sprintf(debuglogdata,"Start playing radio station url %s",radiooversigt.get_stream_url(rknapnr-1));
         write_logfile(logfile,(char *) debuglogdata);
         if (snd == 0) {
             #if defined USE_FMOD_MIXER
