@@ -392,8 +392,8 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(spotify_secret_id,"");                                               //
     strcpy(spotifytoken,"");                                                    //
     strcpy(spotifytoken_refresh,"");                                            //
-    strcpy(spotify_client_id,"0you-tidal-code");
-    strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
+    strcpy(spotify_client_id,"you-tidal-code");               //
+    strcpy(spotify_secret_id,"you-secret-id");               //
     strcpy(active_default_play_device_name,"");
     strcpy(overview_show_band_name,"");                                         //
     strcpy(overview_show_cd_name,"");                                           //
