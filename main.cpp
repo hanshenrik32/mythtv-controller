@@ -15150,15 +15150,14 @@ int main(int argc, char** argv) {
       // login ok load playlistes from file
       // get users playlists if not loaded before      
       // tidal_oversigt.get_users_playlist_plus_favorite(false);
-
       // load from file
       // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
-      // get_playlist_from_file use get_users_album(albumid) to download files
-      
+      // get_playlist_from_file use get_users_album(albumid) to download files     
       // ** my playliste default first time load
 
+
+      // test
       /*
-      test
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
@@ -15168,8 +15167,8 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
       tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skilex
       */
-
-      //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
+  
+      // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // load default file
       if (checkartistdbexist()==false) {
         tidal_oversigt.get_artist_from_file((char *) "");

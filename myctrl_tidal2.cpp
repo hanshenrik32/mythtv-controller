@@ -2050,10 +2050,10 @@ void tidal_class::clean_tidal_oversigt() {
 // *********************************************************************************************************************************
 // Download image
 // sample call
-// download_image("https://i.scdn.co/image/ab67616d0000b2737bded29598acbe1e2f4b4437","/home/hans/image_filename.jpg");
+// download_image("https://i.scdn.co/image/ab67616d0000b2737bded29598acbe1e2f4b4437","/home/user/image_filename.jpg");
 // ********************************************************************************************
 
-int tidal_download_image(char *imgurl,char *filename) {
+int tidal_class::tidal_download_image(char *imgurl,char *filename) {
   FILE *file;
   std::string response_string;
   CURLcode res;
