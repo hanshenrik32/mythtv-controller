@@ -15198,7 +15198,6 @@ int main(int argc, char** argv) {
     //tridal_oversigt.tridal_login_token2();
     #endif
 
-
     recordoversigt.opdatere_recorded_oversigt();      
 
     if (configbackend_openspotify_player) {

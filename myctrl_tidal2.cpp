@@ -988,7 +988,12 @@ bool checkartistdbexist() {
   if (atoi(antal.c_str())>0) return(true); else return(false);
 }
 
-// 
+
+// ****************************************************************************************
+//
+// load from file.
+//
+// ****************************************************************************************
 
 int tidal_class::get_artist_from_file(char *filename) {
   FILE *fp;
@@ -997,6 +1002,7 @@ int tidal_class::get_artist_from_file(char *filename) {
   size_t len=0;
   bool readok=false;
   if (strlen(filename)==0) {
+    // open default name
     fp=fopen("tidal_artistlists.txt","r");
   } else {
     fp=fopen(filename,"r");
@@ -1260,7 +1266,7 @@ int tidal_class::get_users_album(char *albumid) {
               mysql_store_result(conn);
             }
             //
-            // insert record created playlist if not exist ( song name )
+            // insert record created playlist if not exist ( playlist name )
             //  
             if (playlistexist==false) {            
               snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"%s\",'%s','%s','%s','%s',%d)",  stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url, albumid, stack[tt]->feed_release_date,stack[tt]->feed_artist, 0);
@@ -1696,6 +1702,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   int create_new_record_antal=0;
   int created_playlist;
   std::string sqll;
+  std::string last_artist="";
   // process json artist file after create file name
   
   // tidal_artist_playlist_$artistid.json have the data
@@ -1769,6 +1776,11 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                 write_logfile(logfile,(char *) "mysql create table error.");
                 fprintf(stdout,"SQL : %s\n",sql);
               }
+              sprintf(sql,"CREATE UNIQUE INDEX IF NOT EXISTS tidalcontentartist_artistid_IDX USING BTREE ON mythtvcontroller.tidalcontentartist (artistid)");
+              if (mysql_query(conn,sql)!=0) {
+                write_logfile(logfile,(char *) "mysql create index error.");
+                fprintf(stdout,"SQL : %s\n",sql);
+              }
               res = mysql_store_result(conn);
               // create index for playlist
               sprintf(sql,"CREATE UNIQUE INDEX IF NOT EXISTS tidalcontent_playpath_IDX USING BTREE ON mythtvcontroller.tidalcontent (playpath)");
@@ -1816,12 +1828,26 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                     sqll = sqll + "','";
                     sqll = sqll + stack[recnr]->feed_artist;
                     sqll = sqll + "',0)";
-                    strcpy(stack[recnr]->feed_artist,"");                   // reset to get data again else it will ignore it.
                     if (mysql_query(conn,sqll.c_str())!=0) {
                       write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
                       fprintf(stdout,"Error SQL : %s\n",sql);
                     }
                     mysql_store_result(conn);
+                    // create artist if not exist
+                    if (last_artist!=stack[recnr]->feed_artist) {
+                      sqll = "insert into mythtvcontroller.tidalcontentartist (artistname,paththumb,artistid,id) values (";
+                      sqll = sqll + "'";
+                      sqll = sqll + stack[recnr]->feed_artist;
+                      sqll = sqll + "','none','";
+                      sqll = sqll + stack[recnr]->feed_artist;
+                      sqll = sqll + "',0)";
+                      if (mysql_query(conn,sqll.c_str())!=0) {
+                        write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentartist).");
+                      }
+                      last_artist=stack[recnr]->feed_artist;
+                      mysql_store_result(conn);
+                    }
+                    strcpy(stack[recnr]->feed_artist,"");                   // reset to get data again else it will ignore it.
                     printf("Tidal downloading album + json file %s  nr %d \n",stack[recnr]->playlistid,recnr);
                     // Download playlist json file + update db from the downloaded json file.
                     // get_users_album(stack[recnr]->playlistid);
@@ -2033,7 +2059,7 @@ void tidal_class::clean_tidal_oversigt() {
         if (stack[i]->textureId) {
           // if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
         }
-        delete stack[i];
+        if (stack[i]) delete stack[i];
       }
       stack[i]=NULL;
     }
@@ -3624,7 +3650,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         }
         // hent artist name from db
         // snprintf(sql,sizeof(sql),"select playlistname,artistid,release_date from mythtvcontroller.tidalcontentplaylist where playlistid like '%s'",stack[tidalknapnr]->playlistid);
-        sql1 = fmt::v8::format("select playlistname,artistid,release_date from mythtvcontroller.tidalcontentplaylist where playlistid like '{}'",stack[tidalknapnr]->playlistid);
+        sql1 = fmt::v8::format("select playlistname,tidalcontentartist.artistname,release_date from tidalcontentplaylist left join tidalcontentartist on tidalcontentplaylist.artistid=tidalcontentartist.artistid where playlistid like '{}'",stack[tidalknapnr]->playlistid);
         if (mysql_query(conn,sql1.c_str())!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");
           fprintf(stdout,"ERROR SQL : %s\n",sql);
