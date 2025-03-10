@@ -1969,7 +1969,7 @@ int tidal_class::tidal_get_user_id() {
 
 
 // ****************************************************************************************
-// test test test
+// test test test (NOT IN USE)
 // 1 . auth_device
 //
 // return -1 if fault
@@ -2075,8 +2075,10 @@ void tidal_class::clean_tidal_oversigt() {
 
 // *********************************************************************************************************************************
 // Download image
+//
 // sample call
 // download_image("https://i.scdn.co/image/ab67616d0000b2737bded29598acbe1e2f4b4437","/home/user/image_filename.jpg");
+//
 // ********************************************************************************************
 
 int tidal_class::tidal_download_image(char *imgurl,char *filename) {
@@ -2894,7 +2896,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
   /*
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="openapi.tidal.com/search/?query=";
+  url="https://openapi.tidal.com/v2/searchresults/";
   url=url + keybuffer;
   // 1 = artist, 2 = track
   if (type==1) url=url + "&type=ARTISTS&offset=0&limit=100&countryCode=US&popularity=WORLDWIDE";
@@ -2978,11 +2980,10 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
         value = json_parse(file_contents,file_size);                                  // parser create value obj
         antal=-1;                                                                     // reset antal  
         antalplaylists=0;
-        process_tidal_search_result(value, 0,0);                                      // process to stack variable
+        process_tidal_search_result(value, 0,0);                                      // process json to stack variable
         if (file_contents) free(file_contents);                                       // free memory again
         json_value_free(value);                                                       // json clean up
-  
-        texture_loaded = false;
+        texture_loaded = false;                                                       // set load flag
 
         // stack is ready
         // the array is ready
@@ -3630,7 +3631,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         // hent song names from db
         std::string sql1;
-        // snprintf(sql,sizeof(sql),"select name, playpath from mythtvcontroller.tidalcontent where playlistid like '%s' order by name",stack[tidalknapnr]->playlistid);
         sql1 = fmt::v8::format("select name, playpath from mythtvcontroller.tidalcontent where playlistid like '{}' order by name",stack[tidalknapnr]->playlistid);
         if (mysql_query(conn,sql1.c_str()) != 0) {
           write_logfile(logfile,(char *) "mysql select table error.");
@@ -3649,7 +3649,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           if (recnr>0) tidal_aktiv_song_antal = recnr-1;                                                   // set antal songs in playlist
         }
         // hent artist name from db
-        // snprintf(sql,sizeof(sql),"select playlistname,artistid,release_date from mythtvcontroller.tidalcontentplaylist where playlistid like '%s'",stack[tidalknapnr]->playlistid);
         sql1 = fmt::v8::format("select playlistname,tidalcontentartist.artistname,release_date from tidalcontentplaylist left join tidalcontentartist on tidalcontentplaylist.artistid=tidalcontentartist.artistid where playlistid like '{}'",stack[tidalknapnr]->playlistid);
         if (mysql_query(conn,sql1.c_str())!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");

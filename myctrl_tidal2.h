@@ -195,6 +195,7 @@ class tidal_class {
     void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
     void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
+    // not in use
     int auth_device_authorization();
 
     char *tidal_aktiv_song_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].song_name ); };                       //
