@@ -399,6 +399,8 @@ tidal_class::tidal_class() : antal(0) {
   tidal_update_loaded_begin = false;                                          // true then we are update the stack data
 }
 
+
+
 // ****************************************************************************************
 //
 // destructor
@@ -410,6 +412,8 @@ tidal_class::~tidal_class() {
   mg_mgr_free(&client_mgr);                                      // delete web client
   clean_tidal_oversigt();                                          // clean tidal class
 }
+
+
 
 
 // ****************************************************************************************
@@ -2053,13 +2057,13 @@ int tidal_class::auth_device_authorization() {
 
 void tidal_class::clean_tidal_oversigt() {
     startup_loaded=false;
-    for(int i=1;i<antal;i++) {
+    for(int i=1;i<antal-1;i++) {
       if (stack[i]) {
         // crash
         if (stack[i]->textureId) {
           // if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
         }
-        if (stack[i]) delete stack[i];
+        if (stack[i]) delete(stack[i]);
       }
       stack[i]=NULL;
     }
@@ -3377,7 +3381,7 @@ void *thread_convert_m4a_to_flac(void *path) {
 /*
 eks
 
-/bin/curl -v 'https://listen.tidal.com/us/album/315509960/track/315509961' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer eyJraWQiOiJ2OU1GbFhqWSIsImFsZyI6IkVTMjU2In0.eyJ0eXBlIjoibzJfYWNjZXNzIiwic2NvcGUiOiIiLCJnVmVyIjowLCJzVmVyIjowLCJjaWQiOjEwNjA2LCJleHAiOjE3MDMxOTAxNjksImlzcyI6Imh0dHBzOi8vYXV0aC50aWRhbC5jb20vdjEifQ.IEHjsNsu358r2I5ISJt57wYwlSW9xOFTpgwky_8zvkz9u42U3_qH1iOh6YDxaOZYbUwKfUrj6tBRn2lxm1H8Xw'
+/bin/curl -v 'https://listen.tidal.com/us/album/315509960/track/315509961' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer eyJraWQi....'
 // sample
 https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
@@ -3658,8 +3662,8 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         if (mysql_res) {
           recnr=0;
           while ((( mysql_row = mysql_fetch_row(mysql_res)) != NULL )) {
-            strcpy( tidal_aktiv_song[0].album_name,mysql_row[0] );
-            strcpy( tidal_aktiv_song[0].artist_name,mysql_row[1] );
+            if (strlen(mysql_row[0])>0) strcpy( tidal_aktiv_song[0].album_name,mysql_row[0] );
+            if (strlen(mysql_row[1])>0) strcpy( tidal_aktiv_song[0].artist_name,mysql_row[1] );
             strcpy( tidal_aktiv_song[0].release_date,mysql_row[2] );
             strcpy( tidal_playlistname,mysql_row[0] );                                            // set playlist name to show
           }
@@ -3854,6 +3858,7 @@ int tidal_class::gettoken() {
 // do not work for now
 //
 // ****************************************************************************************
+
 int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {  
   std::size_t foundpos;
   char auth_kode[1024];
@@ -4347,7 +4352,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
           } else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         } else {
           if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-        }        
+        }
       } else {
         if ((i+sofset)==0) {
           if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
