@@ -11702,25 +11702,26 @@ void handleKeypress(unsigned char key, int x, int y) {
               break;
             case 13:           
               if (vis_music_oversigt) {
-                if (ask_save_playlist) write_logfile(logfile,(char *) "Save playlist key pressed, update music list.\n");
-                else write_logfile(logfile,(char *) "Enter key pressed, update music list.\n");
-              } else if (vis_radio_oversigt) write_logfile(logfile,(char *) "Enter key pressed, play radio station.\n");
-              else if (vis_stream_oversigt) write_logfile(logfile,(char *) "Enter key pressed, update stream view.\n");
-              else if (do_show_setup_network) write_logfile(logfile,(char *) "Enter key pressed in set network\n");
-              else if (vis_tv_oversigt) write_logfile(logfile,(char *) "Enter key pressed in vis tv oversigt\n");
-              else if (do_show_tvgraber) write_logfile(logfile,(char *) "Enter key pressed in vis show tvgraber\n");
-              else if (vis_spotify_oversigt) write_logfile(logfile,(char *) "Enter key pressed in vis show spotify\n");
-              else if (vis_tidal_oversigt) write_logfile(logfile,(char *) "Enter key pressed in vis show tidal\n");
-              write_logfile(logfile,(char *) "Start search....");
+                if (ask_save_playlist) write_logfile(logfile,(char *) "Save playlist key pressed, update music list.");
+                else write_logfile(logfile,(char *) "Enter key pressed, update music list.");
+              } else if (vis_radio_oversigt) write_logfile(logfile,(char *) "Enter key pressed, play radio station.");
+              else if (vis_stream_oversigt) write_logfile(logfile,(char *) "Enter key pressed, update stream view.");
+              else if (do_show_setup_network) write_logfile(logfile,(char *) "Enter key pressed in set network");
+              else if (vis_tv_oversigt) write_logfile(logfile,(char *) "Enter key pressed in tv oversigt");
+              else if (do_show_tvgraber) write_logfile(logfile,(char *) "Enter key pressed in show tvgraber");
+              else if (vis_spotify_oversigt) write_logfile(logfile,(char *) "Enter key pressed in show spotify");
+              else if (vis_tidal_oversigt) write_logfile(logfile,(char *) "Enter key pressed in show tidal");
               // set save flag of playlist
               if (vis_tidal_oversigt) {
                 if (ask_save_playlist) {
                   save_ask_save_playlist = true;
                 }
-
-                if ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt)) do_hent_tidal_search_online=true;
-
-
+                if (do_show_tidal_search_oversigt) do_hent_tidal_search_online=true;
+                if ((tidalknapnr>0) && (do_show_tidal_search_oversigt==false)) {
+                  // play song
+                  // it is not playing (find error)
+                  do_play_tidal=tidalknapnr;
+                }
               }
               if (vis_spotify_oversigt) {
                 if (ask_save_playlist) {
@@ -11749,7 +11750,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // search spotify
               #ifdef ENABLE_SPOTIFY
               if (vis_spotify_oversigt) {
-                hent_spotify_search = true;				              // start stream station search
+                hent_spotify_search = true;				              // start spotify search
                 spotifyknapnr=spotify_select_iconnr;            // selected
                 spotify_key_selected=1;
                 spotify_select_iconnr=0;

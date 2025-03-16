@@ -881,13 +881,16 @@ bool tidal_class::delete_record_in_view(long tidalknapnr) {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
-  int n;
+  long n;
+  long db_recnr;
+  std::string playlistid;
   std::string sql_delete;
   std::string tmptxt;
-  n=tidalknapnr;
   conn = mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
   n=tidalknapnr;
+  db_recnr=stack[n]->intnr;
+  playlistid = stack[n]->playlistid;
   // remove element from view
   while(n<antalplaylists-2) {
     stack[n]=stack[n+1];
@@ -899,11 +902,11 @@ bool tidal_class::delete_record_in_view(long tidalknapnr) {
     antalplaylists--;  
     // clean up in db to.
     if (atoi(stack[tidalknapnr]->playlistid)>0) {
-      sql_delete = fmt::v8::format("delete from mythtvcontroller.tidalcontentplaylist where playlistid='{}' limit 1",stack[tidalknapnr]->playlistid);
+      sql_delete = fmt::v8::format("delete from mythtvcontroller.tidalcontentplaylist where id='{}' limit 1", db_recnr);
       mysql_query(conn,sql_delete.c_str());
       res = mysql_store_result(conn);
       // delete files from playlist in disk
-      sql_delete = fmt::v8::format("select playpath from mythtvcontroller.tidalcontent where playlistid='{}'",stack[tidalknapnr]->playlistid);
+      sql_delete = fmt::v8::format("select playpath from mythtvcontroller.tidalcontent where playlistid='{}'",playlistid.c_str());
       mysql_query(conn,sql_delete.c_str());
       res = mysql_store_result(conn);
       if (res) {
@@ -2063,7 +2066,7 @@ void tidal_class::clean_tidal_oversigt() {
         if (stack[i]->textureId) {
           // if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
         }
-        if (stack[i]) delete(stack[i]);
+        if (stack[i]) delete stack[i];
       }
       stack[i]=NULL;
     }
@@ -2413,9 +2416,9 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
             stack[antal]->feed_group_antal=0;
             stack[antal]->feed_path_antal=0;
             stack[antal]->textureId=0;
-            stack[antal]->intnr=atoi(row[3]);
+            stack[antal]->intnr=atoi(row[5]);                               // før 3
             stack[antal]->nyt=false;
-            stack[antal]->type=0;
+            stack[antal]->type=0;            
             // top level (load playlist)
             if (getart == tidal_playlisttype ) {
               strncpy(stack[antal]->feed_showtxt,row[0],tidal_pathlength);
@@ -4067,7 +4070,9 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       if (this->texture_loaded==false) {
         if (stack[i+sofset]->textureId==0) {        
           if (file_exists(stack[i+sofset]->feed_gfx_url)) {
-            stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
+            if (check_zerro_bytes_file(stack[i+sofset]->feed_gfx_url)) {
+              stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
+            }
           }
         }
         gfx_loadnr++;
