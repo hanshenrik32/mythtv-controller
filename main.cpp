@@ -11718,11 +11718,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
                 if (do_show_tidal_search_oversigt) do_hent_tidal_search_online=true;
                 if ((tidalknapnr>0) && (do_show_tidal_search_oversigt==false)) {
-                  // play song
+                  // set play playlist flag
                   // it is not playing (find error)
                   do_play_tidal=tidalknapnr;
                 }
-              }
+              }              
               if (vis_spotify_oversigt) {
                 if (ask_save_playlist) {
                   save_ask_save_playlist = true;

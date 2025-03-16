@@ -24,6 +24,7 @@
 #include <filesystem>                   // File system access.
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include <fmt/format.h>
 
 
@@ -427,6 +428,13 @@ void tidal_class::set_textureloaded(bool set) {
 }
 
 
+// ****************************************************************************************
+//
+// get album by artist NOT IN USE
+//
+// ****************************************************************************************
+
+
 int Get_albums_by_artist() {
   std::string curlstring="curl -X 'GET' \
   'https://openapi.tidal.com/artists/1566/albums?countryCode=US&offset=0&limit=50' \
@@ -800,7 +808,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
             stack[antal]=new (tidal_oversigt_type);
           }
           if (stack[antal]) {
-//              printf("antal %d process_name %s \n",antal,value->u.string.ptr);
+            // printf("antal %d process_name %s \n",antal,value->u.string.ptr);
             strcpy(stack[antal]->feed_name,value->u.string.ptr);
           }
           tidal_process_name=false;
@@ -1020,7 +1028,7 @@ int tidal_class::get_artist_from_file(char *filename) {
       artistidtxt[strcspn(artistidtxt,"\n")]=0;                                   // remove \n from string
       if (artistidtxt) {
         if (*artistidtxt!='#') {
-          if (tidal_get_artists_all_albums((char *) artistidtxt,true)) sleep(3);          
+          if (tidal_get_artists_all_albums((char *) artistidtxt,true)) sleep(3);
         }
       }
     }
@@ -2446,7 +2454,6 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
               convertcommand = convertcommand + " ";
               convertcommand = convertcommand + downloadfilenamelong;
               system(convertcommand.c_str());
-
               antal++;
             }
             // load playlist songs
@@ -2506,7 +2513,7 @@ int tidal_class::tidal_get_playlist(const char *playlist,bool force,bool create_
 
 int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {
   // not in use for now  
-return(1);
+  return(1);
 }
 
 
@@ -3143,16 +3150,16 @@ void *thread_convert_m4a_to_flac(void *path) {
   std::size_t found;
   std::string checkfilexist_name;
   std::filesystem::path dir_files;
-  std::string dir_file_array[1024];
+  std::vector<std::string> files;
   std::string playlist_id;
   std::string sql1;
+  std::string dbfilename;
   char sql[8192];
   char *database = (char *) "mythtvcontroller";
   MYSQL *conn;
   MYSQL_RES *mysql_res;
   MYSQL_ROW mysql_row;
   int i = 0;
-  int antalfiles=0;
   int error;
   struct dirent *ep;
   FILE *fp;
@@ -3160,19 +3167,17 @@ void *thread_convert_m4a_to_flac(void *path) {
   conn=mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
   dirtocheck=tidal_download_home + (char *) path;
-
   // first check if it have dirs that have m4a files check 4 dirs
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD1/";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ent = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ent = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ent->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD1/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD1/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);
@@ -3180,14 +3185,13 @@ void *thread_convert_m4a_to_flac(void *path) {
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD2/";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ent = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ent = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ent->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD2/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD2/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);
@@ -3195,14 +3199,13 @@ void *thread_convert_m4a_to_flac(void *path) {
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD3/";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ent = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ent = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ent->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD3/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD3/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);
@@ -3210,14 +3213,13 @@ void *thread_convert_m4a_to_flac(void *path) {
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD4/";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ep = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ep->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD4/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD4/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);    
@@ -3225,14 +3227,13 @@ void *thread_convert_m4a_to_flac(void *path) {
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD5";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ep = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ep->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD5/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD5/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);
@@ -3240,14 +3241,13 @@ void *thread_convert_m4a_to_flac(void *path) {
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD6";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ep = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ep->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD6/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD6/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);
@@ -3255,14 +3255,13 @@ void *thread_convert_m4a_to_flac(void *path) {
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD7";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ep = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ep->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD7/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD7/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);
@@ -3270,14 +3269,13 @@ void *thread_convert_m4a_to_flac(void *path) {
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD8";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ep = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ep->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD8/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD8/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);
@@ -3285,29 +3283,27 @@ void *thread_convert_m4a_to_flac(void *path) {
   temptxt = dirtocheck;
   temptxt = temptxt + "/CD9";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+    while (((ep = readdir (dir)) != NULL)) {
       dir_found=true;
       filename=ep->d_name;
       if (filename.find(".m4a") != std::string::npos) {
         dir_files=filename;
-        dir_file_array[antalfiles]="CD9/";
-        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
-        antalfiles++;
+        dbfilename= "CD9/" + dir_files.stem().string();
+        files.push_back(dbfilename);
       }
     }
     if (dir) closedir (dir);
   }
   // normal no subdirs
   if (dir_found == false) {
-    antalfiles=0;
     dir = opendir (dirtocheck.c_str());
     if (dir != NULL) {
       while (ep = readdir (dir)) {
         filename=ep->d_name;
         dir_files=filename;
         if (filename.find(".m4a") != std::string::npos) {
-          dir_file_array[antalfiles]=dir_files.stem().string();                   // get only filename not .ext name
-          antalfiles++;
+          dbfilename= dir_files.stem().string();
+          files.push_back(dbfilename);  
         }
       }
       if (dir) closedir (dir);
@@ -3321,45 +3317,44 @@ void *thread_convert_m4a_to_flac(void *path) {
     playlist_id.erase(0,14);                                                  // get playlistid
     myfile.close();
   }
-  // create in db if not exist
-  while(i<=antalfiles-1) {
+  while(i<files.size()) {
     checkfilexist_name = tidal_download_home;
     checkfilexist_name = checkfilexist_name + (char *) path;
     checkfilexist_name = checkfilexist_name + "/";
-    checkfilexist_name = checkfilexist_name + dir_file_array[i];
+    checkfilexist_name = checkfilexist_name + files[i];
     checkfilexist_name = checkfilexist_name + ".wav";
     if (!(file_exists(checkfilexist_name.c_str()))) {
       temptxt = "ffmpeg -y -i \"";
       temptxt = temptxt + tidal_download_home;
       temptxt = temptxt + (char *) path;
       temptxt = temptxt + "/";
-      temptxt = temptxt + dir_file_array[i];
+      temptxt = temptxt + files[i];
       temptxt = temptxt + ".m4a\" \"";
       temptxt = temptxt + tidal_download_home;
       temptxt = temptxt + (char *) path;
       temptxt = temptxt + "/";      
-      temptxt = temptxt + dir_file_array[i];
+      temptxt = temptxt + files[i];
       temptxt = temptxt + ".wav\"";
       error=system(temptxt.c_str());
       if (error!=0) {
         write_logfile(logfile,(char *) "Tidal error: can not convert m4a files to wav.");
       }
       // store in db
-      if (conn) {
+      if ((conn) && (error==0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         mysql_res = mysql_store_result(conn);
         checkfilexist_name = tidal_download_home;
         checkfilexist_name = checkfilexist_name + (char *) path;
         checkfilexist_name = checkfilexist_name + "/";
-        checkfilexist_name = checkfilexist_name + dir_file_array[i];
+        checkfilexist_name = checkfilexist_name + files[i];
         checkfilexist_name = checkfilexist_name + ".wav";        
         // create records if needed
-        sql1="insert into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, id) values (\"" + dir_file_array[i] + "\",\"\",\"" + checkfilexist_name + "\"," + playlist_id + "," + "0)";
+        sql1="insert into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, id) values (\"" + files[i] + "\",\"\",\"" + checkfilexist_name + "\"," + playlist_id + "," + "0)";
         // printf("sql %s \n",sql1.c_str());
         if (conn) {
           if (mysql_query(conn,sql1.c_str())!=0) {
-            write_logfile(logfile,(char *) "mysql create table error.");
-            printf("sql %s \n",sql1.c_str());
+            write_logfile(logfile,(char *) "mysql create table error. (tidalcontent)");
+            printf("error sql %s \n",sql1.c_str());
             // exit by error
             exit(1);
           }
