@@ -109,6 +109,17 @@ class tidal_class {
     // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
     void process_tidal_search_result(json_value* value, int depth,int x);
     // process_tidal_search_result is used in opdatere_tidal_oversigt_searchtxt_online
+
+    // json parser subs.
+    void process_value_token(json_value* value, int depth,int x);
+    void process_object_token(json_value* value, int depth);
+    void process_array_token(json_value* value, int depth);
+    // used by tidal_get_artists_all_albums
+    void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
+    // used by process_tidal_get_artists_all_albums to process json files
+    void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
+    void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
+
   public:
     bool search_loaded;
     bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
@@ -168,10 +179,6 @@ class tidal_class {
     char *get_device_id(int nr) { return(tidal_device[nr].id); };         // get active dev id
     char *get_device_name(int nr) { return(tidal_device[nr].name); };     // get active dev id
 
-    // json parser subs.
-    void process_value_token(json_value* value, int depth,int x);
-    void process_object_token(json_value* value, int depth);
-    void process_array_token(json_value* value, int depth);
 
     // check if done
     int tidal_do_we_play();                                               // Do we play song now
@@ -188,6 +195,7 @@ class tidal_class {
     void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
     void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
+    // not in use
     int auth_device_authorization();
 
     char *tidal_aktiv_song_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].song_name ); };                       //
@@ -202,8 +210,9 @@ class tidal_class {
     int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
     int total_aktiv_songs() { return(tidal_aktiv_song_antal); };                                                          // # of songs in playlist
 
+    // return type playlist
     int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
-    GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
+    // GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
     int antal_tidal_streams() { return antalplaylists; };
     char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
     char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
@@ -226,16 +235,10 @@ class tidal_class {
     // download all albums by artist id
     int tidal_get_artists_all_albums(char *artistid,bool force);
 
-    // used by tidal_get_artists_all_albums
-    void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
-    // used by process_tidal_get_artists_all_albums to process json files
-    void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
-    void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
 
     int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
     int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
-    void set_textureloaded(bool set);
-
+    void set_textureloaded(bool set);                                               // set flag for textures loaded
     int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid,char *artistname);
     bool delete_record_in_view(long tidalknapnr);
     int get_users_playlist_plus_favorite(bool cleandb);
@@ -249,9 +252,9 @@ class tidal_class {
     int get_users_album(char *albumid);                                                             // download json file for album id
     // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
     // void thread_convert_m4a_to_flac(void *path);
+    int tidal_download_image(char *imgurl,char *filename);
 };
 
-int tidal_download_image(char *imgurl,char *filename);      // not in use
 #endif
 
 bool checkartistdbexist();
