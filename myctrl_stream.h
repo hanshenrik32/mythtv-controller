@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <vector>
 #include "myth_vlcplayer.h"
 
 const int feed_namelength=80;
