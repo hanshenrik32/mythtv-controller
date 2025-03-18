@@ -81,6 +81,7 @@ extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
 
+// rss feeds and podcast
 
 std::vector<std::string> sql_podcast_array={
   "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Aftenshowet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Aftenshowet',NULL,NULL,'Aftenshowet',0,0,NULL,'https://www.dr.dk/mu/Feed/aftenshowet-9.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
@@ -322,8 +323,12 @@ std::vector<std::string> sql_podcast_array={
   };
 
 
-
+// ****************************************************************************************
+//
 // constructor
+//
+// ****************************************************************************************
+
 stream_class::stream_class() : antal(0) {
     int i;
     for(i=0;i<maxantal;i++) stack[i]=0;
@@ -336,26 +341,42 @@ stream_class::stream_class() : antal(0) {
     stream_is_pause=false;      // is player on pause
 }
 
-
+// ****************************************************************************************
+//
 // destructor
+//
+// ****************************************************************************************
+
 stream_class::~stream_class() {
     clean_stream_oversigt();
 }
 
 
+// ****************************************************************************************
+//
 // return the name
+//
+// ****************************************************************************************
+
 char *stream_class::get_stream_name(int nr) {
   if (nr<antal) return (stack[nr]->feed_name); else return (NULL);
 }
 
-
+// ****************************************************************************************
+//
 // return the description
+//
+// ****************************************************************************************
+
 char *stream_class::get_stream_desc(int nr) {
   if (nr<antal) return (stack[nr]->feed_desc); else return (NULL);
 }
 
+// ****************************************************************************************
+//
 // clean up number of created
-
+//
+// ****************************************************************************************
 void stream_class::clean_stream_oversigt() {
     startup_loaded=false;				// set radio station loaded in
     for(int i=1;i<antal;i++) {
@@ -368,8 +389,11 @@ void stream_class::clean_stream_oversigt() {
     stream_oversigt_nowloading=0;
 }
 
-
+// ****************************************************************************************
+//
 // set en stream icon image
+//
+// ****************************************************************************************
 void stream_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
@@ -397,7 +421,8 @@ void stream_class::softstopstream() {
   stream_is_playing=false;
 }
 
-
+// ****************************************************************************************
+//
 // get length on stream
 //
 // ****************************************************************************************
@@ -407,7 +432,8 @@ unsigned long stream_class::get_length_in_ms() {
   return(1);
 }
 
-
+// ****************************************************************************************
+//
 // jump in player
 //
 // ****************************************************************************************
@@ -420,7 +446,8 @@ float stream_class::jump_position(float ofset) {
 // to play streams from web
 //vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
 
-
+// ****************************************************************************************
+//
 // pause stream
 //
 // ****************************************************************************************
@@ -614,11 +641,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
               // parse downloaded xmlfile now (create db records)
               // and get base image from funccall (baseicon (url to image))
               parsexmlrssfile(parsefilename,baseicon);
-
-                     
               //printf("... Parse %s rss file \n",parsefilename);
-
-
             } else {
               printf("XML FILE is missing/not working on %s file.\n",row[3]);
             }
@@ -651,6 +674,8 @@ int stream_class::loadrssfile(bool updaterssfile) {
 
 
 // ****************************************************************************************
+//
+// search and replace used here
 //
 // ****************************************************************************************
 
@@ -769,6 +794,12 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                   strcpy(baseiconfile,(char *) tmpdat);
                   xmlFree(tmpdat);
                 }
+                tmpdat=xmlGetProp(subnode,( xmlChar *) "url");
+                if (tmpdat) {
+                  strcpy(rssprgimage,(char *) tmpdat);
+                  strcpy(baseiconfile,(char *) tmpdat);
+                  xmlFree(tmpdat);
+                }
               }
               if ((content) && (strcmp((char *) subnode->name,"thumbnail")==0)) {
                 content = xmlNodeGetContent(subnode);
@@ -834,7 +865,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 recordexist=false;
                 // check if record exist
                 if (strcmp(rssvideolink,"")!=0) {
-                  snprintf(sqlinsert,sizeof(sqlinsert),"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
+                  snprintf(sqlinsert,sizeof(sqlinsert),"select feedtitle from internetcontentarticles where (feedtitle like \"%s\" and mediaURL like '%s')",rssprgtitle,rssvideolink);
                   mysql_query(conn,sqlinsert);
                   res = mysql_store_result(conn);
                   if (res) {
@@ -842,19 +873,16 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                       recordexist=true;
                     }
                   }
-                  // creoate record if not exist
+                  // create record if not exist
                   if (!(recordexist)) {
                     search_and_replace2(rssprgtitle);
                     search_and_replace2(rssprgfeedtitle);
                     search_and_replace2(rssprgdesc);
                     // write debug log
-                    // snprintf(debuglogdata,sizeof(debuglogdata),"Podcast update title %-20s Date %s",rssprgtitle,rssprgpubdate);
-
                     debuglogdata1 = fmt::v8::format("Podcast update title {} date {}", rssprgtitle,rssprgpubdate);
-
                     write_logfile(logfile,(char *) debuglogdata1.c_str());                  
                     snprintf(sqlinsert,sizeof(sqlinsert),"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
-                    std::string sqlinsert1 = fmt::v8::format("REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('{}','{}','{}','{}','{}','{}','','{}','{}','{}')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,rssprgdesc,rssprgimage,rssopretdato,0);
+                    std::string sqlinsert1 = fmt::v8::format("REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"{}\",'{}',\"{}\",'{}','{}','{}','','{}','{}','{}')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,rssprgdesc,rssprgimage,rssopretdato,0);
                     if (mysql_query(conn,sqlinsert)!=0) {
                       printf("mysql REPLACE table error. %s\n",sqlinsert);
                     }
@@ -927,11 +955,9 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 subnode2=subnode2->next;
               }
               recordexist=false;
-              snprintf(sqlinsert,sizeof(sqlinsert),"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
-
-              sqlinsert1 = fmt::v8::format("SELECT feedtitle from internetcontentarticles where (feedtitle like '{}' mediaURL like '{}' and title like '{}')",rssprgtitle,rssvideolink,rssprgfeedtitle);
-
-              mysql_query(conn,sqlinsert);
+              // snprintf(sqlinsert,sizeof(sqlinsert),"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
+              sqlinsert1 = fmt::v8::format("SELECT feedtitle from internetcontentarticles where (feedtitle like '{}' mediaURL like '{}' and title like \"{}\")",rssprgtitle,rssvideolink,rssprgfeedtitle);
+              mysql_query(conn,sqlinsert1.c_str());
               res = mysql_store_result(conn);
               if (res) {
                 while ((row = mysql_fetch_row(res)) != NULL) {
@@ -1031,9 +1057,6 @@ int get_podcasttype_antal(char *typedata) {
   }
   return(nrofrec);
 }
-
-
-
 
 
 
@@ -1144,6 +1167,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         if (mysql_query(conn,sqlselect)!=0) {
           printf("mysql create index error.\n");
         }
+        // set charset to utf8mb4
+        sqlselect1= "ALTER TABLE internetcontentarticles CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+        if (mysql_query(conn,sqlselect1.c_str())!=0) {
+          printf("mysql create index error.\n");
+        }
       }
       res = mysql_store_result(conn);
       // Create records
@@ -1189,11 +1217,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     // strcat(sqlselect,"' ORDER BY abs(title) desc"); // ASC
     getart=2;
   }
-
+  /*
   printf("\n");
   printf("SQL SELECT ****************************** : %s\n",sqlselect1.c_str());
   printf("\n");
-
+  */
   this->type=getart;					// husk sql type
   write_logfile(logfile,(char *) "RSS stream loader started.");
   conn=mysql_init(NULL);
@@ -1480,315 +1508,393 @@ int stream_class::loadweb_stream_iconoversigt() {
 
 
 void stream_class::playstream(char *url) {
-    vlc_controller::playmedia(url);
+  vlc_controller::playmedia(url);
 }
 
 
 // ****************************************************************************************
 //
+// show stream overview
+// 
 // ****************************************************************************************
 
 
-void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
-
-{
-    int j,ii,k,pos;
-    float buttonsizey=160.0f;                                                   // button size
-    float buttonsizex=200.0f;                                                   // button size
-    float yof=orgwinsizey-(buttonsizey);                                        // start ypos
-    float xof=0.0f;
-    int lstreamoversigt_antal=9*6;
-    int i=0;                                                                    // data ofset in stack array
-    unsigned int sofset=0;
-    int bonline=8;                                                              // antal pr linie
-    float boffset;
-    char gfxfilename[200];
-    std::string gfxfilename1;
-    char downloadfilename[200];
-    std::string downloadfilename1;
-    char downloadfilenamelong[1024];
-    std::string downloadfilenamelong1;
-    char *gfxshortnamepointer;
-    char gfxshortname[200];
-    std::string gfxshortname1;
-    char temptxt[200];
-    char word[200];
-    static char downloadfilename_last[1024];
-    int antal_loaded=0;
-    static int stream_oversigt_loaded_done=0;
-    GLuint texture;
-    static GLuint last_texture;
-    char *base,*right_margin;
-    int length,width;
-    int pline=0;
-    bool show_round_corner=false;
+void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected) {
+  int j,ii,k,pos;
+  float buttonsizey=160.0f;                                                   // button size
+  float buttonsizex=200.0f;                                                   // button size
+  float yof=orgwinsizey-(buttonsizey);                                        // start ypos
+  float xof=0.0f;
+  int lstreamoversigt_antal=9*6;
+  int i=0;                                                                    // data ofset in stack array
+  unsigned int sofset=0;
+  int bonline=8;                                                              // antal pr linie
+  float boffset;
+  char gfxfilename[200];
+  std::string gfxfilename1;
+  char downloadfilename[200];
+  std::string downloadfilename1;
+  char downloadfilenamelong[1024];
+  std::string downloadfilenamelong1;
+  char *gfxshortnamepointer;
+  char gfxshortname[200];
+  std::string gfxshortname1;
+  char temptxt[200];
+  char word[200];
+  static char downloadfilename_last[1024];
+  int antal_loaded=0;
+  static int stream_oversigt_loaded_done=0;
+  GLuint texture;
+  static GLuint last_texture;
+  char *base,*right_margin;
+  int length,width;
+  int pline=0;
+  bool show_round_corner=false;
 
 
-    std::string temprgtxt1;
+  std::string temprgtxt1;
 
-    int cx=100+xof;                 // pos x
-    int cy=80+yof;                  // pos y
-    int dx=buttonsizex-20;          // siz y
-    int dy=buttonsizey-30;          // siz x
-    int r=20;                       // radius    
-    float x0,y0,x,y,a=0.0;
-    const int n=9;
-    float da=1.5707963267948966192313216916398/float(n);
-    int loop;
-    if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
-    if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
-      if (stack[stream_oversigt_loaded_nr]) {
-        strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
-        gfxfilename1 = stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv;
-      } else {
-        strcpy(gfxfilename,"");
-        gfxfilename1 = "";
-      }
-      strcpy(gfxshortname,"");
-      gfxshortname1 = "";
-      gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file     
-      if (gfxshortnamepointer) {
-        strcpy(gfxshortname,gfxshortnamepointer);
-        gfxshortname1 = gfxshortnamepointer;
-      }
-      // load texture if none loaded
-      // get_texture return 0 if not loaded
-      if (get_texture(stream_oversigt_loaded_nr)==0) {
-        if (strlen(gfxfilename)<200) {
-          if (strcmp(gfxfilename1.c_str(),"")!=0) {
-            // check om der findes en downloaded icon
-            strcpy(downloadfilenamelong,"");
-            downloadfilenamelong1 = "";
-            downloadfilenamelong1 = downloadfilenamelong1 + gfxfilename1;
-            strcat(downloadfilenamelong,gfxfilename);
-            if (strcmp(downloadfilename_last,gfxfilename1.c_str())!=0) {
-              // check om filen findes i cache dir eller i mythtv netvision dir
-              if (file_exists(gfxfilename1.c_str())) {
-                texture=loadTexture ((char *) gfxfilename1.c_str());
-                if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-                last_texture=texture;
-                antal_loaded+=1;
-              } else if (file_exists(downloadfilenamelong1.c_str())) {
-                // er det ikke samme texture som sidst loaded så load it
-                // else set last used
-                texture=loadTexture ((char *) downloadfilenamelong1.c_str());
-                if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-                last_texture=texture;
-                antal_loaded+=1;
-              } else texture=0;
-            } else {
-              if (last_texture) set_texture(stream_oversigt_loaded_nr,last_texture);
+  int cx=100+xof;                 // pos x
+  int cy=80+yof;                  // pos y
+  int dx=buttonsizex-20;          // siz y
+  int dy=buttonsizey-30;          // siz x
+  int r=20;                       // radius    
+  float x0,y0,x,y,a=0.0;
+  const int n=9;
+  float da=1.5707963267948966192313216916398/float(n);
+  int loop;
+  if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
+  if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
+    if (stack[stream_oversigt_loaded_nr]) {
+      strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
+      gfxfilename1 = stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv;
+    } else {
+      strcpy(gfxfilename,"");
+      gfxfilename1 = "";
+    }
+    strcpy(gfxshortname,"");
+    gfxshortname1 = "";
+    gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file     
+    if (gfxshortnamepointer) {
+      strcpy(gfxshortname,gfxshortnamepointer);
+      gfxshortname1 = gfxshortnamepointer;
+    }
+    // load texture if none loaded
+    // get_texture return 0 if not loaded
+    if (get_texture(stream_oversigt_loaded_nr)==0) {
+      if (strlen(gfxfilename)<200) {
+        if (strcmp(gfxfilename1.c_str(),"")!=0) {
+          // check om der findes en downloaded icon
+          strcpy(downloadfilenamelong,"");
+          downloadfilenamelong1 = "";
+          downloadfilenamelong1 = downloadfilenamelong1 + gfxfilename1;
+          strcat(downloadfilenamelong,gfxfilename);
+          if (strcmp(downloadfilename_last,gfxfilename1.c_str())!=0) {
+            // check om filen findes i cache dir eller i mythtv netvision dir
+            if (file_exists(gfxfilename1.c_str())) {
+              texture=loadTexture ((char *) gfxfilename1.c_str());
+              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              last_texture=texture;
               antal_loaded+=1;
-              std::string temptxt2;
-              temptxt2 = fmt::v8::format("RSS stream graphic download file {}",downloadfilenamelong);
-              write_logfile(logfile,(char *) temptxt2.c_str());
-            }
-            // husk last file name
-            strcpy(downloadfilename_last,downloadfilenamelong1.c_str());
+            } else if (file_exists(downloadfilenamelong1.c_str())) {
+              // er det ikke samme texture som sidst loaded så load it
+              // else set last used
+              texture=loadTexture ((char *) downloadfilenamelong1.c_str());
+              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              last_texture=texture;
+              antal_loaded+=1;
+            } else texture=0;
+          } else {
+            if (last_texture) set_texture(stream_oversigt_loaded_nr,last_texture);
+            antal_loaded+=1;
+            std::string temptxt2;
+            temptxt2 = fmt::v8::format("RSS stream graphic download file {}",downloadfilenamelong);
+            write_logfile(logfile,(char *) temptxt2.c_str());
           }
+          // husk last file name
+          strcpy(downloadfilename_last,downloadfilenamelong1.c_str());
         }
       }
-      // downloading ?
-      if (stream_oversigt_loaded_nr==this->streamantal()) {
-        stream_oversigt_loaded=true;
-        stream_oversigt_loaded_done=true;
-      } else stream_oversigt_loaded_nr++;
     }
+    // downloading ?
+    if (stream_oversigt_loaded_nr==this->streamantal()) {
+      stream_oversigt_loaded=true;
+      stream_oversigt_loaded_done=true;
+    } else stream_oversigt_loaded_nr++;
+  }
 
-    if (!(gfx_loaded)) {
-      stream_oversigt_loaded_nr=0;
-      stream_oversigt_loaded=false;
+  if (!(gfx_loaded)) {
+    stream_oversigt_loaded_nr=0;
+    stream_oversigt_loaded=false;
+  }
+  // calc start pos (ofset)
+  sofset=(_sangley/40)*8;
+  // draw icons
+  while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
+    if (((i % bonline)==0) && (i>0)) {
+      yof=yof-(buttonsizey+20);
+      xof=0;
     }
-    // calc start pos (ofset)
-    sofset=(_sangley/40)*8;
-    // draw icons
-    while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
-      if (((i % bonline)==0) && (i>0)) {
-        yof=yof-(buttonsizey+20);
-        xof=0;
-      }
-      // selected biger
-      if (i+1==(int) stream_key_selected) {
-        buttonsizey=160.0f;
-        buttonsizex=200.0f;
-        show_round_corner = true;
+    // selected biger
+    if (i+1==(int) stream_key_selected) {
+      buttonsizey=160.0f;
+      buttonsizex=200.0f;
+      show_round_corner = true;
+    } else {
+      buttonsizey=160.0f;
+      buttonsizex=200.0f;
+      show_round_corner = false;
+    }
+    if (stack[i+sofset]->textureId) {
+      // stream icon exist draw it
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glBindTexture(GL_TEXTURE_2D,empty_icon1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      // round corner
+      if (show_round_corner) {
+        /*
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+        glEnd();
+        */
+        
+
+        cx=100+xof;          // pos x
+        cy=80+yof;               // pos y
+        dx=buttonsizex-20;          // siz y
+        dy=buttonsizey-30;          // siz x
+        r=20;            // radius
+        a=0.0;
+        da=1.5707963267948966192313216916398/float(n);
+        dx-=r+r;
+        dy-=r+r;
+        loop=0;
+        glBegin(GL_TRIANGLE_FAN);
+        glTexCoord2f(0.5f, 0.5f); 
+        glVertex2f(cx,cy);
+        x0=cx+(0.5*dx);
+        y0=cy+(0.5*dy);
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glTexCoord2f(0, 0); 
+            glVertex2f(x,y);
+        }
+        x0-=dx;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
+        }
+        y0-=dy;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
+        }
+        x0+=dx;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
+        }          
+        glVertex2f(x,cy+(0.5*dy));
+        glEnd();
       } else {
-        buttonsizey=160.0f;
-        buttonsizex=200.0f;
-        show_round_corner = false;
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+        glEnd();
       }
-      if (stack[i+sofset]->textureId) {
-        // stream icon exist draw it
+
+      glPushMatrix();
+      // indsite draw icon rss gfx - SELECTED
+      if (show_round_corner) {  
+
+        /*
+        cx=100+xof;          // pos x
+        cy=80+yof;               // pos y
+        dx=buttonsizex-20;          // siz y
+        dy=buttonsizey-30;          // siz x
+        r=20;            // radius
+        a=0.0;
+        da=1.5707963267948966192313216916398/float(n);
+        dx-=r+r;
+        dy-=r+r;
+        loop=0;
+
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_TRIANGLE_FAN);
+        glTexCoord2f(0.5f, 0.5f); 
+        glVertex2f(cx,cy);
+        x0=cx+(0.5*dx);
+        y0=cy+(0.5*dy);
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glTexCoord2f(0, 0); 
+            glVertex2f(x,y);
+        }
+        x0-=dx;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
+        }
+        y0-=dy;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
+        }
+        x0+=dx;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
+        }          
+        glVertex2f(x,cy+(0.5*dy));
+        glEnd();
+        */
+        
+        // indsite draw icon rss gfx
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        if (tema==5) {
+          glTexCoord2f(0, 0); glVertex3f( xof+25, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-25, yof+buttonsizey-10 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-25, yof+10 , 0.0);
+        } else {
+          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+        }
+        glEnd();
+      } else {
+        // indsite draw icon rss gfx - NOT SELECTED
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        if (tema==5) {
+          glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+        } else {
+          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+        }
+        glEnd();
+      }
+
+      // show nyt icon note
+      if (stack[i+sofset]->nyt) {
+        glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+        glEnd();
+      }
+      glPopMatrix();
+    } else {
+      // no icon - draw default icon
+      glPushMatrix();
+      // indsite draw radio station icon
+      if (show_round_corner) {  
+        cx=100+xof;          // pos x
+        cy=80+yof;               // pos y
+        dx=buttonsizex-20;          // siz y
+        dy=buttonsizey-30;          // siz x
+        r=20;            // radius
+        a=0.0;
+        da=1.5707963267948966192313216916398/float(n);
+        dx-=r+r;
+        dy-=r+r;
+        loop=0;
+
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
         glBindTexture(GL_TEXTURE_2D,empty_icon1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        // round corner
-        if (show_round_corner) {
-          /*
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-          glEnd();
-          */
-         
-
-          cx=100+xof;          // pos x
-          cy=80+yof;               // pos y
-          dx=buttonsizex-20;          // siz y
-          dy=buttonsizey-30;          // siz x
-          r=20;            // radius
-          a=0.0;
-          da=1.5707963267948966192313216916398/float(n);
-          dx-=r+r;
-          dy-=r+r;
-          loop=0;
-          glBegin(GL_TRIANGLE_FAN);
-          glTexCoord2f(0.5f, 0.5f); 
-          glVertex2f(cx,cy);
-          x0=cx+(0.5*dx);
-          y0=cy+(0.5*dy);
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glTexCoord2f(0, 0); 
-              glVertex2f(x,y);
-          }
-          x0-=dx;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }
-          y0-=dy;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }
-          x0+=dx;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }          
-          glVertex2f(x,cy+(0.5*dy));
-          glEnd();
-        } else {
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-          glEnd();
+        glLoadName(100+i+sofset);
+        glBegin(GL_TRIANGLE_FAN);
+        glTexCoord2f(0.5f, 0.5f); 
+        glVertex2f(cx,cy);
+        x0=cx+(0.5*dx);
+        y0=cy+(0.5*dy);
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glTexCoord2f(0, 0); 
+            glVertex2f(x,y);
         }
-
-        glPushMatrix();
-        // indsite draw icon rss gfx - SELECTED
-        if (show_round_corner) {  
-
-          /*
-          cx=100+xof;          // pos x
-          cy=80+yof;               // pos y
-          dx=buttonsizex-20;          // siz y
-          dy=buttonsizey-30;          // siz x
-          r=20;            // radius
-          a=0.0;
-          da=1.5707963267948966192313216916398/float(n);
-          dx-=r+r;
-          dy-=r+r;
-          loop=0;
-
-          glEnable(GL_TEXTURE_2D);
-          glBlendFunc(GL_ONE, GL_ONE);
-          glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(100+i+sofset);
-          glBegin(GL_TRIANGLE_FAN);
-          glTexCoord2f(0.5f, 0.5f); 
-          glVertex2f(cx,cy);
-          x0=cx+(0.5*dx);
-          y0=cy+(0.5*dy);
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glTexCoord2f(0, 0); 
-              glVertex2f(x,y);
-          }
-          x0-=dx;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }
-          y0-=dy;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }
-          x0+=dx;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }          
-          glVertex2f(x,cy+(0.5*dy));
-          glEnd();
-          */
-          
-          // indsite draw icon rss gfx
-          glEnable(GL_TEXTURE_2D);
-          glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
-          glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(100+i+sofset);
-          glBegin(GL_QUADS);
-          if (tema==5) {
-            glTexCoord2f(0, 0); glVertex3f( xof+25, yof+10, 0.0);
-            glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10, 0.0);
-            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-25, yof+buttonsizey-10 , 0.0);
-            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-25, yof+10 , 0.0);
-          } else {
-            glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-            glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
-            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
-          }
-          glEnd();
-        } else {
-          // indsite draw icon rss gfx - NOT SELECTED
-          glEnable(GL_TEXTURE_2D);
-          glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
-          glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(100+i+sofset);
-          glBegin(GL_QUADS);
-          if (tema==5) {
-            glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-            glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-          } else {
-            glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-            glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
-            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
-          }
-          glEnd();
+        x0-=dx;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
         }
-
+        y0-=dy;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
+        }
+        x0+=dx;
+        for (loop=0;loop<n;loop++,a+=da) {
+            x=x0+(r*cos(a));
+            y=y0+(r*sin(a));
+            glVertex2f(x,y);
+        }          
+        glVertex2f(x,cy+(0.5*dy));
+        glEnd();
+      } else {
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D,empty_icon1);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+        glEnd();
         // show nyt icon note
         if (stack[i+sofset]->nyt) {
           glBindTexture(GL_TEXTURE_2D,newstuf_icon);
-          //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
           glBegin(GL_QUADS);
           glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
           glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
@@ -1796,116 +1902,38 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
           glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
           glEnd();
         }
-        glPopMatrix();
-      } else {
-        // no icon - draw default icon
-        glPushMatrix();
-        // indsite draw radio station icon
-        if (show_round_corner) {  
-          cx=100+xof;          // pos x
-          cy=80+yof;               // pos y
-          dx=buttonsizex-20;          // siz y
-          dy=buttonsizey-30;          // siz x
-          r=20;            // radius
-          a=0.0;
-          da=1.5707963267948966192313216916398/float(n);
-          dx-=r+r;
-          dy-=r+r;
-          loop=0;
-
-          glEnable(GL_TEXTURE_2D);
-          glBlendFunc(GL_ONE, GL_ONE);
-          glBindTexture(GL_TEXTURE_2D,empty_icon1);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(100+i+sofset);
-          glBegin(GL_TRIANGLE_FAN);
-          glTexCoord2f(0.5f, 0.5f); 
-          glVertex2f(cx,cy);
-          x0=cx+(0.5*dx);
-          y0=cy+(0.5*dy);
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glTexCoord2f(0, 0); 
-              glVertex2f(x,y);
-          }
-          x0-=dx;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }
-          y0-=dy;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }
-          x0+=dx;
-          for (loop=0;loop<n;loop++,a+=da) {
-              x=x0+(r*cos(a));
-              y=y0+(r*sin(a));
-              glVertex2f(x,y);
-          }          
-          glVertex2f(x,cy+(0.5*dy));
-          glEnd();
-        } else {
-          glEnable(GL_TEXTURE_2D);
-          glBlendFunc(GL_ONE, GL_ONE);
-          glBindTexture(GL_TEXTURE_2D,empty_icon1);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(100+i+sofset);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-          glEnd();
-          // show nyt icon note
-          if (stack[i+sofset]->nyt) {
-            glBindTexture(GL_TEXTURE_2D,newstuf_icon);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
-            glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
-            glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
-            glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
-            glEnd();
-          }
-        }
-        glPopMatrix();
       }
-      // draw numbers in group
-      if (stack[i+sofset]->feed_group_antal>1) {
-        // show numbers in group
-        temprgtxt1 = fmt::v8::format("Feeds {}",stack[i+sofset]->feed_group_antal);
-        drawText(temprgtxt1.c_str(), xof+22,yof+14, 0.3f,1);
-      }
-      // show text 20 of elements in string
-      temprgtxt1 = fmt::v8::format("{:^20}",stack[i+sofset]->feed_showtxt);
-      temprgtxt1.resize(20);
-      drawText(temprgtxt1.c_str(), xof+20,yof-10, 0.4f,1);
-      // next button
-      i++;
-      xof+=(buttonsizex+10);
+      glPopMatrix();
     }
-    // no records loaded error
-    //
-    if ((i==0) && (antal_rss_streams()==0)) {
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+400, 200+150 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+400, 200 , 0.0);
-      glEnd();
-      drawText("Please wait Loading ...", 700, 260, 0.4f,1);
+    // draw numbers in group
+    if (stack[i+sofset]->feed_group_antal>1) {
+      // show numbers in group
+      temprgtxt1 = fmt::v8::format("Feeds {}",stack[i+sofset]->feed_group_antal);
+      drawText(temprgtxt1.c_str(), xof+22,yof+14, 0.3f,1);
     }
+    // show text 20 of elements in string
+    temprgtxt1 = fmt::v8::format("{:^20}",stack[i+sofset]->feed_showtxt);
+    temprgtxt1.resize(20);
+    drawText(temprgtxt1.c_str(), xof+20,yof-10, 0.4f,1);
+    // next button
+    i++;
+    xof+=(buttonsizex+10);
+  }
+  // no records loaded error
+  //
+  if ((i==0) && (antal_rss_streams()==0)) {
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_ONE, GL_ONE);
+    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glBindTexture(GL_TEXTURE_2D,_textureIdloading);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
+    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+400, 200+150 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+400, 200 , 0.0);
+    glEnd();
+    drawText("Please wait Loading ...", 700, 260, 0.4f,1);
+  }
 }
