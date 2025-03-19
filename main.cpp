@@ -5493,10 +5493,10 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+400 ,  480 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+400 ,  200+480, 0.0);
-        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+400+200 , 200+480 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+400+200 , 480, 0.0);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+400 ,  460 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+400 ,  200+460, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+400+200 , 200+460 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+400+200 , 460, 0.0);
         glEnd();
       }
     }
