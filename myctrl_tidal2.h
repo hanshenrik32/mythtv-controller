@@ -109,6 +109,17 @@ class tidal_class {
     // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
     void process_tidal_search_result(json_value* value, int depth,int x);
     // process_tidal_search_result is used in opdatere_tidal_oversigt_searchtxt_online
+
+    // json parser subs.
+    void process_value_token(json_value* value, int depth,int x);
+    void process_object_token(json_value* value, int depth);
+    void process_array_token(json_value* value, int depth);
+    // used by tidal_get_artists_all_albums
+    void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
+    // used by process_tidal_get_artists_all_albums to process json files
+    void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
+    void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
+
   public:
     bool search_loaded;
     bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
@@ -162,16 +173,11 @@ class tidal_class {
     char *tidal_get_token() { return(tidaltoken); };                    // get token from struct
     int tidal_get_user_id();
     void clean_tidal_oversigt();
-    void select_device_to_play();
     int gettoken();                               // TEST
     int opdatere_tidal_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
     int tidal_get_user_playlists(bool force,int startoffset);
     char *get_device_id(int nr) { return(tidal_device[nr].id); };         // get active dev id
     char *get_device_name(int nr) { return(tidal_device[nr].name); };     // get active dev id
-
-    void process_value_token(json_value* value, int depth,int x);
-    void process_object_token(json_value* value, int depth);
-    void process_array_token(json_value* value, int depth);
 
 
     // check if done
@@ -189,6 +195,7 @@ class tidal_class {
     void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
     void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
+    // not in use
     int auth_device_authorization();
 
     char *tidal_aktiv_song_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].song_name ); };                       //
@@ -197,14 +204,15 @@ class tidal_class {
     char *tidal_aktiv_album_name(int nr) { return( tidal_aktiv_song[nr].album_name ); };
     bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; return(true); }
     GLuint get_tidal_aktiv_cover_image() { return(tidal_aktiv_song[tidal_aktiv_song_nr].cover_image); };
-    GLuint set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song[tidal_aktiv_song_nr].cover_image=img; };
+    void set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song[tidal_aktiv_song_nr].cover_image=img; };
     char *tidal_aktiv_cover_image_url() { return(tidal_aktiv_song[0].cover_image_url); };                                 // Only use icon 0 
     // new
     int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
     int total_aktiv_songs() { return(tidal_aktiv_song_antal); };                                                          // # of songs in playlist
 
+    // return type playlist
     int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
-    GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
+    // GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
     int antal_tidal_streams() { return antalplaylists; };
     char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
     char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
@@ -215,15 +223,6 @@ class tidal_class {
     int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
     int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
     char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
-
-
-    int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
-    int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
-    
-    
-    int load_tidal_iconoversigt();                                                                  // load all icons
-    int get_access_token(char *loginbase64);                                                        // get token
-    int get_users_album(char *albumid);                                                             // download json file for album id
     void process_value_playlist(json_value* value, int depth,int x);
     void process_object_playlist(json_value* value, int depth);
     void process_array_playlist(json_value* value, int depth);
@@ -236,23 +235,26 @@ class tidal_class {
     // download all albums by artist id
     int tidal_get_artists_all_albums(char *artistid,bool force);
 
-    // used by tidal_get_artists_all_albums
-    void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
-    // used by process_tidal_get_artists_all_albums to process json files
-    void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
-    void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
 
     int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
     int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
-    void set_textureloaded(bool set);
-
+    void set_textureloaded(bool set);                                               // set flag for textures loaded
     int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid,char *artistname);
-    bool delete_record_in_view(int tidalknapnr);
+    bool delete_record_in_view(long tidalknapnr);
     int get_users_playlist_plus_favorite(bool cleandb);
-
+    void set_tidal_playing_flag(bool flag);    
+    bool get_tidal_playing_flag();
+    int get_artist_from_file(char *filename);                                                       // load artis playlists in db
+    int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
+    int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
+    int load_tidal_iconoversigt();                                                                  // load all icons
+    int get_access_token(char *loginbase64);                                                        // get token
+    int get_users_album(char *albumid);                                                             // download json file for album id
     // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
     // void thread_convert_m4a_to_flac(void *path);
+    int tidal_download_image(char *imgurl,char *filename);
 };
 
-int tidal_download_image(char *imgurl,char *filename);      // not in use
 #endif
+
+bool checkartistdbexist();

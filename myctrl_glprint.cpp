@@ -12,6 +12,9 @@
 #include <string.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <iostream>
+#include <sstream>
+#include <fmt/format.h>
 
 #include "myctrl_glprint.h"
 
@@ -173,5 +176,49 @@ void drawText(const char *text, float x, float y, float scale,int color) {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
+
+// ****************************************************************************************
+//
+// Funktion to draw lines of text in screen.
+//
+// ****************************************************************************************
+void drawLinesOfText(const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
+    std::istringstream stream(text);
+    std::string word;
+    std::string currentLine;
+    std::string formattext;
+    float yoffset=0.0f;
+    int linecount=0;
+    while (stream >> word) {
+        // Check if adding the word exceeds the maximum width then print the line
+        if (currentLine.length() + word.length() + 1 > maxWidth) {
+            if (currentLine.length()>0) {
+                if (center) formattext = fmt::format("{:^{}s}",currentLine,maxWidth);
+                else formattext = fmt::format("{}",currentLine);
+                drawText(formattext.c_str(), x, y + yoffset, scale, color);
+                currentLine = word; // Start a new line with the current word
+                linecount++;
+                yoffset-=20.0f;
+            } else {
+                currentLine = word; // Start a new line with the current word
+            }
+        } else {
+            if (!currentLine.empty()) {
+                currentLine += " "; // Add a space before the next word
+            }
+            currentLine += word; // Add the word to the current line
+        }
+        if (linecount>maxlines) break;
+    }
+    // Print any remaining text in the current line
+    if (linecount<=maxlines) {
+        if (!currentLine.empty()) {
+            if (currentLine.length()>maxWidth) currentLine.resize(maxWidth);
+            if (center) formattext = fmt::format("{:^{}s}",currentLine,maxWidth);
+            else formattext = fmt::format("{}",currentLine);
+            drawText(formattext.c_str(), x, y + yoffset, scale, color);
+        }
+    }
+}
 
 #endif

@@ -27,7 +27,7 @@ class vlc_controller {
     void volume_up(int volume);
     void volume_down(int volume);
     void setvolume(int volume);
-    void pause(int pause);
+    void pause(int pause);    
 };
 
 

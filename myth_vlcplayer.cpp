@@ -26,8 +26,8 @@ const char * const vlc_args[] = {
 // ****************************************************************************************
 
 vlc_controller::vlc_controller() {
-  //vlc_inst = libvlc_new(5,opt);
-  vlc_inst = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args);
+  // vlc_inst = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args);
+  vlc_inst = libvlc_new (0, NULL);
   is_playing=false;
   is_pause=false;
 }
@@ -38,7 +38,9 @@ vlc_controller::vlc_controller() {
 //
 // ****************************************************************************************
 vlc_controller::~vlc_controller() {
-  if (vlc_inst) libvlc_release(vlc_inst);
+  if (vlc_inst) {
+    if (is_playing) libvlc_release(vlc_inst);
+  }
 }
 
 // ****************************************************************************************
@@ -59,39 +61,41 @@ bool vlc_controller::vlc_in_playing() {
 int vlc_controller::playmedia(char *path) {
   int error=0;
   libvlc_media_t *vlc_m;
-  vlc_m=libvlc_media_new_path(vlc_inst,path);
-  if (vlc_m) {
-    // Create a media player playing environement
-    vlc_mp=libvlc_media_player_new_from_media(vlc_m);
-    libvlc_media_add_option(vlc_m,"no-video-title-show");
-    // set fullscreen
-    libvlc_set_fullscreen(vlc_mp,true);
-    // enable ketboard input to vlc player
-    libvlc_video_set_key_input(vlc_mp,true);
-    libvlc_video_set_mouse_input(vlc_mp,true);
-    //libvlc_media_add_option(vlc_m,":fullscreen");
-    //libvlc_media_add_option(vlc_m,":sout-all");
-    // <gdk/gdkx.h>
-    // Bind to xwindows
-    //libvlc_media_player_set_xwindow(vlc_mp, 0);
-    //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
-    if (!(vlc_mp)) error=1;
-    libvlc_media_release(vlc_m);
-    #if 0
-         /* This is a non working code that show how to hooks into a window,
-          * if we have a window around */
-          libvlc_media_player_set_xwindow (mp, xid);
-         /* or on windows */
-          libvlc_media_player_set_hwnd (mp, hwnd);
-         /* or on mac os */
-          libvlc_media_player_set_nsobject (mp, view);
-    #endif
-    // start play
-    libvlc_media_player_play(vlc_mp);
-    // set playing flag in class
-    is_playing=true;
-    return(1);
-  } else return(0);
+  if (vlc_inst) {
+    vlc_m=libvlc_media_new_path(vlc_inst,path);
+    if (vlc_m) {
+      // Create a media player playing environement
+      vlc_mp=libvlc_media_player_new_from_media(vlc_m);
+      libvlc_media_add_option(vlc_m,"no-video-title-show");
+      // set fullscreen
+      libvlc_set_fullscreen(vlc_mp,true);
+      // enable ketboard input to vlc player
+      libvlc_video_set_key_input(vlc_mp,true);
+      libvlc_video_set_mouse_input(vlc_mp,true);
+      //libvlc_media_add_option(vlc_m,":fullscreen");
+      //libvlc_media_add_option(vlc_m,":sout-all");
+      // <gdk/gdkx.h>
+      // Bind to xwindows
+      //libvlc_media_player_set_xwindow(vlc_mp, 0);
+      //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
+      if (!(vlc_mp)) error=1;
+      libvlc_media_release(vlc_m);
+      #if 0
+          /* This is a non working code that show how to hooks into a window,
+            * if we have a window around */
+            libvlc_media_player_set_xwindow (mp, xid);
+          /* or on windows */
+            libvlc_media_player_set_hwnd (mp, hwnd);
+          /* or on mac os */
+            libvlc_media_player_set_nsobject (mp, view);
+      #endif
+      // start play
+      libvlc_media_player_play(vlc_mp);
+      // set playing flag in class
+      is_playing=true;
+      return(1);
+    }
+  } else return(0);  
 }
 
 
@@ -104,38 +108,39 @@ int vlc_controller::playmedia(char *path) {
 int vlc_controller::playwebmedia(char *path) {
   int error=0;
   libvlc_media_t *vlc_m;
-  //vlc_m=libvlc_media_new_path(vlc_inst,path);
-  vlc_m=libvlc_media_new_location(vlc_inst,path);
-  if (vlc_m) {
-    // Create a media player playing environement
-    vlc_mp=libvlc_media_player_new_from_media(vlc_m);
-    libvlc_media_add_option(vlc_m,"no-video-title-show");
-    // set fullscreen
-    libvlc_set_fullscreen(vlc_mp,true);
-    // enable ketboard input to vlc player
-    libvlc_video_set_key_input(vlc_mp,true);
-    libvlc_video_set_mouse_input(vlc_mp,true);
-    //libvlc_media_add_option(vlc_m,":fullscreen");
-    //libvlc_media_add_option(vlc_m,":sout-all");
-    // <gdk/gdkx.h>
-    // Bind to xwindows
-    //libvlc_media_player_set_xwindow(vlc_mp, 0);
-    //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
-    if (!(vlc_mp)) error=1;
-    libvlc_media_release(vlc_m);
-    #if 0
-         /* This is a non working code that show how to hooks into a window,
-          * if we have a window around */
-          libvlc_media_player_set_xwindow (mp, xid);
-         /* or on windows */
-          libvlc_media_player_set_hwnd (mp, hwnd);
-         /* or on mac os */
-          libvlc_media_player_set_nsobject (mp, view);
-    #endif
-    // start play
-    libvlc_media_player_play(vlc_mp);
-    // set playing flag in class
-    is_playing=true;
+  if (vlc_inst) {
+    vlc_m=libvlc_media_new_location(vlc_inst,path);
+    if (vlc_m) {
+      // Create a media player playing environement
+      vlc_mp=libvlc_media_player_new_from_media(vlc_m);
+      libvlc_media_add_option(vlc_m,"no-video-title-show");
+      // set fullscreen
+      libvlc_set_fullscreen(vlc_mp,true);
+      // enable ketboard input to vlc player
+      libvlc_video_set_key_input(vlc_mp,true);
+      libvlc_video_set_mouse_input(vlc_mp,true);
+      //libvlc_media_add_option(vlc_m,":fullscreen");
+      //libvlc_media_add_option(vlc_m,":sout-all");
+      // <gdk/gdkx.h>
+      // Bind to xwindows
+      //libvlc_media_player_set_xwindow(vlc_mp, 0);
+      //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
+      if (!(vlc_mp)) error=1;
+      libvlc_media_release(vlc_m);
+      #if 0
+          /* This is a non working code that show how to hooks into a window,
+            * if we have a window around */
+            libvlc_media_player_set_xwindow (mp, xid);
+          /* or on windows */
+            libvlc_media_player_set_hwnd (mp, hwnd);
+          /* or on mac os */
+            libvlc_media_player_set_nsobject (mp, view);
+      #endif
+      // start play
+      libvlc_media_player_play(vlc_mp);
+      // set playing flag in class
+      is_playing=true;
+    }
     return(1);
   } else return(0);
 }
@@ -198,7 +203,7 @@ unsigned long vlc_controller::get_length_in_ms() {
 // ****************************************************************************************
 
 float vlc_controller::get_position() {
-  return(libvlc_media_player_get_position(vlc_mp));
+  if (vlc_mp) return(libvlc_media_player_get_position(vlc_mp)); else return(0);
 }
 
 

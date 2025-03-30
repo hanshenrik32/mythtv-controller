@@ -192,7 +192,7 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
         }
         // snprintf(sql,sizeof(sql),"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
         std::string sql1;
-        sql1 = fmt::v8::format("curl -X POST -H 'Authorization: Basic {}' -d grant_type=authorization_code -d code={} -d redirect_uri=http://localhost:8000/callback/ -d client_id={} -d client_secret={} -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+        sql1 = fmt::format("curl -X POST -H 'Authorization: Basic {}' -d grant_type=authorization_code -d code={} -d redirect_uri=http://localhost:8000/callback/ -d client_id={} -d client_secret={} -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
         //printf("sql curl : %s \n ",sql);
         curl_error=system(sql1.c_str());
         if (curl_error==0) {
@@ -392,8 +392,8 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(spotify_secret_id,"");                                               //
     strcpy(spotifytoken,"");                                                    //
     strcpy(spotifytoken_refresh,"");                                            //
-    strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
-    strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
+    strcpy(spotify_client_id,"you-tidal-code");               //
+    strcpy(spotify_secret_id,"you-secret-id");               //
     strcpy(active_default_play_device_name,"");
     strcpy(overview_show_band_name,"");                                         //
     strcpy(overview_show_cd_name,"");                                           //
@@ -562,6 +562,7 @@ int download_image(char *imgurl,char *filename) {
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); // <-- ssl don't forget this
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); // <-- ssl and this
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3); // new
     errbuf[0] = 0;
     try {
       file = fopen(filename, "wb");
@@ -4065,19 +4066,19 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   std::string call1;
   switch(type) {
             // search artist name
-    case 0: call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
+    case 0: call1 = fmt::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search album name
-    case 1: call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
+    case 1: call1 = fmt::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search playlist name
-    case 2: call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
+    case 2: call1 = fmt::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search track/song name
-    case 3: call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
+    case 3: call1 = fmt::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // default search artist name
-    default:call1 = fmt::v8::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
+    default:call1 = fmt::format("curl -f -X GET 'https://api.spotify.com/v1/search?q={}&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer {}' > spotify_search_result.json",searchstring,spotifytoken);
             break;
   }
   curl_error=system(call1.c_str());
@@ -4566,6 +4567,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
+      /*
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       base=temptxt;
       length=strlen(temptxt);                               // get length
@@ -4601,6 +4603,8 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         base = right_margin+1;
         if (pline>=2) break;
       }
+      */
+      drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+20,yof-10,0.38f,20,2,1,true);
       glPopMatrix();
       // next button
       i++;
@@ -4796,7 +4800,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       glDisable(GL_TEXTURE_2D);
       glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glRasterPos2f(0.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);      
       glDisable(GL_TEXTURE_2D);
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       base=temptxt;

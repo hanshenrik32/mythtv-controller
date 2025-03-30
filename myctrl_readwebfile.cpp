@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <iostream>
 #include "myctrl_readwebfile.h"
 
 
@@ -246,16 +247,17 @@ bool check_filename_ext(const char *filename) {
 // ****************************************************************************************
 
 int get_webfile2(char *webpath,char *outfile) {
-  char command[2048];
+  std::string command;
   // check file ext is image yes download
   if ((check_filename_ext(webpath)) && (strlen(webpath)<300)) {
-    strcpy(command,"wget \"");
-    strcat(command,webpath);
-    strcat(command,"\" -O- | convert -thumbnail 'x320^' - - > ");
-    strcat(command,outfile);
-    strcat(command," 2>&1 ");                                                           // disable output
+    command = "wget \"";
+    command = command = + webpath;
+    command = command = + "\" -O- | convert -thumbnail 'x320^' - - > ";
+    command = command = + outfile;
+    command = command = + " 2>&1 ";                                                           // disable output
     //strcat(command," 2>> wget.log ");
     //if (debugmode & 4) printf(" do COMMAND *%s* \n",command);
-    return (system(command));
+    system(command.c_str());
   }
+  return(0);
 }

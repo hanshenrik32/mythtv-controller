@@ -16,11 +16,9 @@
 #include <IL/ilut.h>
 #include <math.h>
 #include <ctype.h>
-//#include <ical.h>
 #include <libical/ical.h>
 #include <libxml/parser.h>
 #include <fmt/format.h>
-
 #include "utility.h"
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
@@ -31,13 +29,9 @@
 
 extern char localuserhomedir[4096];                                             // user homedir
 extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
-
-
 extern const char *dbname;                                                      // internal database name in mysql (music,movie,radio)
-
 extern FILE *logfile;
 extern char debuglogdata[1024];                                // used by log system
-
 extern GLuint setuptvgraberback;
 extern bool tv_guide_firsttime_update;
 extern float configdefaulttvguidefontsize;                                     // font size in tvguide
@@ -88,6 +82,20 @@ float prgtypeRGB[]={    0.7f,0.7f,0.7f,               // 0 - none
                         1.0f,0.6f,0.0f,               // 9 - Sci-Fi
                         0.1f,0.2f,0.1f,               // 10 - Series
                         0.8f,0.2f,0.8f};              // 11 - Adult
+
+
+const char *prgtypee[]={"Unknown",
+                        "children",
+                        "Sport",
+                        "Cartoon",
+                        "News",
+                        "Movie",
+                        "Nature",
+                        "Documentary",
+                        "Entertainment",
+                        "Sci-Fi",
+                        "Serie",
+                        "Adult"};
 
 
 // bruges ikke af show_tvoversigt
@@ -382,6 +390,7 @@ int tv_oversigt::saveparsexmltvdb() {
   } else {
     write_logfile(logfile,(char *) "Error write tvguidedb.dat to disk.");
   }
+  return(1);
 }
 
 // ****************************************************************************************
@@ -409,6 +418,7 @@ int tv_oversigt::loadparsexmltvdb() {
   } else {
     write_logfile(logfile,(char *) "Error loading tvguidedb.dat from disk.");
   }
+  return(1);
 }
 
 // ****************************************************************************************
@@ -2949,7 +2959,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 mysql_free_result(res);
                 prg_antal++;
                 std::string debuglogdata1;
-                debuglogdata1 = fmt::v8::format("#{} of Tvguide records created.... Channel {} {}->{} {} ",prg_antal,channelname,starttime,endtime,prgtitle);
+                debuglogdata1 = fmt::format("#{} of Tvguide records created.... Channel {} {}->{} {} ",prg_antal,channelname,starttime,endtime,prgtitle);
                 write_logfile(logfile,(char *) debuglogdata1.c_str());
 //                if (debugmode & 256) fprintf(stdout,"#%4d of Tvguide records created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
               } else {
@@ -3839,6 +3849,7 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
 
 unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].endtime_unix);
+  else return(0);
 }
 
 // ****************************************************************************************
@@ -3850,6 +3861,7 @@ unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg
 
 unsigned long tv_oversigt::getprogram_startunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].starttime_unix);
+  else return(0);
 }
 
 // ****************************************************************************************
@@ -4408,22 +4420,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
 }
 
 
-
-
-const char *prgtypee[]={"Unknown",
-                        "children",
-                        "Sport",
-                        "Cartoon",
-                        "News",
-                        "Movie",
-                        "Nature",
-                        "Documentary",
-                        "Entertainment",
-                        "Sci-Fi",
-                        "Serie",
-                        "Adult"};
-
-
 // ****************************************************************************************
 //
 // viser et prgrams record info.
@@ -4437,9 +4433,7 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   struct tm prgtidinfo;
   time_t prgtid;
   time_t aktueltid;
-
   struct tm *timeinfo;
-
   int xpos,ypos,xsiz,ysiz;
   int antalrec=0;
   // windows background
@@ -4463,115 +4457,111 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   std::string temprgtxt1;
   // new ver 1
   switch (configland) {
-    case 0: temprgtxt1 = fmt::v8::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
+    case 0: temprgtxt1 = fmt::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
             break;
-    case 1: temprgtxt1 = fmt::v8::format("Kanal    : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
+    case 1: temprgtxt1 = fmt::format("Kanal    : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
             break;
-    case 2: temprgtxt1 = fmt::v8::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
+    case 2: temprgtxt1 = fmt::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
             break;
-    case 3: temprgtxt1 = fmt::v8::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
+    case 3: temprgtxt1 = fmt::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
             break;
-    case 4: temprgtxt1 = fmt::v8::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
+    case 4: temprgtxt1 = fmt::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
             break;
     default:
-            temprgtxt1 = fmt::v8::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
+            temprgtxt1 = fmt::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
   }
   drawText(temprgtxt1.c_str(), 700,575, 0.4f,1);
   // new ver 2
   switch (configland) {
-    case 0: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 0: temprgtxt1 = fmt::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 1: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 1: temprgtxt1 = fmt::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 2: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 2: temprgtxt1 = fmt::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 3: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 3: temprgtxt1 = fmt::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 4: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 4: temprgtxt1 = fmt::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
     default:    
-          temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+          temprgtxt1 = fmt::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
   }
   drawText(temprgtxt1.c_str(), 700,525, 0.4f,1);
   // new ver 3
   switch (configland) {
-    case 0: temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 0: temprgtxt1 = fmt::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    case 1: temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 1: temprgtxt1 = fmt::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    case 2: temprgtxt1 = fmt::v8::format("début    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 2: temprgtxt1 = fmt::format("début    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    case 3: temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 3: temprgtxt1 = fmt::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    case 4: temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 4: temprgtxt1 = fmt::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    default:temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    default:temprgtxt1 = fmt::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
 
   }
   drawText(temprgtxt1.c_str(), 700,525, 0.4f,1);
 
   // new ver 4
   switch (configland) {
-    case 0: temprgtxt1 = fmt::v8::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 0: temprgtxt1 = fmt::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
-    case 1: temprgtxt1 = fmt::v8::format("Længde   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 1: temprgtxt1 = fmt::format("Længde   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
-    case 2: temprgtxt1 = fmt::v8::format("durée du : {} min..",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 2: temprgtxt1 = fmt::format("durée du : {} min..",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
-    case 3: temprgtxt1 = fmt::v8::format("Programmlänge : {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 3: temprgtxt1 = fmt::format("Programmlänge : {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
-    case 4: temprgtxt1 = fmt::v8::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 4: temprgtxt1 = fmt::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
     default:
-            temprgtxt1 = fmt::v8::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            temprgtxt1 = fmt::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
   }
   drawText(temprgtxt1.c_str(), 700,475, 0.4f,1);
 
   // new ver 5
   if (antalrec==-1) antalrec=tvprgrecordedbefore(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn,tvkanaler[tvvalgtrecordnr].chanid);
   switch (configland) {
-    case 0: temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
+    case 0: temprgtxt1 = fmt::format("Recorded : %d times before.",antalrec);
             break;
-    case 1: temprgtxt1 = fmt::v8::format("Optaget  : %d gange før.",antalrec);
+    case 1: temprgtxt1 = fmt::format("Optaget  : %d gange før.",antalrec);
             break;
-    case 2: temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
+    case 2: temprgtxt1 = fmt::format("Recorded : %d times before.",antalrec);
             break;
-    case 3: temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
+    case 3: temprgtxt1 = fmt::format("Recorded : %d times before.",antalrec);
             break;
-    case 4: temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
+    case 4: temprgtxt1 = fmt::format("Recorded : %d times before.",antalrec);
             break;
-    default:temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
+    default:temprgtxt1 = fmt::format("Recorded : %d times before.",antalrec);
 
   }
   if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].recorded) strcat(temprgtxt," Set to record");
   drawText(temprgtxt1.c_str(), 700,450, 0.4f,1);
-
-
   // new ver 6
   if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type<=10)
   sprintf(temprgtxt,"Type     : %-10s",prgtypee[tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type]);
   else sprintf(temprgtxt,"Type     : %d nr  ",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type);
   drawText(temprgtxt, 700,425, 0.4f,1);
-
-
   // new ver 7
   switch (configland) {
-    case 0: temprgtxt1 = fmt::v8::format("Description : ");
+    case 0: temprgtxt1 = fmt::format("Description : ");
             break;
-    case 1: temprgtxt1 = fmt::v8::format("Description : ");
+    case 1: temprgtxt1 = fmt::format("Description : ");
             break;
-    case 2: temprgtxt1 = fmt::v8::format("Description : ");
+    case 2: temprgtxt1 = fmt::format("Description : ");
             break;
-    case 3: temprgtxt1 = fmt::v8::format("Description : ");    
+    case 3: temprgtxt1 = fmt::format("Description : ");    
             break;
-    case 4: temprgtxt1 = fmt::v8::format("Description : ");
+    case 4: temprgtxt1 = fmt::format("Description : ");
             break;
-    default:temprgtxt1 = fmt::v8::format("Description : ");
+    default:temprgtxt1 = fmt::format("Description : ");
   }
   drawText(temprgtxt1.c_str(), 700,375, 0.4f,1);
 
   // new ver 8
-  temprgtxt1 = fmt::v8::format("{}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description);
+  temprgtxt1 = fmt::format("{}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description);
   drawText(temprgtxt1.c_str(), 700,350, 0.4f,1);
   if (strptime(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime,"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
       printf("RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
@@ -4840,7 +4830,9 @@ void earlyrecorded::getrecordprogram(char *mysqlhost,char *mysqluser,char *mysql
 // ****************************************************************************************
 //
 // viser liste over tv programmer som skal optages.
+//
 // do not work
+//
 // ****************************************************************************************
 
 void earlyrecorded::showtvreclist() {
