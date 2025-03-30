@@ -15294,7 +15294,7 @@ int main(int argc, char** argv) {
     #ifdef ENABLE_TIDAL
     bool tidalok;
     // login tidal
-    tidalok=tidal_oversigt.get_access_token((char *) "your access token");
+    tidalok=tidal_oversigt.get_access_token((char *) "TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {   
       // login ok load playlistes from file
       // get users playlists if not loaded before      
