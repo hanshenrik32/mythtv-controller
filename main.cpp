@@ -96,6 +96,8 @@ FILE *logfile=NULL;                   // global logfile
 
 extern float sinofsetz[];
 
+bool do_sqlite=false;                    // use sqlite3
+
 bool tv_guide_firsttime_update = false;                                           //
 int radio_oversigt_loaded_nr=0;                                                  //
 bool radio_oversigt_loaded_begin = false;                                         // true first time radio is loaded
@@ -15294,7 +15296,7 @@ int main(int argc, char** argv) {
     #ifdef ENABLE_TIDAL
     bool tidalok;
     // login tidal
-    tidalok=tidal_oversigt.get_access_token((char *) "TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
+    tidalok=tidal_oversigt.get_access_token((char *) "your access token");
     if (tidalok) {   
       // login ok load playlistes from file
       // get users playlists if not loaded before      
@@ -15305,7 +15307,7 @@ int main(int argc, char** argv) {
       // ** my playliste default first time load
 
       // test
-      /*
+      
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
@@ -15314,7 +15316,7 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
       tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skilex
-      */
+      
   
       // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // load default file

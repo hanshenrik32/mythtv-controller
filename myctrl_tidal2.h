@@ -16,6 +16,7 @@ const int tidal_songlisttype=1;                         // song list type
 
 const std::string tidal_download_home="/home/hans/download/";
 
+
 //
 // device struct
 //
@@ -253,8 +254,17 @@ class tidal_class {
     // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
     // void thread_convert_m4a_to_flac(void *path);
     int tidal_download_image(char *imgurl,char *filename);
+
+    void set_tidal_feed_showtxt(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_showtxt,name); }
+    void set_tidal_feed_artistname(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_artist,name); }
+    void set_tidal_feed_name(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_name,name); }
+    void set_tidal_feed_desc(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_desc,name); }
+    void set_tidal_feed_gfx_url(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_gfx_url,name); }
+    void set_tidal_feed_release_date(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_release_date,name); }
+    void set_tidal_playlistid(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->playlistid,name); }    
 };
 
 #endif
 
+int tidal_sqldb_callback(void *data, int argc, char **argv, char **azColName);
 bool checkartistdbexist();

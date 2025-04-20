@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <fmt/format.h>
+#include <sqlite3.h>                    // sqlite interface to xbmc
 
 #include "myctrl_radio.h"
 #include "utility.h"
@@ -59,7 +60,7 @@ extern bool radio_oversigt_loaded_begin;
 
 extern int radio_oversigt_loaded_nr;
 extern int radio_oversigt_antal;
-
+extern bool do_sqlite;
 
 // ****************************************************************************************
 //
@@ -380,66 +381,70 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
     bool online;
     //gotoxy(10,13);
     //printf("Opdatere radio oversigt fra database. type %d \n",radiosortorder);
-    if (radiosortorder==0)			// start order default
-      strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by intnr");
-      //strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 order by popular desc,name");
-    else if (radiosortorder==28)		// bit rate
-      sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name");
-    else if (radiosortorder==27)		// land kode
-      sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by landekode desc,popular desc,name");
-    else if (radiosortorder==19)		// mest hørt
-      sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by lastplayed desc,popular desc,name");
-    else 					// ellers efter art
-      sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 and art=%d order by popular desc,name",radiosortorder);
-    try {
-      conn=mysql_init(NULL);
-      // Connect to database
-      if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
-        mysql_query(conn,"set NAMES 'utf8'");
-        res = mysql_store_result(conn);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        if (res) {
-          while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-            // printf("Hent info om radio station nr %s %-20s\n",row[6],row[0]);
-            art=atoi(row[3]);
-            intnr=atoi(row[6]);
-            kbps=atoi(row[7]);
-            online=atoi(row[8]);
-            land=atoi(row[9]);
-            if (antal<maxantal) {
-              stack[antal]=new (struct radio_oversigt_type);
-              if (stack[antal]) {
-                strncpy(stack[antal]->station_name,row[0],stationamelength);
-                strncpy(stack[antal]->desc,row[4],statiodesclength);
-                strncpy(stack[antal]->streamurl,row[1],statiourl_homepage);
-                strncpy(stack[antal]->homepage,row[2],statiourl_homepage);
-                strncpy(stack[antal]->gfxfilename,row[5],stationamelength);
-                stack[antal]->art=art;
-                stack[antal]->kbps=kbps;
-                stack[antal]->online=online;
-                stack[antal]->land=land;
-                stack[antal]->textureId=0;
-                stack[antal]->intnr=intnr;
-                antal++;
+    if (do_sqlite) {
+
+    } else {
+      if (radiosortorder==0)			// start order default
+        strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by intnr");
+        //strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 order by popular desc,name");
+      else if (radiosortorder==28)		// bit rate
+        sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name");
+      else if (radiosortorder==27)		// land kode
+        sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by landekode desc,popular desc,name");
+      else if (radiosortorder==19)		// mest hørt
+        sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by lastplayed desc,popular desc,name");
+      else 					// ellers efter art
+        sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 and art=%d order by popular desc,name",radiosortorder);
+      try {
+        conn=mysql_init(NULL);
+        // Connect to database
+        if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
+          mysql_query(conn,"set NAMES 'utf8'");
+          res = mysql_store_result(conn);
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          if (res) {
+            while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
+              // printf("Hent info om radio station nr %s %-20s\n",row[6],row[0]);
+              art=atoi(row[3]);
+              intnr=atoi(row[6]);
+              kbps=atoi(row[7]);
+              online=atoi(row[8]);
+              land=atoi(row[9]);
+              if (antal<maxantal) {
+                stack[antal]=new (struct radio_oversigt_type);
+                if (stack[antal]) {
+                  strncpy(stack[antal]->station_name,row[0],stationamelength);
+                  strncpy(stack[antal]->desc,row[4],statiodesclength);
+                  strncpy(stack[antal]->streamurl,row[1],statiourl_homepage);
+                  strncpy(stack[antal]->homepage,row[2],statiourl_homepage);
+                  strncpy(stack[antal]->gfxfilename,row[5],stationamelength);
+                  stack[antal]->art=art;
+                  stack[antal]->kbps=kbps;
+                  stack[antal]->online=online;
+                  stack[antal]->land=land;
+                  stack[antal]->textureId=0;
+                  stack[antal]->intnr=intnr;
+                  antal++;
+                }
               }
             }
+            if (antal==0) printf("No Radio station loaded");
+          } else {
+            fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
           }
-          if (antal==0) printf("No Radio station loaded");
+          if (conn) mysql_close(conn);
+          //load_radio_stations_gfx();
+          return(antal-1);
         } else {
           fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
         }
         if (conn) mysql_close(conn);
-        //load_radio_stations_gfx();
-        return(antal-1);
-      } else {
-        fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
       }
-      if (conn) mysql_close(conn);
-    }
-    catch (...) {
-      fprintf(stdout,"Error connect to mysql radio station db.\n");
-      write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
+      catch (...) {
+        fprintf(stdout,"Error connect to mysql radio station db.\n");
+        write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
+      }
     }
     return(0);
 }
