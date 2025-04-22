@@ -3718,7 +3718,7 @@ https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
 // ************************************************************************************************
 //
-// start play first song in playlist and start one thread to download the rest and update the db. (in use)
+// start play first song in playlist and download the rest and update the db. (in use)
 //
 // ************************************************************************************************
 
@@ -3735,6 +3735,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   std::string filename;
   std::string sqlstring;
   std::string ffilename;
+  std::string sql_artist;
   int error=0;
   std::string sysstring;
   int result;
@@ -3948,8 +3949,11 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
         }
         // convert the rest of the m4a files we have downloed to be able to play it in fmod
+        // no thread version
         convert_m4a_to_flac(stack[tidalknapnr]->playlistid);
         /*
+        // there is thread version
+        //
         pthread_t loaderthread; // thread_convert_m4a_to_flac() used to convert m4a files
         int rc2 = pthread_create( &loaderthread , NULL , thread_convert_m4a_to_flac , (void *) stack[tidalknapnr]->feed_showtxt);
         if (rc2) {
@@ -3981,10 +3985,10 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           }
           if (recnr>0) tidal_aktiv_song_antal = recnr-1;                                                   // set antal songs in playlist
         }
-        // hent artist name from db
+        // hent playlistname + artist name + release date from db
         sql1 = fmt::format("select playlistname,tidalcontentartist.artistname,release_date from tidalcontentplaylist left join tidalcontentartist on tidalcontentplaylist.artistid=tidalcontentartist.artistid where playlistid like '{}'",stack[tidalknapnr]->playlistid);
         if (mysql_query(conn,sql1.c_str())!=0) {
-          write_logfile(logfile,(char *) "mysql create table error.");
+          write_logfile(logfile,(char *) "mysql select table error.");
           fprintf(stdout,"ERROR SQL : %s\n",sql);
         }
         mysql_res = mysql_store_result(conn);
@@ -3992,7 +3996,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           recnr=0;
           while ((( mysql_row = mysql_fetch_row(mysql_res)) != NULL )) {
             if (strlen(mysql_row[0])>0) strcpy( tidal_aktiv_song[0].album_name,mysql_row[0] );
-            if (strlen(mysql_row[1])>0) strcpy( tidal_aktiv_song[0].artist_name,mysql_row[1] );
+            // if (strlen(mysql_row[1])>0) strcpy( tidal_aktiv_song[0].artist_name,mysql_row[1] ); // crash
             strcpy( tidal_aktiv_song[0].release_date,mysql_row[2] );
             strcpy( tidal_playlistname,mysql_row[0] );                                            // set playlist name to show
           }

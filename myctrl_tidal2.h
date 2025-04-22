@@ -154,7 +154,6 @@ class tidal_class {
     char client_secret[120];                                                // tidal client secret
     int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
     void set_texture(int nr,GLuint idtexture);                              // set texture
-    int opdatere_stream_gfx(int nr,char *gfxpath);		                      // NOT in use
     bool startup_loaded;					                                          // load stream icons statios list
     bool tidal_oversigt_loaded;                                             //
     int tidal_oversigt_loaded_nr;                                           //
@@ -221,8 +220,6 @@ class tidal_class {
   
     char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
     char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].playurl ); else return(0); }
-    int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
-    int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
     char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
     void process_value_playlist(json_value* value, int depth,int x);
     void process_object_playlist(json_value* value, int depth);
