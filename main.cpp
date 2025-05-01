@@ -4188,7 +4188,7 @@ void display() {
     xof = 550;
     yof = 500;
     buttonsize = 200;
-    // ***************************************************************** play icon
+    // ***************************************************************** show play icon
     glPushMatrix();
     glEnable(GL_TEXTURE_2D); 
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -4242,6 +4242,7 @@ void display() {
   //
   if (do_play_tidal==1) {
     do_play_tidal=0;
+    // set play flag
     tidal_oversigt.startplay=true;
   }
 
@@ -4365,7 +4366,6 @@ void display() {
         // do_play_tidal_cover=false;                                          // do not show we play.
         // do_zoom_tidal_cover=false;                                       // show we play
         //write_logfile(logfile,(char *) "Error loading tidal song");
-        do_zoom_tidal_cover=false;                                       // show we play
         snd=0;
       }
     } else {
@@ -4530,7 +4530,6 @@ void display() {
     // create radio station online check tread
     #endif
   }
- 
  
  
   /*
@@ -9186,7 +9185,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (tidal_player_start_status == 0) {
               do_play_tidal_cover=true;
               do_zoom_tidal_cover=true;                                       // show we play
-            }
+            }            
           }
         }
       }

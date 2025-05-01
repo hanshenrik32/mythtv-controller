@@ -35,9 +35,6 @@
 #include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod_errors.h"
 
 
-
-
-
 // json parser
 #include "json-parser/json.h"
 // global def
@@ -647,7 +644,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
       process_array_playlist(value, depth+1);
       break;
     case json_integer:
-      printf("depth = %d x = %d   integer: %s\n", depth, x, value->u.string.ptr);
+      // printf("int - depth = %d x = %d   integer: %s\n", depth, x, value->u.string.ptr);
       if (tidal_process_duration) {
         printf("duation %s \n", value->u.string.ptr );
         if ( antalplaylists<maxantal ) {
@@ -665,7 +662,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
       //if (debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
       break;
     case json_string:
-      printf("depth = %d x = %d   string: %s\n", depth, x, value->u.string.ptr);
+      // printf("string - depth = %d x = %d   string: %s\n", depth, x, value->u.string.ptr);
       // 1. sample title (ortobello Belle (Live) [Alternative Outtake] [2022 Remaster])
       if (( tidal_process_title ) && (depth==7) && (x==2)){
         if ( antalplaylists<maxantal ) {
@@ -1482,7 +1479,7 @@ void tidal_class::process_object_playlist_tidal_get_artists_all_albums(json_valu
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     // print_depth_shift(depth);
-    printf("x=%d depth=%d object[%d].name = %s    \n ",x,depth, x, value->u.object.values[x].name);
+    // printf("x=%d depth=%d object[%d].name = %s    \n ",x,depth, x, value->u.object.values[x].name);
     // new
     if (strcmp(value->u.object.values[x].name , "attributes")==0) {
       tidal_process_resource=true;
