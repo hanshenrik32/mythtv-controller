@@ -94,15 +94,20 @@ extern GLuint big_search_bar_artist;                    // big search bar used b
 extern GLuint tidal_big_search_bar_artist;
 extern GLuint tidal_big_search_bar_album;
 extern GLuint tidal_big_search_bar_track;
-
+extern GLuint setuprssback;
+extern GLuint _textureclose;
+extern GLuint setupkeysbar1;
 extern float configsoundvolume;                           // default sound volume
 
+extern unsigned int do_show_setup_select_linie;
 
 extern FMOD::System    *sndsystem;
 extern FMOD::Sound     *sound;
 extern FMOD::Channel   *channel;
 extern int fmodbuffersize;
 extern bool do_sqlite;
+
+extern char keybuffer[512];                     // keyboard buffer
 
 // used by json passer
 
@@ -205,7 +210,7 @@ void tidal_class::process_object_token(json_value* value, int depth) {
 
 // *****************************************************************************************
 //
-//
+// internal function to process json data
 //
 // ****************************************************************************************
 
@@ -349,7 +354,7 @@ bool tidal_class::reset_amin_in_viewer() {
 
 // ****************************************************************************************
 //
-// constructor
+// Constructor
 //
 // ****************************************************************************************
 
@@ -406,7 +411,7 @@ tidal_class::tidal_class() : antal(0) {
 
 // ****************************************************************************************
 //
-// destructor
+// Destructor
 //
 // ****************************************************************************************
 
@@ -421,7 +426,7 @@ tidal_class::~tidal_class() {
 
 // ****************************************************************************************
 //
-// set texture loaded flag
+// Set texture loaded flag
 //
 // ****************************************************************************************
 
@@ -432,7 +437,7 @@ void tidal_class::set_textureloaded(bool set) {
 
 // ****************************************************************************************
 //
-// get album by artist NOT IN USE
+// Get album by artist NOT IN USE
 //
 // ****************************************************************************************
 
@@ -862,7 +867,7 @@ int tidal_class::get_access_token(char *loginbase64) {
   std::string curlstring1;
   char curlstring[8192];
   sprintf(curlstring,"/bin/curl -X POST -H 'Authorization: Basic %s' -d 'grant_type=client_credentials' -d 'client_id=%s' https://auth.tidal.com/v1/oauth2/token > tidal_token.json",loginbase64,"Nq5WQmVhv2L7QWQO");
-  curlstring1 = fmt::format("/bin/curl -X POST -H 'Authorization: Basic {}' -d 'grant_type=client_credentials' -d 'client_id={}' https://auth.tidal.com/v1/oauth2/token > tidal_token.json",loginbase64,"Nq5WQmVhv2L7QWQO");
+  // curlstring1 = fmt::format("/bin/curl -X POST -H 'Authorization: Basic {}' -d 'grant_type=client_credentials' -d 'client_id={}' https://auth.tidal.com/v1/oauth2/token > tidal_token.json",loginbase64,"Nq5WQmVhv2L7QWQO");
   error=system(curlstring);
   if (error) {
     printf("System call error.\n");    
@@ -876,6 +881,9 @@ int tidal_class::get_access_token(char *loginbase64) {
       printf("Tidal token read OK.\n");
       write_logfile(logfile,(char *) "Tidal token read OK");
     }
+    // clean up
+    std::remove("tidal_token.json"); // delete file
+    std::remove("tidal_token.txt"); // delete file
   }
   if (error) return(0); else return(1);
 }
@@ -1010,7 +1018,7 @@ bool checkartistdbexist() {
 
 // ****************************************************************************************
 //
-// load from file.
+// download albums from file.
 //
 // ****************************************************************************************
 
@@ -1038,7 +1046,8 @@ int tidal_class::get_artist_from_file(char *filename) {
     }
     readok=true;
     fclose(fp);
-  }
+    write_logfile(logfile,(char *) "Tidal loaded artist from file tidal_artistlists.txt");
+  } else write_logfile(logfile,(char *) "Tidal artist file (tidal_artistlists.txt) not found.");
   if (artistidtxt) free(artistidtxt);
   if (readok) return(1); else return(0);
 }
@@ -1715,6 +1724,14 @@ std::string escapeSingleQuotesOss(const std::string& input) {
   return oss.str();
 }
 
+
+// ****************************************************************************************
+//
+// get all albums by artistid,force download + create db if not exist
+//
+// ****************************************************************************************
+
+
 int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   int httpcode;
   std::string logdata;
@@ -2092,11 +2109,11 @@ void tidal_class::clean_tidal_oversigt() {
       if (stack[i]) {
         // crash
         if (stack[i]->textureId) {
-          // if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
+          // glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
         }
         if (stack[i]) delete stack[i];
+        stack[i]=NULL;
       }
-      stack[i]=NULL;
     }
     antal=0;
     antalplaylists=0;
@@ -2188,7 +2205,6 @@ void tidal_class::set_tidal_update_flag(bool flag) {
 
 // ****************************************************************************************
 //
-// IN USE (old test)
 // Get users playlist NOT in use
 // The default view
 //
@@ -4741,4 +4757,130 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     glcRenderString("No tidal account enabled.");
     // drawText("No tidal account enabled.", xof+20+(buttonsize/2),yof-10, 0.4f,1);
   }
+}
+
+
+// ****************************************************************************************
+//
+// ********************* show setup tidal stuf like dev and clientid/secrect ************
+//
+// ****************************************************************************************
+
+void tidal_class::show_setup_tidal() {
+  int i;
+  int winsizx=100;
+  int winsizy=300;
+  int xpos=0;
+  int ypos=0;
+  char text[200];
+  // int dev_nr=0;
+  // char temptxt[200];
+  // ICON TEXT pos
+  const int icon_text_posx1=510;
+  const int icon_text_posy1=320;
+  const int icon_text_posx2=510+120;
+  const int icon_text_posy2=320;
+  const int icon_text_posx3=510+120+120;
+  const int icon_text_posy3=320;
+  const int icon_text_posx4=510+120+120+120;
+  const int icon_text_posy4=320;
+  const int icon_text_posx5=510;
+  const int icon_text_posy5=180;
+  const int icon_text_posx6=510+120;
+  const int icon_text_posy6=180;
+  const int icon_text_posx7=510+120+120;
+  const int icon_text_posy7=180;
+  const int icon_text_posx8=510+120+120+120;
+  const int icon_text_posy8=180;
+  //
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // tidal setup
+  // background
+  glPushMatrix();
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glColor3f(0.6f, 0.6f, 0.6f);
+  glBindTexture(GL_TEXTURE_2D,setuprssback);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4)-50,10 , 0.0);
+  glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4)-50,800 , 0.0);
+  glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+750,800 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+750,10 , 0.0);
+  glEnd();
+  glPopMatrix();
+  // top text
+  drawText("Tidal Account setup", 640, 750, 0.6f,1);
+  // close buttons
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glBindTexture(GL_TEXTURE_2D,_textureclose);
+  winsizx=100;
+  winsizy=100;
+  xpos=310;
+  ypos=-70;
+  glLoadName(40);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glEnd();
+  glPopMatrix();
+  // start af input felter
+  glPushMatrix();
+  winsizx=310;
+  winsizy=30;
+  xpos=300;
+  ypos=500;
+  glEnable(GL_TEXTURE_2D);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glDisable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glEnd();
+  glPopMatrix();
+  glPushMatrix();
+  // start af input felter
+  winsizx=310;
+  winsizy=30;
+  xpos=300;
+  ypos=450;
+  glEnable(GL_TEXTURE_2D);
+  glColor3f(0.7f, 0.7f, 0.7f);
+  glDisable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glEnd();
+  glDisable(GL_TEXTURE_2D);
+  glTranslatef(680 , 600 , 0.0f);
+  glRasterPos2f(0.0f, 0.0f);
+  glColor3f(1.0f,1.0f,1.0f);
+  glPopMatrix();
+  drawText("email adress        ", 520, 650, 0.4f,15);
+  drawText(tidal_client_id, 520+140.0f, 650, 0.4f,1);
+  drawText("Password            ", 520.0f, 600, 0.4f,15);
+  if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));
+  drawText(tidal_secret_id, 520+140.0f, 600, 0.4f,1);
+  drawText("Token ok ", 520, 550, 0.4f,1);
+  if (strlen(tidaltoken)>0) drawText("Yes ", 520+140.0f, 550, 0.4f,1); else drawText("No  ", 520+140.0f, 550, 0.4f,1);
+  drawText("You have to config tidal-dl for now. If not done.", 520, 450, 0.4f,1);
+  drawText("Change this settings.", 520, 400, 0.4f,1);
+  drawText("| Album folder format - {AlbumID}", 520, 350, 0.4f,1);
+  drawText("| Playlist folder format - Playlist/{PlaylistName} [{PlaylistUUID}]", 520, 300, 0.4f,1); 
+  // tidaltoken = token
 }

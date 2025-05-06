@@ -102,6 +102,7 @@ extern GLuint _texturesetupfont;
 extern GLuint _texturekeyssetup;
 extern GLuint _texturekeysrss;
 extern GLuint _texturespotify;
+extern GLuint _texturetidal;
 extern GLuint _texturelock;			                  // en hænge lås
 extern GLuint setupkeysbar1;
 extern GLuint setupkeysbar2;
@@ -133,7 +134,7 @@ static bool fontselected=false;
 const GLfloat selectcolor[3]={1.0f,1.0f,0.0f};		                              // text select color
 
 extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
-
+extern char keybuffer[];                                    // keyboard buffer
 
 
 // ****************************************************************************************
@@ -3961,7 +3962,7 @@ void show_setup_tv_graber(int startofset) {
 
 void show_setup_interface() {
   int ii=0;
-  int winsizx=1000;
+  int winsizx=1200;
   int winsizy=800;
   int xpos=0;
   int ypos=0;
@@ -4148,6 +4149,23 @@ void show_setup_interface() {
   glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
+
+
+  // setup tidal
+  xpos=1000;
+  ypos=100;
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,_texturetidal);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glLoadName(44);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glEnd();
+
 
   // close button
   xpos=200;

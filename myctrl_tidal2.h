@@ -94,7 +94,6 @@ class tidal_class {
     bool tidal_update_loaded_begin;
     //
     char tidaltoken[512];                                                 // access_token
-    char tidaltoken2[512];                                                 // access_token2
     char countryCode[512];                                                //
     char tidaltoken_refresh[512];                                         // refresh_token
     int antal;					                       	                            // Antal songs in playlist
@@ -259,6 +258,8 @@ class tidal_class {
     void set_tidal_feed_gfx_url(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_gfx_url,name); }
     void set_tidal_feed_release_date(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_release_date,name); }
     void set_tidal_playlistid(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->playlistid,name); }    
+
+    void show_setup_tidal();
 };
 
 #endif

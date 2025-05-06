@@ -4109,11 +4109,8 @@ void display() {
     keybufferindex=0;
   }
   #ifdef ENABLE_TIDAL
-  // save playlist to db
+  // Tidal save playlist to db
   if ((vis_tidal_oversigt) && (save_ask_save_playlist)) {
-
-    printf("**************************************************** Save Tidal PLAY list %s\n",playlistfilename);
-
     tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid,playlistfileartistname);
     save_ask_save_playlist=false;
     ask_save_playlist=false;
@@ -4123,7 +4120,6 @@ void display() {
     keybufferindex=0;
   }
   #endif
-
 
   //
   // spotify ask play or open playlist
@@ -4311,7 +4307,7 @@ void display() {
       }
 
       // debug code
-      printf("antal_i_tidal_playlist %d func get_aktiv_played_song return %d \n",antal_i_tidal_playlist,tidal_oversigt.get_aktiv_played_song());
+      // printf("antal_i_tidal_playlist %d func get_aktiv_played_song return %d \n",antal_i_tidal_playlist,tidal_oversigt.get_aktiv_played_song());
 
       // try load and play song
       if ((tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) && (antal_i_tidal_playlist)) {
@@ -4994,6 +4990,8 @@ void display() {
       }
     }
   }
+
+  
   // ******************************************************************************************************************
   // ******************************************************************************************************************
   // ******************************************************************************************************************
@@ -5524,8 +5522,6 @@ void display() {
       write_logfile(logfile,(char *) "Tidal start search result thread");
       do_hent_tidal_search_online=false;
       tidal_oversigt_loaded_begin=true;
-      // clear old
-      tidal_oversigt.clean_tidal_oversigt();
 
       tidal_oversigt.search_tidal_online_done=false;
       fprintf(stderr,"Update tidal search result thread.\n");
@@ -5729,6 +5725,9 @@ void display() {
         if (do_show_setup_rss) show_setup_rss(configrss_ofset);             // podcast rss feeds source
         #ifdef ENABLE_SPOTIFY
         if (do_show_setup_spotify) spotify_oversigt.show_setup_spotify();   // spotify
+        #endif
+        #ifdef ENABLE_TIDAL
+        if (do_show_setup_tidal) tidal_oversigt.show_setup_tidal();         // tidal
         #endif
       }
       if (vis_tv_oversigt) {
@@ -6804,6 +6803,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_tvgraber = false;
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // test screen setup
@@ -6817,6 +6817,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_keys = false;
           do_show_videoplayer = false;
           do_show_tvgraber = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // test for gfx opløsning
@@ -6830,6 +6831,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_keys = false;
           do_show_videoplayer = false;
           do_show_tvgraber = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // test for tema setup
@@ -6843,6 +6845,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_keys = false;
           do_show_videoplayer = false;
           do_show_tvgraber = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // test for sql setup/info
@@ -6856,6 +6859,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_keys = false;
           do_show_videoplayer = false;
           do_show_tvgraber = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // test for ttffont setup/info
@@ -6869,6 +6873,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_setup_font = true;
           do_show_tvgraber = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // test for F keys setup/info
@@ -6882,6 +6887,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_setup_keys = true;
           do_show_tvgraber = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // test for setupclose
@@ -6896,6 +6902,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_setup = false;
           do_show_tvgraber = false;
+          do_show_setup_tidal = false;
           fundet = true;
           do_save_config = true;             // save setup now
         }
@@ -6909,6 +6916,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_font = false;
           do_show_setup_keys = false;
           do_show_tvgraber = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // do_show_tvgraber
@@ -6922,11 +6930,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_keys = false;
           do_show_videoplayer = false;
           do_show_tvgraber = true;
+          do_show_setup_tidal = false;
           fundet = true;
         }
         // test for close windows again icon for all other windows in setup glLoadName(40)
         //
-        if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
+        if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
           do_show_setup_sound = false;
           do_show_setup_screen = false;
           do_show_setup_sql = false;
@@ -6936,6 +6945,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
+          do_show_setup_tidal = false;
           if (do_show_setup_font) {
             if (debugmode) fprintf(stderr,"Set aktiv font to '%s' \n",aktivfont.typeinfo[setupfontselectofset].fontname);
             strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
@@ -6972,6 +6982,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_rss = false;
           do_show_setup_rss = true;
           do_show_setup_spotify = false;
+          do_show_setup_tidal = false;
           fundet = true;
         }
 
@@ -6990,6 +7001,25 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_rss = false;
           do_show_setup_rss = false;
           do_show_setup_spotify = true;
+          do_show_setup_tidal = false;
+          fundet = true;
+        }
+        // test for tidal setup
+        if (((GLubyte) names[i*4+3]==44) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false && (do_show_setup_spotify==false))) {
+          // close  all show setup windows
+          do_show_setup_sound = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_screen = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = false;
+          do_show_rss = false;
+          do_show_setup_rss = false;
+          do_show_setup_spotify = false;
+          do_show_setup_tidal = true;
           fundet = true;
         }
         //
@@ -7898,6 +7928,71 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
+
+      #ifdef ENABLE_TIDAL
+      if ((do_show_setup_tidal)  && (!(fundet))) {
+        // select default play device
+        if ((GLubyte) names[i*4+3]==10) {
+          fprintf(stderr,"selected first device\n");
+          // spotify_oversigt.set_default_device_to_play(0);
+          write_logfile(logfile,(char *) "selected 1 device.");
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==11) {
+          fprintf(stderr,"selected 2 device\n");
+          // spotify_oversigt.set_default_device_to_play(1);
+          write_logfile(logfile,(char *) "selected 2 device.");
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==12) {
+          fprintf(stderr,"selected 3 device\n");
+          // spotify_oversigt.set_default_device_to_play(2);
+          write_logfile(logfile,(char *) "selected 3 device.");
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==13) {
+          fprintf(stderr,"selected 4 device\n");
+          // spotify_oversigt.set_default_device_to_play(3);
+          write_logfile(logfile,(char *) "selected 4 device.");
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==14) {
+          fprintf(stderr,"selected 5 device\n");
+          // spotify_oversigt.set_default_device_to_play(4);
+          write_logfile(logfile,(char *) "selected 5 device.");
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==15) {
+          fprintf(stderr,"selected 6 device\n");
+          // spotify_oversigt.set_default_device_to_play(5);
+          write_logfile(logfile,(char *) "selected 6 device.");
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==16) {
+          fprintf(stderr,"selected 7 device\n");
+          // spotify_oversigt.set_default_device_to_play(6);
+          write_logfile(logfile,(char *) "selected 7 device.");
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==17) {
+          fprintf(stderr,"selected 8 device\n");
+          // spotify_oversigt.set_default_device_to_play(7);
+          write_logfile(logfile,(char *) "selected 8 device.");
+          returnfunc = 0;
+          fundet = true;
+        }
+      }
+      #endif
+
+
+
       // select what to play music/tidal/spotify or radio from icon nr
       if ((vis_radio_or_music_oversigt) && (!(fundet))) {
         // Radio
@@ -9040,10 +9135,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             sprintf(debuglogdata,"Open tidal playliste %s ", tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
             write_logfile(logfile,(char *) debuglogdata);
             // opdate view from intnr id.
-            tidal_oversigt.opdatere_tidal_oversigt(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));         // update view
-            
+            tidal_oversigt.opdatere_tidal_oversigt(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));         // update view           
             // tidal_oversigt.load_tidal_iconoversigt();                                                           // load icons            
-
             tidalknapnr=0;                                                                                      // reset select
             tidal_selected_startofset=0;                                                                        // and start ofset to.
             strcpy(tidal_oversigt.overview_show_band_name,"");
@@ -9051,13 +9144,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // play
           if ((( retfunc == 4 ) || ( retfunc == 5 )) && (tidalknapnr>0)) {
             switch(tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
-              case 0: sprintf(temptxt,"Tidal play nr %d playliste id %s named %s ",tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
+              case 0: sprintf(temptxt,"Tidal play playliste id %s named %s ", tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
                       write_logfile(logfile,(char *) temptxt);
-                      fprintf(stderr,"Tidal play nr %d playliste id %s named %s ",tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
+                      fprintf(stderr,"Tidal play playliste id %s named %s ", tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
                       break;
-              case 1: sprintf(temptxt,"Tidal play nr %d song id %s named %s ", tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
+              case 1: sprintf(temptxt,"Tidal play song id %s named %s ", tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
                       write_logfile(logfile,(char *) temptxt);
-                      fprintf(stderr,"Tidal play nr %d song id %s named %s ", tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
+                      fprintf(stderr,"Tidal play song id %s named %s ", tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
                       break;
               default:sprintf(temptxt,"Error in type. Type found %d \n",tidal_oversigt.get_tidal_type(tidalknapnr-1));
                       write_logfile(logfile,(char *) temptxt);
@@ -10008,7 +10101,7 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((realrssrecordnr)<43) realrssrecordnr++;
                     }
                   }
-                  // setup rss source window
+                  // setup spotify window
                   if (do_show_setup_spotify) {
                     if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
                   }
@@ -10751,12 +10844,12 @@ void handleKeypress(unsigned char key, int x, int y) {
       #endif
       #ifdef ENABLE_TIDAL
       // NEED FIX
-      if (do_show_setup_spotify) {
+      if (do_show_setup_tidal) {
         switch (do_show_setup_select_linie) {
-          case 0: // strcpy(keybuffer,spotify_oversigt.spotify_client_id);
+          case 0: // strcpy(keybuffer,tidal_oversigt.spotify_client_id);
                   // keybufferindex=strlen(keybuffer);
                   break;
-          case 1: // strcpy(keybuffer,spotify_oversigt.spotify_secret_id);
+          case 1: // strcpy(keybuffer,tidal_oversigt.spotify_secret_id);
                   // keybufferindex=strlen(keybuffer);
                   break;
         }
@@ -11787,7 +11880,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // set save flag of playlist
               if (vis_tidal_oversigt) {
                 if (ask_save_playlist) {
-                  save_ask_save_playlist = true;
+                  save_ask_save_playlist = true;        // set save flag
                 }
                 if (do_show_tidal_search_oversigt) {
                   do_hent_tidal_search_online=true;
@@ -14772,6 +14865,7 @@ void loadgfx() {
     _texturekeyssetup 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeys");
     _texturekeysrss		    = loadgfxfile(temapath,(char *) "images/",(char *) "setuprss");
     _texturespotify       = loadgfxfile(temapath,(char *) "images/",(char *) "setupspotify");
+    _texturetidal         = loadgfxfile(temapath,(char *) "images/",(char *) "setuptidal");
     _texturevideoplayersetup	= loadgfxfile(temapath,(char *) "images/",(char *) "setupplayer");
     _texturetvgrabersetup = loadgfxfile(temapath,(char *) "images/",(char *) "setupxmltv");
     _texturesetupclose		= loadgfxfile(temapath,(char *) "images/",(char *) "setupclose");
@@ -14954,6 +15048,7 @@ void freegfx() {
     glDeleteTextures( 1, &_texturekeyssetup);		    // setup
     glDeleteTextures( 1, &_texturekeysrss);	  	    // setup rss
     glDeleteTextures( 1, &_texturespotify);         // setup spotify
+    glDeleteTextures( 1, &_texturetidal);           // setup tidal
     glDeleteTextures( 1, &_texturevideoplayersetup);// setup
     glDeleteTextures( 1, &_texturetvgrabersetup);   //
     glDeleteTextures( 1, &setupkeysbar1);			      // bruges af myth_setup.cpp
@@ -15308,7 +15403,6 @@ int main(int argc, char** argv) {
       // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files     
       // ** my playliste default first time load
-
       // test
       
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
