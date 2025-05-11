@@ -31,8 +31,8 @@
 
 // sound system include fmod
 
-#include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod.hpp"
-#include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod_errors.h"
+#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod_errors.h"
 
 
 // json parser

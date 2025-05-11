@@ -76,8 +76,8 @@ FILE *logfile=NULL;                   // global logfile
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod.hpp"
-#include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod_errors.h"
+#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod_errors.h"
 #endif
 
 #include "mongoose-master/mongoose.h"
@@ -5764,7 +5764,8 @@ void display() {
     if (!(dsp)) {
       sndsystem->getMasterChannelGroup(&mastergroup);
       sndsystem->createDSPByType(FMOD_DSP_TYPE_FFT, &dsp);
-      dsp->setParameterInt(FMOD_DSP_FFT_WINDOWTYPE,FMOD_DSP_FFT_WINDOW_TRIANGLE);
+      // dsp->setParameterInt(FMOD_DSP_FFT_WINDOWTYPE,FMOD_DSP_FFT_WINDOW_TRIANGLE);
+      // dsp->setParameterInt(FMOD_DSP_FFT_WINDOW_TYPE,FMOD_DSP_FFT_WINDOW_TRIANGLE);
       dsp->setParameterInt(FMOD_DSP_FFT_WINDOWSIZE, sampleSize);
       mastergroup->addDSP(0, dsp);
       //channel->addDSP(FMOD_DSP_PARAMETER_DATA_TYPE_FFT, dsp);
@@ -11639,6 +11640,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_tidal_oversigt=false;
                 keybufferopenwin=false;
                 key=0;
+
+                printf("Esc key pressed in tidal view \n");
+
+
               } else if ((!(do_show_setup)) && (key==27)) {                       // exit program
                 remove("mythtv-controller.lock");
                 runwebserver=false;
