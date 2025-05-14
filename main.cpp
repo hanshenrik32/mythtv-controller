@@ -5775,7 +5775,7 @@ void display() {
     if (result!=FMOD_OK) fprintf(stderr,"Error DSP %s\n",FMOD_ErrorString(result));
     int length = fft->length/2;
     int numChannels = fft->numchannels;
-    int gangefaktor=12;
+    int gangefaktor=8;
     // crash if only 1 channel
     if ((fft) && (result==FMOD_OK)) {
       // new ver 4
@@ -15409,7 +15409,7 @@ int main(int argc, char** argv) {
       // get_playlist_from_file use get_users_album(albumid) to download files     
       // ** my playliste default first time load
       // test
-      
+      /*
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
@@ -15418,7 +15418,12 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
       tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skilex
-      
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "17738642",true);       // kedde
+      */
+
+      // 
+      // https://listen.tidal.com/my-collection/tracks (heart tracks)
+      // 
   
       // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // load default file
