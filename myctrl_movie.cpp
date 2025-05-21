@@ -700,7 +700,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
-            if (atoi(row[1])==32) dbexist=true; else dbexist=false;
+            if (atoi(row[1])==34) dbexist=true; else dbexist=false;
           }
         } else dbexist=false;
         // create databases/tables if not exist
@@ -772,7 +772,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
             while (moviefil = readdir(dirp)) {
               t = std::time(0);   // get time now
               now = std::localtime(&t);
-              if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {          
+              if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {
                 // save path for later use in db insert
                 thismoviepathdir = configmoviepath;            
                 thismoviepathdir = thismoviepathdir + "/";
