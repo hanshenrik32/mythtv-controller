@@ -4092,6 +4092,7 @@ void show_setup_interface() {
   glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
+
   // setup video player button
   xpos=800;
   ypos=300;
@@ -4106,8 +4107,9 @@ void show_setup_interface() {
   glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
+
   // setup tv graber to use
-  xpos=400;
+  xpos=300; // 400
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturetvgrabersetup);
@@ -4120,8 +4122,9 @@ void show_setup_interface() {
   glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
+
   // setup rss
-  xpos=600;
+  xpos=500; // 600 
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturekeysrss);
@@ -4136,7 +4139,7 @@ void show_setup_interface() {
   glEnd();
 
   // setup spotify
-  xpos=800;
+  xpos=700; // 800
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturespotify);
@@ -4152,7 +4155,7 @@ void show_setup_interface() {
 
 
   // setup tidal
-  xpos=1000;
+  xpos=900; // 1000
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturetidal);
@@ -4168,7 +4171,7 @@ void show_setup_interface() {
 
 
   // close button
-  xpos=200;
+  xpos=100;
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturesetupclose);

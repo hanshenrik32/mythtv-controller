@@ -642,6 +642,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     string moviepathcheck;
     char statfilename[2000];
     bool fundet;
+    bool nostat=false;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
@@ -786,12 +787,14 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                 strcpy(statfilename,configmoviepath);
                 strcat(statfilename,"/");
                 strcat(statfilename,moviefil->d_name);
+                // need fix
                 if (stat(statfilename,&statbuffer)==-1) {
-                  perror("stat");
-                  exit(EXIT_FAILURE);
+                  // perror("stat");
+                  // exit(EXIT_FAILURE);
+                  nostat=true;
                 }
                 // if dir
-                if ((statbuffer.st_mode & S_IFMT)==S_IFDIR) {
+                if ((nostat==false) && ((statbuffer.st_mode & S_IFMT)==S_IFDIR)) {
                   // it a dir opendir and find files
                   subdirp=opendir(statfilename);
                   film_ok=false;
