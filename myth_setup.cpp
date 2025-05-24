@@ -4174,7 +4174,7 @@ void show_setup_interface() {
   xpos=100;
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_texturesetupclose);
+  glBindTexture(GL_TEXTURE_2D,_texturesetupclose); 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glLoadName(37);

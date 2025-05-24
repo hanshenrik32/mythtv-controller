@@ -2551,6 +2551,9 @@ void newLine(float rStart, float rEnd, float angle) {
 //
 // ****************************************************************************************
 
+float sin_table[50*4];
+float barRotation[45+1][51];
+
 void display() {
   int tidal_player_start_status;
   static picture_saver *psaver=NULL;
@@ -2946,8 +2949,14 @@ void display() {
                 xxofset = 40.0f;                            // start ofset
                 float decay = 0.95f;        // 0.05f
                 // create the bars
-                for(int xp=0;xp<barantal;xp++) {
-                 
+                
+                // glRotatef(0.0f,0.0f,1.0f,rr);
+                rr += 1.1f;
+                // printf("rr %f\n",rr);
+
+
+                barantal=45;                
+                for(int xp=0;xp<barantal;xp++) {                 
                   xpos = (-siz_x)*xxofset;
                   ypos = (-400)+((siz_y*2)+2.0);
                   float target = sqrtf(spectrum[xp] * 8.0f) * 2.0f;
@@ -2965,7 +2974,11 @@ void display() {
                   b = 0.2f + r * 0.5f;
                   glColor3f(r, g, b);
 
+                  // printf("xpos %f  \n",xpos);
 
+                  // glRotatef(0.0f,0.0f,1.0f,rr);
+                  // draw the bar
+                  /*
                   for(int yp=0;yp<high;yp++) {
                     // front
                     glBegin(GL_QUADS);
@@ -2973,31 +2986,101 @@ void display() {
                     glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
                     glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
                     glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
-                    /*
+                    
                     // left
-                    glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                    glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                    glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-                    glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+                    // glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+                    // glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+                    // glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+                    // glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
                     // right
-                    glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                    glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                    glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-                    glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+                    // glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+                    // glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+                    // glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+                    // glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
                     // back
-                    glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
-                    glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
-                    glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
-                    glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
-                    */
+                    // glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
+                    // glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
+                    // glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
+                    // glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
+                    
                     glEnd();
                     ypos += (siz_y*2)+2.0;
                   }
+                  */
                   xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
                 }
+
+                glPopMatrix();
+              
+                barantal=42;
+                xpos=0.0f;
+                ypos=0.0f;
+                int xp=0;
+                int y=0;
+                int TABLE_SIZE = 50;
+                float barRotation[45+1][51];
+                static float Rotation = 0.0f;
+                float angle;
+                float step = (2.0f * M_PI) / (TABLE_SIZE - 1);
+                static bool firsttime_sin_table = true;
+                if (firsttime_sin_table) {
+                  firsttime_sin_table = false;
+                  for (int i = 0; i < TABLE_SIZE*4; i++) {
+                    if ((i>50) &&(i<150)) {
+                      angle = 2.0f * 3.14159265358979323846f * (i-50) / TABLE_SIZE;
+                      sin_table[i] = cos(angle);
+                    } else {
+                      sin_table[i] = 0.0f; // Initialize to zero
+                    }
+                  }
+                  for (int x = 0; x < barantal; x++) {
+                    for(y=0;y<50;y++) {
+                      barRotation[x][y] = sin_table[y];
+                    }
+                  }
+                }
+                float last = sin_table[TABLE_SIZE*4 - 1];
+                for (int i = TABLE_SIZE*4 - 1; i > 0; --i) {
+                    sin_table[i] = sin_table[i - 1];
+                }
+                sin_table[0] = last;
+
+                for (i = 0; i < TABLE_SIZE; i++) {
+                  printf("barantal %d tnr %2d: %f\n",barantal, i, sin_table[i]);
+                }
+
+                for (int x = 0; x < barantal; x++) {
+                  for (y = 0; y < TABLE_SIZE; y=y+2) {
+                    barRotation[x][y] = sin_table[y]*100;
+                    barRotation[x][y+1] = sin_table[y+1]*100;
+                  }
+                }           
+                glColor3f(255.0f, 255.0f, 255.0f);
+                xpos=0.0f;
+                for(xp=0;xp<barantal-1;xp++) {
+                  ypos=0.0f;
+                  high = barHeights[xp]*2;
+                  for(int yp=0;yp<high;yp++) {
+                    glPushMatrix();
+                    glTranslatef(75.0f+xpos,200.0f+ypos,0.0f);
+                    // glRotatef(sin_table[xp]*100,0.0f,1.0f,0.0f);
+                    glRotatef(barRotation[xp][yp],0.0f,1.0f,0.0f);
+                    glBegin(GL_QUADS);
+                    glTexCoord2f(0, 0); glVertex3f((-siz_x) ,-siz_y , 0.0f); // 1
+                    glTexCoord2f(0, 1); glVertex3f((-siz_x) , siz_y , 0.0f); // 2
+                    glTexCoord2f(1, 1); glVertex3f((siz_x) , siz_y , 0.0f); // 3
+                    glTexCoord2f(1, 0); glVertex3f((siz_x) ,-siz_y , 0.0f); // 4
+                    glEnd();
+                    glPopMatrix();
+                    ypos += (siz_y*2)+2.0f;
+                  }
+                  xpos += (siz_x*2);
+                }
+
                 //
                 // Mirror
                 //               
+                /*
                 glColor3f(0.4f, 0.4f, 0.4f);
                 glBindTexture(GL_TEXTURE_2D,texturedot);
                 // glBindTexture(GL_TEXTURE_2D,_textureuv1);
@@ -3041,8 +3124,7 @@ void display() {
                   }
                   xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
                 }
-                
-
+                */
                 glPopMatrix();
               }
             }
@@ -5812,7 +5894,7 @@ void display() {
   //
   // show uv metter in music player in the right corner
   // visur = screensaver on
-  if (((snd) && (visur==false) && (urtype!=MUSICMETER) && (show_uv) && (vis_uv_meter) && (configuvmeter)) || (((vis_radio_oversigt) || (vis_music_oversigt) || (vis_tidal_oversigt) || (vis_stream_oversigt) || (vis_radio_or_music_oversigt)) && (visur==false) && (snd))) {
+  if (((snd) && (visur==false) && (urtype!=MUSICMETER) && (show_uv) && (vis_uv_meter) && (configuvmeter)) || (((vis_radio_oversigt) || (vis_music_oversigt) || (vis_tidal_oversigt) || (vis_stream_oversigt)) && (vis_radio_or_music_oversigt==false) && (visur==false) && (snd))) {
     // draw uv meter in right corner
     int high = 2;
     int qq = 1;
@@ -5835,7 +5917,7 @@ void display() {
         ypos = 10;
         float decay = 0.8f;        // 0.05f
         static float barHeights[45] = {0}; // persistent for smoothing
-        float target = sqrtf(spectrum[qq/2] * 8.0f) * 2.0f;
+        float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
         if (target > barHeights[qq]) {
           barHeights[qq] = target;
         } else {

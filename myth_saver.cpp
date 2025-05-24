@@ -2630,10 +2630,10 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
 //
 // working in use
 //
-// *******mythtv-controller.log*********************************************************************************
+// ****************************************************************************************
 
 void boxarray::show_music_3d_2(float aangle,GLuint textureId) {
-    float BOX_SIZE=120.0f;
+    float BOX_SIZE=40.0f;
     static float rangle=0.0f;
     int x,y;
     float angle=aangle;

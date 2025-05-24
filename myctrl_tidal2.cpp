@@ -4854,7 +4854,7 @@ void tidal_class::show_setup_tidal() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   winsizx=100;
   winsizy=100;
-  xpos=310;
+  xpos=410;
   ypos=-70;
   glLoadName(40);
   glBegin(GL_QUADS);
