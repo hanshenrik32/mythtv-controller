@@ -445,7 +445,6 @@ void tidal_class::set_textureloaded(bool set) {
 int Get_albums_by_artist() {
   std::string curlstring="curl -X 'GET' \
   'https://openapi.tidal.com/artists/1566/albums?countryCode=US&offset=0&limit=50' \
-  -H 'accept: application/vnd.tidal.v1+json' \
   -H 'Authorization: Bearer eyJraWQiOiJ2OU1GbFhqWSIsImFsZyI6IkVTMjU2In0.eyJ0eXBlIjoibzJfYWNjZXNzIiwic2NvcGUiOiIiLCJnVmVyIjowLCJzVmVyIjowLCJjaWQiOjEwNjA2LCJleHAiOjE3MDI1MDMzMzksImlzcyI6Imh0dHBzOi8vYXV0aC50aWRhbC5jb20vdjEifQ._nwyfiDuTO-MdHIlyzflhHklh6o-as0wlgWnoeVEumU8opSrSakLLfrKH_X-VNBE0SN31jRmbk_XdViuu-dBOQ' \
   -H 'Content-Type: application/vnd.tidal.v1+json'";
   system(curlstring.c_str());
@@ -864,10 +863,8 @@ int tidal_class::get_access_token(char *loginbase64) {
   // lib curl stuf
   FILE *tokenfil=NULL;
   int error=0;
-  std::string curlstring1;
   char curlstring[8192];
   sprintf(curlstring,"/bin/curl -X POST -H 'Authorization: Basic %s' -d 'grant_type=client_credentials' -d 'client_id=%s' https://auth.tidal.com/v1/oauth2/token > tidal_token.json",loginbase64,"Nq5WQmVhv2L7QWQO");
-  // curlstring1 = fmt::format("/bin/curl -X POST -H 'Authorization: Basic {}' -d 'grant_type=client_credentials' -d 'client_id={}' https://auth.tidal.com/v1/oauth2/token > tidal_token.json",loginbase64,"Nq5WQmVhv2L7QWQO");
   error=system(curlstring);
   if (error) {
     printf("System call error.\n");    
@@ -880,7 +877,7 @@ int tidal_class::get_access_token(char *loginbase64) {
       fclose(tokenfil);
       printf("Tidal token read OK.\n");
       write_logfile(logfile,(char *) "Tidal token read OK");
-    }
+    } else strcpy(tidaltoken,"");
     // clean up
     std::remove("tidal_token.json"); // delete file
     std::remove("tidal_token.txt"); // delete file
@@ -1360,7 +1357,7 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
   curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
   if ((curl) && (strlen(auth_kode.c_str())>0)) {
-    header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
+    // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
     header = curl_slist_append(header, auth_kode.c_str());
     header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -1441,7 +1438,7 @@ int tidal_class::tidal_get_album_items(char *albumid) {
   curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
   if ((curl) && (strlen(auth_kode.c_str())>0)) {
-    header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
+    // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
     header = curl_slist_append(header, auth_kode.c_str());    
     header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -2640,7 +2637,7 @@ void tidal_class::process_object_tidal_search_result(json_value* value, int dept
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     // print_depth_shift(depth);
-    printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
+    // printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
     // new
     if (strcmp(value->u.object.values[x].name , "attributes")==0) {      
       tidal_process_attributes=true;
@@ -3001,7 +2998,8 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
 int tidal_class::opdatere_tidal_userCollections(std::string uid) {
   std::string url;
   int error;
-  url="curl -v -X GET 'https://openapi.tidal.com/v2/userCollections/" + uid + "/relationships/albums?countryCode=US&include=albums' -H 'accept: application/vnd.tidal.v1+json'" + " -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_usercollection_result.json";
+  url="curl -X GET 'https://openapi.tidal.com/v2/userCollections/" + uid + "/relationships/albums?countryCode=US&include=albums' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_usercollection_result.json";
+  printf("url %s \n",url.c_str());
   error=system(url.c_str());
   if (error!=0) {
     fprintf(stderr,"Curl error get user collections\n");
@@ -3009,11 +3007,6 @@ int tidal_class::opdatere_tidal_userCollections(std::string uid) {
   }
   return(1);
 }
-
-
-
-
-
 
 
 
@@ -3062,7 +3055,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
   curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
   if ((curl) && (strlen(auth_kode.c_str())>0)) {
-    header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
+    // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
     header = curl_slist_append(header, auth_kode.c_str());
     header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -3100,7 +3093,6 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     else searchbuffer=searchbuffer+"%20";
     n++;
   }
-    // old url="curl -X GET 'https://openapi.tidal.com/search?query=";
   url="curl -X GET 'https://openapi.tidal.com/v2/searchresults/";
   url=url + searchbuffer;
   switch (type) {
@@ -3109,8 +3101,8 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
             url=url + "/relationships/albums?countryCode=US&include=albums' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             break;
             // artist
-    case 1: // url=url + "/relationships/artists?countryCode=US&include=artists'  -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + "/relationships/artists?countryCode=US&include=artists'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+    case 1: // url=url + "/relationships/artists?countryCode=US&include=artists'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            url=url + "/relationships/artists?countryCode=US&include=artists' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             break;
             // tracks
     case 2: // url=url + "/relationships/tracks?countryCode=US&include=tracks'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
@@ -3120,8 +3112,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     default:// url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             url=url + "/relationships/albums?countryCode=US&include=albums' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
   }
-  
-  printf("url = %s \n",url.c_str());
+  // printf("url = %s \n",url.c_str());
   error=system(url.c_str());
   // if no error we have json file have the search result
   if (error==0) {
@@ -3762,7 +3753,7 @@ void convert_m4a_to_flac(char *path) {
 /*
 eks
 
-/bin/curl -v 'https://listen.tidal.com/us/album/315509960/track/315509961' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer eyJraWQi....'
+/bin/curl -v 'https://listen.tidal.com/us/album/315509960/track/315509961' -H 'Authorization: Bearer eyJraWQi....'
 // sample
 https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 

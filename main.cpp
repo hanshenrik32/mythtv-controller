@@ -2915,7 +2915,7 @@ void display() {
             newLine(-0.2f, 4.7f, -angleSec+M_PI/2);                        // sec
             glEnd();
           } else {
-            //
+            // music is playing
             // vis spectium in screen saver
             //
             if (urtype==MUSICMETER) {          
@@ -3027,9 +3027,9 @@ void display() {
                 if (firsttime_sin_table) {
                   firsttime_sin_table = false;
                   for (int i = 0; i < TABLE_SIZE*4; i++) {
-                    if ((i>50) &&(i<150)) {
+                    if ((i>50) && (i<100)) {
                       angle = 2.0f * 3.14159265358979323846f * (i-50) / TABLE_SIZE;
-                      sin_table[i] = cos(angle);
+                      sin_table[i] = sin(angle);
                     } else {
                       sin_table[i] = 0.0f; // Initialize to zero
                     }
@@ -3046,20 +3046,24 @@ void display() {
                 }
                 sin_table[0] = last;
                 for (int x = 0; x < barantal; x++) {
-                  for (y = 0; y < TABLE_SIZE; y=y+2) {
+                  for (y = 0; y < TABLE_SIZE; y=y+3) {
                     barRotation[x][y] = sin_table[y]*100;
                     barRotation[x][y+1] = sin_table[y+1]*100;
+                    barRotation[x][y+2] = sin_table[y+2]*100;
                   }
-                }           
-                glColor3f(255.0f, 255.0f, 255.0f);
+                }
+                for (int x = 0; x < TABLE_SIZE; x++) {
+                  cout << x << " sin_table[" << sin_table[x] << "] " << endl;
+                }
+                // glColor3f(255.0f, 255.0f, 255.0f);
                 xpos=0.0f;
                 for(xp=0;xp<barantal-1;xp++) {
                   ypos=0.0f;
                   high = barHeights[xp]*2;
                   for(int yp=0;yp<high;yp++) {
                     glPushMatrix();
+                    glColor3f(1.0f, 1.0f, 0.0f);
                     glTranslatef(75.0f+xpos,100.0f+ypos,0.0f);
-                    // glRotatef(sin_table[xp]*100,0.0f,1.0f,0.0f);
                     glRotatef(barRotation[xp][yp],0.0f,1.0f,0.0f);
                     glBegin(GL_QUADS);
                     glTexCoord2f(0, 0); glVertex3f((-siz_x) ,-siz_y , 0.0f); // 1
@@ -14133,6 +14137,7 @@ void datainfoloader_webserver_v2() {
       // clear old
       tidal_oversigt.clean_tidal_oversigt();
       // update from search
+      // tidal_oversigt.searchtype=1;
       switch(tidal_oversigt.searchtype) {
         case 0: tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
                 break;
@@ -15457,7 +15462,7 @@ int main(int argc, char** argv) {
     tidalok=tidal_oversigt.get_access_token((char *) "your access token");
     if (tidalok) {   
       
-      tidal_oversigt.opdatere_tidal_userCollections("131776836");
+      // tidal_oversigt.opdatere_tidal_userCollections("131776836");
 
 
       // login ok load playlistes from file
@@ -15469,6 +15474,7 @@ int main(int argc, char** argv) {
       // ** my playliste default first time load
       // test
       /*
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "131776836",true); // my playliste      
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",true);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
