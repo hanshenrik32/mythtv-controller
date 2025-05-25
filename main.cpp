@@ -2927,7 +2927,9 @@ void display() {
               float siz_y = 6.0f;                     // size 8
               static float barHeights[45] = {0}; // persistent for smoothing
               if (snd) {
+                
                 glPushMatrix();
+
         //        glTranslatef(100.0f, 100.0f, 0.0f);
                 glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
                 glRotatef(0,0.0f,1.0f,0.0f);
@@ -2959,7 +2961,7 @@ void display() {
                 for(int xp=0;xp<barantal;xp++) {                 
                   xpos = (-siz_x)*xxofset;
                   ypos = (-400)+((siz_y*2)+2.0);
-                  float target = sqrtf(spectrum[xp] * 8.0f) * 2.0f;
+                  float target = sqrtf(spectrum[xp] * 8.0f) * 3.0f;
                   if (target > barHeights[xp]) {
                     barHeights[xp] = target;
                   } else {
@@ -2972,10 +2974,9 @@ void display() {
                   r = fminf(1.0f, amp * 8.0f);
                   g = 1.0f - r * 0.5f;
                   b = 0.2f + r * 0.5f;
-                  glColor3f(r, g, b);
 
+                  // glColor3f(r, g, b);
                   // printf("xpos %f  \n",xpos);
-
                   // glRotatef(0.0f,0.0f,1.0f,rr);
                   // draw the bar
                   /*
@@ -3044,11 +3045,6 @@ void display() {
                     sin_table[i] = sin_table[i - 1];
                 }
                 sin_table[0] = last;
-
-                for (i = 0; i < TABLE_SIZE; i++) {
-                  printf("barantal %d tnr %2d: %f\n",barantal, i, sin_table[i]);
-                }
-
                 for (int x = 0; x < barantal; x++) {
                   for (y = 0; y < TABLE_SIZE; y=y+2) {
                     barRotation[x][y] = sin_table[y]*100;
@@ -3062,7 +3058,7 @@ void display() {
                   high = barHeights[xp]*2;
                   for(int yp=0;yp<high;yp++) {
                     glPushMatrix();
-                    glTranslatef(75.0f+xpos,200.0f+ypos,0.0f);
+                    glTranslatef(75.0f+xpos,100.0f+ypos,0.0f);
                     // glRotatef(sin_table[xp]*100,0.0f,1.0f,0.0f);
                     glRotatef(barRotation[xp][yp],0.0f,1.0f,0.0f);
                     glBegin(GL_QUADS);
@@ -3076,60 +3072,9 @@ void display() {
                   }
                   xpos += (siz_x*2);
                 }
-
-                //
-                // Mirror
-                //               
-                /*
-                glColor3f(0.4f, 0.4f, 0.4f);
-                glBindTexture(GL_TEXTURE_2D,texturedot);
-                // glBindTexture(GL_TEXTURE_2D,_textureuv1);
-                xxofset = 40.0f;                            // start ofset
-                for(int xp=0;xp<barantal;xp++) {
-                  xpos = (-siz_x)*xxofset;
-                  ypos = (-432)+((siz_y*4)+2.0);
-                  // high = spectrum[xp];
-                  float target = sqrtf(spectrum[xp] * 8.0f) * 2.0f;
-                  if (target > barHeights[xp]) {
-                    barHeights[xp] = target;
-                  } else {
-                    barHeights[xp] -= decay;
-                    if (barHeights[xp] < 0) barHeights[xp] = 0;
-                  }
-                  high = barHeights[xp];
-                  for(int yp=0;yp<high/1.5;yp++) {
-                    // front
-                    glBegin(GL_QUADS);
-                    glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                    glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                    glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
-                    glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
-                    // left
-                    glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                    glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                    glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-                    glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-                    // right
-                    glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                    glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                    glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-                    glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-                    // back
-                    glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
-                    glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
-                    glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
-                    glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
-                    glEnd();
-                    ypos -= (siz_y*2)+2.0;
-                  }
-                  xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
-                }
-                */
                 glPopMatrix();
               }
             }
-
-
             // end spectium
           }
           break;
