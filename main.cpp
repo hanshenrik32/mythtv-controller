@@ -9516,7 +9516,7 @@ void handlespeckeypress(int key,int x,int y) {
                   else if (findtype==1) findtype=0;
                   */
                   tidal_oversigt.searchtype++;
-                  if (tidal_oversigt.searchtype>3) tidal_oversigt.searchtype=0;
+                  if (tidal_oversigt.searchtype>2) tidal_oversigt.searchtype=0;
                 }
                 break;
         case 2:
@@ -9798,7 +9798,6 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
                 #endif
-
                 #ifdef ENABLE_TIDAL
                 if ((vis_tidal_oversigt) && (!(ask_open_dir_or_play_tidal))) {
                   if (do_show_tidal_search_oversigt==false) {
@@ -10568,7 +10567,7 @@ void handlespeckeypress(int key,int x,int y) {
                     _sangley=4*RADIO_CS;
                   }
                 }
-                // if indside tv overoview
+                // if indside tv overview
                 if ((vis_tv_oversigt) && ((aktiv_tv_oversigt.vistvguidekl>1) || (aktiv_tv_oversigt.vistvguidekl==0))) {
                     aktiv_tv_oversigt.changetime(-(60));
                     if (aktiv_tv_oversigt.vistvguidekl==0) {

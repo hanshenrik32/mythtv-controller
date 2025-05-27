@@ -1915,16 +1915,6 @@ void boxarray::roll_array() {
 
 
 
-
-
-
-
-
-
-
-
-
-
 // type 0 = set to music texture
 // type 1 = set new texture NOT center cross from param newtexture
 // type 2 = set new texture from param newtexture
@@ -2435,7 +2425,9 @@ int boxarray::loadboxpictures()
 }
 
 // ****************************************************************************************
-// setter textures fra cd samling i mythtv
+//
+// textures fra cd samling i mythtv
+//
 // ****************************************************************************************
 
 void boxarray::settexture() {
@@ -2468,7 +2460,6 @@ void boxarray::settexture() {
 
 
 int n=0;
-
 static bool music_3d_statup=true;
 
 // ****************************************************************************************

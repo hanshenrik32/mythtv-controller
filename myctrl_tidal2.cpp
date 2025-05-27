@@ -1850,9 +1850,6 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
               while ((recnr<create_new_record_antal) && (stack[recnr])) {
                 // check if exist
                 playlistexist = false;
-                // strcpy(sql,"select playlistid from mythtvcontroller.tidalcontentplaylist where playlistid like '");
-                // strcat(sql,stack[recnr]->playlistid);
-                // strcat(sql,"'");
                 sqll="select playlistid from mythtvcontroller.tidalcontentplaylist where playlistid like '";
                 sqll = sqll + stack[recnr]->playlistid;
                 sqll = sqll + "'";
@@ -1901,8 +1898,6 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                     }
                     strcpy(stack[recnr]->feed_artist,"");                   // reset to get data again else it will ignore it.
                     printf("Tidal downloading album + json file %20s  nr %d \n",stack[recnr]->playlistid,recnr);
-                    // Download playlist json file + update db from the downloaded json file.
-                    // get_users_album(stack[recnr]->playlistid);
                     logdata="TIDAL Update playlist id ";
                     logdata=logdata + stack[recnr]->playlistid;
                     write_logfile(logfile,(char *) logdata.c_str());
