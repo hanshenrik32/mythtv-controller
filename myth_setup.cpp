@@ -4109,7 +4109,7 @@ void show_setup_interface() {
   glEnd();
 
   // setup tv graber to use
-  xpos=300; // 400
+  xpos=200; // 400
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturetvgrabersetup);
@@ -4124,7 +4124,7 @@ void show_setup_interface() {
   glEnd();
 
   // setup rss
-  xpos=500; // 600 
+  xpos=400; // 600 
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturekeysrss);
@@ -4139,7 +4139,7 @@ void show_setup_interface() {
   glEnd();
 
   // setup spotify
-  xpos=700; // 800
+  xpos=600; // 800
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturespotify);
@@ -4155,7 +4155,7 @@ void show_setup_interface() {
 
 
   // setup tidal
-  xpos=900; // 1000
+  xpos=800; // 1000
   ypos=100;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturetidal);
@@ -4171,8 +4171,11 @@ void show_setup_interface() {
 
 
   // close button
-  xpos=100;
-  ypos=100;
+  xpos=400;
+  ypos=10;
+  winsizx = 355;
+  winsizy = 81;
+  glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturesetupclose); 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
