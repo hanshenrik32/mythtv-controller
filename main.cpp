@@ -747,6 +747,7 @@ GLuint _textureId9_2; 	                  // askbox music image
 GLuint _textureIdplayicon; 	              // play icon
 GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
+GLuint _textureclosemain;                 // close menu icon
 GLuint _textureclose_small;               // close icon small
 GLuint _textureswap; 	                    // swap icon
 GLuint _textureId11; 	                    // tv program oversigt logo
@@ -3363,7 +3364,7 @@ void display() {
 
       // Icon 5
       if (vis_radio_or_music_oversigt) {
-        glBindTexture(GL_TEXTURE_2D, _textureclose);
+        glBindTexture(GL_TEXTURE_2D, _textureclosemain);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(29);
@@ -3375,7 +3376,7 @@ void display() {
         glEnd();
       }
       if (vis_stream_or_movie_oversigt) {
-        glBindTexture(GL_TEXTURE_2D, _textureclose);
+        glBindTexture(GL_TEXTURE_2D, _textureclosemain);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(29);
@@ -14869,6 +14870,7 @@ void loadgfx() {
     _textureIdplayicon   	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
     _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
     _textureclose        	= loadgfxfile(temapath,(char *) "images/",(char *) "close");
+    _textureclosemain    	= loadgfxfile(temapath,(char *) "images/",(char *) "closemain");
     _textureclose_small  	= loadgfxfile(temapath,(char *) "images/",(char *) "close_small");
     _textureswap         	= loadgfxfile(temapath,(char *) "images/",(char *) "swap");
     _textureId11         	= loadgfxfile(temapath,(char *) "images/",(char *) "tvprogram_oversigt");
@@ -15057,6 +15059,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdplayicon);			// play icon
     glDeleteTextures( 1, &_textureopen);            // open icon
     glDeleteTextures( 1, &_textureclose);			      // no dont play icon
+    glDeleteTextures( 1, &_textureclosemain);			      // no dont play icon
     glDeleteTextures( 1, &_textureclose_small);			      // no dont play icon
     glDeleteTextures( 1, &_textureswap);			      // no dont play icon
     glDeleteTextures( 1, &_textureId11);			      // tv program oversigt logo

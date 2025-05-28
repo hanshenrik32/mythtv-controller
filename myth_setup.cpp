@@ -439,8 +439,8 @@ void show_setup_screen() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=550;
   ypos=50;
   glLoadName(40);
@@ -777,8 +777,8 @@ void show_setup_video() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=550;
   ypos=150;
   glLoadName(40);
@@ -1073,8 +1073,8 @@ void show_setup_tema() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=450;
   ypos=100;
   glLoadName(40);
@@ -1200,8 +1200,8 @@ void show_setup_font(int startofset) {
     glBindTexture(GL_TEXTURE_2D,_textureclose);                            // _texturesetupclose
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    winsizx=100;
-    winsizy=100;
+    winsizx=188;
+    winsizy=81;
     xpos=490;
     ypos=70;
     glLoadName(40);
@@ -1319,8 +1319,8 @@ void show_wlan_networks(int valgtnr) {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=450;
   ypos=80;
   glLoadName(40);
@@ -1372,8 +1372,8 @@ void show_setup_network() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=450;
   ypos=80;
   glLoadName(40);
@@ -1617,8 +1617,8 @@ void show_setup_sound() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=450;
   ypos=150;
   glLoadName(40);
@@ -1788,8 +1788,8 @@ void show_setup_sql() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=450;
   ypos=-10;
   glLoadName(40);
@@ -2142,8 +2142,8 @@ void show_setup_keys() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=475;
   ypos=-10;
   glLoadName(40);
@@ -2748,8 +2748,8 @@ void show_setup_rss(unsigned int startofset) {
     glBindTexture(GL_TEXTURE_2D,_textureclose);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    winsizx=100;
-    winsizy=100;
+    winsizx=188;
+    winsizy=81;
     xpos=475;
     ypos=-10;
     glLoadName(40);
@@ -3786,8 +3786,8 @@ void show_setup_tv_graber(int startofset) {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=475;
   ypos=-10;
   glLoadName(40);

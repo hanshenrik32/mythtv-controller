@@ -4847,8 +4847,8 @@ void tidal_class::show_setup_tidal() {
   glColor3f(1.0f, 1.0f, 1.0f);
   glTranslatef(0.0f, 0.0f, 0.0f);
   glBindTexture(GL_TEXTURE_2D,_textureclose);
-  winsizx=100;
-  winsizy=100;
+  winsizx=188;
+  winsizy=81;
   xpos=410;
   ypos=-70;
   glLoadName(40);
