@@ -2798,6 +2798,9 @@ void display() {
   // background picture if none type is selected
   if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_tv_oversigt))) show_background();
   //visur=1;
+
+  printf("tidal_oversigt.get_tidal_playing_flag() %d  music_oversigt.play() %d \n",tidal_oversigt.get_tidal_playing_flag(),musicoversigt.play());
+
   if (visur) {
     glPushMatrix();
     switch (urtype) {
@@ -2820,7 +2823,7 @@ void display() {
       case ANALOG:
       case MUSICMETER:
           // create one display list
-          if (((snd==0) && (visur==MUSICMETER)) || (urtype==ANALOG)) {
+          if ((streamoversigt.stream_is_playing==false) && (tidal_oversigt.get_tidal_playing_flag()== false) && (musicoversigt.play()==false) && (film_oversigt.film_is_playing==false)) {
             if (firsttime) {
               index = glGenLists(1);
               lastohur=t->tm_hour;
@@ -5758,7 +5761,9 @@ void display() {
         if (do_show_setup_sound) show_setup_sound();                        // sound device
         if (do_show_setup_screen) show_setup_screen();                      //
         if (do_show_videoplayer) show_setup_video();                        //
-        if (do_show_setup_sql) show_setup_sql();                            //
+        if (do_show_setup_sql) {
+          show_setup_sql();                            //
+        }
         if (do_show_setup_tema) show_setup_tema();                          // select tema
         if (do_show_setup_network) {                                        //
           show_setup_network();

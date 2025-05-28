@@ -3267,7 +3267,7 @@ bool tidal_class::get_tidal_playing_flag() {
 // ****************************************************************************************
 
 void tidal_class::set_tidal_playing_flag(bool flag) {
-  tidal_is_playing=flag;
+  tidal_is_playing=flag;  
 }
 
 // *********************************************************************************************************
