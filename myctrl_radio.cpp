@@ -76,6 +76,7 @@ radiostation_class::radiostation_class() : antal(0) {
     radiosortopt[i].antal=0;
   }
   radiooptionsselect=0;							// selected line in radio options
+  playing=false;						// playing radio station
 }
 
 

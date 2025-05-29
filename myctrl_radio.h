@@ -54,6 +54,7 @@ class radiostation_class {
         bool check_radio_online_bool();                                                 // check and set radio station online flag (DO NOT WORK)
 
     public:
+        bool playing;                                                                   // playing radio station
         unsigned long check_radio_online(unsigned int startrecnr);	                    // check and set radio station online flag (DO NOT WORK)
         void nextradiooptselect();		                                    			// select next type in radio type oversigt
         void lastradiooptselect();                                      				//

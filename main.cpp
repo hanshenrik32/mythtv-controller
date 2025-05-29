@@ -2799,7 +2799,7 @@ void display() {
   if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_tv_oversigt))) show_background();
   //visur=1;
 
-  printf("tidal_oversigt.get_tidal_playing_flag() %d  music_oversigt.play() %d \n",tidal_oversigt.get_tidal_playing_flag(),musicoversigt.play());
+  // printf("tidal_oversigt.get_tidal_playing_flag() %d  music_oversigt.play() %d \n",tidal_oversigt.get_tidal_playing_flag(),musicoversigt.play());
 
   if (visur) {
     glPushMatrix();
@@ -2823,7 +2823,7 @@ void display() {
       case ANALOG:
       case MUSICMETER:
           // create one display list
-          if ((streamoversigt.stream_is_playing==false) && (tidal_oversigt.get_tidal_playing_flag()== false) && (musicoversigt.play()==false) && (film_oversigt.film_is_playing==false)) {
+          if ((streamoversigt.stream_is_playing==false) && (radiooversigt.playing==false) && (tidal_oversigt.get_tidal_playing_flag()== false) && (musicoversigt.play()==false) && (film_oversigt.film_is_playing==false)) {
             if (firsttime) {
               index = glGenLists(1);
               lastohur=t->tm_hour;
@@ -2979,39 +2979,6 @@ void display() {
                   g = 1.0f - r * 0.5f;
                   b = 0.2f + r * 0.5f;
 
-                  // glColor3f(r, g, b);
-                  // printf("xpos %f  \n",xpos);
-                  // glRotatef(0.0f,0.0f,1.0f,rr);
-                  // draw the bar
-                  /*
-                  for(int yp=0;yp<high;yp++) {
-                    // front
-                    glBegin(GL_QUADS);
-                    glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                    glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                    glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
-                    glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
-                    
-                    // left
-                    // glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                    // glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                    // glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-                    // glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-                    // right
-                    // glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                    // glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                    // glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-                    // glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-                    // back
-                    // glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
-                    // glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
-                    // glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
-                    // glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
-                    
-                    glEnd();
-                    ypos += (siz_y*2)+2.0;
-                  }
-                  */
                   xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
                 }
 
@@ -4436,6 +4403,7 @@ void display() {
         dsp = 0;                                                                                  // reset uv
         ERRCHECK(result,0);
         snd=0;                                // set play new flag
+        radiooversigt.playing=false;
       }
       #endif
       #if defined USE_SDL_MIXER
@@ -4492,6 +4460,7 @@ void display() {
           result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
           ERRCHECK(result,rknapnr);
           if ((result==FMOD_OK) && (openstate!=FMOD_OPENSTATE_CONNECTING)) {
+            radiooversigt.playing=true;			// set playing flag
             if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
             //ERRCHECK(result,do_play_music_aktiv_table_nr);
             if (sndsystem) channel->setVolume(configsoundvolume); // set play volume from configfile
@@ -4514,6 +4483,7 @@ void display() {
             ERRCHECK_SDL(Mix_GetError(),rknapnr);
           }
           if (sdlmusicplayer) {
+            radiooversigt.playing=true;
             radiooversigt.set_radio_popular(rknapnr-1);                             // set afspillings antal
             radiooversigt.set_radio_online(rknapnr-1,true);                         // station virker fint ok status igen
             radiooversigt.set_radio_intonline(rknapnr-1);
