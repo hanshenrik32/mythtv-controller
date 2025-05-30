@@ -1075,7 +1075,7 @@ void show_setup_tema() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   winsizx=188;
   winsizy=81;
-  xpos=450;
+  xpos=430;
   ypos=100;
   glLoadName(40);
   glBegin(GL_QUADS);
@@ -1202,8 +1202,8 @@ void show_setup_font(int startofset) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     winsizx=188;
     winsizy=81;
-    xpos=490;
-    ypos=70;
+    xpos=430;
+    ypos=80;
     glLoadName(40);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -1321,8 +1321,8 @@ void show_wlan_networks(int valgtnr) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   winsizx=188;
   winsizy=81;
-  xpos=450;
-  ypos=80;
+  xpos=430;
+  ypos=90;
   glLoadName(40);
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -1374,7 +1374,7 @@ void show_setup_network() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   winsizx=188;
   winsizy=81;
-  xpos=450;
+  xpos=430;
   ypos=80;
   glLoadName(40);
   glBegin(GL_QUADS);
@@ -1619,8 +1619,8 @@ void show_setup_sound() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   winsizx=188;
   winsizy=81;
-  xpos=450;
-  ypos=150;
+  xpos=430;
+  ypos=120;
   glLoadName(40);
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -1790,7 +1790,7 @@ void show_setup_sql() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   winsizx=188;
   winsizy=81;
-  xpos=450;
+  xpos=430;
   ypos=-10;
   glLoadName(40);
   glBegin(GL_QUADS);
@@ -2120,7 +2120,6 @@ void show_setup_keys() {
   // background
   glPushMatrix();
   glTranslatef(0.0f, 0.0f, 0.0f);
-  //glBlendFunc(GL_ONE, GL_ONE);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,setupkeysback);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2135,7 +2134,6 @@ void show_setup_keys() {
   glPushMatrix();
   // close buttons
   glEnable(GL_TEXTURE_2D);
-  //glBlendFunc(GL_ONE, GL_ONE);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glColor3f(1.0f, 1.0f, 1.0f);
   glTranslatef(0.0f, 0.0f, 0.0f);
@@ -2144,7 +2142,7 @@ void show_setup_keys() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   winsizx=188;
   winsizy=81;
-  xpos=475;
+  xpos=430;
   ypos=-10;
   glLoadName(40);
   glBegin(GL_QUADS);
@@ -4152,8 +4150,6 @@ void show_setup_interface() {
   glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
-
-
   // setup tidal
   xpos=800; // 1000
   ypos=100;
@@ -4168,8 +4164,6 @@ void show_setup_interface() {
   glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
-
-
   // close button
   xpos=400;
   ypos=10;
