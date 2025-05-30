@@ -5268,13 +5268,13 @@ void spotify_class::show_setup_spotify() {
     glTranslatef(0.0f, 0.0f, 0.0f);
     glBindTexture(GL_TEXTURE_2D,_textureclose);
     if (spotify_device_antal<4) {
-      winsizx=100;
-      winsizy=100;
+      winsizx=188;
+      winsizy=81;
       xpos=310;
       ypos=-10;
     } else {
-      winsizx=100;
-      winsizy=100;
+      winsizx=188;
+      winsizy=81;
       xpos=310;
       ypos=-70;
     }

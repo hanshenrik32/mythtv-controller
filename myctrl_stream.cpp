@@ -86,6 +86,9 @@ extern bool stream_loadergfx_started_break;
 // to create youtube podcast use 
 // https://www.youtube.com/feeds/videos.xml?channel_id=(channel id) 
 
+// 2 levels array for earch line
+
+// table internetcontent, table internetcontentarticles
 
 std::vector<std::string> sql_podcast_array={
   "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Venjent music',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Venjent music',NULL,NULL,'Venjent music',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCrY8Y0rs3BlE3T57TOMM1aw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
@@ -626,13 +629,11 @@ int stream_class::loadrssfile(bool updaterssfile) {
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         stream_rssparse_nowloading++;
-        printf("Get rss file %10s antal streams %d \n",row[0],antal_rss_streams());
-        // antalrss_feeds++;
+        printf("Get rss file %10s \n",row[0]);
         snprintf(temptxt,sizeof(temptxt),"Get rss feed title %10s ",row[0]);
         write_logfile(logfile,temptxt);
         if ((row[3]) && (strcmp(row[3],"")!=0)) {
-          //getuserhomedir(homedir);                                          // get user homedir
-          strcpy(homedir,localuserhomedir);
+          strcpy(homedir,localuserhomedir);                                   // Get user homedir
           strcpy(totalurl,"wget -U Netscape --timeout=10 '");
           if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
           strcat(totalurl,"' -o '");
@@ -675,7 +676,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
             // if title ok and not podcast bud real rss feed
             if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
               // parse downloaded xmlfile now (create db records)
-              // and get base image from funccall (baseicon (url to image))
+              // and get base image from func call (baseicon (url to image))
               parsexmlrssfile(parsefilename,baseicon);
               //printf("... Parse %s rss file \n",parsefilename);
             } else {
@@ -718,22 +719,18 @@ int stream_class::loadrssfile(bool updaterssfile) {
 
 void search_and_replace2(char *text) {
   int n=0;
-  int nn=0;
-  char newtext[2048];
-  strcpy(newtext,"");
+  std::string newtext;
+  newtext="";
   while(n<strlen(text)) {
     if (text[n]=='"') {
-      strcat(newtext,"'");
+      newtext.append("'");
       n++;
     } else {
-      newtext[nn]=text[n];
-      newtext[nn+1]='\0';                               // null terminate string
-      nn++;
+      newtext.append(1, (char ) text[n]);
       n++;
     }
   }
-  newtext[n]=0;
-  strcpy(text,newtext);
+  strcpy(text,newtext.c_str());
 }
 
 
@@ -1428,21 +1425,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     } else {
       write_logfile(logfile,(char *) "No stream data loaded.");
     }
-    //load_stream_gfx();
-    //
     // load all the data in phread datainfoloader
     // web gfx file loader in phread
-    /*
-    pthread_t loaderthread;           // the load
-    int rc=pthread_create(&loaderthread,NULL,loadweb,NULL);
-    if (rc) {
-      printf("ERROR; return code from pthread_create() is %d\n", rc);
-      exit(-1);
-    }
-    */
     loadweb_stream_iconoversigt();
-
-
     return(antal-1);
   } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
   write_logfile(logfile,(char *) "RSS/PODCAST loader done.");

@@ -18,6 +18,7 @@
 #include <MediaInfo/MediaInfo.h>
 #include <sstream>
 #include <fmt/format.h>
+#include <sqlite3.h>                    // sqlite interface to xbmc
 
 #include "utility.h"
 #include "myctrl_movie.h"
@@ -63,6 +64,7 @@ extern int orgwinsizex;
 
 extern GLuint _textureId9_askbox;
 
+extern bool do_sqlite;
 
 
 // ****************************************************************************************
@@ -590,6 +592,17 @@ int countEntriesInDir(const char* dirname) {
 }
 
 
+sqlite3 *sqlitedb_obj_movie;
+
+int sql_movie_sqldb_callback(void *data, int argc, char **argv, char **azColName) {
+    int i;
+    for (i=0; i<argc; i++) {
+        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+    }
+    return 0;
+}
+
+
 // ****************************************************************************************
 //
 // overloaded function in .h file
@@ -629,6 +642,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     string moviepathcheck;
     char statfilename[2000];
     bool fundet;
+    bool nostat=false;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
@@ -651,182 +665,292 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     string thismoviepathdir;
     std::time_t t = std::time(0);   // get time now
     std::tm* now = std::localtime(&t);
+    int rc;
+    char *zErrMsg = 0;
+    char *data = (char *) "sqlitedb_obj_movie";
+    const char *sql = "SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title";
+    if (do_sqlite) {      
+      sqlite3_open("mythtvcontroller.db", &sqlitedb_obj_movie);
+      rc = sqlite3_exec(sqlitedb_obj_movie , sql, sql_movie_sqldb_callback, (void*)data, &zErrMsg);
+      if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+      } else {
+        fprintf(stdout, "Operation done successfully\n");
+      }
+      sqlite3_close(sqlitedb_obj_movie);
 
-    // mysql stuf
-    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-    strcpy(database,dbname);
-    int checkdirexist=0;
-    write_logfile(logfile,(char *) "Opdatere Film oversigt fra db :");
-    sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
-//    sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,videogenre.genre from videogenre,videometadatagenre,videometadata left join videocategory on videometadata.category=videocategory.intid where videometadatagenre.idvideo=videometadata.intid and browse=1 group by idvideo order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
-    conn=mysql_init(NULL);
-    if (conn) {
-      allokay=true;
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-      // test musik table exist
-      // sprintf(sqlselect,"select table_schema as database_name,count(*) as tables from information_schema.tables where table_type = 'BASE TABLE' and table_schema not in ('information_schema', 'sys', 'performance_schema', 'mysql') group by table_schema order by table_schema");
-      ssqlselect = "select table_schema as database_name,count(*) as tables from information_schema.tables where table_type = 'BASE TABLE' and table_schema not in ('information_schema', 'sys', 'performance_schema', 'mysql') group by table_schema order by table_schema";
-      mysql_query(conn,ssqlselect.c_str());
-      res = mysql_store_result(conn);
-      if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          if (atoi(row[1])==32) dbexist=true; else dbexist=false;
+    } else {
+      // mysql stuf
+      if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
+      strcpy(database,dbname);
+      int checkdirexist=0;
+      write_logfile(logfile,(char *) "Opdatere Film oversigt fra db :");
+      sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
+  //    sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,videogenre.genre from videogenre,videometadatagenre,videometadata left join videocategory on videometadata.category=videocategory.intid where videometadatagenre.idvideo=videometadata.intid and browse=1 group by idvideo order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
+      conn=mysql_init(NULL);
+      if (conn) {
+        allokay=true;
+        mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+        mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);
+        // test musik table exist
+        // sprintf(sqlselect,"select table_schema as database_name,count(*) as tables from information_schema.tables where table_type = 'BASE TABLE' and table_schema not in ('information_schema', 'sys', 'performance_schema', 'mysql') group by table_schema order by table_schema");
+        ssqlselect = "select table_schema as database_name,count(*) as tables from information_schema.tables where table_type = 'BASE TABLE' and table_schema not in ('information_schema', 'sys', 'performance_schema', 'mysql') group by table_schema order by table_schema";
+        mysql_query(conn,ssqlselect.c_str());
+        res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            if (atoi(row[1])==34) dbexist=true; else dbexist=false;
+          }
+        } else dbexist=false;
+        // create databases/tables if not exist
+        // needed by movie loader
+        if (!(dbexist)) {
+          ssqlselect = "create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int, bitrate int , width int , high int, fsize int, fformat varchar(150))";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "create table IF NOT EXISTS videocategory(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, category varchar(128))";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "create table IF NOT EXISTS videogenre(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(128))";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "create table IF NOT EXISTS videocountry(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, country varchar(128))";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "create table IF NOT EXISTS videocollection(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(256), contenttype int, plot text,network varchar(128), collectionref varchar(128), certification varchar(128), genre varchar(128),releasedate date, language varchar(10),status varchar(64), rating float, ratingcount int, runtime int, banner text,fanart text,coverart text)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "create table IF NOT EXISTS videopathinfo(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, path text, contenttype int, collectionref int,recurse  int)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "create table IF NOT EXISTS videotypes(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, extension varchar(128),playcommand varchar(255), f_ignore int,  use_default int)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'txt','',1,0)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'log','',1,0)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'mpg','',0,0)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'avi','',0,1)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'vob','',0,0)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'mpeg','',0,0)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'VIDEO_TS','',0,0)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'iso','',0,0)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
+          ssqlselect = "insert into videotypes values (0,'img','',0,0)";
+          mysql_query(conn,ssqlselect.c_str());
+          res = mysql_store_result(conn);
         }
-      } else dbexist=false;
-      // create databases/tables if not exist
-      // needed by movie loader
-      if (!(dbexist)) {
-        ssqlselect = "create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int, bitrate int , width int , high int, fsize int, fformat varchar(150))";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "create table IF NOT EXISTS videocategory(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, category varchar(128))";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "create table IF NOT EXISTS videogenre(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(128))";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "create table IF NOT EXISTS videocountry(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, country varchar(128))";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "create table IF NOT EXISTS videocollection(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(256), contenttype int, plot text,network varchar(128), collectionref varchar(128), certification varchar(128), genre varchar(128),releasedate date, language varchar(10),status varchar(64), rating float, ratingcount int, runtime int, banner text,fanart text,coverart text)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "create table IF NOT EXISTS videopathinfo(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, path text, contenttype int, collectionref int,recurse  int)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "create table IF NOT EXISTS videotypes(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, extension varchar(128),playcommand varchar(255), f_ignore int,  use_default int)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'txt','',1,0)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'log','',1,0)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'mpg','',0,0)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'avi','',0,1)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'vob','',0,0)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'mpeg','',0,0)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'VIDEO_TS','',0,0)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'iso','',0,0)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-        ssqlselect = "insert into videotypes values (0,'img','',0,0)";
-        mysql_query(conn,ssqlselect.c_str());
-        res = mysql_store_result(conn);
-      }
-      //configdefaultmoviepath
-      dirp=opendir(configmoviepath);                                                          // "~/.kodi/userdata/Database/");
-      //dirp=opendir(configdefaultmoviepath);                                                          // "~/.kodi/userdata/Database/");
-      if (dirp==NULL) {
-        printf("No %s dir found \nOpen dir error \n",userhomedir);
-        //exit(0);
-      }
-      // loop dir and update movie db
-      // and find kodi db version
-      if (!(dbexist)) {      
-        conn=mysql_init(NULL);
-        if ((conn) && (dirp)) {
-          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,database, 0, NULL, 0);
-          // loop files in dirp
-          while (moviefil = readdir(dirp)) {
-            t = std::time(0);   // get time now
-            now = std::localtime(&t);
-            if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {          
-              // save path for later use in db insert
-              thismoviepathdir = configmoviepath;            
-              thismoviepathdir = thismoviepathdir + "/";
-              thismoviepathdir = thismoviepathdir + moviefil->d_name;
-              ext = strrchr(moviefil->d_name, '.');
-              if (ext) {
-                strcpy(filename,moviefil->d_name);
-              }
-              // get title from dir/file name
-              strcpy(movietitle,filename);
-              strcpy(statfilename,configmoviepath);
-              strcat(statfilename,"/");
-              strcat(statfilename,moviefil->d_name);
-              if (stat(statfilename,&statbuffer)==-1) {
-                perror("stat");
-                exit(EXIT_FAILURE);
-              }
-              // if dir
-              if ((statbuffer.st_mode & S_IFMT)==S_IFDIR) {
-                // it a dir opendir and find files
-                subdirp=opendir(statfilename);
-                film_ok=false;
-                while (submoviefil = readdir(subdirp)) {
-                  ext = strrchr(submoviefil->d_name, '.');
+        //configdefaultmoviepath
+        dirp=opendir(configmoviepath);                                                          // "~/.kodi/userdata/Database/");
+        //dirp=opendir(configdefaultmoviepath);                                                          // "~/.kodi/userdata/Database/");
+        if (dirp==NULL) {
+          printf("No %s dir found \nOpen dir error \n",userhomedir);
+          //exit(0);
+        }
+        // loop dir and update movie db
+        // and find kodi db version
+        if (!(dbexist)) {      
+          // conn=mysql_init(NULL);
+          if ((conn) && (dirp)) {
+            // mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,database, 0, NULL, 0);
+            // loop files in dirp
+            while (moviefil = readdir(dirp)) {
+              t = std::time(0);   // get time now
+              now = std::localtime(&t);
+              if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {
+                // save path for later use in db insert
+                thismoviepathdir = configmoviepath;            
+                thismoviepathdir = thismoviepathdir + "/";
+                thismoviepathdir = thismoviepathdir + moviefil->d_name;
+                ext = strrchr(moviefil->d_name, '.');
+                if (ext) {
+                  strcpy(filename,moviefil->d_name);
+                }
+                // get title from dir/file name
+                strcpy(movietitle,filename);
+                strcpy(statfilename,configmoviepath);
+                strcat(statfilename,"/");
+                strcat(statfilename,moviefil->d_name);
+                // need fix
+                if (stat(statfilename,&statbuffer)==-1) {
+                  // perror("stat");
+                  // exit(EXIT_FAILURE);
+                  nostat=true;
+                }
+                // if dir
+                if ((nostat==false) && ((statbuffer.st_mode & S_IFMT)==S_IFDIR)) {
+                  // it a dir opendir and find files
+                  subdirp=opendir(statfilename);
+                  film_ok=false;
+                  while (submoviefil = readdir(subdirp)) {
+                    ext = strrchr(submoviefil->d_name, '.');
+                    if (ext) {
+                      film_ok=false;
+                      if (strcmp(ext,".avi")==0) film_ok=true;
+                      if (strcmp(ext,".mp4")==0) film_ok=true;
+                      if (strcmp(ext,".mkv")==0) film_ok=true;
+                      if (strcmp(ext,".mov")==0) film_ok=true;
+                      if (strcmp(ext,".wmv")==0) film_ok=true;
+                      if (strcmp(ext,".mpeg")==0) film_ok=true;
+                      if (strcmp(ext,".ogv")==0) film_ok=true;
+                      if (strcmp(ext,".iso")==0) film_ok=true;
+                      if (strcmp(ext,".ISO")==0) film_ok=true;
+                      if (strcmp(ext,".ISO")==0) film_ok=true;
+                      if (film_ok) {
+                        // name title
+                        strcpy(movietitle,submoviefil->d_name);
+                        ext = strrchr(movietitle, '.');
+                        if (ext) {
+                          *ext='\0';
+                        }
+                        // check for '\n' in the end of the string and remove it
+                        if (movietitle[strlen(movietitle)-2]=='\n') movietitle[strlen(movietitle)-2]=0;
+                        
+                        moviepath=moviefil->d_name;
+                        moviepath=moviepath + "/";
+                        moviepath=submoviefil->d_name;          
+                        moviepathcheck=configmoviepath;
+                        if (moviepathcheck.back()!='/') moviepathcheck=moviepathcheck + "/";
+
+                        moviepathcheck = moviepathcheck + moviefil->d_name;                     // dir name 
+                        moviepathcheck = moviepathcheck + "/";
+                        moviepathcheck = moviepathcheck + submoviefil->d_name;                     // get full filename
+                        // get cover file from movie file name
+                        coverfile=configmoviepath;
+                        if (coverfile.back()!='/') coverfile=coverfile + "/";
+                        coverfile=coverfile + moviefil->d_name;                        // path
+                        coverfile=coverfile + "/";
+                        coverfile=coverfile + submoviefil->d_name;                      // add file name
+                        size_t lastindex = coverfile.find_last_of("."); 
+                        string tmpcovername = coverfile.substr(0, lastindex); 
+                        coverfile=tmpcovername;
+                        coverfile=coverfile + ".jpg";
+                        if (!(file_exists(coverfile.c_str()))) {
+                          // cover file name do not exist do make name as cover.jpg else no cover
+                          coverfile=configmoviepath;
+                          if (coverfile.back()!='/') coverfile=coverfile + "/";
+                          coverfile=coverfile + moviefil->d_name;                        // path
+                          coverfile=coverfile + "/";
+                          coverfile=coverfile + "cover.jpg";
+                          if (!(file_exists(coverfile.c_str()))) {
+                            // sprintf(sqlselect,"No cover file for %s ",coverfile.c_str());
+                            // printf("%s\n",sqlselect);
+                            coverfile="";
+                          }
+                        }
+                        fundet=false;
+                        del_rec_nr=0;
+                        sprintf(sqlselect,"select intid from videometadata where filename like '%%");
+                        sprintf(temptxt,"%s",submoviefil->d_name);
+                        strcat(sqlselect,temptxt);
+                        sprintf(temptxt,"%%' limit 1");
+                        strcat(sqlselect,temptxt);
+                        mysql_query(conn,sqlselect);
+                        res = mysql_store_result(conn);
+                        if (res) {
+                          while ((row = mysql_fetch_row(res)) != NULL) {
+                            fundet=true;
+                            del_rec_nr=atoi(row[0]);
+                          }
+                        }
+                        // write debug log
+                        if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle '%s'",movietitle);
+                        else sprintf(debuglogdata,"Checking/Insert movietitle '%s'",movietitle);
+                        write_logfile(logfile,(char *) debuglogdata);
+                        // check if record exist (video file exist)
+                        if ((fundet) && (del_rec_nr)) {
+                          if (!(file_exists(moviepathcheck.c_str()))) {
+                            ssqlselect = fmt::format("delete from videometadata where intid={} limit 1",del_rec_nr);
+                            mysql_query(conn,ssqlselect.c_str());
+                            res = mysql_store_result(conn);
+                          }
+                        }
+                        if (!(fundet)) {
+                          // update movie info
+                          dato=to_string(now->tm_year + 1900);
+                          dato=dato + "-";
+                          dato=dato + to_string(now->tm_mon + 1);
+                          dato=dato + "-";
+                          dato=dato + to_string(now->tm_mday);
+                          dato=dato + " ";
+                          dato=dato + to_string(now->tm_hour);
+                          dato=dato + ":";
+                          dato=dato + to_string(now->tm_min);
+                          dato=dato + ":";
+                          dato=dato + to_string(now->tm_sec);
+                          // sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepathcheck.c_str(),coverfile.c_str(),dato.c_str());
+                          ssqlselect = fmt::format("insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'{}','{}','','director','','{}','','{}',0,'',{},'2016-12-31',{:2.5f},{},0,0,0,0,'{}','hash','{}',0,0,0,0,'playcommand',0,'','','','','','{}',0)",movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepathcheck.c_str(),coverfile.c_str(),dato.c_str());
+                          recnr++;
+                          mysql_query(conn,"set NAMES 'utf8'");
+                          res = mysql_store_result(conn);
+                          mysql_query(conn,ssqlselect.c_str());
+                          res = mysql_store_result(conn);
+                          if (mysql_error(conn)) {
+                            write_logfile(logfile,(char *) "Mysql error 'insert into videometadata'");
+                          }
+                          // sprintf(sqlselect,"insert into videopathinfo(intid, path, contenttype, collectionref , recurse) values (0,'%s',0,0,0)",thismoviepathdir.c_str());
+                          ssqlselect = fmt::format("insert into videopathinfo(intid, path, contenttype, collectionref , recurse) values (0,'{}',0,0,0)",thismoviepathdir.c_str());
+                          mysql_query(conn,ssqlselect.c_str());
+                          res = mysql_store_result(conn);
+                          if (mysql_error(conn)) {
+                            write_logfile(logfile,(char *) "Mysql error 'insert into videpathinfo'");
+                          }
+                        }
+                      }
+                    }
+                  }
+                } else if ((statbuffer.st_mode & S_IFMT)==S_IFREG) {                        // if file
+                  // if file get ext of filename
+                  ext = strrchr(moviefil->d_name, '.');
                   if (ext) {
                     film_ok=false;
                     if (strcmp(ext,".avi")==0) film_ok=true;
                     if (strcmp(ext,".mp4")==0) film_ok=true;
                     if (strcmp(ext,".mkv")==0) film_ok=true;
-                    if (strcmp(ext,".mov")==0) film_ok=true;
-                    if (strcmp(ext,".wmv")==0) film_ok=true;
-                    if (strcmp(ext,".mpeg")==0) film_ok=true;
-                    if (strcmp(ext,".ogv")==0) film_ok=true;
                     if (strcmp(ext,".iso")==0) film_ok=true;
                     if (strcmp(ext,".ISO")==0) film_ok=true;
-                    if (strcmp(ext,".ISO")==0) film_ok=true;
                     if (film_ok) {
+                      strcpy(movietitle,moviefil->d_name);
                       // name title
-                      strcpy(movietitle,submoviefil->d_name);
                       ext = strrchr(movietitle, '.');
                       if (ext) {
                         *ext='\0';
                       }
-                      // check for '\n' in the end of the string and remove it
-                      if (movietitle[strlen(movietitle)-2]=='\n') movietitle[strlen(movietitle)-2]=0;
-                      
-                      moviepath=moviefil->d_name;
-                      moviepath=moviepath + "/";
-                      moviepath=submoviefil->d_name;          
-                      moviepathcheck=configmoviepath;
-                      if (moviepathcheck.back()!='/') moviepathcheck=moviepathcheck + "/";
-
-                      moviepathcheck = moviepathcheck + moviefil->d_name;                     // dir name 
-                      moviepathcheck = moviepathcheck + "/";
-                      moviepathcheck = moviepathcheck + submoviefil->d_name;                     // get full filename
-                      // get cover file from movie file name
+                      // make cover file name if exist. (movie file name (no ext) + jpg)
                       coverfile=configmoviepath;
                       if (coverfile.back()!='/') coverfile=coverfile + "/";
-                      coverfile=coverfile + moviefil->d_name;                        // path
-                      coverfile=coverfile + "/";
-                      coverfile=coverfile + submoviefil->d_name;                      // add file name
+                      coverfile=coverfile + moviefil->d_name;
                       size_t lastindex = coverfile.find_last_of("."); 
                       string tmpcovername = coverfile.substr(0, lastindex); 
-                      coverfile=tmpcovername;
+                      coverfile=tmpcovername;                                           // get name - ext
                       coverfile=coverfile + ".jpg";
-                      if (!(file_exists(coverfile.c_str()))) {
-                        // cover file name do not exist do make name as cover.jpg else no cover
-                        coverfile=configmoviepath;
-                        if (coverfile.back()!='/') coverfile=coverfile + "/";
-                        coverfile=coverfile + moviefil->d_name;                        // path
-                        coverfile=coverfile + "/";
-                        coverfile=coverfile + "cover.jpg";
-                        if (!(file_exists(coverfile.c_str()))) {
-                          // sprintf(sqlselect,"No cover file for %s ",coverfile.c_str());
-                          // printf("%s\n",sqlselect);
-                          coverfile="";
-                        }
-                      }
+                      if (!(file_exists(coverfile.c_str()))) coverfile="";
+                      // strcpy(moviepath1,moviefil->d_name);                         // get full filename
+                      moviepath=moviefil->d_name;
                       fundet=false;
                       del_rec_nr=0;
-                      sprintf(sqlselect,"select intid from videometadata where filename like '%%");
-                      sprintf(temptxt,"%s",submoviefil->d_name);
+                      sprintf(sqlselect,"select intid from videometadata where title like '%%");
+                      sprintf(temptxt,"%s",movietitle);
+                      strcat(sqlselect,temptxt);
+                      sprintf(temptxt,"%%' and filename like '%%");
+                      strcat(sqlselect,temptxt);
+                      sprintf(temptxt,"%s",moviepath.c_str());
                       strcat(sqlselect,temptxt);
                       sprintf(temptxt,"%%' limit 1");
                       strcat(sqlselect,temptxt);
@@ -839,19 +963,22 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                         }
                       }
                       // write debug log
-                      if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle '%s'",movietitle);
-                      else sprintf(debuglogdata,"Checking/Insert movietitle '%s'",movietitle);
+                      if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle %s \n",movietitle);
+                      else sprintf(debuglogdata,"Insert movietitle %s \n",movietitle);
                       write_logfile(logfile,(char *) debuglogdata);
-                      // check if record exist (video file exist)
+                      // findes filmen i db i forvejen så slet den og opret den igen
+                      // ellers bare opret den
+                      // dette skal gøres hvis dir eller fil navn ændre sig
                       if ((fundet) && (del_rec_nr)) {
                         if (!(file_exists(moviepathcheck.c_str()))) {
-                          ssqlselect = fmt::format("delete from videometadata where intid={} limit 1",del_rec_nr);
+                          // sprintf(sqlselect,"delete from videometadata where intid=%d limit 1",del_rec_nr);
+                          ssqlselect = fmt::format("delete from videometadata where intid={} limit 1",del_rec_nr);                        
                           mysql_query(conn,ssqlselect.c_str());
                           res = mysql_store_result(conn);
                         }
                       }
+                      // add to db again 
                       if (!(fundet)) {
-                        // update movie info
                         dato=to_string(now->tm_year + 1900);
                         dato=dato + "-";
                         dato=dato + to_string(now->tm_mon + 1);
@@ -863,263 +990,168 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                         dato=dato + to_string(now->tm_min);
                         dato=dato + ":";
                         dato=dato + to_string(now->tm_sec);
-                        // sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepathcheck.c_str(),coverfile.c_str(),dato.c_str());
-                        ssqlselect = fmt::format("insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'{}','{}','','director','','{}','','{}',0,'',{},'2016-12-31',{:2.5f},{},0,0,0,0,'{}','hash','{}',0,0,0,0,'playcommand',0,'','','','','','{}',0)",movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepathcheck.c_str(),coverfile.c_str(),dato.c_str());
+                        // sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype, bitrate , width , high, fsize) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0,%d,%d,%d,%d,%d)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath.c_str(),coverfile.c_str(),dato.c_str(),0,0,0,0,"");
+                        ssqlselect = fmt::format("insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype, bitrate , width , high, fsize) values (0,'{}','{}','','director','','{}','','{}',0,'',{},'2016-12-31',{:2.5f},{},0,0,0,0,'{}','hash','{}',0,0,0,0,'playcommand',0,'','','','','','{}',0,{},{},{},{},{})",movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath.c_str(),coverfile.c_str(),dato.c_str(),0,0,0,0,"");
                         recnr++;
-                        mysql_query(conn,"set NAMES 'utf8'");
-                        res = mysql_store_result(conn);
+                        fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
+                        //mysql_query(conn,"set NAMES 'utf8'");
+                        //res = mysql_store_result(conn);
                         mysql_query(conn,ssqlselect.c_str());
                         res = mysql_store_result(conn);
                         if (mysql_error(conn)) {
-                          write_logfile(logfile,(char *) "Mysql error 'insert into videometadata'");
+                          string tmplog;
+                          write_logfile(logfile,(char *) "Mysql error.");
+                          tmplog="Mysql error :";
+                          tmplog=tmplog + mysql_error(conn);
+                          write_logfile(logfile,(char *) tmplog.c_str());
+                          // printf("%s\n",mysql_error(conn));
+                          // exit(0);
                         }
-                        // sprintf(sqlselect,"insert into videopathinfo(intid, path, contenttype, collectionref , recurse) values (0,'%s',0,0,0)",thismoviepathdir.c_str());
-                        ssqlselect = fmt::format("insert into videopathinfo(intid, path, contenttype, collectionref , recurse) values (0,'{}',0,0,0)",thismoviepathdir.c_str());
-                        mysql_query(conn,ssqlselect.c_str());
-                        res = mysql_store_result(conn);
-                        if (mysql_error(conn)) {
-                          write_logfile(logfile,(char *) "Mysql error 'insert into videpathinfo'");
-                        }
                       }
                     }
+                  } else {
+                    // not file
                   }
-                }
-              } else if ((statbuffer.st_mode & S_IFMT)==S_IFREG) {                        // if file
-                // if file get ext of filename
-                ext = strrchr(moviefil->d_name, '.');
-                if (ext) {
-                  film_ok=false;
-                  if (strcmp(ext,".avi")==0) film_ok=true;
-                  if (strcmp(ext,".mp4")==0) film_ok=true;
-                  if (strcmp(ext,".mkv")==0) film_ok=true;
-                  if (strcmp(ext,".iso")==0) film_ok=true;
-                  if (strcmp(ext,".ISO")==0) film_ok=true;
-                  if (film_ok) {
-                    strcpy(movietitle,moviefil->d_name);
-                    // name title
-                    ext = strrchr(movietitle, '.');
-                    if (ext) {
-                      *ext='\0';
-                    }
-                    // make cover file name if exist. (movie file name (no ext) + jpg)
-                    coverfile=configmoviepath;
-                    if (coverfile.back()!='/') coverfile=coverfile + "/";
-                    coverfile=coverfile + moviefil->d_name;
-                    size_t lastindex = coverfile.find_last_of("."); 
-                    string tmpcovername = coverfile.substr(0, lastindex); 
-                    coverfile=tmpcovername;                                           // get name - ext
-                    coverfile=coverfile + ".jpg";
-                    if (!(file_exists(coverfile.c_str()))) coverfile="";
-                    // strcpy(moviepath1,moviefil->d_name);                         // get full filename
-                    moviepath=moviefil->d_name;
-                    fundet=false;
-                    del_rec_nr=0;
-                    sprintf(sqlselect,"select intid from videometadata where title like '%%");
-                    sprintf(temptxt,"%s",movietitle);
-                    strcat(sqlselect,temptxt);
-                    sprintf(temptxt,"%%' and filename like '%%");
-                    strcat(sqlselect,temptxt);
-                    sprintf(temptxt,"%s",moviepath.c_str());
-                    strcat(sqlselect,temptxt);
-                    sprintf(temptxt,"%%' limit 1");
-                    strcat(sqlselect,temptxt);
-                    mysql_query(conn,sqlselect);
-                    res = mysql_store_result(conn);
-                    if (res) {
-                      while ((row = mysql_fetch_row(res)) != NULL) {
-                        fundet=true;
-                        del_rec_nr=atoi(row[0]);
-                      }
-                    }
-                    // write debug log
-                    if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle %s \n",movietitle);
-                    else sprintf(debuglogdata,"Insert movietitle %s \n",movietitle);
-                    write_logfile(logfile,(char *) debuglogdata);
-                    // findes filmen i db i forvejen så slet den og opret den igen
-                    // ellers bare opret den
-                    // dette skal gøres hvis dir eller fil navn ændre sig
-                    if ((fundet) && (del_rec_nr)) {
-                      if (!(file_exists(moviepathcheck.c_str()))) {
-                        // sprintf(sqlselect,"delete from videometadata where intid=%d limit 1",del_rec_nr);
-                        ssqlselect = fmt::format("delete from videometadata where intid={} limit 1",del_rec_nr);                        
-                        mysql_query(conn,ssqlselect.c_str());
-                        res = mysql_store_result(conn);
-                      }
-                    }
-                    // add to db again 
-                    if (!(fundet)) {
-                      dato=to_string(now->tm_year + 1900);
-                      dato=dato + "-";
-                      dato=dato + to_string(now->tm_mon + 1);
-                      dato=dato + "-";
-                      dato=dato + to_string(now->tm_mday);
-                      dato=dato + " ";
-                      dato=dato + to_string(now->tm_hour);
-                      dato=dato + ":";
-                      dato=dato + to_string(now->tm_min);
-                      dato=dato + ":";
-                      dato=dato + to_string(now->tm_sec);
-                      // sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype, bitrate , width , high, fsize) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0,%d,%d,%d,%d,%d)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath.c_str(),coverfile.c_str(),dato.c_str(),0,0,0,0,"");
-                      ssqlselect = fmt::format("insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype, bitrate , width , high, fsize) values (0,'{}','{}','','director','','{}','','{}',0,'',{},'2016-12-31',{:2.5f},{},0,0,0,0,'{}','hash','{}',0,0,0,0,'playcommand',0,'','','','','','{}',0,{},{},{},{},{})",movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath.c_str(),coverfile.c_str(),dato.c_str(),0,0,0,0,"");
-                      recnr++;
-                      fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
-                      //mysql_query(conn,"set NAMES 'utf8'");
-                      //res = mysql_store_result(conn);
-                      mysql_query(conn,ssqlselect.c_str());
-                      res = mysql_store_result(conn);
-                      if (mysql_error(conn)) {
-                        string tmplog;
-                        write_logfile(logfile,(char *) "Mysql error.");
-                        tmplog="Mysql error :";
-                        tmplog=tmplog + mysql_error(conn);
-                        write_logfile(logfile,(char *) tmplog.c_str());
-                        // printf("%s\n",mysql_error(conn));
-                        // exit(0);
-                      }
-                    }
-                  }
-                } else {
-                  // not file
                 }
               }
             }
           }
         }
+        // mysql_close(conn);
       }
-      mysql_close(conn);
-    }
-    // Connect to database
-    // fill array from db just created
-    //
-    conn=mysql_init(NULL);
-    if (conn) {
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);      
-      // sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
-      mainsqlselect1 = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit {}",FILM_OVERSIGT_TYPE_SIZE-1);
-      mysql_query(conn,mainsqlselect1.c_str());
-      res = mysql_store_result(conn);
-      i=0;
-      filhandle=fopen("filmcover_gfx.log","w");
-      if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
-          is_db_updated_then_do_clean_up=true;
-          filmantal++;
-
-          /* Felt nr from db call
-          0 SELECT videometadata.intid 
-          1 title
-          2 filename
-          3 coverfile
-          4 length,
-          5 year,
-          6 rating,
-          7 userrating,
-          8 plot,
-          9 inetref,
-          10 videocategory.category,
-          11 bitrate,
-          12 width,
-          13 high,
-          14 fsize,
-          15 fformat
-          16 sub_title
-          */
-
-          filmoversigt[i].setfilmid(atoi(row[0]));
-          filmoversigt[i].setfilmtitle(row[1]);
-          hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
-          hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
-          if (row[8]) {							                                  // hent film beskrivelse
-            filmoversigt[i].setfilmsubtitle(row[8]);
-          } else filmoversigt[i].setfilmsubtitle((char *) "");
-          filmoversigt[i].setfilmfilename(row[2]);	                 // fil navn på film
-          filmoversigt[i].setfilmcoverfile(row[3]);				           // fil navn på cover fil
-          // filmoversigt[i].setfilmlength(atoi(row[4]));			         // film længde i unsigned int
-          filmoversigt[i].setfilmaar(atoi(row[5]));
-          filmoversigt[i].setimdbfilmrating(row[6]);	               // rating hmm imdb ?
-          filmoversigt[i].setfilmrating(atoi(row[7]));          		 // user rating
-          filmoversigt[i].setfilmimdbnummer(row[9]);
-          if (row[10]) {							                              // category (type text)
-            strncpy(filmoversigt[i].category_name,row[10],127);   // get name from db
-          } else strcpy(filmoversigt[i].category_name,"");
-          if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");
-            // check file
-          if (row[11]) {
-            if (strlen(row[11])>0) filmoversigt[i].setBitrate(atoi(row[11]));
-            if (strlen(row[12])>0) filmoversigt[i].setWidth(atoi(row[12]));
-            if (strlen(row[13])>0) filmoversigt[i].setHigh(atoi(row[13]));
-            if (strlen(row[14])>0) filmoversigt[i].setSize(atoll(row[14]));
-            if (strlen(row[15])>0) filmoversigt[i].setFormat(row[15]);
-          }
-          if (row[16]) filmoversigt[i].setfilmsubtitle(row[16]);
-          // if movie do not have any format check it and update
-          if (strcmp(filmoversigt[i].getFormat(),"")==0) {
-            if (filmoversigt[i].get_media_info_from_file((char *) row[2])) {
-              // sprintf(sqlselect1,"update videometadata set length=%lu,bitrate=%d,width=%d,high=%d,fsize=%d,fformat='%s' where filename like '%s'",filmoversigt[i].getfilmlength(),filmoversigt[i].getBitrate(), filmoversigt[i].getWidth() ,filmoversigt[i].getHigh(), filmoversigt[i].getSize(), filmoversigt[i].getFormat() ,row[2]);
-              ssqlselect1 = fmt::format("update videometadata set length={},bitrate={},width={},high={},fsize={},fformat='{}' where filename like '{}'",filmoversigt[i].getfilmlength(),filmoversigt[i].getBitrate(), filmoversigt[i].getWidth() ,filmoversigt[i].getHigh(), filmoversigt[i].getSize(), filmoversigt[i].getFormat() ,row[2]);
-              printf("update movie %s \n",row[1]);
-              mysql_query(conn,ssqlselect1.c_str());
-              res1 = mysql_store_result(conn);
-            }
-          }
-	        i++;
-        }
-      }
-    } else {
-      write_logfile(logfile,(char *) "Can not connect to mysql server.");
-    }
-    if (filhandle) {
-      fputs("No db avable\n",filhandle);
-      fclose(filhandle);							// close log file again
-    }
-    // check if movied is deleted in dir
-    if (is_db_updated_then_do_clean_up) {
-      sprintf(mainsqlselect,"SELECT videometadata.intid,filename from videometadata");
-      conn=mysql_init(NULL);
+      // Connect to database
+      // fill array from db just created
+      //
+      // conn=mysql_init(NULL);
       if (conn) {
-        filhandle=0;
-        filhandle=fopen("movie_cleanup_info.log","r+");
-        // if file not exist crete first time
-        if (filhandle==NULL) filhandle=fopen("movie_cleanup_info.log","w+");
-        mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+        // mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);      
+        // sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
+        mainsqlselect1 = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit {}",FILM_OVERSIGT_TYPE_SIZE-1);
+        mysql_query(conn,mainsqlselect1.c_str());
         res = mysql_store_result(conn);
-        mysql_query(conn,mainsqlselect);
-        res = mysql_store_result(conn);
+        i=0;
+        filhandle=fopen("filmcover_gfx.log","w");
         if (res) {
-          while ((res) && ((row = mysql_fetch_row(res)) != NULL))  {
-            filepathsize=strlen(configmoviepath)+strlen(row[1])+1+1;            // + NULL + /
-            file_to_check_path=new char[filepathsize];
-            if (file_to_check_path) {
-              strcpy(file_to_check_path,configmoviepath);                       // make path to file
-              strcat(file_to_check_path,"/");
-              strcat(file_to_check_path,row[1]);
-              if (strlen(file_to_check_path)>1) {
-                if (!(file_exists(file_to_check_path))) {
-                  fputs("Movie deleted filename ",filhandle);
-                  fputs(row[1],filhandle);                                      // write to log file
-                  fputs("\n",filhandle);
-                  delrecid=atol(row[0]);
-                  // delete from db
-                  // sprintf(sqlselect,"delete from videometadata where intid=%ld limit 1",delrecid);
-                  ssqlselect = fmt::format("delete from videometadata where intid={} limit 1",delrecid);
-                  mysql_query(conn,ssqlselect.c_str());
-                  res = mysql_store_result(conn);
-                }
-              }
-              delete [] file_to_check_path;                                     // clean up
+          while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
+            is_db_updated_then_do_clean_up=true;
+            filmantal++;
+
+            /* Felt nr from db call
+            0 SELECT videometadata.intid 
+            1 title
+            2 filename
+            3 coverfile
+            4 length,
+            5 year,
+            6 rating,
+            7 userrating,
+            8 plot,
+            9 inetref,
+            10 videocategory.category,
+            11 bitrate,
+            12 width,
+            13 high,
+            14 fsize,
+            15 fformat
+            16 sub_title
+            */
+
+            filmoversigt[i].setfilmid(atoi(row[0]));
+            filmoversigt[i].setfilmtitle(row[1]);
+            hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
+            hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
+            if (row[8]) {							                                  // hent film beskrivelse
+              filmoversigt[i].setfilmsubtitle(row[8]);
+            } else filmoversigt[i].setfilmsubtitle((char *) "");
+            filmoversigt[i].setfilmfilename(row[2]);	                 // fil navn på film
+            filmoversigt[i].setfilmcoverfile(row[3]);				           // fil navn på cover fil
+            // filmoversigt[i].setfilmlength(atoi(row[4]));			         // film længde i unsigned int
+            filmoversigt[i].setfilmaar(atoi(row[5]));
+            filmoversigt[i].setimdbfilmrating(row[6]);	               // rating hmm imdb ?
+            filmoversigt[i].setfilmrating(atoi(row[7]));          		 // user rating
+            filmoversigt[i].setfilmimdbnummer(row[9]);
+            if (row[10]) {							                              // category (type text)
+              strncpy(filmoversigt[i].category_name,row[10],127);   // get name from db
+            } else strcpy(filmoversigt[i].category_name,"");
+            if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");
+              // check file
+            if (row[11]) {
+              if (strlen(row[11])>0) filmoversigt[i].setBitrate(atoi(row[11]));
+              if (strlen(row[12])>0) filmoversigt[i].setWidth(atoi(row[12]));
+              if (strlen(row[13])>0) filmoversigt[i].setHigh(atoi(row[13]));
+              if (strlen(row[14])>0) filmoversigt[i].setSize(atoll(row[14]));
+              if (strlen(row[15])>0) filmoversigt[i].setFormat(row[15]);
             }
+            if (row[16]) filmoversigt[i].setfilmsubtitle(row[16]);
+            // if movie do not have any format check it and update
+            if (strcmp(filmoversigt[i].getFormat(),"")==0) {
+              if (filmoversigt[i].get_media_info_from_file((char *) row[2])) {
+                // sprintf(sqlselect1,"update videometadata set length=%lu,bitrate=%d,width=%d,high=%d,fsize=%d,fformat='%s' where filename like '%s'",filmoversigt[i].getfilmlength(),filmoversigt[i].getBitrate(), filmoversigt[i].getWidth() ,filmoversigt[i].getHigh(), filmoversigt[i].getSize(), filmoversigt[i].getFormat() ,row[2]);
+                ssqlselect1 = fmt::format("update videometadata set length={},bitrate={},width={},high={},fsize={},fformat='{}' where filename like '{}'",filmoversigt[i].getfilmlength(),filmoversigt[i].getBitrate(), filmoversigt[i].getWidth() ,filmoversigt[i].getHigh(), filmoversigt[i].getSize(), filmoversigt[i].getFormat() ,row[2]);
+                printf("update movie %s \n",row[1]);
+                mysql_query(conn,ssqlselect1.c_str());
+                res1 = mysql_store_result(conn);
+              }
+            }
+            i++;
           }
         }
-        if (filhandle) fclose(filhandle);
       } else {
         write_logfile(logfile,(char *) "Can not connect to mysql server.");
       }
+      if (filhandle) {
+        fputs("No db avable\n",filhandle);
+        fclose(filhandle);							// close log file again
+      }
+      // check if movied is deleted in dir
+      if (is_db_updated_then_do_clean_up) {
+        sprintf(mainsqlselect,"SELECT videometadata.intid,filename from videometadata");
+        conn=mysql_init(NULL);
+        if (conn) {
+          filhandle=0;
+          filhandle=fopen("movie_cleanup_info.log","r+");
+          // if file not exist crete first time
+          if (filhandle==NULL) filhandle=fopen("movie_cleanup_info.log","w+");
+          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+          mysql_query(conn,"set NAMES 'utf8'");
+          res = mysql_store_result(conn);
+          mysql_query(conn,mainsqlselect);
+          res = mysql_store_result(conn);
+          if (res) {
+            while ((res) && ((row = mysql_fetch_row(res)) != NULL))  {
+              filepathsize=strlen(configmoviepath)+strlen(row[1])+1+1;            // + NULL + /
+              file_to_check_path=new char[filepathsize];
+              if (file_to_check_path) {
+                strcpy(file_to_check_path,configmoviepath);                       // make path to file
+                strcat(file_to_check_path,"/");
+                strcat(file_to_check_path,row[1]);
+                if (strlen(file_to_check_path)>1) {
+                  if (!(file_exists(file_to_check_path))) {
+                    fputs("Movie deleted filename ",filhandle);
+                    fputs(row[1],filhandle);                                      // write to log file
+                    fputs("\n",filhandle);
+                    delrecid=atol(row[0]);
+                    // delete from db
+                    // sprintf(sqlselect,"delete from videometadata where intid=%ld limit 1",delrecid);
+                    ssqlselect = fmt::format("delete from videometadata where intid={} limit 1",delrecid);
+                    mysql_query(conn,ssqlselect.c_str());
+                    res = mysql_store_result(conn);
+                  }
+                }
+                delete [] file_to_check_path;                                     // clean up
+              }
+            }
+          }
+          if (filhandle) fclose(filhandle);
+        } else {
+          write_logfile(logfile,(char *) "Can not connect to mysql server.");
+        }
+      }
+      if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
+      if (conn) mysql_close(conn);
     }
-    if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
-    if (conn) mysql_close(conn);
     return(filmantal);
 }
 

@@ -6,14 +6,23 @@ https://tvheadend.org/projects/tvheadend/wiki/Faq
 
 if you wants to make the deb file you have to install debhelper
 
+you need to install fmodstudioapi20307linux.tar.gz
+
 # mythtv-controller 
 # packs to install to compile on Ubuntu 10.xx/12.xx
 # Updated 01/11/2014
 # Updated 27/08/2017
 # Updated 26/11/2024
+# Updated 21/05/2025
+
 # Soon support for vdr recording
 
-Version.
+Versions.
+
+new uvmeter and some tidal stuf is changed.
+setup menu for tidal
+
+mythtv-controller ver 0.43.1
 
 mythtv-controller ver 0.42.6
 

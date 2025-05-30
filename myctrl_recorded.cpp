@@ -14,6 +14,7 @@
 #include <sstream>
 #include <iostream>
 #include <fmt/format.h>
+#include <sqlite3.h>                    // sqlite interface to xbmc
 #include "text3d.h"
 #include "readjpg.h"
 #include "utility.h"
@@ -38,6 +39,7 @@ extern GLuint _textureId23;    // movie open info box2
 extern GLuint _textureId24;    // movie open info box3
 extern int screen_size;
 extern int visvalgtnrtype;
+extern bool do_sqlite;
 
 // ****************************************************************************************
 //
@@ -180,10 +182,19 @@ int find_storagegroupfile(char *filename) {
     if (fundet) return(1); else return(0);
 }
 
+sqlite3 *sqlitedb_obj_recorded;
 
 // ****************************************************************************************
 //
 // ****************************************************************************************
+
+int sql_recorded_sqldb_callback(void *data, int argc, char **argv, char **azColName) {
+  for(int i=0; i<argc; i++){
+    // fill array
+    printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+  }
+  return 0;
+}
 
 
 int recorded_overigt::opdatere_recorded_oversigt() {
@@ -198,62 +209,82 @@ int recorded_overigt::opdatere_recorded_oversigt() {
   char filename[512];
   std::string filename1;
   int storagegroupused=0;
+  char *zErrMsg = 0;
+  int rc;
+  char *data = (char *) "sqlitedb_obj_recorded";
   //gotoxy(10,17);
   // Connect to database
-  try {
-    conn=mysql_init(NULL);
-    if (conn) {
-      write_logfile(logfile,(char *) "Update recorded programs from database.");
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-      mysql_query(conn,"set NAMES 'utf8'");
-      sqlselect = "create table IF NOT EXISTS recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int,stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)";
-      mysql_query(conn,sqlselect.c_str());
-      res = mysql_store_result(conn);
-      sqlselect = "create table IF NOT EXISTS recordedprogram(chanid int(10) unsigned,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description text,category varchar(64),category_type varchar(64),airdate year(4),stars float unsigned,previouslyshown tinyint(4),title_pronounce varchar(128),stereo tinyint(1),subtitled tinyint(1),hdtv tinyint(1),closecaptioned tinyint(1),partnumber int,parttotal int,seriesid varchar(12),originalairdate date,showtype varchar(30),colorcode  varchar(20),syndicatedepisodenumber varchar(20),programid varchar(64),manualid int(10) unsigned,generic tinyint(1),listingsource int(11),first tinyint(1),last tinyint(1),audioprop varchar(20),subtitletypes varchar(20),videoprop varchar(20))";
-      mysql_query(conn,sqlselect.c_str());
-      res = mysql_store_result(conn);
-      sqlselect = "select title,subtitle,starttime,endtime,basename,description,chanid from recorded order by title,starttime desc";
-      mysql_query(conn,sqlselect.c_str());
-      res = mysql_store_result(conn);
-      n=-1;
-      nn=0;
-      strcpy(title,"");
-      if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          if (row[0]) {
-            if (strcmp(title,row[0])!=0) {
-              n++;
-              nn=0;
-              strcpy(title,row[0]);
-            } else {
-              if (n==-1) n++;
-              nn++;
-            }
-            // printf("title=%s n=%d nn=%d  \n",title,n,nn);
-            if (row[4]) strcpy(filename,row[4]); else strcpy(filename,"");
-            if (row[4]) filename1=row[4]; else filename1="";
-            storagegroupused=find_storagegroupfile((char *) filename1.c_str());						// hent storage group info
-            if ((storagegroupused==0) && (row[4])) strcpy(filename,row[4]);
-            if ((n<40) && (nn<200)) {
-              recordoversigt.programs[n].put_recorded_top(title);
-              recordoversigt.programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],(char *) filename1.c_str(),row[5],row[6]);
-              recordoversigt.programs[n].prg_antal++;
-            }
-          }
-        }        	// end while
-      } else {
-        write_logfile(logfile,(char *) "SQL Database error.");
-        n=0;
+  n=0;
+  if (do_sqlite) {
+    try {
+      sqlselect = "create table recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int,stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)";
+      sqlite3_open("mythtvcontroller.db", &sqlitedb_obj_recorded);
+      rc = sqlite3_exec(sqlitedb_obj_recorded, sqlselect.c_str() , sql_recorded_sqldb_callback, (void*)data, &zErrMsg);
+      if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
       }
-      set_top_antal(n);					// sætter hvor mange der er i array
-      if (n>0) {
-        //printf("Fundet %d recorded programs.                                                \n",n);
-      }
-      mysql_close(conn);
+      if (sqlitedb_obj_recorded) sqlite3_close(sqlitedb_obj_recorded);
     }
-  }
-  catch (...) {
-    write_logfile(logfile,(char *) "Error connect to mysql..");
+    catch (...) {
+      write_logfile(logfile,(char *) "Error connect to sqlite..");
+    }
+  } else {
+    try {
+      conn=mysql_init(NULL);
+      if (conn) {
+        write_logfile(logfile,(char *) "Update recorded programs from database.");
+        mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+        mysql_query(conn,"set NAMES 'utf8'");
+        sqlselect = "create table IF NOT EXISTS recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int,stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)";
+        mysql_query(conn,sqlselect.c_str());
+        res = mysql_store_result(conn);
+        sqlselect = "create table IF NOT EXISTS recordedprogram(chanid int(10) unsigned,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description text,category varchar(64),category_type varchar(64),airdate year(4),stars float unsigned,previouslyshown tinyint(4),title_pronounce varchar(128),stereo tinyint(1),subtitled tinyint(1),hdtv tinyint(1),closecaptioned tinyint(1),partnumber int,parttotal int,seriesid varchar(12),originalairdate date,showtype varchar(30),colorcode  varchar(20),syndicatedepisodenumber varchar(20),programid varchar(64),manualid int(10) unsigned,generic tinyint(1),listingsource int(11),first tinyint(1),last tinyint(1),audioprop varchar(20),subtitletypes varchar(20),videoprop varchar(20))";
+        mysql_query(conn,sqlselect.c_str());
+        res = mysql_store_result(conn);
+        sqlselect = "select title,subtitle,starttime,endtime,basename,description,chanid from recorded order by title,starttime desc";
+        mysql_query(conn,sqlselect.c_str());
+        res = mysql_store_result(conn);
+        n=-1;
+        nn=0;
+        strcpy(title,"");
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            if (row[0]) {
+              if (strcmp(title,row[0])!=0) {
+                n++;
+                nn=0;
+                strcpy(title,row[0]);
+              } else {
+                if (n==-1) n++;
+                nn++;
+              }
+              // printf("title=%s n=%d nn=%d  \n",title,n,nn);
+              if (row[4]) strcpy(filename,row[4]); else strcpy(filename,"");
+              if (row[4]) filename1=row[4]; else filename1="";
+              storagegroupused=find_storagegroupfile((char *) filename1.c_str());						// hent storage group info
+              if ((storagegroupused==0) && (row[4])) strcpy(filename,row[4]);
+              if ((n<40) && (nn<200)) {
+                recordoversigt.programs[n].put_recorded_top(title);
+                recordoversigt.programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],(char *) filename1.c_str(),row[5],row[6]);
+                recordoversigt.programs[n].prg_antal++;
+              }
+            }
+          }        	// end while
+        } else {
+          write_logfile(logfile,(char *) "SQL Database error.");
+          n=0;
+        }
+        set_top_antal(n);					// sætter hvor mange der er i array
+        if (n>0) {
+          //printf("Fundet %d recorded programs.                                                \n",n);
+        }
+        mysql_close(conn);
+      }
+    }
+    catch (...) {
+      write_logfile(logfile,(char *) "Error connect to mysql..");
+    }
   }
   return(n);
 }

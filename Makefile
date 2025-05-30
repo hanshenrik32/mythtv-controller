@@ -13,7 +13,7 @@ DESTIMG    = /opt/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi20218linux.tar.gz
+FMODFILE   = fmodstudioapi20307linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -35,11 +35,11 @@ endif
 
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/x86_64/ -name 'libfmod.so')
+	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86_64/ -name 'libfmod.so')
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/x86/ -name 'libfmod.so')
+	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86/ -name 'libfmod.so')
     CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -122,7 +122,8 @@ installsound:
 	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
 	#remove old link
 	if test -e /usr/lib/libfmod.so.12; then rm /usr/lib/libfmod.so.12; fi
-	ln -s /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/x86_64/libfmod.so /usr/lib/libfmod.so.13
+	if test -e /usr/lib/libfmod.so.13; then rm /usr/lib/libfmod.so.13; fi
+	ln -s /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86_64/libfmod.so /usr/lib/libfmod.so.14
 	@echo "Done installing fmod32/64 bit version 4.44.41"
 	@echo "Sound system installed."
 

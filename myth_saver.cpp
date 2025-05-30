@@ -1915,16 +1915,6 @@ void boxarray::roll_array() {
 
 
 
-
-
-
-
-
-
-
-
-
-
 // type 0 = set to music texture
 // type 1 = set new texture NOT center cross from param newtexture
 // type 2 = set new texture from param newtexture
@@ -2435,7 +2425,9 @@ int boxarray::loadboxpictures()
 }
 
 // ****************************************************************************************
-// setter textures fra cd samling i mythtv
+//
+// textures fra cd samling i mythtv
+//
 // ****************************************************************************************
 
 void boxarray::settexture() {
@@ -2468,7 +2460,6 @@ void boxarray::settexture() {
 
 
 int n=0;
-
 static bool music_3d_statup=true;
 
 // ****************************************************************************************
@@ -2630,10 +2621,10 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
 //
 // working in use
 //
-// *******mythtv-controller.log*********************************************************************************
+// ****************************************************************************************
 
 void boxarray::show_music_3d_2(float aangle,GLuint textureId) {
-    float BOX_SIZE=120.0f;
+    float BOX_SIZE=40.0f;
     static float rangle=0.0f;
     int x,y;
     float angle=aangle;
