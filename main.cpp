@@ -292,9 +292,9 @@ bool loading_tv_guide = false;                            // loading_tv_guide tr
 int tvchannel_startofset=0;                                 // ofset used in tv_graber config (line offset)
 bool showfps = true;
 int configmythtvver=0;            			                  // mythtv config found version
-bool stopmovie = false;
+bool stopmovie = false;                                   // stop movie play  
 int film_key_selected=1;                                  // den valgte med keyboard i film oversigt
-int vis_volume_timeout=0;
+int vis_volume_timeout=0;                                 // timeout to show volume info
 int music_key_selected=1;                                 // default music selected
 int spotify_key_selected=1;                                 // default music selected
 int tidal_key_selected=1;                                 // default music selected
@@ -890,6 +890,7 @@ GLuint _tvbar1_1;
 
 GLuint newstuf_icon;                        // icon for new stuf in stream view
 GLuint analog_clock_background;             // background for analog clock
+GLuint volume_window;                     // volume window
 
 GLuint _textureIdmusic_mask_anim[10];    // texture array to anim of music menu icon
 
@@ -3789,7 +3790,6 @@ void display() {
       keybufferopenwin=true;                                                    // open input window
     }
   }
-  
   // show volume value
   if (show_volume_info) {
     vis_volume_timeout--;
@@ -3797,27 +3797,38 @@ void display() {
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glColor4f(1.0f,1.0f,1.0f,0.2f);
+    glColor4f(1.0f,1.0f,1.0f,1.0f);
     glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBindTexture(GL_TEXTURE_2D, texturedot);                                 // volume icon
+    // glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D, volume_window);                                 // volume icon
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTranslatef(10, 19, 0.0f);
-    int aa = 0;
-    for(i=0;i<(configsoundvolume*10);i++) {
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
-      glTexCoord2f(0, 0); glVertex3f( 10.0+aa, 0.0, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 10.0+aa, 40.0, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 40.0+aa, 40.0, 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 40.0+aa, 0.0, 0.0);
-      glEnd(); //End quadrilateral coordinates
-      aa+=40;
-    }
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    float xof = (1920.0f/2.0)-(248.0f/2.0f);
+    float yof = 100.0f;
+    float buttonsize = 248.0f;
+    float buttonsizey = 58.0f;
+    glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof+buttonsize, yof+10 , 0.0);
+    glEnd(); //End quadrilateral coordinates    
+    
+    glBindTexture(GL_TEXTURE_2D, 0);                                 // volume icon texturedot
+    xof = (1920.0f/2.0)-(248.0f/2.0f)+ 55.0f;
+    yof = 122.0f;
+    buttonsize = (configsoundvolume*168.0f);
+    buttonsizey = 14.0f;
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);    
+    glTexCoord2f(1, 0); glVertex3f( xof+buttonsize, yof+10 , 0.0);
+    glEnd(); //End quadrilateral coordinates    
     glPopMatrix();
   }
-  // vis_error=true;
-  // vis_error_timeout=10;
   // show music loader/player (sdl_mixer/fmod) error in program
   if ((vis_error) && (vis_error_timeout)) {
     vis_error_timeout--;
@@ -10699,7 +10710,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         #endif
         //save_config((char *) "/etc/mythtv-controller.conf");
         show_volume_info=true;					// show volume info window
-        vis_volume_timeout=80;
+        vis_volume_timeout=120;
       }
       #endif
     }
@@ -10711,7 +10722,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         #endif
         //save_config((char *) "/etc/mythtv-controller.conf");
         show_volume_info=true;					// show volume info window
-        vis_volume_timeout=80;
+        vis_volume_timeout=120;
       }
     }
     if ((key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!='S') && (key!='*') && (key!='U') && (key!=117) && (key!=optionmenukey) && (key!=13) && (key!=27) || ((vis_spotify_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_tidal_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_film_oversigt) && (key!=13) && (key!=27) && (key!=117)) || ((vis_radio_oversigt) && (key!='u') && (key!=optionmenukey) && (key!=27 && (key!=13))) || ((vis_tv_oversigt) && (key!='u') && (key!=27))) {
@@ -13529,7 +13540,7 @@ printf("LIRC-DOWN  ask_open_dir_or_play = %d stream antal %d \n",ask_open_dir_or
             configsoundvolume+=0.1f;
           }
           show_volume_info = true;					// show volume info window
-          vis_volume_timeout=80;
+          vis_volume_timeout=120;
         }
         if (strcmp("KEY_VOLUMEDOWN",cmd)==0) {
           if (configsoundvolume>0) configsoundvolume-=0.1f;
@@ -13541,7 +13552,7 @@ printf("LIRC-DOWN  ask_open_dir_or_play = %d stream antal %d \n",ask_open_dir_or
             configsoundvolume-=0.1f;
           }
           show_volume_info = true;					// show volume info window
-          vis_volume_timeout=80;
+          vis_volume_timeout=120;
         }
         if (strcmp("KEY_NEXT",cmd)==0) {
            // next song
@@ -15006,6 +15017,7 @@ void loadgfx() {
     _textureIdreset_search = loadgfxfile(temapath,(char *) "buttons/",(char *) "reset_search");
     // analog clock background
     analog_clock_background = loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
+    volume_window = loadgfxfile(temapath,(char *) "images/",(char *) "volume_win");
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
@@ -15172,6 +15184,7 @@ void freegfx() {
     glDeleteTextures( 1,&screensaverbox1);            //
     glDeleteTextures( 1,&newstuf_icon);               //
     glDeleteTextures( 1,&analog_clock_background);    // analog clock
+    glDeleteTextures( 1,&volume_window);              // volume window
 }
 
 
