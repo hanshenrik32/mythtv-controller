@@ -2991,7 +2991,7 @@ void display() {
                 int xp=0;
                 int y=0;
                 int TABLE_SIZE = 50;
-                float barRotation[45+1][51];
+                float barRotation[45+1][101];
                 static float Rotation = 0.0f;
                 float angle;
                 float step = (2.0f * M_PI) / (TABLE_SIZE - 1);
@@ -3024,10 +3024,6 @@ void display() {
                     barRotation[x][y+2] = sin_table[y+2]*100;
                   }
                 }
-                for (int x = 0; x < TABLE_SIZE; x++) {
-                  cout << x << " sin_table[" << sin_table[x] << "] " << endl;
-                }
-                // glColor3f(255.0f, 255.0f, 255.0f);
                 xpos=0.0f;
                 for(xp=0;xp<barantal-1;xp++) {
                   ypos=0.0f;
@@ -3036,7 +3032,7 @@ void display() {
                     glPushMatrix();
                     glColor3f(1.0f, 1.0f, 0.0f);
                     glTranslatef(75.0f+xpos,100.0f+ypos,0.0f);
-                    glRotatef(barRotation[xp][yp],0.0f,1.0f,0.0f);
+                    glRotatef(barRotation[xp][yp+xp],0.0f,1.0f,0.0f);
                     glBegin(GL_QUADS);
                     glTexCoord2f(0, 0); glVertex3f((-siz_x) ,-siz_y , 0.0f); // 1
                     glTexCoord2f(0, 1); glVertex3f((-siz_x) , siz_y , 0.0f); // 2
@@ -3815,18 +3811,19 @@ void display() {
     glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);
     glTexCoord2f(1, 0); glVertex3f( xof+buttonsize, yof+10 , 0.0);
     glEnd(); //End quadrilateral coordinates    
-    
-    glBindTexture(GL_TEXTURE_2D, 0);                                 // volume icon texturedot
-    xof = (1920.0f/2.0)-(248.0f/2.0f)+ 55.0f;
-    yof = 122.0f;
-    buttonsize = (configsoundvolume*168.0f);
-    buttonsizey = 14.0f;
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-    glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-    glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);    
-    glTexCoord2f(1, 0); glVertex3f( xof+buttonsize, yof+10 , 0.0);
-    glEnd(); //End quadrilateral coordinates    
+    if (configsoundvolume>0) {
+      glBindTexture(GL_TEXTURE_2D, 0);                                 // volume icon texturedot
+      xof = (1920.0f/2.0)-(248.0f/2.0f) + 60.0f;
+      yof = 122.0f;
+      buttonsize = (configsoundvolume*168.0f);
+      buttonsizey = 14.0f;
+      glBegin(GL_QUADS); //Begin quadrilateral coordinates
+      glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);    
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize, yof+10 , 0.0);
+      glEnd(); //End quadrilateral coordinates    
+    }
     glPopMatrix();
   }
   // show music loader/player (sdl_mixer/fmod) error in program
@@ -6473,7 +6470,7 @@ void display() {
   if (spotify_oversigt.get_spotify_update_flag()) strcat(textstring,"SPOTIFY,");
   if (!(radio_oversigt_loaded_done)) strcat(textstring,"RADIO,"); 
   if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
-  // if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
+  if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
   if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
   if (strcmp(textstring,"")==0) {
     strcat(textstring,"STATUS: None."); 
@@ -6732,12 +6729,14 @@ void display() {
   }
   if (do_update_xmltv) {
     // call/start update xmltv multi phread
-    fprintf(stderr,"Start phread xmltv.\n");
+    fprintf(stderr,"phread xmltv is running.\n");
+    // old version
     // update_xmltv_phread_loader();
 
-    datainfoloader_xmltv_v2();                                                // load all stream from xmltv files
+    // Moved to tidal thread loader
+    // datainfoloader_xmltv_v2();                                                // load all stream from xmltv files
 
-    do_update_xmltv=false;
+    // do_update_xmltv=false;
   }
   if (do_update_rss) {
     // call/start update rss multi phread
@@ -10716,7 +10715,7 @@ void handleKeypress(unsigned char key, int x, int y) {
     }
     if (key==SOUNDDOWNKEY) {                               // volume down
       if (!(vis_spotify_oversigt)) {
-        if ((configsoundvolume-0.05)>0) configsoundvolume-=0.05f;
+        if ((configsoundvolume-0.00)>0) configsoundvolume-=0.05f;
         #if defined USE_FMOD_MIXER
         if (sndsystem) channel->setVolume(configsoundvolume);
         #endif
@@ -14175,7 +14174,13 @@ void datainfoloader_spotify_v2(string msg) {
   // write_logfile(logfile,(char *) "loader thread done loaded spotify.");
   spotify_oversigt_loaded_begin=false;
   #endif  
-  datainfoloader_webserver_v2();
+  if (do_update_xmltv) {
+    do_update_xmltv_show=true;            // set update show
+    datainfoloader_xmltv_v2();                // load xmltv data
+    do_update_xmltv=false;
+    do_update_xmltv_show=false;            // set done
+  }
+  datainfoloader_webserver_v2();  
 }
 
 
