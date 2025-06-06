@@ -244,7 +244,7 @@ int get_webfile2(char *webpath,char *outfile) {
     command = command + outfile;
     command = command + " 2>&1 ";                                                           // disable output
     //strcat(command," 2>> wget.log ");
-    printf(" do COMMAND *%s* \n",command.c_str());
+    // printf(" do COMMAND *%s* \n",command.c_str());
     system(command.c_str());
   }
   return(0);

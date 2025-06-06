@@ -1395,6 +1395,115 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
 }
 
 
+
+// ****************************************************************************************
+//
+// Update (load) user collections
+//
+// ****************************************************************************************
+// ID 131776836
+// client id Nq5WQmVhv2L7QWQO
+
+// secret
+// vxOmFp39rweIVD2rb20qmpETsoAECwhGUdnPIPSXq4g=
+
+
+int tidal_class::opdatere_tidal_userCollections2(char *uid) {
+  std::string url;
+  int error;
+  std::string localuserhomedir;
+  localuserhomedir = getenv("HOME");
+  url="curl -X GET 'https://openapi.tidal.com/v2/userCollections/";
+  url = url + "131776836";
+  url = url + "/relationships/albums?countryCode=US&locale=en-US&include=albums' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'accept: application/vnd.api+json' -H 'Authorization: Bearer ";
+  url = url + + tidaltoken;
+  url = url + "'  > ";
+  url = url + localuserhomedir;
+  url = url + "/";
+  url = url + "tidal_usercollection_result.json";
+  printf("url %s \n",url.c_str());
+  error=system(url.c_str());
+  if (error!=0) {
+    fprintf(stderr,"Curl error get user collections\n");
+    exit(0);
+  }
+  return(1);
+}
+
+
+
+// ****************************************************************************************
+//
+// Get userCollections
+//
+// ****************************************************************************************
+
+  
+int tidal_class::opdatere_tidal_userCollections(char *uid) {
+
+  std::string userfilename;
+  FILE *userfile;
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode=0;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=NULL;
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + tidaltoken;
+  url ="https://openapi.tidal.com/v2/userCollections/";
+  url = url + uid;
+  url = url + "?countryCode=US&offset=0&limit=100&include=albums";
+  userfilename = localuserhomedir;
+  userfilename = userfilename + "/";
+  userfilename = userfilename + "tidal_usercollection_result.json";
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if ((curl) && (strlen(auth_kode.c_str())>0)) {
+    // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
+    header = curl_slist_append(header, auth_kode.c_str());
+    header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+    userfile=fopen(userfilename.c_str(),"w");
+    if (userfile) {
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+      res = curl_easy_perform(curl);
+      fclose(userfile);
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);                   // get result in httpCode
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(200);
+    }
+  } else {
+    write_logfile(logfile,(char *) "Tidal curl fault");
+  }
+  return(httpCode);
+
+}
+
+
+
+
 // ****************************************************************************************
 //
 // works ( used by get_users_album )
@@ -2978,33 +3087,6 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
 
 
 
-
-
-
-
-
-
-
-
-// ****************************************************************************************
-//
-// Update (load) user collections
-//
-// ****************************************************************************************
-
-
-int tidal_class::opdatere_tidal_userCollections(std::string uid) {
-  std::string url;
-  int error;
-  url="curl -X GET 'https://openapi.tidal.com/v2/userCollections/" + uid + "/relationships/albums?countryCode=US&include=albums' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_usercollection_result.json";
-  printf("url %s \n",url.c_str());
-  error=system(url.c_str());
-  if (error!=0) {
-    fprintf(stderr,"Curl error get user collections\n");
-    exit(0);
-  }
-  return(1);
-}
 
 
 

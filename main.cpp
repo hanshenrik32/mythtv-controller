@@ -209,7 +209,7 @@ char configxbmcpass[256];                               //
 char configxbmchost[256];                               //
 // ************************************************************************************************
 bool hent_tv_channels = false;                            // if false update tv guide
-long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
+unsigned long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
 long configrssguidelastupdate=0;                        // last date /unix time_t type) tvguide update
 float configdefaulttvguidefontsize=18;                  // default font size tv tvguide
 float configdefaultradiofontsize=30;                    // default font size radio
@@ -1239,7 +1239,7 @@ int parse_config(char *filename) {
               fprintf(stderr,"Tv graber ....: %s\n",configbackend_tvgraber);
               fprintf(stderr,"*********************************************************\n");
             } else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
-            else if (command_nr==rssgraberupdate) configtvguidelastupdate=atol(value);
+            else if (command_nr==rssgraberupdate) configrssguidelastupdate=atol(value);
             // set tvguide color or no color
             else if (command_nr==tvguidercolor) {
              if (strcmp(value,"yes")==0) aktiv_tv_oversigt.vistvguidecolors = true;
@@ -1527,8 +1527,8 @@ void load_config(char * filename) {
     strcpy(configbackend_starred_playlistname,"");                          // default spotify starred playlist 
     configbackend_openspotify_player=false;                   // default openspotify player local to play on.
     strcpy(configbackend_starred_playlistname,"");
-    configtvguidelastupdate=0;                                // default 0
-    configrssguidelastupdate=0;                         // last date /unix time_t type) tvguide update
+    configtvguidelastupdate=0;                                // default tvguide update
+    configrssguidelastupdate=0;                               // last date /unix time_t type) rssguide update
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
     for(int t=0;t<12;t++) {
@@ -2685,7 +2685,6 @@ void display() {
 
 
   clock_t start;
-
   static int barantal=45;
   struct timeb tb;
   struct tm* t;
@@ -2704,10 +2703,8 @@ void display() {
   static int xrand=0;
   static int yrand=0;
   static int do_we_play_check=0;
-
   int antal_i_oversigt=0;                                                       // antal i tidal play array
   static int antal_i_tidal_playlist=0;
-
   int savertimeout=0;
   rawtime=time(NULL);                                 // hent now time
   savertimeout=atoi(configscreensavertimeout);
@@ -2729,9 +2726,6 @@ void display() {
   if (rawtime>rawtime1) {
     visur = true;
   }
-
-  //printf("saver_irq=%d savertimeout=%d visur %d rawtime=%d rawtime1=%d \n",saver_irq,savertimeout,visur,rawtime ,rawtime1);
-
   // make xmltv update
   today=time(NULL);
   t=localtime(&today);                                                        // local time
@@ -2743,13 +2737,11 @@ void display() {
     lastsec=0;
   }
   lastsec++;
-
   if (clock_udpate) {
     angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
     angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec/60.0f;
     angleHour = (float)(t->tm_hour > 12 ? t->tm_hour-12 : t->tm_hour)/6.0f * M_PI+angleMin/12.0f;
   }
-  
   clock_udpate = false;
   // gvguide update
   // update interval
@@ -2781,27 +2773,19 @@ void display() {
     do_update_spotify_playlist=false;                                            // reset update flag
   }
   #endif
-
   #ifdef ENABLE_TIDAL
-  
   if ((do_update_tidal_playlist) && ((do_update_rss==false) && (do_update_xmltv==false) && (do_update_spotify_playlist==false))) {
     write_logfile(logfile,(char *) "Start Tidal update thread");
     // update_tidalonline_phread_loader();                                     // start thread loader
-
     webupdate_loader_tidal_v2();                                          // start update
-
     do_update_tidal_playlist=false;
   }
-  
   #endif
-
   glPushMatrix();
   // background picture if none type is selected
   if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_tv_oversigt))) show_background();
   //visur=1;
-
   // printf("tidal_oversigt.get_tidal_playing_flag() %d  music_oversigt.play() %d \n",tidal_oversigt.get_tidal_playing_flag(),musicoversigt.play());
-
   if (visur) {
     glPushMatrix();
     switch (urtype) {
@@ -2932,9 +2916,7 @@ void display() {
               float siz_y = 6.0f;                     // size 8
               static float barHeights[45] = {0}; // persistent for smoothing
               if (snd) {
-                
                 glPushMatrix();
-
         //        glTranslatef(100.0f, 100.0f, 0.0f);
                 glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
                 glRotatef(0,0.0f,1.0f,0.0f);
@@ -2955,13 +2937,10 @@ void display() {
                 float high;
                 xxofset = 40.0f;                            // start ofset
                 float decay = 0.95f;        // 0.05f
-                // create the bars
-                
+                // create the bars               
                 // glRotatef(0.0f,0.0f,1.0f,rr);
                 rr += 1.1f;
                 // printf("rr %f\n",rr);
-
-
                 barantal=45;                
                 for(int xp=0;xp<barantal;xp++) {                 
                   xpos = (-siz_x)*xxofset;
@@ -2979,12 +2958,9 @@ void display() {
                   r = fminf(1.0f, amp * 8.0f);
                   g = 1.0f - r * 0.5f;
                   b = 0.2f + r * 0.5f;
-
                   xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
                 }
-
                 glPopMatrix();
-              
                 barantal=42;
                 xpos=0.0f;
                 ypos=0.0f;
@@ -3428,15 +3404,7 @@ void display() {
       }
       glPopMatrix();
   }
-
-
-
-  // drawText("Hej OpenGL!", 200.00f, 200.0f, 1.2f,1);
-  // drawText("Hej OpenGL2!", 210.00f, 210.0f, 1.0f,1);
-
-
   //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
-
   // show new film
   if ((vis_music_oversigt) || (vis_tidal_oversigt) || (vis_spotify_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
     show_newmovietimeout = 0;
@@ -3577,7 +3545,6 @@ void display() {
     }
   }
   #endif
-
   // update after search
   #ifdef ENABLE_TIDAL
   const int tidal_start_search_action_waittime=4;
@@ -3601,7 +3568,6 @@ void display() {
     }
   }
   #endif
-
   // tidal
   // get search result
   #ifdef ENABLE_TIDAL
@@ -3624,7 +3590,6 @@ void display() {
     tidal_oversigt_loaded_begin=false;
   }
   #endif
-
   start = clock();
   if (!(visur)) {
     // music view
@@ -3677,7 +3642,6 @@ void display() {
       if (do_show_spotify_search_oversigt==false) spotify_oversigt.reset_amin_in_viewer();
     }
     #endif
-
     // Tidal stuf
     #ifdef ENABLE_TIDAL
     if (vis_tidal_oversigt) { 
@@ -3694,7 +3658,6 @@ void display() {
         tidal_oversigt.reset_amin_in_viewer();
     }
     #endif
-
     if (vis_tv_oversigt) {
       // show tv guide
       // take time on it
@@ -3727,9 +3690,7 @@ void display() {
       //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     }
   }
-
   //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
-
   #ifdef ENABLE_SPOTIFY
   //firsttimespotifyupdate=true;
   // show firsttime spotify update windows request
@@ -4093,8 +4054,6 @@ void display() {
       showcoursornow(266,460+5,strlen(keybuffer));
     }
   }
-
-  // 
   if (vis_tidal_oversigt) {
     if (ask_save_playlist) {
       xof = 500;
@@ -4121,7 +4080,6 @@ void display() {
       showcoursornow(266,460+5,strlen(keybuffer));
     }
   }
-
   // save playlist to file
   if ((vis_music_oversigt) && (save_ask_save_playlist)) {
     musicoversigt.save_music_oversigt_playlists(playlistfilename);
@@ -4554,8 +4512,6 @@ void display() {
     // create radio station online check tread
     #endif
   }
- 
- 
   /*
   if (!(check_radio_thread)) {
     check_radio_thread=true;
@@ -4567,8 +4523,6 @@ void display() {
     }      
   }
   */
-
-
   // stop music
   // if playing
   if (vis_stream_oversigt) {
@@ -6729,7 +6683,7 @@ void display() {
   }
   if (do_update_xmltv) {
     // call/start update xmltv multi phread
-    fprintf(stderr,"phread xmltv is running.\n");
+    // fprintf(stderr,"phread xmltv is running.\n");
     // old version
     // update_xmltv_phread_loader();
 
@@ -11813,6 +11767,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // set flag for show update
                 do_update_xmltv_show = true;
                 loading_tv_guide = true;
+                do_update_xmltv = true;                                      // set update flag
                 if (strcmp(configbackend,"mythtv")==0) {
                   // update_xmltv_phread_loader();                   // start thred update flag in main loop
                 } else if (strcmp(configbackend,"xbmc")==0) {
@@ -14150,7 +14105,7 @@ void datainfoloader_webserver_v2() {
 
 // ****************************************************************************************
 //
-// phread dataload spotify
+// phread dataload spotify BRUGES
 //
 // ****************************************************************************************
 
@@ -14173,7 +14128,7 @@ void datainfoloader_spotify_v2(string msg) {
 
   // write_logfile(logfile,(char *) "loader thread done loaded spotify.");
   spotify_oversigt_loaded_begin=false;
-  #endif  
+  #endif
   if (do_update_xmltv) {
     do_update_xmltv_show=true;            // set update show
     datainfoloader_xmltv_v2();                // load xmltv data
@@ -14314,6 +14269,7 @@ void webupdate_loader_tidal_v2() {
 
 // ****************************************************************************************
 //
+// in use in thread datainfoloader_spotify_v2
 // phread dataload xmltv
 // called from update_xmltv_phread_loader
 //
@@ -14321,28 +14277,30 @@ void webupdate_loader_tidal_v2() {
 
 void datainfoloader_xmltv_v2() {
   int error;
+  int result;
   //pthread_mutex_lock(&count_mutex);
   // write debug log
   write_logfile(logfile,(char *) "loader thread starting - xmltv file parser starting.");
   //
   // multi thread
   // load xmltvguide from web
-  if (get_tvguide_fromweb()!=-1) {
+  result = get_tvguide_fromweb();
+  if (result==1) {    
     error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
     if (error==0) {
       aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
       //save array to disk
       aktiv_tv_oversigt.saveparsexmltvdb();
       write_logfile(logfile,(char *) "tvguidedb file saved ok.");
+      save_config((char *) "/etc/mythtv-controller.conf");
     } else {
       write_logfile(logfile,(char *) "parser xmltv tv guide error.");
       fprintf(stderr,"Parse xmltv error\n");
     }
+  } else if (result==0) {
+    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   }
   write_logfile(logfile,(char *) "parser xmltv guide done.");
-  // save config again
-  //save_config((char *) "/etc/mythtv-controller.conf");
-  // set update flag for done
   do_update_xmltv_show=false;
 }
 
@@ -14367,7 +14325,7 @@ void *update_rss_phread_loader() {
 
 // ****************************************************************************************
 //
-// spotify db loader. and webserver start
+// spotify db loader. and webserver start BRUGES
 //
 // ****************************************************************************************
 
@@ -15490,8 +15448,9 @@ int main(int argc, char** argv) {
       if (checkartistdbexist()==false) {
         // File tidal_artistlists.txt
         tidal_oversigt.get_artist_from_file((char *) "");
-      }
-      tidal_oversigt.opdatere_tidal_oversigt(0);      
+      }      
+      tidal_oversigt.opdatere_tidal_oversigt(0);
+      tidal_oversigt.opdatere_tidal_userCollections2("");
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
