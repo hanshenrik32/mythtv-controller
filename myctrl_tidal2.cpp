@@ -4965,7 +4965,9 @@ void tidal_class::show_setup_tidal() {
   glColor3f(1.0f,1.0f,1.0f);
   glPopMatrix();
   drawText("email adress        ", 630, 650, 0.4f,15);
+  drawText(tidal_oversigt->client_id, 630+140, 650, 0.4f,15);
   drawText("Password            ", 650.0f, 600, 0.4f,15);
+  drawText(tidal_oversigt->client_secret, 630+140, 600, 0.4f,15);
   if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(395,500-(do_show_setup_select_linie*50),strlen(keybuffer));
   drawText("Token ok ", 650, 550, 0.4f,1);
   if (strlen(tidaltoken)>0) drawText("Yes ", 630+140.0f, 550, 0.4f,1); else drawText("No  ", 630+140.0f, 550, 0.4f,1);

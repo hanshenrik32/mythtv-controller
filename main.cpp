@@ -6861,7 +6861,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
         // test for setupclose
-        if (((GLubyte) names[i*4+3]==37) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
+        if (((GLubyte) names[i*4+3]==37) && (do_show_setup_rss==false) && (do_show_setup_spotify==false) && (do_show_setup_tidal==false) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
           do_show_setup_sound = false;
           do_show_setup_screen = false;
           do_show_setup_sql = false;
@@ -8023,7 +8023,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           returnfunc = 2;
           fundet = true;
         }
-        // show close radio info (27 need to move) 27 now is global exit
+        // show close tidal
         if ((GLubyte) names[i*4+3]==27) {
           if (debugmode & 8) fprintf(stderr,"Show/close tidal info\n");
           do_zoom_tidal =! do_zoom_tidal;
@@ -8309,7 +8309,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // close tv graber windows again
             do_show_tvgraber=false;
             do_show_setup=false;
-
             fundet = true;
           }
         }
@@ -10074,6 +10073,11 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_spotify) {
                     if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
                   }
+                  // setup spotify window
+                  if (do_show_setup_tidal) {
+                    if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
+                  }
+
                   // tv graber setup
                   if (do_show_tvgraber) {
                     if ((do_show_setup_select_linie+tvchannel_startofset)>0) {
@@ -10361,7 +10365,9 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_spotify) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
-
+                  if (do_show_setup_tidal) {
+                    if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                  }                   
                   // config af xmltv graber
                   if (do_show_tvgraber) {
                     if (do_show_setup_select_linie>0) {
@@ -10812,14 +10818,13 @@ void handleKeypress(unsigned char key, int x, int y) {
       }
       #endif
       #ifdef ENABLE_TIDAL
-      // NEED FIX
       if (do_show_setup_tidal) {
         switch (do_show_setup_select_linie) {
-          case 0: // strcpy(keybuffer,tidal_oversigt.spotify_client_id);
-                  // keybufferindex=strlen(keybuffer);
+          case 0: strcpy(keybuffer,tidal_oversigt.tidal_client_id);
+                  keybufferindex=strlen(keybuffer);
                   break;
-          case 1: // strcpy(keybuffer,tidal_oversigt.spotify_secret_id);
-                  // keybufferindex=strlen(keybuffer);
+          case 1: strcpy(keybuffer,tidal_oversigt.tidal_secret_id);
+                  keybufferindex=strlen(keybuffer);
                   break;
         }
       }
@@ -10920,19 +10925,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 search_tidal_string_changed=true;
               }
             }
-            // tidal skal vi save playlist
-            /*
-            if (keybufferindex>0) {
-              if (key=='S') {
-                printf("Save playlist selected \n");
-                // do_select_device_to_play=true;                                                                  // enable select dvice to play on
-                // strcpy(playlistfilename,tidal_oversigt.tidal_aktiv_album_name(0));          // get name
-                // keybufferindex=strlen(playlistfilename);
-                ask_save_playlist=true;
-              }
-              
-            }
-            */
           }
           #endif
 
@@ -11188,6 +11180,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
               }
+            } else if (do_show_setup_tidal) {
+              if (key!=13) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';	// else input key text in buffer
+              }
             } else if (do_show_videoplayer) {
               // video player setting
               if (do_show_setup_select_linie==0) {
@@ -11414,6 +11412,16 @@ void handleKeypress(unsigned char key, int x, int y) {
              }
          }
          #endif
+         #ifdef ENABLE_TIDAL
+         if (do_show_setup_tidal) {
+             switch(do_show_setup_select_linie) {
+               case 0: strcpy(tidal_oversigt.client_id,keybuffer);
+                       break;
+               case 1: strcpy(tidal_oversigt.client_secret,keybuffer);
+                       break;
+             }
+         }
+         #endif
          if (do_show_setup_keys) {
              switch(do_show_setup_select_linie) {
                  case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
@@ -11515,7 +11523,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                   firsttime_xmltvupdate = true;                                 // if true reset xml config file
                   // close tv graber windows again
                   do_show_tvgraber=false;
-                  do_show_setup=false;
                   key=0;
                 } else if (do_show_videoplayer) {
                   do_show_videoplayer=false;
@@ -11539,13 +11546,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                   do_show_setup_screen=false;
                   key=0;
                 } else if (do_show_setup_rss) {
-                  // stop show setup of rss feeds
                   do_show_setup_rss=false;
                   key=0;
                 } else if (do_show_setup_spotify) {
                   do_show_setup_spotify=false;
                   key=0;
-                  // do_save_setup_rss=true;
+                } else if (do_show_setup_tidal) {
+                  do_show_setup_tidal=false;
+                  key=0;
                 } else do_show_setup=false;
                 key=0;
               }
@@ -11608,10 +11616,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_tidal_oversigt=false;
                 keybufferopenwin=false;
                 key=0;
-
-                printf("Esc key pressed in tidal view \n");
-
-
               } else if ((!(do_show_setup)) && (key==27)) {                       // exit program
                 remove("mythtv-controller.lock");
                 runwebserver=false;

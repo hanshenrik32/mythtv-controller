@@ -2712,8 +2712,8 @@ void showrss_list() {
 //
 // ****************************************************************************************
 void show_setup_rss(unsigned int startofset) {
-    int winsizx=100;
-    int winsizy=300;
+    int winsizx=1300;
+    int winsizy=975;
     int xpos=0;
     int ypos=0;
     char text[200];
@@ -2730,10 +2730,10 @@ void show_setup_rss(unsigned int startofset) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // background
     glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/7),100 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/7),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/7)+1300,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/7)+1300,100 , 0.0);
+    glTexCoord2f(0, 0); glVertex3f( 200,100 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( 200,975 , 0.0);
+    glTexCoord2f(1, 1); glVertex3f( 200+1300,975 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( 200+1300,100 , 0.0);
     glEnd();
     glPopMatrix();
     // close buttons
@@ -2748,7 +2748,7 @@ void show_setup_rss(unsigned int startofset) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     winsizx=188;
     winsizy=81;
-    xpos=475;
+    xpos=400;
     ypos=-10;
     glLoadName(40);
     glBegin(GL_QUADS);
