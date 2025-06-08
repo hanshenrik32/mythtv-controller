@@ -80,6 +80,9 @@ int vlc_controller::playmedia(char *path) {
       //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
       if (!(vlc_mp)) error=1;
       libvlc_media_release(vlc_m);
+
+      
+
       #if 0
           /* This is a non working code that show how to hooks into a window,
             * if we have a window around */

@@ -95,6 +95,7 @@ extern GLuint tidal_big_search_bar_artist;
 extern GLuint tidal_big_search_bar_album;
 extern GLuint tidal_big_search_bar_track;
 extern GLuint setuprssback;
+extern GLuint setuptidalback;
 extern GLuint _textureclose;
 extern GLuint setupkeysbar1;
 extern float configsoundvolume;                           // default sound volume
@@ -4883,44 +4884,26 @@ void tidal_class::show_setup_tidal() {
   int xpos=0;
   int ypos=0;
   char text[200];
-  // int dev_nr=0;
-  // char temptxt[200];
-  // ICON TEXT pos
-  const int icon_text_posx1=510;
-  const int icon_text_posy1=320;
-  const int icon_text_posx2=510+120;
-  const int icon_text_posy2=320;
-  const int icon_text_posx3=510+120+120;
-  const int icon_text_posy3=320;
-  const int icon_text_posx4=510+120+120+120;
-  const int icon_text_posy4=320;
-  const int icon_text_posx5=510;
-  const int icon_text_posy5=180;
-  const int icon_text_posx6=510+120;
-  const int icon_text_posy6=180;
-  const int icon_text_posx7=510+120+120;
-  const int icon_text_posy7=180;
-  const int icon_text_posx8=510+120+120+120;
-  const int icon_text_posy8=180;
-  //
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   // tidal setup
   // background
+  winsizx=700;
+  winsizy=800;
+  xpos=0;
+  ypos=0;
   glPushMatrix();
   glTranslatef(0.0f, 0.0f, 0.0f);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glColor3f(0.6f, 0.6f, 0.6f);
-  glBindTexture(GL_TEXTURE_2D,setuprssback);
+  glBindTexture(GL_TEXTURE_2D,setuptidalback);
   glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4)-50,10 , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4)-50,800 , 0.0);
-  glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+750,800 , 0.0);
-  glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+750,10 , 0.0);
+  glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
   glEnd();
   glPopMatrix();
-  // top text
-  drawText("Tidal Account setup", 640, 750, 0.6f,1);
   // close buttons
   glPushMatrix();
   glEnable(GL_TEXTURE_2D);
@@ -4931,8 +4914,8 @@ void tidal_class::show_setup_tidal() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   winsizx=188;
   winsizy=81;
-  xpos=410;
-  ypos=-70;
+  xpos=470;
+  ypos=30;
   glLoadName(40);
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -4945,7 +4928,7 @@ void tidal_class::show_setup_tidal() {
   glPushMatrix();
   winsizx=310;
   winsizy=30;
-  xpos=300;
+  xpos=400;
   ypos=500;
   glEnable(GL_TEXTURE_2D);
   glColor3f(1.0f, 1.0f, 1.0f);
@@ -4963,7 +4946,7 @@ void tidal_class::show_setup_tidal() {
   // start af input felter
   winsizx=310;
   winsizy=30;
-  xpos=300;
+  xpos=400;
   ypos=450;
   glEnable(GL_TEXTURE_2D);
   glColor3f(0.7f, 0.7f, 0.7f);
@@ -4981,16 +4964,13 @@ void tidal_class::show_setup_tidal() {
   glRasterPos2f(0.0f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
   glPopMatrix();
-  drawText("email adress        ", 520, 650, 0.4f,15);
-  drawText(tidal_client_id, 520+140.0f, 650, 0.4f,1);
-  drawText("Password            ", 520.0f, 600, 0.4f,15);
-  if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));
-  drawText(tidal_secret_id, 520+140.0f, 600, 0.4f,1);
-  drawText("Token ok ", 520, 550, 0.4f,1);
-  if (strlen(tidaltoken)>0) drawText("Yes ", 520+140.0f, 550, 0.4f,1); else drawText("No  ", 520+140.0f, 550, 0.4f,1);
-  drawText("You have to config tidal-dl for now. If not done.", 520, 450, 0.4f,1);
-  drawText("Change this settings.", 520, 400, 0.4f,1);
-  drawText("| Album folder format - {AlbumID}", 520, 350, 0.4f,1);
-  drawText("| Playlist folder format - Playlist/{PlaylistName} [{PlaylistUUID}]", 520, 300, 0.4f,1); 
-  // tidaltoken = token
+  drawText("email adress        ", 630, 650, 0.4f,15);
+  drawText("Password            ", 650.0f, 600, 0.4f,15);
+  if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(395,500-(do_show_setup_select_linie*50),strlen(keybuffer));
+  drawText("Token ok ", 650, 550, 0.4f,1);
+  if (strlen(tidaltoken)>0) drawText("Yes ", 630+140.0f, 550, 0.4f,1); else drawText("No  ", 630+140.0f, 550, 0.4f,1);
+  drawText("You have to config tidal-dl for now. If not done.", 650, 450, 0.4f,1);
+  drawText("Change this settings.", 650, 400, 0.4f,1);
+  drawText("| Album folder format - {AlbumID}", 650, 350, 0.4f,1);
+  drawText("| Playlist folder format - Playlist/{PlaylistName} [{PlaylistUUID}]", 650, 300, 0.4f,1);   
 }

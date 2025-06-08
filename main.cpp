@@ -815,6 +815,7 @@ GLuint setuptemaback;
 GLuint setupfontback;
 GLuint setupkeysback;
 GLuint setuprssback;
+GLuint setuptidalback;
 GLuint _texturesetupclose;
 GLuint mobileplayer_icon;                   // mobile pplayer icon
 GLuint pcplayer_icon;                       // pc player icon
@@ -1511,7 +1512,7 @@ void load_config(char * filename) {
       strcpy(configstoragerecord[i].path,"");
       strcpy(configstoragerecord[i].name,"");
     }
-    strcpy(configdefaultplayer,"default");	                 	// default sound player (fmod)
+    strcpy(configdefaultplayer,"mplayer");	                 	// default sound player (fmod) (default) movie player
     strcpy(configclosemythtvfrontend,"no");		                // close mythtv frontend
     strcpy(configscreensavertimeout,"30");	                 	// default screensaver timeout
     strcpy(configsoundoutport,"SPDIF");			                  // default sound interface
@@ -14284,7 +14285,11 @@ void datainfoloader_xmltv_v2() {
   //
   // multi thread
   // load xmltvguide from web
-  result = get_tvguide_fromweb();
+  // controlled by time it will only run once a day
+  //  return 1 for full update
+  //  return 0 for not download new file. Load from db
+  //  return -1 for error
+  result = get_tvguide_fromweb(60*60*24);
   if (result==1) {    
     error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
     if (error==0) {
@@ -14903,6 +14908,7 @@ void loadgfx() {
     setupfontback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupfontback");
     setupkeysback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeysback");
     setuprssback         	= loadgfxfile(temapath,(char *) "images/",(char *) "setuprssback");
+    setuptidalback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptidalscreen");
     _texturesaveplaylist  = loadgfxfile(temapath,(char *) "images/",(char *) "filename");
     mobileplayer_icon     = loadgfxfile(temapath,(char *) "images/",(char *) "mobileplayer");
     pcplayer_icon         = loadgfxfile(temapath,(char *) "images/",(char *) "pcplayer");
@@ -15085,8 +15091,11 @@ void freegfx() {
     glDeleteTextures( 1, &setupnetworkwlanback);    //
     glDeleteTextures( 1, &setupscreenback);         //
     glDeleteTextures( 1, &setupfontback);           //
-    glDeleteTextures( 1, &setupkeysback);           //
-    glDeleteTextures( 1, &setuprssback);            //
+    glDeleteTextures( 1, &setupkeysback);           // setup keys
+    glDeleteTextures( 1, &setuprssback);            // rss setup background
+    glDeleteTextures( 1, &setuprssback);            // rss setup background 
+    glDeleteTextures( 1, &setuptidalback);          // tidal setup background
+    glDeleteTextures( 1, &_texturesetupmenu);       // setup menu
     glDeleteTextures( 1, &_texturesaveplaylist);    //
     glDeleteTextures( 1, &mobileplayer_icon);       // mobile icon
     glDeleteTextures( 1, &pcplayer_icon);           // pc player icon

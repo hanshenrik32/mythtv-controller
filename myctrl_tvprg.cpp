@@ -138,12 +138,11 @@ bool check_tvguide_process_running(char *processname) {
 //
 // ****************************************************************************************
 
-int get_tvguide_fromweb() {
+int get_tvguide_fromweb(long filetimediff) {
   std::string exestring;
   std::string guidefilepath;
   int result=0;
-  unsigned long lastmod;
-  unsigned long rawtime;
+  unsigned long lastmod;  
   bool running=false;
   struct stat t_stat;                                                                   // file info struct
   #ifdef _WIN32
@@ -154,8 +153,7 @@ int get_tvguide_fromweb() {
   guidefilepath = guidefilepath + "/tvguide.xml";                                                // get tvguide.xml file path
   stat(guidefilepath.c_str(), &t_stat);                                                       // get file info like create date
   lastmod = t_stat.st_mtime;                                                            // unix time
-  rawtime = time(NULL);                                                                 // get current time
-  if ((rawtime>lastmod+(60*60*24)) || (lastmod==0) || (&t_stat.st_size==0)) {
+  if ((time(NULL)>lastmod+(filetimediff)) || (lastmod==0) || (&t_stat.st_size==0)) {
     // check if active xml_tv graber is running (running = true)
     if (check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false) {
       exestring=configbackend_tvgraber;
