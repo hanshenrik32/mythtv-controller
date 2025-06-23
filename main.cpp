@@ -5514,17 +5514,19 @@ void display() {
       // clear old
       tidal_oversigt.clean_tidal_oversigt();
       // update from search
+      int tidal_search_status=0;
       switch(tidal_oversigt.searchtype) {
-        case 0: tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
+        case 0: tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
                 break;
-        case 1: tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,1);               // ARTISTS
+        case 1: tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,1);               // ARTISTS
                 break;
-        case 2: tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,2);               // TRACKS
+        case 2: tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,2);               // TRACKS
                 break;
-        default:tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
+        default:tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
       }
-      printf("Done Update tidal search result thread.\n");
-      write_logfile(logfile,(char *) "Tidal done search result thread");
+      printf("Done Update tidal search result thread. STATUS : %d \n",tidal_search_status);
+      if (tidal_search_status==-1) write_logfile(logfile,(char *) "Tidal error search result thread");
+      else write_logfile(logfile,(char *) "Tidal ok search result thread");
       tidal_oversigt.search_tidal_online_done=true;
       tidal_oversigt_loaded_begin=false;
       tidal_oversigt.set_search_loaded();                                 // load icons

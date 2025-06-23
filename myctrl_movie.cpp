@@ -252,9 +252,6 @@ bool film_oversigt_type::get_media_info_from_file(char *moviepath) {
 
 
 
-// *********************************************************************************************************************************************
-
-
 // ****************************************************************************************
 //
 // constructor
@@ -338,9 +335,17 @@ int film_oversigt_typem::playmovie(int nr) {
   char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
   if (conn) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    updatedbplayed = fmt::format("update videometadata set playcount=playcount+1 where filename like '{}'",this->filmoversigt[nr].getfilmfilename());
-    mysql_query(conn,updatedbplayed.c_str());
+    if (!(mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, database, 0, NULL, 0))) {
+      fprintf(stderr, "MySQL connection failed: %s\n", mysql_error(conn));
+      mysql_close(conn);
+      return 0;
+    }
+    updatedbplayed = fmt::format("update videometadata set playcount=playcount+1 where filename like '{}'", this->filmoversigt[nr].getfilmfilename());
+    if (mysql_query(conn, updatedbplayed.c_str()) != 0) {
+      fprintf(stderr, "MySQL query failed: %s\n", mysql_error(conn));
+      mysql_close(conn);
+      return 0;
+    }
     res = mysql_store_result(conn);
     mysql_close(conn);
   }
@@ -428,6 +433,8 @@ void film_oversigt_typem::setcolume(int volume) {
 
 // ****************************************************************************************
 //
+// sort movies in array
+//
 // ****************************************************************************************
 
 void film_oversigt_typem::sortfilm(int type) {
@@ -508,6 +515,8 @@ int film_oversigt_typem::load_film_dvcovers() {
 
 
 // ****************************************************************************************
+//
+// hent genre fra db
 //
 // ****************************************************************************************
 
@@ -1281,6 +1290,8 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   winsizy=200;
   xpos=220;
   ypos=700;
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
     sofset=(_mangley/40)*8;
     if ((i+sofset)<filmoversigt_antal) {
@@ -1295,8 +1306,8 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(120+i+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
@@ -1308,8 +1319,8 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glBindTexture(GL_TEXTURE_2D,filmoversigt[i+sofset].gettextureid());
         glDisable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(120+i+sofset);
         glBegin(GL_QUADS); //Begin quadrilateral coordinates
         glTexCoord2f(0, 0); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
@@ -1325,8 +1336,8 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(120+i+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
@@ -1349,7 +1360,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 // ****************************************************************************************
 //
 // normal oversigt
-// ny udgave
 //
 // ****************************************************************************************
 
@@ -1397,6 +1407,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   winsizy=200;
   xpos=20;
   ypos=700;
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   while((film_nr<lfilmoversigt_antal) && (film_nr+sofset<filmoversigtsize)) {
     sofset=(_mangley/40)*8;
     if ((film_nr+sofset)<filmoversigt_antal) {
@@ -1407,15 +1419,9 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       if (film_nr+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (filmoversigt[film_nr+sofset].gettextureid()) {
         // print cover dvd
-        //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);                           //
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(120+film_nr+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
@@ -1427,8 +1433,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glBindTexture(GL_TEXTURE_2D,filmoversigt[film_nr+sofset].gettextureid());
         glDisable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(120+film_nr+sofset);
         glBegin(GL_QUADS); //Begin quadrilateral coordinates
         glTexCoord2f(0, 0); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
@@ -1439,13 +1443,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       } else {
         // do default cover dvd
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(120+film_nr+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
