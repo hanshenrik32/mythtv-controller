@@ -5488,16 +5488,11 @@ void display() {
       }
     }
   }
-
-
-
-  
   // ******************************************************************************************************************
   //
-  //  *********************** Tidal search result ************************************************************
+  //  *********************** Tidal search result *********************************************************************
   //
   // ****************************************************************************************************************** 
-
   if (vis_tidal_oversigt) {
     if (do_hent_tidal_search_online) {
       tidal_oversigt.search_tidal_online_done=false;
@@ -5534,11 +5529,6 @@ void display() {
       tidal_oversigt.search_loaded=true;
     }
   }
-
-
-
-  // ******************************************************************************************************************
-  // ******************************************************************************************************************
   // ******************************************************************************************************************
   //
   // *********************** RADIO stuf *******************************************************************************
@@ -5729,6 +5719,9 @@ void display() {
   //
   // calc spectrum
   // from fmod
+  // ******************************************************************************************************************
+  //
+  // *********************** Show uv ********************************************************************************** 
   #if defined USE_FMOD_MIXER
   if (snd) {
     // getSpectrum() performs the frequency analysis, see explanation below
@@ -5987,8 +5980,10 @@ void display() {
     rssstreamoversigt.save_rss_data();                                        // save rss data in db
     streamoversigt.loadrssfile(1);                                            // download/update rss files (1=force all)
     do_save_setup_rss=false;
-  }
-  // do start movie player
+  }  
+  // ******************************************************************************************************************
+  //
+  // *********************** do start movie player ********************************************************************
   if ((startmovie) && (do_zoom_film_cover)) {
     // non default player use the batch file startmovie.sh from path where vi are installed
     if (strcmp("default",configdefaultplayer)!=0)  {
@@ -6166,7 +6161,9 @@ void display() {
     streamoversigt.pausestream(1);
     do_pause_stream = false;
   }
-  // play recorded program
+  // ******************************************************************************************************************
+  //
+  // *********************** play recorded program ********************************************************************
   if (do_play_recorded_aktiv_nr) {
     // write debug log
     sprintf(debuglogdata,"Start playing recorded program");
@@ -6197,10 +6194,9 @@ void display() {
       do_play_recorded_aktiv_nr=0;                                                                // start kun 1 player
     }
   }
-  
+  // ******************************************************************************************************************
   //
-  // show new movie info
-  //
+  // *********************** show new movie info **********************************************************************
   if (((vis_film_oversigt) || (vis_nyefilm_oversigt)) && (do_zoom_film_cover) && (fknapnr>0) && (!(visur))) {
     do_zoom_film_aktiv_nr=fknapnr-1;
     // draw window
@@ -6740,9 +6736,6 @@ void display() {
 
 
 
-
-
-
 // ****************************************************************************************
 //
 // used by mouse stuf
@@ -7171,7 +7164,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
       //
       // stream control
       //
@@ -7270,7 +7262,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
         }
-
         // Bruges til mus/touch skærm (ved playlist )
         if ((!(fundet)) && (!(do_zoom_music_cover)) && (!(ask_open_dir_or_play))) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
           // we have a select mouse/touch element dirid
@@ -7366,10 +7357,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
       }
-
-
-
-
       //
       // spotify stuf offline search (only in local db)
       //
@@ -7525,7 +7512,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             ask_open_dir_or_play_spotify = false;
             fundet = true;
           }
-
           /*
           if (( fundet == false) && ( spotifyknapnr == 1 ) && ( ask_open_dir_or_play_spotify == false ) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back") == 0)) {
             // update
@@ -7566,7 +7552,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
           */
-
           // play playlist icon select (20) type 0
           if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
             fprintf(stderr,"play spotify playlist. type 0\n");
@@ -7621,7 +7606,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
       //
       // tidal stuf offline search (only in local db)
       //
@@ -7763,9 +7747,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           sprintf(debuglogdata,"tidalknapnr %d type=%d ",tidalknapnr,tidal_oversigt.get_tidal_type(tidalknapnr));
           write_logfile(logfile,(char *) debuglogdata);
           #endif
-
           // back button ved søgning
-
           // works ok
           // back icon to main playlist overview
           // do update from root
@@ -7778,7 +7760,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             ask_open_dir_or_play_tidal = false;
             fundet = true;
           }
-
           // tidal play playlist icon select (20) type 0
           if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==0)) {
             fprintf(stderr,"play tidal playlist. type 0\n");
@@ -7834,7 +7815,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
       //
       // spotify stuf
       // set default device to play on
@@ -7900,7 +7880,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
       #ifdef ENABLE_TIDAL
       if ((do_show_setup_tidal)  && (!(fundet))) {
         // select default play device
@@ -7962,9 +7941,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
-
-
       // select what to play music/tidal/spotify or radio from icon nr
       if ((vis_radio_or_music_oversigt) && (!(fundet))) {
         // Radio
@@ -8033,7 +8009,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
       // kun til mus/touch skærm (spotify oversigt)
       // luk show play radio
       // scroll down
@@ -8089,7 +8064,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
         }
-
       } // radio overview
       // vælg skal der spilles film eller stream
       if ((vis_stream_or_movie_oversigt) && (!(fundet))) {

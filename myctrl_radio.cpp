@@ -163,9 +163,9 @@ int radiostation_class::opdatere_radiostation_gfx(int nr,char *gfxpath) {
 
 int radiostation_class::load_radio_stations_gfx() {
   int i=0;
-  GLuint texture;
-  char tmpfilename[200];
-  char gfxfilename[80];
+  GLuint texture;  
+  std::string tmpfilename;
+  std::string gfxfilename;
   char resl[200];
   FILE *filhandle;
   try {
@@ -173,30 +173,30 @@ int radiostation_class::load_radio_stations_gfx() {
     if (startup_loaded) return(0);
     startup_loaded=true;
     while(i<radiooversigt.radioantal()) {
-      strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");	// hent path
-      strcpy(gfxfilename,radiooversigt.get_station_gfxfile(i));			// hent radio icon gfx filename
-      strcat(tmpfilename,gfxfilename);        					// add filename to path
-      if ((strcmp(gfxfilename,"")!=0) && (file_exists(tmpfilename))) {		// den har et navn samt gfx filen findes.
-        texture=loadTexture ((char *) tmpfilename);					// load texture
+      tmpfilename = "/opt/mythtv-controller/images/radiostations/";	// hent path
+      gfxfilename = radiooversigt.get_station_gfxfile(i);
+      tmpfilename = tmpfilename + gfxfilename;			// add filename to path
+      if ((gfxfilename.length() > 0) && (file_exists(tmpfilename.c_str()))) {	// den har et navn samt gfx filen findes.
+        texture=loadTexture ((char *) tmpfilename.c_str());					// load texture
         set_texture(i,texture);							// save it in radio station struct to show
-      } else if (strcmp(gfxfilename,"")==0) {
+      } else if (gfxfilename.length() == 0) {
         // check hvis ikke noget navn om der findes en fil med radio station navnet *.png/jpg
         // hvis der gør load denne fil.
-        strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");
-        strcat(tmpfilename,radiooversigt.get_station_name(i));
-        strcat(tmpfilename,".png");
-        if (file_exists(tmpfilename)) {
-          texture=loadTexture ((char *) tmpfilename);                                 // load texture
+        tmpfilename = "/opt/mythtv-controller/images/radiostations/";
+        tmpfilename = tmpfilename + radiooversigt.get_station_name(i);
+        tmpfilename = tmpfilename + ".png";      
+        if (file_exists(tmpfilename.c_str())) {		// den har et navn samt gfx filen findes.
+          texture=loadTexture ((char *) tmpfilename.c_str());                                 // load texture
           set_texture(i,texture);                         		            // save it in radio station struct
           strncpy(stack[i]->gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
           strcat(stack[i]->gfxfilename,".png");
           opdatere_radiostation_gfx(stack[i]->intnr,stack[i]->gfxfilename);           // and update db filename
         } else {
-          strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");
-          strcat(tmpfilename,radiooversigt.get_station_name(i));
-          strcat(tmpfilename,".jpg");
-          if (file_exists(tmpfilename)) {
-            texture=loadTexture ((char *) tmpfilename);                                 // load texture
+          tmpfilename = "/opt/mythtv-controller/images/radiostations/";
+          tmpfilename = tmpfilename + radiooversigt.get_station_name(i);
+          tmpfilename = tmpfilename + ".jpg";
+          if (file_exists(tmpfilename.c_str())) {
+            texture=loadTexture ((char *) tmpfilename.c_str());                                 // load texture
             set_texture(i,texture);     		                                            // save it in radio station struct
             strncpy(stack[i]->gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
             strcat(stack[i]->gfxfilename,".png");
@@ -206,7 +206,7 @@ int radiostation_class::load_radio_stations_gfx() {
       } else {
         sprintf(resl,"Radio station gfx file %s for %s is missing.\n",get_station_gfxfile(i),get_station_name(i));
         fputs(resl,filhandle);
-      }
+      }      
       i++;
     }
     if (filhandle) fclose(filhandle);
@@ -230,7 +230,7 @@ int radiostation_class::load_radio_stations_gfx() {
 // ****************************************************************************************
 
 int radiostation_class::opdatere_radio_oversigt() {
-  char sqlselect[512];
+  std::string sqlselect_str;
   // mysql vars
   MYSQL *conn;
   MYSQL_RES *res;
@@ -239,15 +239,15 @@ int radiostation_class::opdatere_radio_oversigt() {
   int land;
   bool online;
   //gotoxy(10,13);
-  //printf("Opdatere radio oversigt fra database. type %d \n",radiosortorder);
-  strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 order by popular desc,name");
+  //printf("Opdatere radio oversigt fra database. type %d \n",radiosortorder);  
+  sqlselect_str ="select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 order by popular desc,name";
   try {
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      mysql_query(conn,sqlselect);
+      mysql_query(conn,sqlselect_str.c_str());
       res = mysql_store_result(conn);
       if (res) {
         while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
@@ -305,25 +305,24 @@ int radiostation_class::opdatere_radio_oversigt() {
 // ****************************************************************************************
 
 int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
-    char sqlselect[512];
+    std::string sqlselect_str;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
     int art,intnr,kbps;
     int land;
-//    char tmptxt1[80];
     bool online;
-    strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and name like '%");
-    strcat(sqlselect,searchtxt);
-    strcat(sqlselect,"%'");
+    sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and name like '%";
+    sqlselect_str += searchtxt;
+    sqlselect_str += "%'";
     try {
       conn=mysql_init(NULL);
       // Connect to database
       if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
-        mysql_query(conn,sqlselect);
+        mysql_query(conn,sqlselect_str.c_str());
         res = mysql_store_result(conn);
         if (res) {
           while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
@@ -372,7 +371,8 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
 // ****************************************************************************************
 
 int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
-    char sqlselect[512];
+    // char sqlselect[512];
+    std::string sqlselect_str;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
@@ -386,23 +386,22 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 
     } else {
       if (radiosortorder==0)			// start order default
-        strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by intnr");
-        //strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 order by popular desc,name");
+        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by intnr";
       else if (radiosortorder==28)		// bit rate
-        sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name");
+        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name";
       else if (radiosortorder==27)		// land kode
-        sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by landekode desc,popular desc,name");
+        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by landekode desc,popular desc,name";
       else if (radiosortorder==19)		// mest hørt
-        sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by lastplayed desc,popular desc,name");
+        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by lastplayed desc,popular desc,name";
       else 					// ellers efter art
-        sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 and art=%d order by popular desc,name",radiosortorder);
+        sqlselect_str = fmt::format("select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 and art={} order by popular desc,name",radiosortorder);
       try {
         conn=mysql_init(NULL);
         // Connect to database
         if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
           mysql_query(conn,"set NAMES 'utf8'");
           res = mysql_store_result(conn);
-          mysql_query(conn,sqlselect);
+          mysql_query(conn,sqlselect_str.c_str());
           res = mysql_store_result(conn);
           if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
@@ -661,8 +660,8 @@ static bool hentradioart=false;
 
 
 void radiostation_class::show_radio_options() {
-  int i;
-  char sqlselect[512];
+  int i;  
+  std::string sqlselect_str;
   // mysql vars
   MYSQL *conn;
   MYSQL_RES *res;
@@ -695,13 +694,13 @@ void radiostation_class::show_radio_options() {
   i=0;
   if (hentradioart==false) {
     hentradioart=true;
-    strcpy(sqlselect,"SELECT typename,radiotypes.art,count(radio_stations.art) FROM `radiotypes`,radio_stations where radiotypes.art=radio_stations.art or radiotypes.art=0 and radio_stations.online=1 group by (radiotypes.art)");
+    sqlselect_str ="SELECT typename,radiotypes.art,count(radio_stations.art) FROM `radiotypes`,radio_stations where radiotypes.art=radio_stations.art or radiotypes.art=0 and radio_stations.online=1 group by (radiotypes.art)";
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      mysql_query(conn,sqlselect);
+      mysql_query(conn,sqlselect_str.c_str());
       res = mysql_store_result(conn);
       while (((row = mysql_fetch_row(res)) != NULL) && (i<radiooptionsmax)) {
         strcpy(radiosortopt[i].radiosortopt,row[0]);
@@ -736,7 +735,7 @@ int radiostation_class::set_radio_popular(int stationid) {
   MYSQL_RES *res;
   // write debug log
   write_logfile(logfile,(char *) "Update played radio station.");
-  sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid]->intnr);
+  sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid]->intnr);  
   conn=mysql_init(NULL);
   // Connect to database
   if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {

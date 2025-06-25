@@ -3217,7 +3217,6 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
         if (file_contents) free(file_contents);                                       // free memory again
         json_value_free(value);                                                       // json clean up
         texture_loaded = false;                                                       // set load flag
-
         // stack is ready
         // the array is ready
         /*
