@@ -259,7 +259,8 @@ class tidal_class {
     void set_tidal_feed_release_date(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_release_date,name); }
     void set_tidal_playlistid(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->playlistid,name); }    
 
-    int opdatere_tidal_userCollections(std::string uid);
+    int opdatere_tidal_userCollections(char *uid);
+    int opdatere_tidal_userCollections2(char *uid);
     void show_setup_tidal();
 };
 

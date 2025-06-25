@@ -138,23 +138,40 @@ bool check_tvguide_process_running(char *processname) {
 //
 // ****************************************************************************************
 
-int get_tvguide_fromweb() {
-  char exestring[2048];
-  int result=-1;
-  // check if active xml_tv graber is running (running = true)
-  if (check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false) {
-    strcpy(exestring,configbackend_tvgraber);
-    if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
-    else strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
-    // write debug log
-    sprintf(debuglogdata,"Run tv graber use %s: Command : %s",configbackend_tvgraber,exestring);
-    write_logfile(logfile,(char *) debuglogdata);
-    result=system(exestring);   // do it
-    // write debug log
-    sprintf(debuglogdata,"Done tv graber background process. Exit kode %d",result);
-    write_logfile(logfile,(char *) debuglogdata);
-  } else printf("Graber is already ruuning.\n");
-  return(result);
+int get_tvguide_fromweb(long filetimediff) {
+  std::string exestring;
+  std::string guidefilepath;
+  int result=0;
+  unsigned long lastmod;  
+  bool running=false;
+  struct stat t_stat;                                                                   // file info struct
+  #ifdef _WIN32
+  guidefilepath=getenv("HOMEDRIVE") + getenv("HOMEPATH");
+  #else
+  guidefilepath=getenv("HOME");
+  #endif
+  guidefilepath = guidefilepath + "/tvguide.xml";                                                // get tvguide.xml file path
+  stat(guidefilepath.c_str(), &t_stat);                                                       // get file info like create date
+  lastmod = t_stat.st_mtime;                                                            // unix time
+  if ((time(NULL)>lastmod+(filetimediff)) || (lastmod==0) || (&t_stat.st_size==0)) {
+    // check if active xml_tv graber is running (running = true)
+    if (check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false) {
+      exestring=configbackend_tvgraber;
+      if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) 
+        exestring = exestring + " --days 2 --output ~/tvguide.xml 2> ~/tvguide.log";
+      else 
+        exestring = exestring + " --days 2 --output ~/tvguide.xml 2> ~/tvguide.log";
+      // write debug log
+      sprintf(debuglogdata,"Running tv graber, use %s: cmd : %s",configbackend_tvgraber,exestring.c_str());
+      write_logfile(logfile,(char *) debuglogdata);
+      result=system(exestring.c_str());   // do it
+      // write debug log
+      sprintf(debuglogdata,"Done tv graber background process. ");
+      write_logfile(logfile,(char *) debuglogdata);
+      configtvguidelastupdate=time(NULL);
+    } else printf("Graber is already ruuning.\n");
+    if (result==0) return(1); else return(-1);
+  } else return(0);
 }
 
 
@@ -469,7 +486,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   MYSQL_RES *res;
   MYSQL_ROW row;
   struct stat t_stat;           // file info struct
-  struct tm* lastmod;           //
+  unsigned long lastmod;           //
   loading_tv_guide=true;        // set loadtv guide flag to show in show_tv_guide then xml files is passed
   // mysql stuf
   // Connect to database
@@ -556,13 +573,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
     strcat(path,"/");
     strcat(path,filename);                                                      // add filename to xmlfile name
     // get file date
-    stat(path, &t_stat);                                                        // get file info like create date
-    lastmod=localtime(&(t_stat.st_mtime));                                      // convert to unix time
-    // if file change from last run. update tv guide again
-    if ((configtvguidelastupdate!=mktime(lastmod)) || (configtvguidelastupdate==0)) {
-      // save last updated
-      setlastupdate(mktime(lastmod));
-      configtvguidelastupdate=mktime(lastmod);
+    if ((configtvguidelastupdate+(5*60)>lastmod) || (configtvguidelastupdate==0)) {
       document = xmlReadFile(path, NULL, 0);                                    // open/read xml file
       // if exist do all the parse and update db
       // it use REPLACE in mysql to create/update records if changed in xmlfile
@@ -577,9 +588,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
               if (content) {
                 strcpy(result,(char *) content);
                 s=trimwhitespace(result);
-                //if (debugmode & 256) printf("TV chanel found : %s \n",s);
-                sprintf(debuglogdata,"TV chanel found : %s",s);
-                write_logfile(logfile,(char *) debuglogdata);
               }
               subnode=node->xmlChildrenNode;
               while(subnode) {
@@ -2959,11 +2967,11 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 mysql_free_result(res);
                 prg_antal++;
                 std::string debuglogdata1;
-                debuglogdata1 = fmt::format("#{} of Tvguide records created.... Channel {} {}->{} {} ",prg_antal,channelname,starttime,endtime,prgtitle);
+                debuglogdata1 = fmt::format("#{} of TvGuide records created.... Channel {} {}->{} {} ",prg_antal,channelname,starttime,endtime,prgtitle);
                 write_logfile(logfile,(char *) debuglogdata1.c_str());
-//                if (debugmode & 256) fprintf(stdout,"#%4d of Tvguide records created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
+                // fprintf(stdout,"#%4d of Tvguide records updated.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
               } else {
-//                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist Channel......         %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
+                fprintf(stdout,"Tvguide Program exist Channel......         %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
               }
             }
             // save rec
@@ -3578,7 +3586,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,abs(channel.channum),starttime");
 
-        //printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+        // printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
 
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -3598,7 +3606,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,chanid,abs(channel.channum),starttime");
 
-        write_logfile(logfile,(char *) sqlselect);
+        // write_logfile(logfile,(char *) sqlselect);
 
         //printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
 

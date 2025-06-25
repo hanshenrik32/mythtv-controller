@@ -95,6 +95,7 @@ extern GLuint tidal_big_search_bar_artist;
 extern GLuint tidal_big_search_bar_album;
 extern GLuint tidal_big_search_bar_track;
 extern GLuint setuprssback;
+extern GLuint setuptidalback;
 extern GLuint _textureclose;
 extern GLuint setupkeysbar1;
 extern float configsoundvolume;                           // default sound volume
@@ -1393,6 +1394,115 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
   }
   return(httpCode);
 }
+
+
+
+// ****************************************************************************************
+//
+// Update (load) user collections
+//
+// ****************************************************************************************
+// ID 131776836
+// client id Nq5WQmVhv2L7QWQO
+
+// secret
+// vxOmFp39rweIVD2rb20qmpETsoAECwhGUdnPIPSXq4g=
+
+
+int tidal_class::opdatere_tidal_userCollections2(char *uid) {
+  std::string url;
+  int error;
+  std::string localuserhomedir;
+  localuserhomedir = getenv("HOME");
+  url="curl -X GET 'https://openapi.tidal.com/v2/userCollections/";
+  url = url + "131776836";
+  url = url + "/relationships/albums?countryCode=US&locale=en-US&include=albums' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'accept: application/vnd.api+json' -H 'Authorization: Bearer ";
+  url = url + + tidaltoken;
+  url = url + "'  > ";
+  url = url + localuserhomedir;
+  url = url + "/";
+  url = url + "tidal_usercollection_result.json";
+  printf("url %s \n",url.c_str());
+  error=system(url.c_str());
+  if (error!=0) {
+    fprintf(stderr,"Curl error get user collections\n");
+    exit(0);
+  }
+  return(1);
+}
+
+
+
+// ****************************************************************************************
+//
+// Get userCollections
+//
+// ****************************************************************************************
+
+  
+int tidal_class::opdatere_tidal_userCollections(char *uid) {
+
+  std::string userfilename;
+  FILE *userfile;
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode=0;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=NULL;
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + tidaltoken;
+  url ="https://openapi.tidal.com/v2/userCollections/";
+  url = url + uid;
+  url = url + "?countryCode=US&offset=0&limit=100&include=albums";
+  userfilename = localuserhomedir;
+  userfilename = userfilename + "/";
+  userfilename = userfilename + "tidal_usercollection_result.json";
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if ((curl) && (strlen(auth_kode.c_str())>0)) {
+    // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
+    header = curl_slist_append(header, auth_kode.c_str());
+    header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+    userfile=fopen(userfilename.c_str(),"w");
+    if (userfile) {
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+      res = curl_easy_perform(curl);
+      fclose(userfile);
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);                   // get result in httpCode
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(200);
+    }
+  } else {
+    write_logfile(logfile,(char *) "Tidal curl fault");
+  }
+  return(httpCode);
+
+}
+
+
 
 
 // ****************************************************************************************
@@ -2981,33 +3091,6 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
 
 
 
-
-
-
-
-
-// ****************************************************************************************
-//
-// Update (load) user collections
-//
-// ****************************************************************************************
-
-
-int tidal_class::opdatere_tidal_userCollections(std::string uid) {
-  std::string url;
-  int error;
-  url="curl -X GET 'https://openapi.tidal.com/v2/userCollections/" + uid + "/relationships/albums?countryCode=US&include=albums' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_usercollection_result.json";
-  printf("url %s \n",url.c_str());
-  error=system(url.c_str());
-  if (error!=0) {
-    fprintf(stderr,"Curl error get user collections\n");
-    exit(0);
-  }
-  return(1);
-}
-
-
-
 // ****************************************************************************************
 //
 // Tidal search online and process file
@@ -3110,7 +3193,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     default:// url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
             url=url + "/relationships/albums?countryCode=US&include=albums' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
   }
-  // printf("url = %s \n",url.c_str());
+  printf("url = %s \n",url.c_str());
   error=system(url.c_str());
   // if no error we have json file have the search result
   if (error==0) {
@@ -3134,7 +3217,6 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
         if (file_contents) free(file_contents);                                       // free memory again
         json_value_free(value);                                                       // json clean up
         texture_loaded = false;                                                       // set load flag
-
         // stack is ready
         // the array is ready
         /*
@@ -3154,7 +3236,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     }
   } else write_logfile(logfile,(char *) "Curl error : https://openapi.tidal.com/search");
   search_loaded=true;
-  return(httpCode);
+  if (antal==-1) return(-1); else return(httpCode);
 }
 
 
@@ -4801,44 +4883,26 @@ void tidal_class::show_setup_tidal() {
   int xpos=0;
   int ypos=0;
   char text[200];
-  // int dev_nr=0;
-  // char temptxt[200];
-  // ICON TEXT pos
-  const int icon_text_posx1=510;
-  const int icon_text_posy1=320;
-  const int icon_text_posx2=510+120;
-  const int icon_text_posy2=320;
-  const int icon_text_posx3=510+120+120;
-  const int icon_text_posy3=320;
-  const int icon_text_posx4=510+120+120+120;
-  const int icon_text_posy4=320;
-  const int icon_text_posx5=510;
-  const int icon_text_posy5=180;
-  const int icon_text_posx6=510+120;
-  const int icon_text_posy6=180;
-  const int icon_text_posx7=510+120+120;
-  const int icon_text_posy7=180;
-  const int icon_text_posx8=510+120+120+120;
-  const int icon_text_posy8=180;
-  //
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   // tidal setup
   // background
+  winsizx=700;
+  winsizy=800;
+  xpos=0;
+  ypos=0;
   glPushMatrix();
   glTranslatef(0.0f, 0.0f, 0.0f);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glColor3f(0.6f, 0.6f, 0.6f);
-  glBindTexture(GL_TEXTURE_2D,setuprssback);
+  glBindTexture(GL_TEXTURE_2D,setuptidalback);
   glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4)-50,10 , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4)-50,800 , 0.0);
-  glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+750,800 , 0.0);
-  glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+750,10 , 0.0);
+  glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
   glEnd();
   glPopMatrix();
-  // top text
-  drawText("Tidal Account setup", 640, 750, 0.6f,1);
   // close buttons
   glPushMatrix();
   glEnable(GL_TEXTURE_2D);
@@ -4849,8 +4913,8 @@ void tidal_class::show_setup_tidal() {
   glBindTexture(GL_TEXTURE_2D,_textureclose);
   winsizx=188;
   winsizy=81;
-  xpos=410;
-  ypos=-70;
+  xpos=470;
+  ypos=30;
   glLoadName(40);
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -4863,7 +4927,7 @@ void tidal_class::show_setup_tidal() {
   glPushMatrix();
   winsizx=310;
   winsizy=30;
-  xpos=300;
+  xpos=400;
   ypos=500;
   glEnable(GL_TEXTURE_2D);
   glColor3f(1.0f, 1.0f, 1.0f);
@@ -4881,7 +4945,7 @@ void tidal_class::show_setup_tidal() {
   // start af input felter
   winsizx=310;
   winsizy=30;
-  xpos=300;
+  xpos=400;
   ypos=450;
   glEnable(GL_TEXTURE_2D);
   glColor3f(0.7f, 0.7f, 0.7f);
@@ -4899,16 +4963,15 @@ void tidal_class::show_setup_tidal() {
   glRasterPos2f(0.0f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
   glPopMatrix();
-  drawText("email adress        ", 520, 650, 0.4f,15);
-  drawText(tidal_client_id, 520+140.0f, 650, 0.4f,1);
-  drawText("Password            ", 520.0f, 600, 0.4f,15);
-  if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));
-  drawText(tidal_secret_id, 520+140.0f, 600, 0.4f,1);
-  drawText("Token ok ", 520, 550, 0.4f,1);
-  if (strlen(tidaltoken)>0) drawText("Yes ", 520+140.0f, 550, 0.4f,1); else drawText("No  ", 520+140.0f, 550, 0.4f,1);
-  drawText("You have to config tidal-dl for now. If not done.", 520, 450, 0.4f,1);
-  drawText("Change this settings.", 520, 400, 0.4f,1);
-  drawText("| Album folder format - {AlbumID}", 520, 350, 0.4f,1);
-  drawText("| Playlist folder format - Playlist/{PlaylistName} [{PlaylistUUID}]", 520, 300, 0.4f,1); 
-  // tidaltoken = token
+  drawText("email adress        ", 630, 650, 0.4f,15);
+  drawText(tidal_oversigt->client_id, 630+140, 650, 0.4f,15);
+  drawText("Password            ", 650.0f, 600, 0.4f,15);
+  drawText(tidal_oversigt->client_secret, 630+140, 600, 0.4f,15);
+  if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(395,500-(do_show_setup_select_linie*50),strlen(keybuffer));
+  drawText("Token ok ", 650, 550, 0.4f,1);
+  if (strlen(tidaltoken)>0) drawText("Yes ", 630+140.0f, 550, 0.4f,1); else drawText("No  ", 630+140.0f, 550, 0.4f,1);
+  drawText("You have to config tidal-dl for now. If not done.", 650, 450, 0.4f,1);
+  drawText("Change this settings.", 650, 400, 0.4f,1);
+  drawText("| Album folder format - {AlbumID}", 650, 350, 0.4f,1);
+  drawText("| Playlist folder format - Playlist/{PlaylistName} [{PlaylistUUID}]", 650, 300, 0.4f,1);   
 }

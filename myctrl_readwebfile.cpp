@@ -23,44 +23,32 @@ extern int debugmode;                                           // 64 = radio st
                                                                 // 1024 = flag loader
 
 
-
 // ****************************************************************************************
 //
 // return string (fname) for filename long = last path + name as filename
 //
 // ****************************************************************************************
-//
 
-int get_webfilenamelong(char *fname,char *webpath) {
-  char *npointer=NULL;
-  char *filename;                       // to save filename
-  char tmp[20000];
-  int firstslashpointer=0;
-  strcpy(tmp,webpath);
-  npointer=strrchr(tmp,'/');
-  if (npointer) {
-    firstslashpointer=npointer-tmp;             // husk sted
-    filename=new char[strlen(npointer)+1];
-    if (filename) {
-      strcpy(filename,npointer+1);              // save filename
-      tmp[firstslashpointer-1]='\0';
-      npointer=strrchr(tmp,'/');
-      if (npointer) {
-        //strcpy(fname,filename);
-        /* old have errors
-        strcpy(fname,npointer+1);
-        //fname[11]='\0';
-        strcat(fname,filename);
-        */
-        strcpy(fname,filename);
-      }
-      delete [] filename;
+
+int get_webfilenamelong(char* fname, char* webpath) {
+    if (webpath == nullptr || strlen(webpath) == 0) {
+        return 0;
     }
-    return(1);
-  }
-  return(0);
+    std::string path(webpath);
+    std::size_t lastSlash = path.rfind('/');
+    if (lastSlash == std::string::npos) {
+        return 0;
+    }
+    std::string filename = path.substr(lastSlash + 1);
+    std::string trimmedPath = path.substr(0, lastSlash);
+    std::size_t secondLastSlash = trimmedPath.rfind('/');
+    if (secondLastSlash == std::string::npos) {
+        return 0;
+    }
+    // In den oprindelige version blev kun `filename` kopieret til `fname`
+    strcpy(fname, filename.c_str());
+    return 1;
 }
-
 
 // ****************************************************************************************
 //
@@ -256,7 +244,7 @@ int get_webfile2(char *webpath,char *outfile) {
     command = command + outfile;
     command = command + " 2>&1 ";                                                           // disable output
     //strcat(command," 2>> wget.log ");
-    printf(" do COMMAND *%s* \n",command.c_str());
+    // printf(" do COMMAND *%s* \n",command.c_str());
     system(command.c_str());
   }
   return(0);
