@@ -4279,7 +4279,7 @@ void display() {
             else strcpy( playlistfilename_cover_path , "" );
             strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
             strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
-            keybufferindex=strlen(playlistfilename);        
+            // keybufferindex=strlen(playlistfilename);        
             //
             // play album then selected in tidal view.
             //
@@ -4324,13 +4324,12 @@ void display() {
             strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
             if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
             else strcpy(playlistfilename_cover_path,"");
-            keybufferindex=strlen(playlistfilename);
+            // keybufferindex=strlen(playlistfilename);
             strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
             strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
             // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
             // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
             // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-
             tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
             do_zoom_tidal_cover=true;                                       // show we play        
             snd=1;
@@ -4344,6 +4343,7 @@ void display() {
             show_uv=true;
             vis_uv_meter=true;
             do_zoom_tidal_cover=true;                                       // show we play
+            keybufferindex=0;
           } else {
             // error start playing
             // do_play_tidal_cover=false;                                          // do not show we play.
@@ -4374,10 +4374,14 @@ void display() {
             strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
             if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
             else strcpy(playlistfilename_cover_path,"");
-            keybufferindex=strlen(playlistfilename);
+            //keybufferindex=strlen(playlistfilename);
             strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
             strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
             tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            keybufferindex=0;
             do_zoom_tidal_cover=true;                                       // show we play        
             snd=1;
             show_uv=true;
@@ -9218,7 +9222,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (tidalknapnr>0)) {
             // rember name of playlist to save it later if needed and user press 'S' for save playlist this it is in use.
             strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
-            keybufferindex=strlen(playlistfilename);
+            // keybufferindex=strlen(playlistfilename);
             ask_open_dir_or_play_tidal=false;                                                               // close widow again
             switch (tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
               case 0: fprintf(stderr,"button nr %d play tidal playlist %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
@@ -10882,8 +10886,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
               }
             }
-            // 
+            // search main tidal oversigt
+
+            cout << "vis_tidal_oversigt=" << vis_tidal_oversigt << " ask_open_dir_or_play=" << ask_open_dir_or_play << "keybuffer = " << keybuffer << "keybufferindex=" << keybufferindex << endl;
+
             if (( vis_tidal_oversigt ) && ( ask_open_dir_or_play==false ) && ( do_show_tidal_search_oversigt == false ) && (keybufferindex<search_string_max_length)) {
+              cout << "do it" << endl;
               if (key!=13) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
