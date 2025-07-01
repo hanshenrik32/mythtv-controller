@@ -10887,9 +10887,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
               }
             }
+            //
             // search main tidal oversigt
-            if (( vis_tidal_oversigt ) && ( ask_open_dir_or_play==false ) && ( do_show_tidal_search_oversigt == false ) && (keybufferindex<search_string_max_length)) {
-              if (key!=13) {
+            //
+            if (( vis_tidal_oversigt ) && ( ask_open_dir_or_play==false ) && ( do_show_tidal_search_oversigt==false ) && (keybufferindex<search_string_max_length)) {
+              if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
