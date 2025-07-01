@@ -62,7 +62,6 @@ const int feed_url=2000;
 
 
 //bool tidal_debug_json=false;
-
 extern FILE *logfile;
 extern char localuserhomedir[4096];                                                         // get in main
 extern int debugmode;
@@ -4234,7 +4233,7 @@ int tidal_class::tidal_play_now_song(char *playlist_song,int tidalknapnr,bool no
     if (result==FMOD_OK) {
       if (sound) {
         result = sndsystem->playSound(sound,NULL, false, &channel);                       // start play
-        set_tidal_playing_flag(true);
+        set_tidal_playing_flag(true);        
       }
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile
     }
@@ -4597,21 +4596,19 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       // type of search
       switch (searchtype) {
-        case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+        case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
                 break;
         case 1: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_album);
                 break;
         case 2: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
                 break;
-        case 3: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
-                break;
-        default:glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+        default:glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
       }
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(0);
       glBegin(GL_QUADS); 
-      float yof_top=orgwinsizey-(buttonsizey*1)+20;                               // start ypos
+      float yof_top=orgwinsizey-((buttonsizey)+20);                               // start ypos
       float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
       glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
       glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
@@ -4621,17 +4618,18 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
 
       // show tidal search string
       glPushMatrix();
-      glTranslatef(xof+210+(buttonsize/2),yof+240,0);
+      // glTranslatef(xof+210+(buttonsize/2),yof+240,0);
+      glTranslatef(xof+210+(buttonsize/2),orgwinsizey-150,0);
       glDisable(GL_TEXTURE_2D);
-      glScalef(120, 120, 1.0);
+      glScalef(90, 90, 1.0);
       strcpy(searchstring,keybuffer);
       if (strcmp(searchstring,"")!=0) {
         glcRenderString(searchstring);
       }
       bool cursor=true;
       if (cursor) glcRenderString("_"); else glcRenderString(" ");
-    }
-
+      yof=orgwinsizey-((buttonsizey*2));                                        // start ypos
+    } else yof=orgwinsizey-(buttonsizey);                                        // start ypos
 
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       // load texture if not loaded

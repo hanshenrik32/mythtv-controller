@@ -540,8 +540,6 @@ extern mplaylist aktiv_playlist;                                                
 
 
 
-
-
 struct dirmusic_list_type {
     char name[200];
     unsigned int songlength;
@@ -4358,6 +4356,9 @@ void display() {
       }
       // play song
       if (tidal_oversigt.type==1) {
+        
+          // aktiv_playlist.clean_playlist();		// clear old playlist        
+
         if (strcmp(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),"")!=0) {
           // try load and start playing playlist
           if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) {
@@ -10878,7 +10879,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           }
           // hvis vi ikke gør andre ting
           if ((ask_save_playlist==false) || (save_ask_save_playlist==false)) {
-            // søg sang/artist navn
+            // gem søg sang/artist navn 
             if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
               if (key!=13) {
                 keybuffer[keybufferindex]=key;
@@ -10887,11 +10888,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
             // search main tidal oversigt
-
-            cout << "vis_tidal_oversigt=" << vis_tidal_oversigt << " ask_open_dir_or_play=" << ask_open_dir_or_play << "keybuffer = " << keybuffer << "keybufferindex=" << keybufferindex << endl;
-
             if (( vis_tidal_oversigt ) && ( ask_open_dir_or_play==false ) && ( do_show_tidal_search_oversigt == false ) && (keybufferindex<search_string_max_length)) {
-              cout << "do it" << endl;
               if (key!=13) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
@@ -14984,6 +14981,7 @@ void loadgfx() {
     tidal_big_search_bar_artist = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_artist");
     tidal_big_search_bar_album = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_album");
     tidal_big_search_bar_track = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_track");
+
 
     // radio options (O) key in radio oversigt
     radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
