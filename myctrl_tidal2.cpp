@@ -62,7 +62,6 @@ const int feed_url=2000;
 
 
 //bool tidal_debug_json=false;
-
 extern FILE *logfile;
 extern char localuserhomedir[4096];                                                         // get in main
 extern int debugmode;
@@ -2719,14 +2718,81 @@ int tidal_class::tidal_get_playlist(const char *playlist,bool force,bool create_
 
 
 // ****************************************************************************************
-//
+// 
+// in use in main line 3580
+//  update show result from db from search string
 //
 // ****************************************************************************************
 
 
-int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {
-  // not in use for now  
-  return(1);
+int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {    
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  bool dbexist=true;
+  std::string sqlselect="";
+  const char *database = (char *) "mythtvcontroller";
+  char downloadfilename[1024];
+  char downloadfilenamelong[1024];
+  std::string convertcommand= "";
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (conn) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
+      dbexist=false;
+    }
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+  }
+  antal=0;
+  // clear old view
+  clean_tidal_oversigt();
+  sqlselect=fmt::format("select name,p.paththumb,playpath,p.playlistid,t.id from mythtvcontroller.tidalcontent t left join mythtvcontroller.tidalcontentplaylist p on t.playlistid = p.playlistid WHERE t.name like '%{}%' order by t.name", keybuffer);
+  if (dbexist) {
+    //get_antal_rss_feeds_sources(conn);
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    if (mysql_query(conn,sqlselect.c_str())!=0) {
+      fprintf(stderr,"mysql insert error.\n");
+      fprintf(stderr,"SQL %s \n",sqlselect);
+    }
+    res = mysql_store_result(conn);
+    if (res) {
+      while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
+        if (antal<maxantal) {
+          stack[antal]=new (struct tidal_oversigt_type);
+          if (stack[antal]) {
+            strcpy(stack[antal]->feed_showtxt,"");          	            // show name
+            strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
+            strcpy(stack[antal]->feed_desc,"");                           // desc
+            strcpy(stack[antal]->feed_gfx_url,"");
+            strcpy(stack[antal]->feed_release_date,"");
+            strcpy(stack[antal]->playlisturl,"");
+            stack[antal]->feed_group_antal=0;
+            stack[antal]->feed_path_antal=0;
+            stack[antal]->textureId=0;
+            stack[antal]->intnr=atoi(row[4]);                               // id
+            stack[antal]->nyt=false;
+            stack[antal]->type=0;            
+            // top level (load playlist)
+            // load playlist songs
+            strncpy(stack[antal]->feed_showtxt,row[0],tidal_pathlength);
+            strncpy(stack[antal]->feed_name,row[0],tidal_namelength);
+            strncpy(stack[antal]->feed_gfx_url,row[1],tidal_namelength);
+            stack[antal]->type=1;              
+            strcpy(stack[antal]->playlistid,row[2]);                              // id is path here
+            antal++;
+          }
+        }
+      }
+      mysql_close(conn);
+    } else {
+      fprintf(stderr,"No tidal data loaded \n");
+    }
+  }
+  this->type=1; // set type songs
+  antalplaylists=antal;  
+  return(antal);  
 }
 
 
@@ -4167,7 +4233,7 @@ int tidal_class::tidal_play_now_song(char *playlist_song,int tidalknapnr,bool no
     if (result==FMOD_OK) {
       if (sound) {
         result = sndsystem->playSound(sound,NULL, false, &channel);                       // start play
-        set_tidal_playing_flag(true);
+        set_tidal_playing_flag(true);        
       }
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile
     }
@@ -4510,6 +4576,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   struct timeval tim;
   static bool gfx_loaded=false;
   static int gfx_loadnr=0;
+  char searchstring[200];
   if (timefirsttime==false) {
     timefirsttime=true;
     tim.tv_usec=0;
@@ -4523,6 +4590,47 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   glTranslatef(0,0,0.0f);
   // do tidal works ?
   if (strcmp(tidaltoken,"")) {
+    if (strcmp(keybuffer,"")!=0) {
+      // top
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      // type of search
+      switch (searchtype) {
+        case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
+                break;
+        case 1: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_album);
+                break;
+        case 2: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+                break;
+        default:glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
+      }
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(0);
+      glBegin(GL_QUADS); 
+      float yof_top=orgwinsizey-((buttonsizey)+20);                               // start ypos
+      float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
+      glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+buttonsizey-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+      glEnd();
+
+      // show tidal search string
+      glPushMatrix();
+      // glTranslatef(xof+210+(buttonsize/2),yof+240,0);
+      glTranslatef(xof+210+(buttonsize/2),orgwinsizey-150,0);
+      glDisable(GL_TEXTURE_2D);
+      glScalef(90, 90, 1.0);
+      strcpy(searchstring,keybuffer);
+      if (strcmp(searchstring,"")!=0) {
+        glcRenderString(searchstring);
+      }
+      bool cursor=true;
+      if (cursor) glcRenderString("_"); else glcRenderString(" ");
+      yof=orgwinsizey-((buttonsizey*2));                                        // start ypos
+    } else yof=orgwinsizey-(buttonsizey);                                        // start ypos
+
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       // load texture if not loaded
       if (this->texture_loaded==false) {

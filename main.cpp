@@ -540,8 +540,6 @@ extern mplaylist aktiv_playlist;                                                
 
 
 
-
-
 struct dirmusic_list_type {
     char name[200];
     unsigned int songlength;
@@ -3584,8 +3582,8 @@ void display() {
           tidal_oversigt.opdatere_tidal_oversigt_searchtxt(keybuffer,1);   // find do search for song name
         // tidal_oversigt.set_search_loaded();                               // triger icon loader
         tidal_oversigt.load_tidal_iconoversigt();
-        // keybuffer[0] = 0;
-        // keybufferindex = 0;
+        keybuffer[0] = 0;
+        keybufferindex = 0;
       }
     }
     tidal_oversigt_loaded_begin=false;
@@ -4255,102 +4253,143 @@ void display() {
     tidal_start_delay=0;
     ask_open_dir_or_play_tidal=false;
     tidal_oversigt.startplay=false;                                                   // stop starting more that one in next run
-    if (strcmp(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),"")!=0) {
-      // try load and start playing playlist
-      if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==0) {
-        // stop last song playing
-        if (snd) {
-          // yes stop play
-          // stop old playing
-          sound->release();                                                                       // stop last playing song
-          dsp = 0;                                                                                  // reset uv
-          ERRCHECK(result,0);
-          snd=0;                                // set play new flag
-        }
-        write_logfile(logfile,(char *) "Tidal start play play album");
-        // int antal_i_oversigt = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
-        
-        // rember name of playlist to save it later
-        strcpy( playlistfilename , tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1) );          // get name of playlist
-        if ( strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0 ) strcpy( playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1) );
-        else strcpy( playlistfilename_cover_path , "" );
-        strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
-        strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
-        keybufferindex=strlen(playlistfilename);        
-        //
-        // play album then selected in tidal view.
-        //
-        do_zoom_tidal_cover=true;                                       // show we play
-        antal_i_tidal_playlist = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
-        snd = 1;                                // set play new flag
-        if (antal_i_tidal_playlist) {
-          tidal_oversigt.tidal_set_aktiv_song(0);
+    // playlist play
+    if (tidal_oversigt.streamantal()>0) {
+      if (tidal_oversigt.type==0) {
+        if (strcmp(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),"")!=0) {
+          // try load and start playing playlist
+          if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==0) {
+            // stop last song playing
+            if (snd) {
+              // yes stop play
+              // stop old playing
+              sound->release();                                                                       // stop last playing song
+              dsp = 0;                                                                                  // reset uv
+              ERRCHECK(result,0);
+              snd=0;                                // set play new flag
+            }
+            write_logfile(logfile,(char *) "Tidal start play play album");
+            // int antal_i_oversigt = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
+            
+            // rember name of playlist to save it later
+            strcpy( playlistfilename , tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1) );          // get name of playlist
+            if ( strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0 ) strcpy( playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1) );
+            else strcpy( playlistfilename_cover_path , "" );
+            strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
+            strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
+            // keybufferindex=strlen(playlistfilename);        
+            //
+            // play album then selected in tidal view.
+            //
+            do_zoom_tidal_cover=true;                                       // show we play
+            antal_i_tidal_playlist = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
+            snd = 1;                                // set play new flag
+            if (antal_i_tidal_playlist) {
+              tidal_oversigt.tidal_set_aktiv_song(0);
+            } else {
+              tidal_oversigt.tidal_set_aktiv_song(-1);
+            }
+          }
+
+          // debug code
+          // printf("antal_i_tidal_playlist %d func get_aktiv_played_song return %d \n",antal_i_tidal_playlist,tidal_oversigt.get_aktiv_played_song());
+
+          // try load and play song
+          if ((tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) && (antal_i_tidal_playlist)) {
+            if (snd) {
+              // yes stop play
+              // stop old playing
+              sound->release();                                                                       // stop last playing song
+              dsp = 0;                                                                                  // reset uv
+              ERRCHECK(result,0);
+              snd=0;                                // set play new flag
+            }
+            write_logfile(logfile,(char *) "Tidal start play song");
+            tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);                
+          }
+          // try play search result
+          if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==2) {
+            do_play_tidal=false;
+            if (snd) {
+              // yes stop play
+              // stop old playing
+              sound->release();                                                                       // stop last playing song
+              dsp = 0;                                                                                  // reset uv
+              ERRCHECK(result,0);
+              snd=0;                                // set play new flag
+            }
+            write_logfile(logfile,(char *) "Tidal start play search result");
+            strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
+            if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
+            else strcpy(playlistfilename_cover_path,"");
+            // keybufferindex=strlen(playlistfilename);
+            strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
+            strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            do_zoom_tidal_cover=true;                                       // show we play        
+            snd=1;
+            show_uv=true;
+            vis_uv_meter=true;
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+          }
+          if (tidal_player_start_status == 0 ) {
+            fprintf(stderr,"tidal start play return ok.\n");
+            snd=1;
+            show_uv=true;
+            vis_uv_meter=true;
+            do_zoom_tidal_cover=true;                                       // show we play
+            keybufferindex=0;
+          } else {
+            // error start playing
+            // do_play_tidal_cover=false;                                          // do not show we play.
+            // do_zoom_tidal_cover=false;                                       // show we play
+            //write_logfile(logfile,(char *) "Error loading tidal song");
+            // snd=0;                                                                       // 1=1
+          }
         } else {
-          tidal_oversigt.tidal_set_aktiv_song(-1);
+          printf("Error tidal playid is missing %s.\n",playlistfileid);
+          write_logfile(logfile,(char *) "Error tidal playid is missing");
         }
       }
+      // play song
+      if (tidal_oversigt.type==1) {
+        
+          // aktiv_playlist.clean_playlist();		// clear old playlist        
 
-      // debug code
-      // printf("antal_i_tidal_playlist %d func get_aktiv_played_song return %d \n",antal_i_tidal_playlist,tidal_oversigt.get_aktiv_played_song());
-
-      // try load and play song
-      if ((tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) && (antal_i_tidal_playlist)) {
-        if (snd) {
-          // yes stop play
-          // stop old playing
-          sound->release();                                                                       // stop last playing song
-          dsp = 0;                                                                                  // reset uv
-          ERRCHECK(result,0);
-          snd=0;                                // set play new flag
-        }
-        write_logfile(logfile,(char *) "Tidal start play song");
-        tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);                
+        if (strcmp(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),"")!=0) {
+          // try load and start playing playlist
+          if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) {
+            // stop last song playing
+            if (snd) {
+              // yes stop play
+              // stop old playing
+              sound->release();                                                                       // stop last playing song
+              dsp = 0;                                                                                  // reset uv
+              ERRCHECK(result,0);
+              snd=0;                                // set play new flag
+            }
+            write_logfile(logfile,(char *) "Tidal start play play album");
+            strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
+            if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
+            else strcpy(playlistfilename_cover_path,"");
+            //keybufferindex=strlen(playlistfilename);
+            strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
+            strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            keybufferindex=0;
+            do_zoom_tidal_cover=true;                                       // show we play        
+            snd=1;
+            show_uv=true;
+            vis_uv_meter=true;
+          }
+        }       
       }
-      // try play search result
-      if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==2) {
-        do_play_tidal=false;
-        if (snd) {
-          // yes stop play
-          // stop old playing
-          sound->release();                                                                       // stop last playing song
-          dsp = 0;                                                                                  // reset uv
-          ERRCHECK(result,0);
-          snd=0;                                // set play new flag
-        }
-        write_logfile(logfile,(char *) "Tidal start play search result");
-        strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
-        if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
-        else strcpy(playlistfilename_cover_path,"");
-        keybufferindex=strlen(playlistfilename);
-        strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
-        strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
-        // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-        // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-
-        tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-        do_zoom_tidal_cover=true;                                       // show we play        
-        snd=1;
-        show_uv=true;
-        vis_uv_meter=true;
-        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-      }
-      if (tidal_player_start_status == 0 ) {
-        fprintf(stderr,"tidal start play return ok.\n");
-        snd=1;
-        show_uv=true;
-        vis_uv_meter=true;
-        do_zoom_tidal_cover=true;                                       // show we play
-      } else {
-        // error start playing
-        // do_play_tidal_cover=false;                                          // do not show we play.
-        // do_zoom_tidal_cover=false;                                       // show we play
-        //write_logfile(logfile,(char *) "Error loading tidal song");
-        // snd=0;                                                                       // 1=1
-      }
-    } else {
-      printf("Error tidal playid is missing %s.\n",playlistfileid);
-      write_logfile(logfile,(char *) "Error tidal playid is missing");
     }
   }
   // end start play tidal
@@ -9184,7 +9223,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (tidalknapnr>0)) {
             // rember name of playlist to save it later if needed and user press 'S' for save playlist this it is in use.
             strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
-            keybufferindex=strlen(playlistfilename);
+            // keybufferindex=strlen(playlistfilename);
             ask_open_dir_or_play_tidal=false;                                                               // close widow again
             switch (tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
               case 0: fprintf(stderr,"button nr %d play tidal playlist %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
@@ -10840,7 +10879,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           }
           // hvis vi ikke gør andre ting
           if ((ask_save_playlist==false) || (save_ask_save_playlist==false)) {
-            // søg sang/artist navn
+            // gem søg sang/artist navn 
             if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
               if (key!=13) {
                 keybuffer[keybufferindex]=key;
@@ -10848,11 +10887,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
               }
             }
-            if (( vis_tidal_oversigt ) && ( ask_open_dir_or_play==false ) && ( do_show_tidal_search_oversigt == false )) {
-              if (key!=13) {
+            //
+            // search main tidal oversigt
+            //
+            if (( vis_tidal_oversigt ) && ( ask_open_dir_or_play==false ) && ( do_show_tidal_search_oversigt==false ) && (keybufferindex<search_string_max_length)) {
+              if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
+                keybufferopenwin=true;
               }
             }
           }
@@ -11876,6 +11919,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // set play playlist flag
                   // it is not playing (find error)
                   do_play_tidal=tidalknapnr;
+                }
+                if (do_show_tidal_search_oversigt==false) {
+                  hent_tidal_search=true;
                 }
               }              
               if (vis_spotify_oversigt) {
@@ -14937,6 +14983,7 @@ void loadgfx() {
     tidal_big_search_bar_artist = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_artist");
     tidal_big_search_bar_album = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_album");
     tidal_big_search_bar_track = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_track");
+
 
     // radio options (O) key in radio oversigt
     radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");

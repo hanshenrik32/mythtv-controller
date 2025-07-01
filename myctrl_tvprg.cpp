@@ -250,8 +250,8 @@ unsigned long get_cannel_id(MYSQL *conn,char *channelname) {
 //
 // ****************************************************************************************
 
-bool do_cannel_exist(MYSQL *conn,char *channelname) {
-  char sql[4096];
+bool do_cannel_exist(MYSQL *conn,char *channelname) {  
+  std::string channelname_str;
   MYSQL_RES *res;
   MYSQL_ROW row;
   unsigned long id=0;
@@ -259,8 +259,10 @@ bool do_cannel_exist(MYSQL *conn,char *channelname) {
     if (conn) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      sprintf(sql,"select chanid from channel where callsign like '%s'",channelname);
-      mysql_query(conn,sql);
+      channelname_str = "select chanid from channel where callsign like '";
+      channelname_str += channelname;
+      channelname_str += "'";
+      mysql_query(conn,channelname_str.c_str());
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
@@ -281,7 +283,7 @@ bool do_cannel_exist(MYSQL *conn,char *channelname) {
 // ****************************************************************************************
 
 bool do_program_exist(MYSQL *conn,int pchanid,char *ptitle,char *pstarttime) {
-  char sql[4096];
+  std::string sql_str;
   MYSQL_RES *res;
   MYSQL_ROW row;
   unsigned long id=0;
@@ -289,8 +291,8 @@ bool do_program_exist(MYSQL *conn,int pchanid,char *ptitle,char *pstarttime) {
     if (conn) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      sprintf(sql,"select chanid from program where chanid=%d and starttime like '%s' limit 1",pchanid,pstarttime);
-      mysql_query(conn,sql);
+      sql_str = fmt::format("select chanid from program where chanid={} and starttime like '{}' limit 1",pchanid,pstarttime);
+      mysql_query(conn,sql_str.c_str());
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
@@ -2998,7 +3000,7 @@ void tv_oversigt::cleartvguide() {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
-  char sqlstr[2048];
+  std::string sqlstr;
   // mysql stuf
   conn=mysql_init(NULL);
   // Connect to database
@@ -3008,18 +3010,18 @@ void tv_oversigt::cleartvguide() {
       mysql_error(conn);
       error=1;
     }
-    if (error==0) {
-      strcpy(sqlstr,"delete from mythtvcontroller.channel where chanid like '%'");
-      mysql_query(conn,sqlstr);
+    if (error==0) {      
+      sqlstr = "delete from mythtvcontroller.channel where chanid like '%'";
+      mysql_query(conn,sqlstr.c_str());
       mysql_free_result(res);
-      strcpy(sqlstr,"delete from mythtvcontroller.program where chanid like '%'");
-      mysql_query(conn,sqlstr);
+      sqlstr = "delete from mythtvcontroller.program where chanid like '%'";
+      mysql_query(conn,sqlstr.c_str());
       mysql_free_result(res);
-      strcpy(sqlstr,"delete from mythtvcontroller.programgenres where chanid like '%'");
-      mysql_query(conn,sqlstr);
+      sqlstr = "delete from mythtvcontroller.programgenres where chanid like '%'";
+      mysql_query(conn,sqlstr.c_str());
       mysql_free_result(res);
-      strcpy(sqlstr,"delete from mythtvcontroller.programrating where chanid like '%'");
-      mysql_query(conn,sqlstr);
+      sqlstr = "delete from mythtvcontroller.programrating where chanid like '%'";
+      mysql_query(conn,sqlstr.c_str());
       mysql_free_result(res);
       mysql_close(conn);
     }

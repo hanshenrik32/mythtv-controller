@@ -27,6 +27,10 @@
 extern FILE *logfile;
 extern char debuglogdata[1024];                                  // used by log system
 
+extern int orgwinsizey;                                                         // screen size
+extern int orgwinsizex;
+
+
 extern float configdefaultradiofontsize;
 extern const char *dbname;                                    // db name in mysql
 extern char configmysqluser[256];                             //
@@ -455,8 +459,6 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 // show radio stations overview
 //
 // ****************************************************************************************
-extern int orgwinsizey;                                                         // screen size
-extern int orgwinsizex;
 
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
   static bool show_all_kode_errors=false;
