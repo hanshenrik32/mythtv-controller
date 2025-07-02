@@ -3941,16 +3941,9 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   bool swap=true;
   // download stuf to be played if not downloaded before
   // check if exist
-  recnr=0;
-  while (recnr<199) {
-    strcpy( tidal_aktiv_song[recnr].artist_name, "" );
-    strcpy( tidal_aktiv_song[recnr].cover_image_url, "" );
-    strcpy( tidal_aktiv_song[recnr].song_name, "" );
-    strcpy( tidal_aktiv_song[recnr].playlistid, "" );                                                  // playlistid
-    strcpy( tidal_aktiv_song[recnr].playurl, "" );                                                     // play path
-    tidal_aktiv_song[recnr].cover_image=0;
-    recnr++;
-  }
+  
+  clear_tidal_aktiv_songlist();
+
   conn=mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
   // check playlist exist
@@ -4537,6 +4530,30 @@ int tidal_class::tidal_refresh_token() {
   return(httpCode);
 }
 
+
+
+// ****************************************************************************************
+//
+// 
+// 
+//  
+// ****************************************************************************************
+
+void tidal_class::clear_tidal_aktiv_songlist() {
+  int recnr=0;
+  tidal_aktiv_song_antal=0;                                                      // reset antal songs in playlist
+  tidal_aktiv_song_nr=0;                                                         // reset active song nr  
+  // clear all song data
+  while (recnr<199) {
+    strcpy( tidal_aktiv_song[recnr].artist_name, "" );
+    strcpy( tidal_aktiv_song[recnr].cover_image_url, "" );
+    strcpy( tidal_aktiv_song[recnr].song_name, "" );
+    strcpy( tidal_aktiv_song[recnr].playlistid, "" );                                                  // playlistid
+    strcpy( tidal_aktiv_song[recnr].playurl, "" );                                                     // play path
+    tidal_aktiv_song[recnr].cover_image=0;
+    recnr++;
+  }
+}
 
 
 // ****************************************************************************************
