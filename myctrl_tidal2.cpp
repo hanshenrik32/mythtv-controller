@@ -514,7 +514,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
       // Now update play files in db.
       i=0;
       while(i<tidal_aktiv_song_antal) {
-        temptxt=fmt::format("insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values ('{}','{}','{}','{}',0) ON DUPLICATE KEY UPDATE playpath='{}'", tidal_aktiv_song[i].song_name, tidal_aktiv_song[i].cover_image_url, tidal_aktiv_song[i].playurl,playlstid,tidal_aktiv_song[i].playurl);
+        temptxt=fmt::format("insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,play_antal,id) values ('{}','{}','{}','{}',0,0) ON DUPLICATE KEY UPDATE playpath='{}'", tidal_aktiv_song[i].song_name, tidal_aktiv_song[i].cover_image_url, tidal_aktiv_song[i].playurl,playlstid,tidal_aktiv_song[i].playurl);
         // printf("SQL : %s \n ",temptxt);
         mysql_query(conn,temptxt.c_str());
         res = mysql_store_result(conn);
@@ -1149,7 +1149,7 @@ int tidal_class::get_users_album(char *albumid) {
       }
       if (dbexist==false) {
         // backup
-        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playpath varchar(255), playlistid varchar(255) ,id int NOT NULL AUTO_INCREMENT) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playpath varchar(255), playlistid varchar(255) ,play_antal bigint ,id int NOT NULL AUTO_INCREMENT) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");
           // fprintf(stdout,"SQL : %s\n",sql);
@@ -1248,7 +1248,7 @@ int tidal_class::get_users_album(char *albumid) {
           std::string sql1;
           if ((!(playlistexist)) && (stack)) {
             // snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontent (name,paththumb, playpath, playlistid ,id) values ('%s','%s','%s',%d)", albumid , stack[0]->feed_gfx_url, albumid, "", 0 );
-            sql1 = fmt::format("insert into mythtvcontroller.tidalcontent (name,paththumb, playpath, playlistid ,id) values ('{}','{}','{}',{})", albumid , stack[0]->feed_gfx_url, albumid, "", 0 );
+            sql1 = fmt::format("insert into mythtvcontroller.tidalcontent (name,paththumb, playpath, playlistid, play_antal ,id) values ('{}','{}','{}',{})", albumid , stack[0]->feed_gfx_url, albumid, "",0 , 0 );
             //fprintf(stdout,"SQL : %s\n",sql);
             if (mysql_query(conn,sql1.c_str())!=0) {
               write_logfile(logfile,(char *) "mysql create table error.");
@@ -1908,7 +1908,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
             }
             if (dbexist==false) {
               // create db (tidal songs table)           
-              sqll="CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playpath varchar(255), playlistid varchar(255) ,id int NOT NULL AUTO_INCREMENT KEY) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+              sqll="CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playpath varchar(255), playlistid varchar(255) , play_antal bigint,id int NOT NULL AUTO_INCREMENT KEY) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
               if (mysql_query(conn,sqll.c_str())!=0) {
                 write_logfile(logfile,(char *) "mysql create table error.");
                 fprintf(stdout,"SQL : %s\n",sqll.c_str());
@@ -3871,7 +3871,7 @@ void convert_m4a_to_flac(char *path) {
         checkfilexist_name = checkfilexist_name + files[i];
         checkfilexist_name = checkfilexist_name + ".flac";
         // create records if needed
-        sql1="insert into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, id) values (\"" + files[i] + "\",\"\",\"" + checkfilexist_name + "\"," + playlist_id + "," + "0)";
+        sql1="insert into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, play_antal, id) values (\"" + files[i] + "\",\"\",\"" + checkfilexist_name + "\"," + playlist_id + "," + "0,0)";
         // printf("add record to tidal db sql %s \n",sql1.c_str());
         if (conn) {
           if (mysql_query(conn,sql1.c_str())!=0) {
@@ -3978,7 +3978,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
     }
     recnr=0;
     // get playlist from db
-    // sqlstring = "select name,playpath,playlistid,playlistgfx from mythtvcontroller.tidalcontent where playlistid like ";
     sqlstring = "select name,playpath,tidalcontent.playlistid,tidalcontentplaylist.paththumb,release_date from mythtvcontroller.tidalcontent , mythtvcontroller.tidalcontentplaylist where tidalcontentplaylist.playlistid=tidalcontent.playlistid and tidalcontentplaylist.playlistid like ";
     sqlstring = sqlstring + stack[tidalknapnr]->playlistid;
     sqlstring = sqlstring + " order by name";
@@ -4121,7 +4120,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         error=system(convcommand.c_str());
       }
       // build file path to play.
-      playfile = fmt::format("{}{}/{}",tidal_download_home,stack[tidalknapnr]->playlistid,dir_file_array[0]);
+      playfile = fmt::format("{}{}/{}",tidal_download_home ,stack[tidalknapnr]->playlistid ,dir_file_array[0]);
       if ( file_exists(playfile.c_str()) == true ) {
         result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
         // start play first song
@@ -4146,8 +4145,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         pthread_join(loaderthread,NULL);
         */
         
-        // conn=mysql_init(NULL);
-        // mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         // hent song names from db
         std::string sql1;
         sql1 = fmt::format("select name, playpath from mythtvcontroller.tidalcontent where playlistid like '{}' order by name",stack[tidalknapnr]->playlistid);
