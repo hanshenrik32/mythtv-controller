@@ -262,6 +262,7 @@ class tidal_class {
     int opdatere_tidal_userCollections(char *uid);
     int opdatere_tidal_userCollections2(char *uid);
     void show_setup_tidal();
+    void clear_tidal_aktiv_songlist();
 };
 
 #endif
