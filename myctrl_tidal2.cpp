@@ -4011,6 +4011,9 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         if (result==FMOD_OK) {
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
           if (sndsystem) channel->setVolume(configsoundvolume);                                                         // set play volume from configfile
+          sqlstring = fmt::format("update tidalcontentplaylist set play_count=play_count+1 where playlistid={}",stack[tidalknapnr]->playlistid);
+          mysql_query(conn,sqlstring.c_str());
+          mysql_res = mysql_store_result(conn);
         }
       }
     }
@@ -4129,6 +4132,9 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
           if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
         }
+        sqlstring = fmt::format("update tidalcontentplaylist set play_count=play_count+1 where playlistid={}",stack[tidalknapnr]->playlistid);
+        mysql_query(conn,sqlstring.c_str());
+
         // convert the rest of the m4a files we have downloed to be able to play it in fmod
         // no thread version
         convert_m4a_to_flac(stack[tidalknapnr]->playlistid);
