@@ -119,7 +119,7 @@ class tidal_class {
     // used by process_tidal_get_artists_all_albums to process json files
     void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
     void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
-
+    int update_playcount(const char *playpath);
   public:
     bool search_loaded;
     bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded

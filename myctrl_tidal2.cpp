@@ -3305,6 +3305,35 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
   if (antal==-1) return(-1); else return(httpCode);
 }
 
+// ****************************************************************************************
+//
+// update playcountin_db
+//
+// ****************************************************************************************
+
+int tidal_class::update_playcount(const char *playpath) {
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;  
+  std::string sqlstring;
+  const char *database = (char *) "mythtvcontroller";
+  conn=mysql_init(NULL);
+  if (conn) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
+      fprintf(stderr,"Failed to connect to database: %s Error: %s\n",database,mysql_error(conn));
+      return(0);
+    }
+    mysql_query(conn,"set NAMES 'utf8'");
+    sqlstring=fmt::format("update mythtvcontroller.tidalcontent set play_count=play_count+1 where playpath='{}'", playpath);
+    if (mysql_query(conn,sqlstring.c_str())==0) {
+      res = mysql_store_result(conn);
+      mysql_free_result(res);
+    }
+    mysql_close(conn);
+  }
+  return(1);
+}
+
 
 // ****************************************************************************************
 //
@@ -3324,6 +3353,7 @@ int tidal_class::tidal_next_play() {
       if (sound) {
         result = sndsystem->playSound(sound,NULL, false, &channel);
         set_tidal_playing_flag(true);
+        update_playcount(tidal_aktiv_song[tidal_aktiv_song_nr].playurl);
       }
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
       logstring="Tidal play song : ";
@@ -3353,6 +3383,7 @@ int tidal_class::tidal_last_play() {
       if (sound) {
         result = sndsystem->playSound(sound,NULL, false, &channel);
         set_tidal_playing_flag(true);
+        update_playcount(tidal_aktiv_song[tidal_aktiv_song_nr].playurl);
       }
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
       logstring="Tidal play song : ";
@@ -4011,7 +4042,8 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         if (result==FMOD_OK) {
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
           if (sndsystem) channel->setVolume(configsoundvolume);                                                         // set play volume from configfile
-          sqlstring = fmt::format("update tidalcontentplaylist set play_count=play_count+1 where playlistid={}",stack[tidalknapnr]->playlistid);
+          //update play count in db
+          sqlstring = fmt::format("update mythtvcontroller.tidalcontent set play_count=play_count+1 where playlistid={} and playpath='{}'",stack[tidalknapnr]->playlistid,tidal_aktiv_song[0].playurl);
           mysql_query(conn,sqlstring.c_str());
           mysql_res = mysql_store_result(conn);
         }
@@ -4150,7 +4182,12 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         // wait for thread is done downloading songs
         pthread_join(loaderthread,NULL);
         */
-        
+
+        // update play count in db
+        sqlstring = fmt::format("update mythtvcontroller.tidalcontent set play_count=play_count+1 where playlistid={}",stack[tidalknapnr]->playlistid);
+        mysql_query(conn,sqlstring.c_str());
+
+
         // hent song names from db
         std::string sql1;
         sql1 = fmt::format("select name, playpath from mythtvcontroller.tidalcontent where playlistid like '{}' order by name",stack[tidalknapnr]->playlistid);
