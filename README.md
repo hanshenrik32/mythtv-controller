@@ -10,6 +10,8 @@ Run on most debian based systems, like Ubuntu.
 
 Version.
 
+mythtv-controller ver 0.43.4
+
 mythtv-controller ver 0.43.2
 
 mythtv-controller ver 0.43.1
