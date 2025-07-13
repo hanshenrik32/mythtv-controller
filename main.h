@@ -203,7 +203,7 @@ class config_icons {
     std::string config_reset_search_icon;
 
     config_icons() {
-      config_tema_path="/opt/mythtv-controller/tema1/";
+      config_tema_path="/opt/mythtv-controller/tema3/";
       config_tvguidex = 1920;
       config_tvguidey = 1080;
       config_tvguide_icon = "tv";

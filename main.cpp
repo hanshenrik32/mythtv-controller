@@ -14921,11 +14921,11 @@ void loadgfx() {
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
     setupupdatebutton     = loadgfxfile(temapath,(char *) "images/",(char *) "updatebutton");
     setuptvgraberback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptvgraberback");
-    _textureIdtv         	= loadgfxfile(temapath,(char *) "buttons/",(char *) config_menu.config_tvguide_icon.c_str());  // "tv"
-    _textureIdmusic     	= loadgfxfile(temapath,(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());  // "music");
+    _textureIdtv         	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tvguide_icon.c_str());  // "tv"
+    _textureIdmusic     	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());  // "music");
     _textureIplaylistsave	= loadgfxfile(temapath,(char *) "images/",(char *) "playlist_save");
-    _textureIdfilm       	= loadgfxfile(temapath,(char *) "buttons/",(char *) config_menu.config_movie_icon.c_str());  // "movie");
-    _textureIdrecorded  	= loadgfxfile(temapath,(char *) "buttons/",(char *) config_menu.config_recorded_icon.c_str()); // "recorded");
+    _textureIdfilm       	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_movie_icon.c_str());  // "movie");
+    _textureIdrecorded  	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_recorded_icon.c_str()); // "recorded");
     _texturemlast       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaylast");
     _texturemlast2      	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaylast");
     _texturemnext       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaynext");
@@ -14940,16 +14940,14 @@ void loadgfx() {
     _textureIdradiosearch = loadgfxfile(temapath,(char *) "images/",(char *) "radio_search");
     _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "playlist_search");
     _textureIdmoviesearch = loadgfxfile(temapath,(char *) "images/",(char *) "movie_search");
-    
-    _textureIdloading   	= loadgfxfile(temapath,(char *) "images/",(char *) config_menu.config_loading_icon.c_str()); // "loading");			// window
-
-    _textureIdplayinfo  	= loadgfxfile(temapath,(char *) "buttons/",(char *) config_menu.config_playinfo_icon.c_str()); // "playinfo");
+    _textureIdloading   	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_loading_icon.c_str()); // "loading");			// window
+    _textureIdplayinfo  	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_playinfo_icon.c_str()); // "playinfo");
     _textureIdclose     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close");
     _textureIdclose1    	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close1");
     _texturelock        	= loadgfxfile(temapath,(char *) "images/",(char *) "lock");
     // ************************ icons ******************************************
-    _texturesetupmenu   	= loadgfxfile(temapath,(char *) "buttons/",(char *) config_menu.config_setup_icon.c_str());     // "setupmenu");				// setup menu
-    _texturesetupmenu_select	= loadgfxfile(temapath,(char *) "buttons/",(char *) config_menu.config_setup_selected_icon.c_str()); // "setupmenu1");		// setup menu selected
+    _texturesetupmenu   	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_setup_icon.c_str());     // "setupmenu");				// setup menu
+    _texturesetupmenu_select	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_setup_selected_icon.c_str()); // "setupmenu1");		// setup menu selected
     _texturesoundsetup		= loadgfxfile(temapath,(char *) "images/",(char *) "setupsound");
     _texturesourcesetup		= loadgfxfile(temapath,(char *) "images/",(char *) "setupsource");
     _textureimagesetup		= loadgfxfile(temapath,(char *) "images/",(char *) "setupimg");
