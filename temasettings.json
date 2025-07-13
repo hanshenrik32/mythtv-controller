@@ -1,0 +1,268 @@
+{
+    "tema1": {
+        "name": "Tema 1",
+        "icon": "tema1.png",
+        "iconpath": "/home/hans/datadisk/mythtv-controller-0.38/tema1.png",
+        "icons" : {
+            "tvguide": {
+                "icon_path": "buttons/tv.png",
+                "x": 1920,
+                "y": 1080
+            },
+            "music": {
+                "icon_path": "music_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "media": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "spotify": {
+                "icon_path": "spotify_button.png",
+                "x": 1920,
+                "y": 1080
+            },
+            "tidal": {
+                "icon_path": "tidal_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "radio": {
+                "icon_path": "radio_button.png",
+                "x": 1920,
+                "y": 696
+            },
+            "flac": {
+                "icon_path": "music.png",
+                "x": 1920,
+                "y": 504
+            },
+            "recorded": {
+                "icon_path": "recorded.png",
+                "x": 1920,
+                "y": 400
+            },
+            "podcast": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "movie": {
+                "icon_path": "movie.png",
+                "x": 1920,
+                "y": 696
+            },
+            "close": {
+                "icon_path": "images/close.png",
+                "x": 1920,
+                "y": 300
+            },
+            "setup": {
+                "icon_path": "setupmenu.png",
+                "x": 1920,
+                "y": 300
+            }
+        }
+    },
+    "tema2": {
+        "name": "Tema 2",
+        "icon": "tema2.png",
+        "iconpath": "/home/hans/datadisk/mythtv-controller-0.38/tema2.png",
+        "icons" : {
+                "icon_path": "tvguide.png",
+                "x": 1920,
+                "y": 1080
+            },
+            "music": {
+                "icon_path": "music_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "media": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "spotify": {
+                "icon_path": "spotify_button.png",
+                "x": 1920,
+                "y": 1080
+            },
+            "tidal": {
+                "icon_path": "tidal_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "radio": {
+                "icon_path": "radio_button.png",
+                "x": 1920,
+                "y": 696
+            },
+            "flac": {
+                "icon_path": "music.png",
+                "x": 1920,
+                "y": 504
+            },
+            "recorded": {
+                "icon_path": "recorded.png",
+                "x": 1920,
+                "y": 400
+            },
+            "podcast": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "movie": {
+                "icon_path": "movie.png",
+                "x": 1920,
+                "y": 696
+            },
+            "close": {
+                "icon_path": "images/close.png",
+                "x": 1920,
+                "y": 300
+            },
+            "setup": {
+                "icon_path": "setupmenu.png",
+                "x": 1920,
+                "y": 300
+            }
+        }
+    },
+    "tema3": {
+        "name": "Tema 3",
+        "icon": "tema2.png",
+        "iconpath": "/home/hans/datadisk/mythtv-controller-0.38/tema2.png",
+        "icons" : {
+                "icon_path": "tvguide.png",
+                "x": 1920,
+                "y": 1080
+            },
+            "music": {
+                "icon_path": "music_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "media": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "spotify": {
+                "icon_path": "spotify_button.png",
+                "x": 1920,
+                "y": 1080
+            },
+            "tidal": {
+                "icon_path": "tidal_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "radio": {
+                "icon_path": "radio_button.png",
+                "x": 1920,
+                "y": 696
+            },
+            "flac": {
+                "icon_path": "music.png",
+                "x": 1920,
+                "y": 504
+            },
+            "recorded": {
+                "icon_path": "recorded.png",
+                "x": 1920,
+                "y": 400
+            },
+            "podcast": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "movie": {
+                "icon_path": "movie.png",
+                "x": 1920,
+                "y": 696
+            },
+            "close": {
+                "icon_path": "images/close.png",
+                "x": 1920,
+                "y": 300
+            },
+            "setup": {
+                "icon_path": "setupmenu.png",
+                "x": 1920,
+                "y": 300
+            }
+        }
+    },
+    "tema4": {
+        "name": "Tema 4",
+        "icon": "tema4.png",
+        "iconpath": "/home/hans/datadisk/mythtv-controller-0.38/tema4.png",
+        "icons" : {
+                "icon_path": "tvguide.png",
+                "x": 1920,
+                "y": 1080
+            },
+            "music": {
+                "icon_path": "music_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "media": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "spotify": {
+                "icon_path": "spotify_button.png",
+                "x": 1920,
+                "y": 1080
+            },
+            "tidal": {
+                "icon_path": "tidal_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "radio": {
+                "icon_path": "radio_button.png",
+                "x": 1920,
+                "y": 696
+            },
+            "flac": {
+                "icon_path": "music.png",
+                "x": 1920,
+                "y": 504
+            },
+            "recorded": {
+                "icon_path": "recorded.png",
+                "x": 1920,
+                "y": 400
+            },
+            "podcast": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "movie": {
+                "icon_path": "movie.png",
+                "x": 1920,
+                "y": 696
+            },
+            "close": {
+                "icon_path": "images/close.png",
+                "x": 1920,
+                "y": 300
+            },
+            "setup": {
+                "icon_path": "setupmenu.png",
+                "x": 1920,
+                "y": 300
+            }
+        }
+    }
+}
+

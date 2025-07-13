@@ -53,7 +53,6 @@ extern bool global_use_internal_music_loader_system;
 const float textcolor_movie_oversigt[3]={0.8f,0.8f,0.8f};
 extern GLint cur_avail_mem_kb;
 extern unsigned int filmoversigt_antal;
-extern GLuint _textureIdloading,_textureIdloading1;
 extern bool vis_uv_meter;                                 // uv meter er igang med at blive vist
 extern int movie_oversigt_loaded_nr;
 extern bool movie_oversigt_gfx_loading;

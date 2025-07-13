@@ -113,4 +113,6 @@ void show_setup_tv_graber(int startofset);
 void show_setup_rss(unsigned int startofset);                                   // rss reader setup
 void show_wlan_networks(int valgtnr);
 
+
+int team_settings_load();
 #endif

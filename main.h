@@ -149,4 +149,105 @@ float uvcolortable2[]={0.8,0.0,0.8, \
                       0.8,0.0,0.1};
 // (top of uv)
 
+
+
+class config_icons {
+  public:
+    // main icons settings from json file
+    int config_tvguidex;
+    int config_tvguidey;
+    std::string config_tvguide_icon;
+    GLuint config_tvguidex_textureId;
+    std::string config_tema_path;
+    int config_spotifyx;
+    int config_spotifyy;
+    std::string config_spotify_icon;
+    int config_tidalx;
+    int config_tidaly;
+    std::string config_tidal_icon;
+    int config_musicx;
+    int config_musicy;
+    std::string config_music_icon;
+    int config_radiox;
+    int config_radioy;
+    std::string config_radio_icon;
+    int config_rssx;
+    int config_rssy;
+    std::string config_rss_icon;
+    int config_moviex;
+    int config_moviey;
+    std::string config_movie_icon;
+    int config_recordedx;
+    int config_recordedy;
+    std::string config_recorded_icon;
+    int config_closex;
+    int config_closey;
+    std::string config_close_icon;
+    int config_setupx;
+    int config_setupy;
+    std::string config_setup_icon;
+    int config_setup_selectedx;
+    int config_setup_selectedy;
+    std::string config_setup_selected_icon;
+
+    int config_loadingx;
+    int config_loadingy;
+    std::string config_loading_icon;
+
+    int config_playinfox;
+    int config_playinfoy;    
+    std::string config_playinfo_icon;
+
+    int config_reset_searchx;
+    int config_reset_searchy;
+    std::string config_reset_search_icon;
+
+    config_icons() {
+      config_tema_path="/opt/mythtv-controller/tema1/";
+      config_tvguidex = 1920;
+      config_tvguidey = 1080;
+      config_tvguide_icon = "tv";
+      config_spotifyx = 0;
+      config_spotifyy = 0;
+      config_spotify_icon = "spotify_button";
+      config_tidalx = 0;
+      config_tidaly = 0;
+      config_tidal_icon = "tidal_button";
+      config_musicx = 0;
+      config_musicy = 0;
+      config_music_icon = "music_button";
+      config_radiox = 0;
+      config_radioy = 0;
+      config_radio_icon = "radio_button";
+      config_rssx = 0;
+      config_rssy = 0;
+      config_rss_icon = "podcast_button";
+      config_moviex = 0;
+      config_moviey = 0;
+      config_movie_icon = "movie_button";
+      config_recordedx = 0;
+      config_recordedy = 0;
+      config_recorded_icon = "recorded_button";
+      config_closex = 0;
+      config_closey = 0;
+      config_close_icon = "closemain";
+      config_setupx = 0;
+      config_setupy = 0;
+      config_setup_icon = "setupmenu";
+      config_setup_selectedx = 0;
+      config_setup_selectedy = 0;
+      config_setup_selected_icon = "setupmenu1";
+      config_loadingx = 1920;
+      config_loadingy = 200;
+      config_loading_icon = "loading";
+      config_playinfox = 1920;
+      config_playinfoy = 1920;
+      config_playinfo_icon = "playinfo";
+      config_reset_searchx = 1920;
+      config_reset_searchy = 1080;
+      config_reset_search_icon = "reset_search";
+    }
+};
+
+
 #endif
