@@ -168,6 +168,11 @@ class config_icons {
     int config_musicx;
     int config_musicy;
     std::string config_music_icon;
+
+    int config_music_activex;
+    int config_music_activey;
+    std::string config_music_active_icon;
+
     int config_mediax;
     int config_mediay;
     std::string config_media_icon;
@@ -215,6 +220,15 @@ class config_icons {
     int config_downx;
     int config_downy;
     std::string config_down_icon;
+
+    int config_search_activex;
+    int config_search_activey;
+    std::string config_search_icon;
+
+    int config_search_backx;
+    int config_search_backy;
+    std::string config_search_back_icon;
+
     config_icons() {
       config_tema_path="/opt/mythtv-controller/tema3/";
       config_tvguidex = 1920;
@@ -229,6 +243,9 @@ class config_icons {
       config_musicx = 0;
       config_musicy = 0;
       config_music_icon = "music_button";
+      config_music_activex = 0;
+      config_music_activey = 0;
+      config_music_active_icon = "music1";
       config_mediax = 0;
       config_mediay = 0;
       config_media_icon = "media_button";
@@ -271,6 +288,12 @@ class config_icons {
       config_upx= 1920;
       config_upy= 1080;
       config_up_icon= "pup";
+      config_search_activex= 1920;
+      config_search_activey= 302;
+      config_search_icon="search";
+      config_search_backx= 1920;
+      config_search_backy= 302;
+      config_search_back_icon="search_back";
     }
 };
 

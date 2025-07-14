@@ -109,7 +109,10 @@ bool movie_oversigt_gfx_loading = false;
 bool show_status_update = false;
 bool spotify_oversigt_loaded_begin = false;                                      // true then spotify update is started
 bool tidal_oversigt_loaded_begin = false;                                      // true then spotify update is started
+bool music_oversigt_loaded_begin = false;                                      // true then music update is started
 bool global_use_spotify_local_player;
+
+
 
 #ifdef USE_FMOD_MIXER
 FMOD::DSP* dsp = 0;                   // fmod Sound device
@@ -302,6 +305,7 @@ bool ask_open_dir_or_play = false;                        // ask open dir or pla
 bool ask_open_dir_or_play_aopen = false;                  // auto open dir
 bool ask_open_dir_or_play_spotify = false;                //
 bool ask_open_dir_or_play_tidal = false;                //
+bool ask_open_dir_or_play_music = false;                //
 bool do_swing_music_cover = true;                         // default swing music cover
 int music_selected_iconnr=0;                              // default valgt icon i music oversigt
 float _angle=0.00;                                        // bruges af 3d screen saver
@@ -331,6 +335,7 @@ bool hent_tidal_search = false;                          // skal vi søge efter 
 
 bool do_show_spotify_search_oversigt=false;
 bool do_show_tidal_search_oversigt=false;
+bool do_show_music_search_oversigt=false;                 // show music search oversigt
 bool hent_spotify_search_online=false;                    // skal vi starte search online
 bool do_hent_spotify_search_online=false;                 // skal vi starte search online (do it)
 bool search_spotify_string_changed=false;
@@ -338,6 +343,8 @@ bool search_spotify_string_changed=false;
 bool do_hent_tidal_search_online=false;                   // skal vi starte search online (do it)
 bool search_tidal_string_changed=false;
 bool hent_tidal_search_online=false;                      // skal vi starte search online
+
+bool do_hent_music_search_online=false;                   // skal vi starte search 
 
 int do_music_icon_anim_icon_ofset=0;                  	  // sin scrool ofset for show fast music
 int do_spotify_icon_anim_icon_ofset=0;                  	// sin scrool ofset for show fast spotify
@@ -420,6 +427,7 @@ int music_select_iconnr;                                  // selected icon
 int spotify_select_iconnr=0;                              // selected icon
 int spotify_selected_startofset=0;                        // used by viewer
 int tidal_selected_startofset=0;                          // used by viewer
+int music_selected_startofset=0;                          // used by viewer
 int tidal_select_iconnr;                                  // selected icon
 int antal_songs=0;                                        //
 int _sangley;                                             //
@@ -3428,6 +3436,21 @@ void display() {
         glEnd();
       }
 
+      // Music show search icon or (back from search) icon
+      if (vis_music_oversigt) {
+        if (do_show_music_search_oversigt) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(5);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050+96 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex+96 , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex+96 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050+96 , 0.0);
+        glEnd();
+      }
+
+
       // show exit button
       if ((!(vis_music_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!((do_show_spotify_search_oversigt)))) {
         glBindTexture(GL_TEXTURE_2D, _textureexit);
@@ -3513,13 +3536,9 @@ void display() {
         if (findtype==0) {
           // new ver
           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
-          // old ver
-          //opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 0 );	// find det som der søges kunster
         } else {
           // new ver
           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
-          // old ver
-          //opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );  // find det som der søges efter sange navn
         }
         // new ver
         musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
@@ -3632,10 +3651,14 @@ void display() {
   start = clock();
   if (!(visur)) {
     // music view
-    if (vis_music_oversigt) {
-      // New ver
-      musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-      if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+    if (vis_music_oversigt) {    
+      if (do_show_music_search_oversigt==false) {
+        musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+        if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+      } else {
+        musicoversigt.show_search_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+        if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+      }  
     } else if (vis_film_oversigt) {
       glPushMatrix();
       //aktivfont.selectfont("DejaVu Sans");
@@ -5612,6 +5635,51 @@ void display() {
       tidal_oversigt.search_loaded=true;
     }
   }
+
+  // ******************************************************************************************************************
+  //
+  //  *********************** Music search result *********************************************************************
+  //
+  // ****************************************************************************************************************** 
+  if (vis_music_oversigt) {
+    if (do_hent_music_search_online) {
+      musicoversigt.search_music_online_done=false;
+      fprintf(stderr,"Update music search result thread.\n");
+      write_logfile(logfile,(char *) "Music start search result thread");
+      do_hent_music_search_online=false;
+      music_oversigt_loaded_begin=true;
+      
+
+      musicoversigt.search_music_online_done=false;
+      fprintf(stderr,"Update music search result thread.\n");
+      write_logfile(logfile,(char *) "Tidal start search result thread");
+      do_hent_music_search_online=false;
+      music_oversigt_loaded_begin=true;
+      // clear old      
+      // musicoversigt.clean_music_oversigt();
+      // update from search
+      int music_search_status=0;
+      switch(musicoversigt.searchtype) {
+        case 0: music_search_status=musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer,0);               // ALBUMS
+                break;
+        case 1: music_search_status=musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer,1);               // ARTISTS
+                break;
+        case 2: music_search_status=musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer,2);               // TRACKS
+                break;
+        default:music_search_status=musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer,0);               // ALBUMS
+      }
+      printf("Done Update music search result thread. STATUS : %d \n",music_search_status);
+      if (music_search_status==-1) write_logfile(logfile,(char *) "Music error search result thread");
+      else write_logfile(logfile,(char *) "Music ok search result thread");
+      musicoversigt.search_music_online_done=true;
+      music_oversigt_loaded_begin=false;
+      musicoversigt.set_search_loaded();                                 // load icons
+      musicoversigt.search_loaded=true;
+    }
+  }
+
+
+
   // ******************************************************************************************************************
   //
   // *********************** RADIO stuf *******************************************************************************
@@ -7247,6 +7315,29 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
+
+      if (vis_music_oversigt) {
+        if ((GLubyte) names[i*4+3]==5) {
+          strcpy(keybuffer,"");                                                 // reset text buffer
+          keybufferindex=0;                                                     //
+          music_selected_startofset=0;
+          ask_open_dir_or_play_music = false;
+          strcpy(musicoversigt.overview_show_band_name,"");
+          if (do_show_music_search_oversigt==true) {
+            do_show_music_search_oversigt=false;
+            music_oversigt_loaded_begin=true;                                 //
+            musicoversigt.opdatere_music_oversigt(0);                      // update view from root
+            musicoversigt.set_search_loaded();                               // triger icon loader
+            //spotify_oversigt.load_spotify_iconoversigt();                     // update icons
+            music_oversigt_loaded_begin=false;                                //
+          } else {
+            do_show_music_search_oversigt=true;
+          }
+          write_logfile(logfile,(char *) "Music search.");
+        }
+      }
+
+
       //
       // stream control
       //
@@ -11940,6 +12031,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               break;
             case 13:           
               if (vis_music_oversigt) {
+                if (do_show_music_search_oversigt) {
+                  do_hent_music_search_online=true;
+                  printf("do_hent_music_search_online=%d\n",do_hent_music_search_online);  
+                }
                 if (ask_save_playlist) write_logfile(logfile,(char *) "Save playlist key pressed, update music list.");
                 else write_logfile(logfile,(char *) "Enter key pressed, update music list.");
               } else if (vis_radio_oversigt) write_logfile(logfile,(char *) "Enter key pressed, play radio station.");
@@ -15019,8 +15114,12 @@ void loadgfx() {
 // ************************** spotify buttons ****************************
     spotify_askplay       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
     spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
-    spotify_search        = loadgfxfile(temapath,(char *) "buttons/",(char *) "search");
-    spotify_search_back   = loadgfxfile(temapath,(char *) "buttons/",(char *) "search_back");
+    
+    // spotify_search        = loadgfxfile(temapath,(char *) "buttons/",(char *) "search");
+    spotify_search        = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_search_icon.c_str());     // "search");
+
+    // spotify_search_back   = loadgfxfile(temapath,(char *) "buttons/",(char *) "search_back");
+    spotify_search_back   =loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_search_back_icon.c_str());     // "search_back");
     
     // spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     spotifybutton         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_spotify_icon.c_str());     // "spotify_button");				// setup menu
@@ -15075,11 +15174,15 @@ void loadgfx() {
     // analog clock background
     analog_clock_background = loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     volume_window = loadgfxfile(temapath,(char *) "images/",(char *) "volume_win");
+    /*
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
       _textureIdmusic_aktiv=loadTexture ((char *) tmpfilename);
     } else _textureIdmusic_aktiv=0;
+    */
+    _textureIdmusic_aktiv=loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_active_icon.c_str()); // "music1");
+
     printf ("Done loading init graphic.\n");
 }
 

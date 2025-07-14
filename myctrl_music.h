@@ -37,14 +37,25 @@ class musicoversigt_class {
     music_oversigt_type musicoversigt[MAX_MUSIC_OVERSIGT_SIZE+1];
     bool do_play;
     bool music_is_playing;                                                // do we play ?
+    
   public:
+    char overview_show_band_name[256];                                  // show band name in overview
+    bool search_loaded;
+    int searchtype;
+    bool loaded_begin;
+    
+    bool search_music_online_done;
     bool play() { return(do_play);}    
+    
+    bool set_search_loaded() { search_loaded=true; return(1); }
+    
     // load covers
     void opdatere_music_oversigt_icons();
     int opdatere_music_oversigt_nodb();
     int opdatere_music_oversigt(unsigned int directory_id);
+    int opdatere_music_oversigt_searchtxt(char *keybuffer,int type);
     // bruges til at finde kunstnere eller sange hvis art >0
-    int opdatere_music_oversigt_searchtxt(char *searchtxt,int search_art);
+    
     // load all covers
     int load_music_covergfx();
     int save_music_oversigt_playlists(char *playlistname);
@@ -53,6 +64,7 @@ class musicoversigt_class {
     int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
     // show playlistes in opengl
     void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
+    void show_search_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     // henter playlist oversigt
     int opdatere_music_oversigt_playlists();
     char *get_album_name(int nr);
