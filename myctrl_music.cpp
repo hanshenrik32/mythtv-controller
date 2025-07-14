@@ -914,7 +914,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     char icon_file[512];
     char tmptxt[512];
     char tmptxt1[512];
-    const char *sql = "SELECT playlistname,paththumb,playlistid,release_date,artistid,id from tidalcontentplaylist group by (playlistname)";
+    const char *sqllite_sql = "select directory_id,path,parent_id from music_directories where parent_id=0 order by path";
     char *zErrMsg = 0;
     int rc;
     char *data = (char *) "sqlitedb_obj_music";  
@@ -954,7 +954,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     }
     if (do_sqlite) {
       sqlite3_open("mythtvcontroller.db", &sqlitedb_obj_music);
-      rc = sqlite3_exec(sqlitedb_obj_music, sql,music_sqldb_callback, (void*)data, &zErrMsg);
+      rc = sqlite3_exec(sqlitedb_obj_music, sqllite_sql,music_sqldb_callback, (void*)data, &zErrMsg);
       if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
@@ -1606,7 +1606,7 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
   glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
   glEnd();
 
-  // show tidal search string
+  // show music search string
   glPushMatrix();
   glTranslatef(xof+210+(buttonsize/2),yof+240,0);
   glDisable(GL_TEXTURE_2D);

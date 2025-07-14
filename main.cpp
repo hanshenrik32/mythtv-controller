@@ -3527,20 +3527,17 @@ void display() {
     }
   }
   // search func for music after enter is pressed
-  if ((vis_music_oversigt) && (!(visur)) && (!(ask_save_playlist)))  {
+  if ((vis_music_oversigt) && (do_show_music_search_oversigt) && (!(visur)) && (!(ask_save_playlist)))  {
     if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
       keybufferopenwin=true;					// yes open filename window
       // hent søgte sange oversigt
       if ((keybufferopenwin) && (hent_music_search)) {				                // vi har søgt og skal reset view ofset til 0 = start i 3d visning.
         hent_music_search=false;
         if (findtype==0) {
-          // new ver
-          musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
+          musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 1);
         } else {
-          // new ver
-          musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
+          musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 1);
         }
-        // new ver
         musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
         // old ver
         //opdatere_music_oversigt_icons(); 					                            // load gfx icons
