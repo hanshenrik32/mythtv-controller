@@ -3301,7 +3301,7 @@ void display() {
             glLoadName(24); 			                                                // load film icon name
           } else {
             if (vis_recorded_oversigt) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdrecorded_aktiv);
+              glBindTexture(GL_TEXTURE_2D, _textureIdrecorded); // _textureIdrecorded_aktiv);
             } else {
               glBindTexture(GL_TEXTURE_2D, _textureIdrecorded);                              // record icon
             }
@@ -3342,10 +3342,10 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
         */
         
-        glTexCoord2f(0, 0); glVertex3f( config_menu.config_closex-200 , config_menu.config_closey , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( config_menu.config_closex-200,   config_menu.config_closey+iconsizex , 0.0);
-        glTexCoord2f(1, 1); glVertex3f( config_menu.config_closex-200+iconsizex,config_menu.config_closey+iconsizex , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( config_menu.config_closex-200+iconsizex, config_menu.config_closey , 0.0);
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_closex-200 , config_menu.config_closemainy , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_closex-200,   config_menu.config_closemainy+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_closex-200+iconsizex,config_menu.config_closemainy+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_closex-200+iconsizex, config_menu.config_closemainy , 0.0);
         glEnd();
       }
       if (vis_stream_or_movie_oversigt) {
@@ -3362,10 +3362,10 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
         */
 
-        glTexCoord2f(0, 0); glVertex3f( config_menu.config_closex-200 , config_menu.config_closey , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( config_menu.config_closex-200, config_menu.config_closey+iconsizex , 0.0);
-        glTexCoord2f(1, 1); glVertex3f( config_menu.config_closex-200+iconsizex,config_menu.config_closey+iconsizex , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( config_menu.config_closex-200+iconsizex, config_menu.config_closey , 0.0);
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_closex-200 , config_menu.config_closemainy , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_closex-200, config_menu.config_closemainy+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_closex-200+iconsizex,config_menu.config_closemainy+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_closex-200+iconsizex, config_menu.config_closemainy , 0.0);
 
         glEnd();
       } 
@@ -14895,7 +14895,7 @@ void loadgfx() {
     _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
     _textureclose        	= loadgfxfile(temapath,(char *) "images/",(char *) "close");
     
-    _textureclosemain    	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_close_icon.c_str()); // "closemain");
+    _textureclosemain    	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_closemain_icon.c_str()); // "closemain");
 
     _textureclose_small  	= loadgfxfile(temapath,(char *) "images/",(char *) "close_small");
     _textureswap         	= loadgfxfile(temapath,(char *) "images/",(char *) "swap");
@@ -14935,7 +14935,7 @@ void loadgfx() {
     _textureIdpdown     	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_down_icon.c_str()); // "pdown");
     _texturemstop       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaystop");
     _textureIdrecorded_aktiv=loadgfxfile(temapath,(char *) "buttons/",(char *) "recorded_selected");
-    _textureIdfilm_aktiv  = loadgfxfile(temapath,(char *) "buttons/",(char *) "movie1");
+    _textureIdfilm_aktiv  = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_movie1_icon.c_str()); // "movie1");
     _textureIdmusicsearch = loadgfxfile(temapath,(char *) "images/",(char *) "music_search");
     _textureIdradiosearch = loadgfxfile(temapath,(char *) "images/",(char *) "radio_search");
     _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "playlist_search");
@@ -15009,15 +15009,25 @@ void loadgfx() {
     onlineradio           = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
     onlineradio192        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
     onlineradio320        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
-    radiobutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "radio_button");
-    musicbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "music_button");
+    
+    // radiobutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "radio_button");
+    radiobutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_radio_icon.c_str());     // "radio_button");				// setup menu
+
+    // musicbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "music_button");
+    musicbutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());     // "radio_button");				// setup menu
+
 // ************************** spotify buttons ****************************
     spotify_askplay       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
     spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
     spotify_search        = loadgfxfile(temapath,(char *) "buttons/",(char *) "search");
     spotify_search_back   = loadgfxfile(temapath,(char *) "buttons/",(char *) "search_back");
-    spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
-    tidalbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "tidal_button");
+    
+    // spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
+    spotifybutton         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_spotify_icon.c_str());     // "spotify_button");				// setup menu
+
+    // tidalbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "tidal_button");
+    tidalbutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tidal_icon.c_str());     // "tidal_button");				// setup menu
+
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
     tidal_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_ecover");
     spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
@@ -15038,9 +15048,14 @@ void loadgfx() {
     onlinestream_empty    = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
     onlinestream_empty1   = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
     // podcast button
-    streambutton          = loadgfxfile(temapath,(char *) "buttons/",(char *) "stream_button");
+    //streambutton          = loadgfxfile(temapath,(char *) "buttons/",(char *) "stream_button");
+
+    streambutton          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_media_icon.c_str()); // "stream_button");
+
     // movie button
-    moviebutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "movie_button");
+    // moviebutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "movie_button");
+    moviebutton          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_movie_icon.c_str()); // "movie_button");
+
     // main logo
     _mainlogo             = loadgfxfile(temapath,(char *) "images/",(char *) "logo");
     // mask for flags
@@ -15374,6 +15389,10 @@ int team_settings_load() {
     config_menu.config_musicx=(iRoot["tema1"]["icons"]["music"].get("x","0").asInt());
     config_menu.config_musicy=(iRoot["tema1"]["icons"]["music"].get("y","0").asInt());
     config_menu.config_music_icon=(iRoot["tema1"]["icons"]["music"].get("icon_path","0").asString());
+
+    config_menu.config_mediax=(iRoot["tema1"]["icons"]["media"].get("x","0").asInt());
+    config_menu.config_mediax=(iRoot["tema1"]["icons"]["media"].get("y","0").asInt());
+    config_menu.config_media_icon=(iRoot["tema1"]["icons"]["media"].get("icon_path","0").asString());
 
     config_menu.config_spotifyx=(iRoot["tema1"]["icons"]["spotify"].get("x","0").asInt());
     config_menu.config_spotifyy=(iRoot["tema1"]["icons"]["spotify"].get("y","0").asInt());

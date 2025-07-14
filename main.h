@@ -168,21 +168,29 @@ class config_icons {
     int config_musicx;
     int config_musicy;
     std::string config_music_icon;
+    int config_mediax;
+    int config_mediay;
+    std::string config_media_icon;
     int config_radiox;
     int config_radioy;
     std::string config_radio_icon;
-    int config_rssx;
-    int config_rssy;
-    std::string config_rss_icon;
     int config_moviex;
     int config_moviey;
     std::string config_movie_icon;
+
+    int config_movie1x;               // når movie er valgt
+    int config_movie1y;
+    std::string config_movie1_icon;
+
     int config_recordedx;
     int config_recordedy;
     std::string config_recorded_icon;
     int config_closex;
     int config_closey;
     std::string config_close_icon;
+    int config_closemainx;
+    int config_closemainy;
+    std::string config_closemain_icon;
     int config_setupx;
     int config_setupy;
     std::string config_setup_icon;
@@ -221,21 +229,27 @@ class config_icons {
       config_musicx = 0;
       config_musicy = 0;
       config_music_icon = "music_button";
+      config_mediax = 0;
+      config_mediay = 0;
+      config_media_icon = "media_button";
       config_radiox = 0;
       config_radioy = 0;
       config_radio_icon = "radio_button";
-      config_rssx = 0;
-      config_rssy = 0;
-      config_rss_icon = "podcast_button";
       config_moviex = 0;
       config_moviey = 0;
       config_movie_icon = "movie_button";
+      config_movie1x = 0;
+      config_movie1y = 0;
+      config_movie1_icon = "movie1";
       config_recordedx = 0;
       config_recordedy = 0;
       config_recorded_icon = "recorded_button";
-      config_closex = 0;
-      config_closey = 0;
-      config_close_icon = "closemain";
+      config_closex = 1920;
+      config_closey = 302;
+      config_close_icon = "close";
+      config_closemainx = 1920;
+      config_closemainy = 30;
+      config_closemain_icon = "closemain";
       config_setupx = 0;
       config_setupy = 0;
       config_setup_icon = "setupmenu";
@@ -253,10 +267,10 @@ class config_icons {
       config_reset_search_icon = "reset_search";
       config_downx = 1920;
       config_downy = 1080;
-      config_down_icon= "down";
+      config_down_icon= "pdown";
       config_upx= 1920;
       config_upy= 1080;
-      config_up_icon= "up";
+      config_up_icon= "pup";
     }
 };
 

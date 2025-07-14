@@ -1,8 +1,8 @@
 {
     "tema1": {
-        "name": "Tema 7",
-        "icon": "tema7.png",
-        "iconpath": "/opt/mythtv-controller/tema7/",
+        "name": "Tema 2",
+        "icon": "tema2.png",
+        "iconpath": "/opt/mythtv-controller/tema3/",
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
@@ -10,32 +10,32 @@
                 "y": 1080
             },
             "music": {
-                "icon_path": "music",
+                "icon_path": "music_button",
                 "x": 1920,
                 "y": 888
             },
             "media": {
-                "icon_path": "stream_button.png",
+                "icon_path": "stream_button",
                 "x": 1920,
                 "y": 888
             },
             "spotify": {
-                "icon_path": "spotify_button.png",
+                "icon_path": "spotify_button",
                 "x": 1920,
                 "y": 1080
             },
             "tidal": {
-                "icon_path": "tidal_button.png",
+                "icon_path": "tidal_button",
                 "x": 1920,
                 "y": 888
             },
             "radio": {
-                "icon_path": "radio_button.png",
+                "icon_path": "radio_button",
                 "x": 1920,
                 "y": 696
             },
             "flac": {
-                "icon_path": "music.png",
+                "icon_path": "music_button",
                 "x": 1920,
                 "y": 504
             },
@@ -50,7 +50,12 @@
                 "y": 888
             },
             "movie": {
-                "icon_path": "movie",
+                "icon_path": "movie_button",
+                "x": 1920,
+                "y": 504
+            },
+            "movie1": {
+                "icon_path": "movie1",
                 "x": 1920,
                 "y": 504
             },
@@ -83,6 +88,16 @@
                 "icon_path": "reset_search",
                 "x": 1920,
                 "y": 30
+            },
+            "config_down": {
+                "icon_path": "pdown",
+                "x": 1920,
+                "y": 504
+            },
+            "config_up": {
+                "icon_path": "pup",
+                "x": 1920,
+                "y": 302
             }
         }
     }
