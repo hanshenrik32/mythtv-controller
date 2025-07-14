@@ -14931,8 +14931,8 @@ void loadgfx() {
     _texturemnext       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaynext");
     _texturemplay       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplay");
     _texturempause        = loadgfxfile(temapath,(char *) "images/",(char *) "mpause");
-    _textureIdpup       	= loadgfxfile(temapath,(char *) "buttons/",(char *) "pup");
-    _textureIdpdown     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "pdown");
+    _textureIdpup       	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_up_icon.c_str()); // "pup");
+    _textureIdpdown     	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_down_icon.c_str()); // "pdown");
     _texturemstop       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaystop");
     _textureIdrecorded_aktiv=loadgfxfile(temapath,(char *) "buttons/",(char *) "recorded_selected");
     _textureIdfilm_aktiv  = loadgfxfile(temapath,(char *) "buttons/",(char *) "movie1");
@@ -15411,6 +15411,13 @@ int team_settings_load() {
     config_menu.config_playinfoy=(iRoot["tema1"]["icons"]["playinfo"].get("y","0").asInt());
     config_menu.config_playinfo_icon=(iRoot["tema1"]["icons"]["playinfo"].get("icon_path","0").asString());
 
+    config_menu.config_playinfox=(iRoot["tema1"]["icons"]["down"].get("x","0").asInt());
+    config_menu.config_playinfoy=(iRoot["tema1"]["icons"]["down"].get("y","0").asInt());
+    config_menu.config_playinfo_icon=(iRoot["tema1"]["icons"]["down"].get("icon_path","0").asString());
+
+    config_menu.config_playinfox=(iRoot["tema1"]["icons"]["up"].get("x","0").asInt());
+    config_menu.config_playinfoy=(iRoot["tema1"]["icons"]["up"].get("y","0").asInt());
+    config_menu.config_playinfo_icon=(iRoot["tema1"]["icons"]["up"].get("icon_path","0").asString());
     
     temaname = "tema1";
     cout << "element iconpath: " << iRoot[temaname].get("iconpath","0") .asString() << std::endl;
@@ -15519,14 +15526,15 @@ int main(int argc, char** argv) {
       }
     }
 
-    team_settings_load();
-
     numCPU = sysconf( _SC_NPROCESSORS_ONLN );
     // write cpu info to log file
     sprintf(debuglogdata,"Numbers of cores :%d found.",numCPU);
     write_logfile(logfile,(char *) debuglogdata);
     // Load config
     load_config((char *) "/etc/mythtv-controller.conf");				// load setup config
+    
+    team_settings_load();
+
     // create dir for json files and icon files downloaded
     if (!(file_exists("~/spotify_json"))) {
       dircreatestatus = mkdir("~/spotify_json", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -15808,6 +15816,8 @@ int main(int argc, char** argv) {
     init();                                           // init gopengl
     write_logfile(logfile,(char *) "Mythtv-controller startup.");
     write_logfile(logfile,(char *) "Loading graphic.");
+    
+
     loadgfx();                                        // load gfx stuf
     write_logfile(logfile,(char *) "Graphic loaded.");
     if (full_screen) {

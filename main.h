@@ -201,7 +201,12 @@ class config_icons {
     int config_reset_searchx;
     int config_reset_searchy;
     std::string config_reset_search_icon;
-
+    int config_upx;
+    int config_upy;
+    std::string config_up_icon;
+    int config_downx;
+    int config_downy;
+    std::string config_down_icon;
     config_icons() {
       config_tema_path="/opt/mythtv-controller/tema3/";
       config_tvguidex = 1920;
@@ -246,6 +251,12 @@ class config_icons {
       config_reset_searchx = 1920;
       config_reset_searchy = 1080;
       config_reset_search_icon = "reset_search";
+      config_downx = 1920;
+      config_downy = 1080;
+      config_down_icon= "down";
+      config_upx= 1920;
+      config_upy= 1080;
+      config_up_icon= "up";
     }
 };
 

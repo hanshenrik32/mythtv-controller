@@ -83,6 +83,16 @@
                 "icon_path": "reset_search",
                 "x": 1920,
                 "y": 30
+            },
+            "down": {
+                "icon_path": "down",
+                "x": 1920,
+                "y": 504
+            },
+            "up": {
+                "icon_path": "up",
+                "x": 1920,
+                "y": 300
             }
         }
     }
