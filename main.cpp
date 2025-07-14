@@ -3551,6 +3551,10 @@ void display() {
         music_key_selected = 1;                    // reset cursor position
         ask_open_dir_or_play_aopen = 1;		//
         ask_open_dir_or_play = 0;
+        musicoversigt.search_music_online_done=true;
+        music_oversigt_loaded_begin=false;
+        // musicoversigt.set_search_loaded();                                 // load icons
+        musicoversigt.search_loaded=true;
       }
     }
   }
@@ -5638,6 +5642,7 @@ void display() {
   //  *********************** Music search result *********************************************************************
   //
   // ****************************************************************************************************************** 
+  /*
   if (vis_music_oversigt) {
     if (do_hent_music_search_online) {
       musicoversigt.search_music_online_done=false;
@@ -5645,16 +5650,6 @@ void display() {
       write_logfile(logfile,(char *) "Music start search result thread");
       do_hent_music_search_online=false;
       music_oversigt_loaded_begin=true;
-      
-
-      musicoversigt.search_music_online_done=false;
-      fprintf(stderr,"Update music search result thread.\n");
-      write_logfile(logfile,(char *) "Tidal start search result thread");
-      do_hent_music_search_online=false;
-      music_oversigt_loaded_begin=true;
-      // clear old      
-      // musicoversigt.clean_music_oversigt();
-      // update from search
       int music_search_status=0;
       switch(musicoversigt.searchtype) {
         case 0: music_search_status=musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer,0);               // ALBUMS
@@ -5674,9 +5669,7 @@ void display() {
       musicoversigt.search_loaded=true;
     }
   }
-
-
-
+  */
   // ******************************************************************************************************************
   //
   // *********************** RADIO stuf *******************************************************************************
@@ -7313,6 +7306,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       }
       #endif
 
+      // music
       if (vis_music_oversigt) {
         if ((GLubyte) names[i*4+3]==5) {
           strcpy(keybuffer,"");                                                 // reset text buffer
@@ -8954,17 +8948,19 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
           // New ver
           // hent fra db
-          if (musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1))>0) {
-            musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
-          } else {
-            // opdatere music oversigt fra intern path
-            fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt.get_album_path(mknapnr-1));
+          if (do_show_music_search_oversigt==false) {
+            if (musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1))>0) {
+              musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
+            } else {
+              // opdatere music oversigt fra intern path
+              fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt.get_album_path(mknapnr-1));
 
-            // New ver
-            if (musicoversigt.opdatere_music_oversigt_nodb()==0) {
-              // no update posible
-              fprintf(stderr,"No Music loaded/found by internal loader.\n");
-              write_logfile(logfile,(char *) "No Music loaded/found by internal loader.");
+              // New ver
+              if (musicoversigt.opdatere_music_oversigt_nodb()==0) {
+                // no update posible
+                fprintf(stderr,"No Music loaded/found by internal loader.\n");
+                write_logfile(logfile,(char *) "No Music loaded/found by internal loader.");
+              }
             }
           }
         }
@@ -12109,7 +12105,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               #endif
               // start music search
-              if ((vis_music_oversigt) && (keybufferopenwin)) {
+              if ((vis_music_oversigt) && (keybufferopenwin) && (strcmp(keybuffer,"")!=0)) {
                 mknapnr=0;				                            	// reset mouse/key pos in vis_music_overs
                 _mangley=0.0f;
                 hent_music_search = true;                       // start music search (set flag)
@@ -12140,7 +12136,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                   ask_open_dir_or_play = true;							// yes ask om vi skal spille den (play playlist)
                   //do_zoom_music_cover=true;
-                } else {
+                } else if (strcmp(keybuffer,"")!=0) {
                   // playlist dir
                   if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
                   // playlist loader
