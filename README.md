@@ -12,10 +12,6 @@ Version.
 
 mythtv-controller ver 0.43.4
 
-mythtv-controller ver 0.43.2
-
-mythtv-controller ver 0.43.1
-
 mythtv-controller ver 0.42.6
 
 mythtv-controller ver 0.41.0

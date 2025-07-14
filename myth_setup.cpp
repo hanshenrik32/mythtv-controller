@@ -15,6 +15,11 @@
 // glc true type font system
 #include <GL/glc.h>
 #include <libxml/parser.h>
+#include <fstream>
+#include <fmt/format.h>
+
+#include <iostream>
+
 // mysql support
 #include <mysql.h>
 // program include
@@ -25,6 +30,8 @@
 #include "checknet.h"
 #include "utility.h"
 #include "myctrl_tvprg.h"
+
+using namespace std;
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                                 // used by log system
@@ -219,7 +226,12 @@ void showcoursornow(int cxpos,int cypos,int txtlength) {
 
 }
 
+
+
+
 // *********************************************************************************************************
+
+
 
 // ****************************************************************************************
 //

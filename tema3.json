@@ -1,0 +1,105 @@
+{
+    "tema1": {
+        "name": "Tema 2",
+        "icon": "tema2.png",
+        "iconpath": "/opt/mythtv-controller/tema3/",
+        "icons" : {
+            "tvguide": {
+                "icon_path": "tv",
+                "x": 1920,
+                "y": 1080
+            },
+            "music": {
+                "icon_path": "music_button",
+                "x": 1920,
+                "y": 888
+            },
+            "media": {
+                "icon_path": "stream_button",
+                "x": 1920,
+                "y": 888
+            },
+            "spotify": {
+                "icon_path": "spotify_button",
+                "x": 1920,
+                "y": 1080
+            },
+            "tidal": {
+                "icon_path": "tidal_button",
+                "x": 1920,
+                "y": 888
+            },
+            "radio": {
+                "icon_path": "radio_button",
+                "x": 1920,
+                "y": 696
+            },
+            "flac": {
+                "icon_path": "music_button",
+                "x": 1920,
+                "y": 504
+            },
+            "recorded": {
+                "icon_path": "recorded",
+                "x": 1920,
+                "y": 312
+            },
+            "podcast": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
+            },
+            "movie": {
+                "icon_path": "movie_button",
+                "x": 1920,
+                "y": 504
+            },
+            "movie1": {
+                "icon_path": "movie1",
+                "x": 1920,
+                "y": 504
+            },
+            "close": {
+                "icon_path": "closemain",
+                "x": 1920,
+                "y": 30
+            },
+            "setup": {
+                "icon_path": "setupmenu",
+                "x": 1920,
+                "y": 300
+            },
+            "setup_selected": {
+                "icon_path": "setupmenu1",
+                "x": 1920,
+                "y": 300
+            },
+            "loading": {
+                "icon_path": "loading",
+                "x": 1920,
+                "y": 200
+            },
+            "playinfo_icon": {
+                "icon_path": "playinfo",
+                "x": 1920,
+                "y": 200
+            },
+            "reset_search": {
+                "icon_path": "reset_search",
+                "x": 1920,
+                "y": 30
+            },
+            "config_down": {
+                "icon_path": "pdown",
+                "x": 1920,
+                "y": 504
+            },
+            "config_up": {
+                "icon_path": "pup",
+                "x": 1920,
+                "y": 302
+            }
+        }
+    }
+}
+

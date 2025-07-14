@@ -2215,8 +2215,13 @@ void tidal_class::clean_tidal_oversigt() {
         if (stack[i]->textureId) {
           // glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
         }
-        if (stack[i]) delete stack[i];
-        stack[i]=NULL;
+        try {
+          if (stack[i]) delete stack[i];		// delete cover image
+          stack[i]=NULL;
+        }
+        catch (...) {
+          printf("Error delete stack.\n");
+        }
       }
     }
     antal=0;
@@ -3307,7 +3312,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
 
 // ****************************************************************************************
 //
-// update playcountin_db
+// update playcount in db
 //
 // ****************************************************************************************
 
