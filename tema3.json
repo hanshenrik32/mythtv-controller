@@ -2,7 +2,7 @@
     "tema1": {
         "name": "Tema 2",
         "icon": "tema2.png",
-        "iconpath": "/opt/mythtv-controller/tema3/",
+        "iconpath": "/opt/mythtv-controller/tema2/",
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
@@ -59,10 +59,10 @@
                 "x": 1920,
                 "y": 504
             },
-            "close": {
+            "closemain": {
                 "icon_path": "closemain",
                 "x": 1920,
-                "y": 30
+                "y": 300
             },
             "setup": {
                 "icon_path": "setupmenu",
@@ -96,6 +96,11 @@
             },
             "config_up": {
                 "icon_path": "pup",
+                "x": 1920,
+                "y": 302
+            },
+            "close": {
+                "icon_path": "close",
                 "x": 1920,
                 "y": 302
             }
