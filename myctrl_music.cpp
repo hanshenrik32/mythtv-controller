@@ -25,6 +25,16 @@
 #include "myth_saver.h"
 #include "myctrl_glprint.h"
 
+extern GLuint big_search_bar_playlist;                    // big search bar used by sporify search
+extern GLuint big_search_bar_track;                    // big search bar used by sporify search
+extern GLuint big_search_bar_albumm;                    // big search bar used by sporify search
+extern GLuint big_search_bar_artist;                    // big search bar used by sporify search
+extern GLuint tidal_big_search_bar_artist;
+extern GLuint tidal_big_search_bar_album;
+extern GLuint tidal_big_search_bar_track;
+
+extern char keybuffer[512];                     // keyboard buffer
+
 extern FILE *logfile;
 extern char debuglogdata[1024];
 
@@ -904,7 +914,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     char icon_file[512];
     char tmptxt[512];
     char tmptxt1[512];
-    const char *sql = "SELECT playlistname,paththumb,playlistid,release_date,artistid,id from tidalcontentplaylist group by (playlistname)";
+    const char *sqllite_sql = "select directory_id,path,parent_id from music_directories where parent_id=0 order by path";
     char *zErrMsg = 0;
     int rc;
     char *data = (char *) "sqlitedb_obj_music";  
@@ -944,7 +954,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     }
     if (do_sqlite) {
       sqlite3_open("mythtvcontroller.db", &sqlitedb_obj_music);
-      rc = sqlite3_exec(sqlitedb_obj_music, sql,music_sqldb_callback, (void*)data, &zErrMsg);
+      rc = sqlite3_exec(sqlitedb_obj_music, sqllite_sql,music_sqldb_callback, (void*)data, &zErrMsg);
       if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
         sqlite3_free(zErrMsg);
@@ -1405,6 +1415,211 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   int length;
   std::string temptxt1;
   sofset=(_mangley/40)*8;
+  while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
+    // do new line (if not first line)
+    if (((i % bonline)==0) && (i>0)) {
+      xof=0;
+      yof=yof-(buttonsizey+28);
+    }
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // show back or opem playlist list
+    if (i==0) {
+      // view is playlist ?
+      if (musicoversigt[i+sofset].oversigttype!=-1) {
+        if (i+sofset==0) {
+          glBindTexture(GL_TEXTURE_2D,back_icon);
+        } else {
+          if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
+          else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      } else {
+        glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      }
+    } else {
+      // else normal icon loader if exist else load default icon (normal_icon) or playlist icon (dirplaylist_icon)
+      if (musicoversigt[i+sofset].textureId!=0) {
+        glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      } else {
+        if (musicoversigt[i+sofset].oversigttype==-1) {
+          glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        } else {
+          glBindTexture(GL_TEXTURE_2D,normal_icon);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+      }
+    }
+    // if selected icon
+    if (i+1==music_key_selected) buttonsize=190.0f;
+    else buttonsize=180.0f;
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glLoadName(100+i);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsize , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+    glEnd();
+    glPopMatrix();
+    drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 0.4f,18,5,1,true);
+    /* // old print stuf
+    glPushMatrix();
+    glTranslatef(xof, yof ,0.0f);
+    glColor4f(1.0f, 1.0f, 1.0f,1.0f);				//
+    glRasterPos2f(	0.0f, 0.0f);
+    strcpy(temptxt,musicoversigt[i+sofset].album_name);      	// album navn
+    lastslash=strrchr(temptxt,'/');
+    if (lastslash) strcpy(temptxt,lastslash+1);
+    //glScalef(20.0, 20.0, 1.0);
+    glScalef(configdefaultmusicfontsize, configdefaultmusicfontsize, 1.0);
+    glDisable(GL_TEXTURE_2D);
+    length=strlen(temptxt);
+    base=temptxt;
+    // print artist/song name
+    const float xInitial = (width / 5) - (strlen(base) / 4);
+    const float xTranslation=1.0f-(strlen(base)/1.6f)+2;
+    pline=0;
+    while(*base) {
+      // if text can be on line
+      if(length <= width) {
+        glTranslatef(xInitial,0.0f,0.0f);
+        glcRenderString(base);
+        pline++;
+        break;
+      }
+      right_margin = base+width;
+      while((!isspace(*right_margin)) && (stop==false)) {
+        right_margin--;
+        if (right_margin == base) {
+          right_margin += width;
+          while(!isspace(*right_margin)) {
+            if (*right_margin == '\0') break;
+            else stop=true;
+            right_margin++;
+          }
+        }
+      }
+      if (stop) *(base+width)='\0';
+      *right_margin = '\0';
+      glcRenderString(base);
+      pline++;
+      glTranslatef(xInitial,-pline*1.2f,0.0f);
+      length -= right_margin-base+1;                         // +1 for the space
+      base = right_margin+1;
+      if (pline>=2) break;
+    }
+    glEnable(GL_TEXTURE_2D);
+    glPopMatrix();
+    */
+    xof+=210;
+    i++;
+  }
+  if (i==0) {
+    // show error message
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glBindTexture(GL_TEXTURE_2D,_textureIdloading);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
+    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
+    glEnd();
+    sprintf(temptxt,"Error no music loaded in db");
+    drawText(temptxt, (orgwinsizex/3)+30, 275.0f, 0.4f,1);
+  }
+}
+
+
+
+// ****************************************************************************************
+//
+// Show search music overview
+//
+// ****************************************************************************************
+
+
+void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
+  int buttonsize=180;
+  int buttonsizey=180;
+  int i=0;
+  int ii=0;
+  int lmusicoversigt_antal=(5*7);
+  int sofset=0;
+  int xof=0;
+  int yof=orgwinsizey-(buttonsize*2);
+  char *lastslash;
+  char temptxt[200];
+  int bonline=8;                    //# of element pr line
+  int ofs;
+  int pline=0;
+  int width = 20;
+  bool stop=false;
+  char *base,*right_margin;
+  int length;
+  std::string temptxt1;
+  sofset=(_mangley/40)*8;
+  char searchstring[200];
+  bool cursor=true;
+  float yof_top=orgwinsizey-(buttonsizey*1)+20;                               // start ypos
+  float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
+  // top
+  glEnable(GL_TEXTURE_2D);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  // type of search
+  switch (searchtype) {
+    case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+            break;
+    case 1: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_album);
+            break;
+    case 2: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+            break;
+    case 3: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
+            break;
+    default:glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+  }
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glLoadName(0);
+  glBegin(GL_QUADS); 
+  glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+  glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
+  glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+buttonsizey-20 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+  glEnd();
+
+  // show music search string
+  glPushMatrix();
+  glTranslatef(xof+210+(buttonsize/2),yof+240,0);
+  glDisable(GL_TEXTURE_2D);
+  glScalef(120, 120, 1.0);
+  strcpy(searchstring,keybuffer);
+  if (strcmp(searchstring,"")!=0) {
+    glcRenderString(searchstring);
+  }
+  if (cursor) glcRenderString("_"); else glcRenderString(" ");
+  glPopMatrix();
+
+
+
   while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
     // do new line (if not first line)
     if (((i % bonline)==0) && (i>0)) {
