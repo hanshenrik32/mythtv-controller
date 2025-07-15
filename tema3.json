@@ -1,8 +1,8 @@
 {
     "tema1": {
-        "name": "Tema 3",
+        "name": "Tema 2",
         "icon": "tema2.png",
-        "iconpath": "/opt/mythtv-controller/tema3/",
+        "iconpath": "/opt/mythtv-controller/tema2/",
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
@@ -11,6 +11,11 @@
             },
             "music": {
                 "icon_path": "music_button",
+                "x": 1920,
+                "y": 888
+            },
+            "music_active": {
+                "icon_path": "music1",
                 "x": 1920,
                 "y": 888
             },
@@ -69,6 +74,11 @@
                 "x": 1920,
                 "y": 300
             },
+            "exit": {
+                "icon_path": "exit",
+                "x": 0,
+                "y": 1008
+            },
             "setup_selected": {
                 "icon_path": "setupmenu1",
                 "x": 1920,
@@ -103,6 +113,41 @@
                 "icon_path": "close",
                 "x": 1920,
                 "y": 302
+            },
+            "search": {
+                "icon_path": "search",
+                "x": 1720,
+                "y": 126
+            },
+            "search_back": {
+                "icon_path": "search_back",
+                "x": 1720,
+                "y": 126
+            },
+            "musicplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 200
+            },
+            "spotifyplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 300
+            },
+            "tidalplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 300
+            },
+            "radioplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 320
+            },
+            "mediaplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 320
             }
         }
     }

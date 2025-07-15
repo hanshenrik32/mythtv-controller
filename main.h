@@ -229,6 +229,30 @@ class config_icons {
     int config_search_backy;
     std::string config_search_back_icon;
 
+    int config_musicplayer_infox;
+    int config_musicplayer_infoy;
+    std::string config_musicplayer_info_icon;
+
+    int config_spotifyplayer_infox;
+    int config_spotifyplayer_infoy;
+    std::string config_spotifyplayer_info_icon;
+
+    int config_tidalplayer_infox;
+    int config_tidalplayer_infoy;
+    std::string config_tidalplayer_info_icon;
+
+    int config_radioplayer_infox;
+    int config_radioplayer_infoy;
+    std::string config_radioplayer_info_icon;
+
+    int config_mediaplayer_infox;
+    int config_mediaplayer_infoy;
+    std::string config_mediaplayer_info_icon;
+
+    int config_exitx;
+    int config_exity;
+    std::string config_exit_icon;
+
     config_icons() {
       config_tema_path="/opt/mythtv-controller/tema3/";
       config_tvguidex = 1920;
@@ -288,12 +312,30 @@ class config_icons {
       config_upx= 1920;
       config_upy= 1080;
       config_up_icon= "pup";
-      config_search_activex= 1920;
-      config_search_activey= 302;
+      config_search_activex= 1720;
+      config_search_activey= 126;
       config_search_icon="search";
-      config_search_backx= 1920;
-      config_search_backy= 302;
+      config_search_backx= 1720;
+      config_search_backy= 126;
       config_search_back_icon="search_back";
+      config_musicplayer_infox = 480;
+      config_musicplayer_infoy = 200;
+      config_musicplayer_info_icon = "musicplayer-info";
+      config_spotifyplayer_infox = 480;
+      config_spotifyplayer_infoy = 200;
+      config_spotifyplayer_info_icon = "musicplayer-info";
+      config_tidalplayer_infox = 480;
+      config_tidalplayer_infoy = 300;
+      config_tidalplayer_info_icon = "musicplayer-info";
+      config_radioplayer_infox = 480;
+      config_radioplayer_infoy = 320;
+      config_radioplayer_info_icon = "musicplayer-info";
+      config_mediaplayer_infox = 480;
+      config_mediaplayer_infoy = 320;
+      config_mediaplayer_info_icon = "musicplayer-info";
+      config_exitx = 0;
+      config_exity = 1008;
+      config_exit_icon= "exit";
     }
 };
 

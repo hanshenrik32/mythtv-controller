@@ -74,6 +74,11 @@
                 "x": 1920,
                 "y": 300
             },
+            "exit": {
+                "icon_path": "exit",
+                "x": 0,
+                "y": 1008
+            },
             "setup_selected": {
                 "icon_path": "setupmenu1",
                 "x": 1920,
@@ -111,13 +116,38 @@
             },
             "search": {
                 "icon_path": "search",
-                "x": 1920,
-                "y": 302
+                "x": 1720,
+                "y": 126
             },
             "search_back": {
                 "icon_path": "search_back",
-                "x": 1920,
-                "y": 302
+                "x": 1720,
+                "y": 126
+            },
+            "musicplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 200
+            },
+            "spotifyplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 300
+            },
+            "tidalplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 300
+            },
+            "radioplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 320
+            },
+            "mediaplayer_info": {
+                "icon_path": "musicplayer-info",
+                "x": 480,
+                "y": 320
             }
         }
     }
