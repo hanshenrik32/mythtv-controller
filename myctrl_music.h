@@ -33,7 +33,6 @@ class musicoversigt_class {
   private:
     // const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
     unsigned int antal_music_oversigt;
-    void clean_music_oversigt();
     music_oversigt_type musicoversigt[MAX_MUSIC_OVERSIGT_SIZE+1];
     bool do_play;
     bool music_is_playing;                                                // do we play ?
@@ -46,7 +45,7 @@ class musicoversigt_class {
     
     bool search_music_online_done;
     bool play() { return(do_play);}    
-    
+    void clean_music_oversigt();
     bool set_search_loaded() { search_loaded=true; return(1); }
     
     // load covers
