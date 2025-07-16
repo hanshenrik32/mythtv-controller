@@ -253,6 +253,10 @@ class config_icons {
     int config_exity;
     std::string config_exit_icon;
 
+    int config_askboxx;
+    int config_askboxy;
+    std::string config_askbox_icon;
+
     config_icons() {
       config_tema_path="/opt/mythtv-controller/tema3/";
       config_tvguidex = 1920;
@@ -264,8 +268,8 @@ class config_icons {
       config_tidalx = 0;
       config_tidaly = 0;
       config_tidal_icon = "tidal_button";
-      config_musicx = 0;
-      config_musicy = 0;
+      config_musicx = 1920;
+      config_musicy = 696;
       config_music_icon = "music_button";
       config_music_activex = 0;
       config_music_activey = 0;
@@ -336,6 +340,9 @@ class config_icons {
       config_exitx = 0;
       config_exity = 1008;
       config_exit_icon= "exit";
+      config_askboxx= 500;
+      config_askboxy= 200;
+      config_askbox_icon= "askbox";
     }
 };
 

@@ -12,7 +12,7 @@
             "music": {
                 "icon_path": "music_button",
                 "x": 1920,
-                "y": 888
+                "y": 696
             },
             "music_active": {
                 "icon_path": "music1",
@@ -148,7 +148,13 @@
                 "icon_path": "musicplayer-info",
                 "x": 480,
                 "y": 320
+            },
+            "askbox": {
+                "icon_path": "askbox",
+                "x": 500,
+                "y": 200
             }
+
         }
     }
 }

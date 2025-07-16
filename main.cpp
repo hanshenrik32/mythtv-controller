@@ -3233,10 +3233,11 @@ void display() {
         }
       }
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( config_menu.config_musicx-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( config_menu.config_musicx-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
-      glTexCoord2f(1, 1); glVertex3f( config_menu.config_musicx-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( config_menu.config_musicx-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( config_menu.config_musicx-200 ,  config_menu.config_musicy , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( config_menu.config_musicx-200,   config_menu.config_musicy+iconsizex , 0.0);
+      glTexCoord2f(1, 1); glVertex3f( config_menu.config_musicx-200+iconsizex,config_menu.config_musicy+iconsizex , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( config_menu.config_musicx-200+iconsizex,  config_menu.config_musicy, 0.0);
+
       glEnd();
       // Icon 3
       if (vis_radio_or_music_oversigt) {
@@ -3869,7 +3870,7 @@ void display() {
 
   }
   //
-  // skal vi til at spørge ask open dir or play (ask about play (music))
+  // skal vi til at spørge ask open dir or play (ask about play (music)) (gfx askbox)
   //
   if ((vis_music_oversigt) && (!(visur)) && (ask_open_dir_or_play) && (mknapnr>0)) {
     do_swing_music_cover = false;
@@ -3888,10 +3889,10 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS); // draw ask box
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+800, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+800, yof+800 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( config_menu.config_askboxx, config_menu.config_askboxy , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( config_menu.config_askboxx,config_menu.config_askboxy+800, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( config_menu.config_askboxx+800, config_menu.config_askboxy+800 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( config_menu.config_askboxx+800, config_menu.config_askboxy , 0.0);
       glEnd();
       glPopMatrix();
       // ***************************************************************** play icon
@@ -3909,10 +3910,10 @@ void display() {
       glLoadName(20);                      				  // play icon nr
       glBegin(GL_QUADS);
       // play icon
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( config_menu.config_askboxx+50, config_menu.config_askboxy+50 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( config_menu.config_askboxx+50, config_menu.config_askboxy+50+buttonsize, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( config_menu.config_askboxx+50+buttonsize, config_menu.config_askboxy+50+buttonsize , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( config_menu.config_askboxx+50+buttonsize, config_menu.config_askboxy+50 , 0.0);
       glEnd();
       glPopMatrix();
       // ************************************************************ Open/or close window again
@@ -3935,10 +3936,10 @@ void display() {
       glLoadName(21);                        // Overwrite the first name in the buffer
       glBegin(GL_QUADS);
       // play icon
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( config_menu.config_askboxx+150, config_menu.config_askboxy+50 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( config_menu.config_askboxx+150,config_menu.config_askboxy+50+buttonsize, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( config_menu.config_askboxx+150+buttonsize, config_menu.config_askboxy+50+buttonsize , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( config_menu.config_askboxx+150+buttonsize,config_menu.config_askboxy+50 , 0.0);
       glEnd();
       glPopMatrix();
       // swap ************************************************************** icon swap
@@ -3955,10 +3956,10 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(22);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( config_menu.config_askboxx+250, config_menu.config_askboxy+50 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( config_menu.config_askboxx+250,config_menu.config_askboxy+50+buttonsize, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( config_menu.config_askboxx+250+buttonsize, config_menu.config_askboxy+50+buttonsize , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( config_menu.config_askboxx+250+buttonsize,config_menu.config_askboxy+50 , 0.0);
       glEnd();
       glPopMatrix();
       // draw cd cover
@@ -3976,10 +3977,10 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS); 							//	Begin quadrilateral coordinates
         // 										draw front box
-        glTexCoord2f(0, 0); glVertex3f(200+ xof, yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(200+ xof,yof+buttonsize, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(200+ xof+buttonsize, yof+buttonsize , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(200+ xof+buttonsize,yof , 0.0);
+        glTexCoord2f(0, 0); glVertex3f(400+ config_menu.config_askboxx, config_menu.config_askboxy+50 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(400+ config_menu.config_askboxx,config_menu.config_askboxy+50+buttonsize, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(400+ config_menu.config_askboxx+buttonsize, config_menu.config_askboxy+50+buttonsize , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(400+ config_menu.config_askboxx+buttonsize,config_menu.config_askboxy+50 , 0.0);
         glEnd();
         // ****************************************************************
         // draw cd cover
@@ -3995,10 +3996,10 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS); 							//	Begin quadrilateral coordinates
-        glTexCoord2f(0, 0); glVertex3f(200+ xof, yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(200+ xof,yof+buttonsize, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(200+ xof+buttonsize, yof+buttonsize , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(200+ xof+buttonsize,yof , 0.0);
+        glTexCoord2f(0, 0); glVertex3f(400+ config_menu.config_askboxx, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(400+ config_menu.config_askboxx,yof+buttonsize, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(400+ config_menu.config_askboxx+buttonsize, yof+buttonsize , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(400+ config_menu.config_askboxx+buttonsize,yof , 0.0);
         glEnd(); //End quadrilateral coordinates
         glPopMatrix();
       }
@@ -14950,7 +14951,9 @@ void loadgfx() {
 
     _texturetidalloading	= loadgfxfile(temapath,(char *) "images/",(char *) "tidalplayer-loading");
 
-    _textureId9_askbox   	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
+    // _textureId9_askbox   	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
+    _textureId9_askbox   	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_askbox_icon.c_str());  // "askbox");
+
     _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
     _textureIdplayicon   	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
     _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
@@ -15113,14 +15116,9 @@ void loadgfx() {
     onlinestream_empty    = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
     onlinestream_empty1   = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
     // podcast button
-    //streambutton          = loadgfxfile(temapath,(char *) "buttons/",(char *) "stream_button");
-
     streambutton          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_media_icon.c_str()); // "stream_button");
-
     // movie button
-    // moviebutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "movie_button");
     moviebutton          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_movie_icon.c_str()); // "movie_button");
-
     // main logo
     _mainlogo             = loadgfxfile(temapath,(char *) "images/",(char *) "logo");
     // mask for flags
@@ -15140,15 +15138,7 @@ void loadgfx() {
     // analog clock background
     analog_clock_background = loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     volume_window = loadgfxfile(temapath,(char *) "images/",(char *) "volume_win");
-    /*
-    strcpy(tmpfilename,temapath);
-    strcat(tmpfilename,(char *) "buttons/music1.png");
-    if (file_exists(tmpfilename)) {
-      _textureIdmusic_aktiv=loadTexture ((char *) tmpfilename);
-    } else _textureIdmusic_aktiv=0;
-    */
     _textureIdmusic_aktiv=loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_active_icon.c_str()); // "music1");
-
     printf ("Done loading init graphic.\n");
 }
 
@@ -15533,6 +15523,9 @@ int team_settings_load() {
     config_menu.config_exity=(iRoot["tema1"]["icons"]["exit"].get("y","0").asInt());
     config_menu.config_exit_icon=(iRoot["tema1"]["icons"]["exit"].get("icon_path","0").asString());
 
+    config_menu.config_askboxx=(iRoot["tema1"]["icons"]["exit"].get("x","0").asInt());
+    config_menu.config_askboxy=(iRoot["tema1"]["icons"]["exit"].get("y","0").asInt());
+    config_menu.config_askbox_icon=(iRoot["tema1"]["icons"]["exit"].get("askbox","0").asString());
     
   } catch (const std::exception &e) {
     cout << "Error parsing JSON: " << e.what() << endl;
