@@ -17,7 +17,10 @@
 #include <iostream>
 #include <fmt/format.h>
 
+
 using namespace std;
+
+#include "myth_config.h"
 
 #include "myctrl_music.h"
 #include "myctrl_mplaylist.h"
@@ -80,6 +83,8 @@ extern int orgwinsizex;
 extern char localuserhomedir[4096];
 
 extern bool do_sqlite;
+
+extern config_icons config_menu;
 
 // ****************************************************************************************
 //
@@ -1571,6 +1576,8 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
 void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
   int buttonsize=180;
   int buttonsizey=180;
+  buttonsize=config_menu.config_music_main_window_icon_sizex;
+  buttonsizey=config_menu.config_music_main_window_icon_sizey;
   int i=0;
   int ii=0;
   int lmusicoversigt_antal=(5*7);
@@ -1592,6 +1599,10 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
   bool cursor=true;
   float yof_top=orgwinsizey-(buttonsizey*1)+20;                               // start ypos
   float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
+
+  // xof_top=config_menu.config_music_main_window_sizex;                               // start ypos
+  // yof_top=config_menu.config_music_main_window_sizey;                               // start ypos
+
   // top
   glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
