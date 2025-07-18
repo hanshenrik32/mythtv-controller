@@ -37,6 +37,9 @@
 #include "myctrl_spotify.h"
 
 #include "myctrl_glprint.h"
+#include "myth_config.h"
+
+extern config_icons config_menu;
 
 extern const char *dbname;                                                      // internal database name in mysql (music,movie,radio)
 // web port

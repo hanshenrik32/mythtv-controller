@@ -236,7 +236,7 @@ class config_icons {
       config_exit_icon= "exit";
 
       config_music_main_windowx = 0;
-      config_music_main_windowy = 0;
+      config_music_main_windowy = 920;
       config_music_main_window_sizex = 1920;
       config_music_main_window_sizey = 1080;
       config_music_main_window_icon_spac = 28;
@@ -244,7 +244,7 @@ class config_icons {
       config_music_main_window_icon_sizey = 180;
 
       config_radio_main_windowx = 0;
-      config_radio_main_windowy = 0;      
+      config_radio_main_windowy = 1080;      
       config_radio_main_window_sizex = 1920;
       config_radio_main_window_sizey = 1080;
       config_radio_main_window_icon_spac = 28;
@@ -252,7 +252,7 @@ class config_icons {
       config_radio_main_window_icon_sizey = 1080;
 
       config_stream_main_windowx = 0;
-      config_stream_main_windowy = 0;      
+      config_stream_main_windowy = 1080;
       config_stream_main_window_sizex = 1920;
       config_stream_main_window_sizey = 1080;
       config_stream_main_window_icon_spac = 28;
@@ -260,7 +260,7 @@ class config_icons {
       config_stream_main_window_icon_sizey = 1080;
 
       config_movie_main_windowx = 0;
-      config_movie_main_windowy = 0;      
+      config_movie_main_windowy = 1080;
       config_movie_main_window_sizex = 1920;
       config_movie_main_window_sizey = 1080;
       config_movie_main_window_icon_spac = 28;

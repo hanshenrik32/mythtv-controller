@@ -51,6 +51,9 @@
 #include "myctrl_readwebfile.h"
 #include "myctrl_tidal2.h"
 #include "myctrl_glprint.h"
+#include "myth_config.h"
+
+extern config_icons config_menu;
 
 
 const char *tidal_gfx_path = "tidal_gfx/";

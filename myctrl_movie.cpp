@@ -26,6 +26,9 @@
 #include "myth_vlcplayer.h"
 #include "myctrl_music.h"
 #include "myctrl_glprint.h"
+#include "myth_config.h"
+
+extern config_icons config_menu;
 
 using namespace std;
 using namespace MediaInfoLib;

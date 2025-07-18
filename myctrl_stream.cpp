@@ -21,6 +21,9 @@
 #include "readjpg.h"
 #include "loadpng.h"
 #include "myctrl_glprint.h"
+#include "myth_config.h"
+
+extern config_icons config_menu;
 
 // web file loader
 #include "myctrl_readwebfile.h"
@@ -1553,9 +1556,14 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   int j,ii,k,pos;
   float buttonsizey=160.0f;                                                   // button size
   float buttonsizex=200.0f;                                                   // button size
+  buttonsizex=config_menu.config_music_main_window_icon_sizex;
+  buttonsizey=config_menu.config_music_main_window_icon_sizey;
   float yof=orgwinsizey-(buttonsizey);                                        // start ypos
   float xof=0.0f;
+  int xx=(float) config_menu.config_music_main_window_sizex/(buttonsizex+60);
+  int yy=(float) (config_menu.config_music_main_window_sizey/buttonsizey)-1.0f;
   int lstreamoversigt_antal=9*6;
+  lstreamoversigt_antal = xx*yy;        // 
   int i=0;                                                                    // data ofset in stack array
   unsigned int sofset=0;
   int bonline=8;                                                              // antal pr linie
