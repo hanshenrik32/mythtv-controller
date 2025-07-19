@@ -156,6 +156,8 @@ extern char __BUILD_NUMBER;
 #include "readjpg.h"
 // #include "myth_picture.h"
 
+#include "myth_config.h"
+
 extern rss_stream_class rssstreamoversigt;
 
 #ifdef ENABLE_SPOTIFY
@@ -15497,9 +15499,9 @@ int team_settings_load() {
     config_menu.config_loadingy=(iRoot["tema1"]["icons"]["loading"].get("y","0").asInt());
     config_menu.config_loading_icon=(iRoot["tema1"]["icons"]["loading"].get("icon_path","0").asString());
 
-    config_menu.config_playinfox=(iRoot["tema1"]["icons"]["playinfo"].get("x","0").asInt());
-    config_menu.config_playinfoy=(iRoot["tema1"]["icons"]["playinfo"].get("y","0").asInt());
-    config_menu.config_playinfo_icon=(iRoot["tema1"]["icons"]["playinfo"].get("icon_path","0").asString());
+    config_menu.config_playinfox=(iRoot["tema1"]["icons"]["playinfo_icon"].get("x","0").asInt());
+    config_menu.config_playinfoy=(iRoot["tema1"]["icons"]["playinfo_icon"].get("y","0").asInt());
+    config_menu.config_playinfo_icon=(iRoot["tema1"]["icons"]["playinfo_icon"].get("icon_path","0").asString());
 
     config_menu.config_downx=(iRoot["tema1"]["icons"]["down"].get("x","0").asInt());
     config_menu.config_downy=(iRoot["tema1"]["icons"]["down"].get("y","0").asInt());
@@ -15532,6 +15534,48 @@ int team_settings_load() {
     config_menu.config_exitx=(iRoot["tema1"]["icons"]["exit"].get("x","0").asInt());
     config_menu.config_exity=(iRoot["tema1"]["icons"]["exit"].get("y","0").asInt());
     config_menu.config_exit_icon=(iRoot["tema1"]["icons"]["exit"].get("icon_path","0").asString());
+
+    config_menu.config_music_main_windowx=(iRoot["tema1"]["icons"]["music_main_window"].get("window_x","0").asInt());
+    config_menu.config_music_main_windowy=(iRoot["tema1"]["icons"]["music_main_window"].get("window_y","0").asInt());
+    config_menu.config_music_main_window_sizex=(iRoot["tema1"]["icons"]["music_main_window"].get("window_sizex","0").asInt());
+    config_menu.config_music_main_window_sizey=(iRoot["tema1"]["icons"]["music_main_window"].get("window_sizey","0").asInt());
+    config_menu.config_music_main_window_icon_sizex=(iRoot["tema1"]["icons"]["music_main_window"].get("window_icon_sizex","0").asInt());
+    config_menu.config_music_main_window_icon_sizey=(iRoot["tema1"]["icons"]["music_main_window"].get("window_icon_sizey","0").asInt());
+    
+    config_menu.config_radio_main_windowx=(iRoot["tema1"]["icons"]["radio_main_window"].get("window_x","0").asInt());
+    config_menu.config_radio_main_windowy=(iRoot["tema1"]["icons"]["radio_main_window"].get("window_y","0").asInt());
+    config_menu.config_radio_main_window_sizex=(iRoot["tema1"]["icons"]["radio_main_window"].get("window_sizex","0").asInt());
+    config_menu.config_radio_main_window_sizey=(iRoot["tema1"]["icons"]["radio_main_window"].get("window_sizey","0").asInt());
+    config_menu.config_radio_main_window_icon_sizex=(iRoot["tema1"]["icons"]["radio_main_window"].get("window_icon_sizex","0").asInt());
+    config_menu.config_radio_main_window_icon_sizey=(iRoot["tema1"]["icons"]["radio_main_window"].get("window_icon_sizey","0").asInt());
+    
+    config_menu.config_stream_main_windowx=(iRoot["tema1"]["icons"]["stream_main_window"].get("window_x","0").asInt());
+    config_menu.config_stream_main_windowy=(iRoot["tema1"]["icons"]["stream_main_window"].get("window_y","0").asInt());
+    config_menu.config_stream_main_window_sizex=(iRoot["tema1"]["icons"]["stream_main_window"].get("window_sizex","0").asInt());
+    config_menu.config_stream_main_window_sizey=(iRoot["tema1"]["icons"]["stream_main_window"].get("window_sizey","0").asInt());
+    config_menu.config_stream_main_window_icon_sizex=(iRoot["tema1"]["icons"]["stream_main_window"].get("window_icon_sizex","0").asInt());
+    config_menu.config_stream_main_window_icon_sizey=(iRoot["tema1"]["icons"]["stream_main_window"].get("window_icon_sizey","0").asInt());
+
+    config_menu.config_movie_main_windowx=(iRoot["tema1"]["icons"]["movie_main_window"].get("window_x","0").asInt());
+    config_menu.config_movie_main_windowy=(iRoot["tema1"]["icons"]["movie_main_window"].get("window_y","0").asInt());
+    config_menu.config_movie_main_window_sizex=(iRoot["tema1"]["icons"]["movie_main_window"].get("window_sizex","0").asInt());
+    config_menu.config_movie_main_window_sizey=(iRoot["tema1"]["icons"]["movie_main_window"].get("window_sizey","0").asInt());
+    config_menu.config_movie_main_window_icon_sizex=(iRoot["tema1"]["icons"]["movie_main_window"].get("window_icon_sizex","0").asInt());
+    config_menu.config_movie_main_window_icon_sizey=(iRoot["tema1"]["icons"]["movie_main_window"].get("window_icon_sizey","0").asInt());
+
+    config_menu.config_spotify_main_windowx=(iRoot["tema1"]["icons"]["spotify_main_window"].get("window_x","0").asInt());
+    config_menu.config_spotify_main_windowy=(iRoot["tema1"]["icons"]["spotify_main_window"].get("window_y","0").asInt());
+    config_menu.config_spotify_main_window_sizex=(iRoot["tema1"]["icons"]["spotify_main_window"].get("window_sizex","0").asInt());
+    config_menu.config_spotify_main_window_sizey=(iRoot["tema1"]["icons"]["spotify_main_window"].get("window_sizey","0").asInt());
+    config_menu.config_spotify_main_window_icon_sizex=(iRoot["tema1"]["icons"]["spotify_main_window"].get("window_icon_sizex","0").asInt());
+    config_menu.config_spotify_main_window_icon_sizey=(iRoot["tema1"]["icons"]["spotify_main_window"].get("window_icon_sizey","0").asInt());
+
+    config_menu.config_tidal_main_windowx=(iRoot["tema1"]["icons"]["tidal_main_window"].get("window_x","0").asInt());
+    config_menu.config_tidal_main_windowy=(iRoot["tema1"]["icons"]["tidal_main_window"].get("window_y","0").asInt());
+    config_menu.config_tidal_main_window_sizex=(iRoot["tema1"]["icons"]["tidal_main_window"].get("window_sizex","0").asInt());
+    config_menu.config_tidal_main_window_sizey=(iRoot["tema1"]["icons"]["tidal_main_window"].get("window_sizey","0").asInt());
+    config_menu.config_tidal_main_window_icon_sizex=(iRoot["tema1"]["icons"]["tidal_main_window"].get("window_icon_sizex","0").asInt());
+    config_menu.config_tidal_main_window_icon_sizey=(iRoot["tema1"]["icons"]["tidal_main_window"].get("window_icon_sizey","0").asInt());
 
     
   } catch (const std::exception &e) {

@@ -17,7 +17,10 @@
 #include <iostream>
 #include <fmt/format.h>
 
+
 using namespace std;
+
+#include "myth_config.h"
 
 #include "myctrl_music.h"
 #include "myctrl_mplaylist.h"
@@ -80,6 +83,8 @@ extern int orgwinsizex;
 extern char localuserhomedir[4096];
 
 extern bool do_sqlite;
+
+extern config_icons config_menu;
 
 // ****************************************************************************************
 //
@@ -1409,9 +1414,14 @@ int musicoversigt_class::opdatere_music_oversigt_playlists() {
 void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
   int buttonsize=180;
   int buttonsizey=180;
+  buttonsize=config_menu.config_music_main_window_icon_sizex;
+  buttonsizey=config_menu.config_music_main_window_icon_sizey;
   int i=0;
   int ii=0;
-  int lmusicoversigt_antal=(5*8);
+  int lmusicoversigt_antal=(8*5);
+  int xx=(float) config_menu.config_music_main_window_sizex/(buttonsize+60);
+  int yy=(float) (config_menu.config_music_main_window_sizey/220)+1;
+  lmusicoversigt_antal = xx*yy;        // 
   int sofset=0;
   int xof=0;
   int yof=orgwinsizey-(buttonsize);
@@ -1481,8 +1491,8 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glLoadName(100+i);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsize , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsizey , 0.0);
     glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
     glEnd();
     glPopMatrix();
@@ -1571,15 +1581,20 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
 void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
   int buttonsize=180;
   int buttonsizey=180;
+  buttonsize=config_menu.config_music_main_window_icon_sizex;
+  buttonsizey=config_menu.config_music_main_window_icon_sizey;
   int i=0;
   int ii=0;
-  int lmusicoversigt_antal=(5*7);
+  int lmusicoversigt_antal = (8*4);  
+  int xx=(float) config_menu.config_music_main_window_sizex/(buttonsize+60);
+  int yy=(float) (config_menu.config_music_main_window_sizey/220);
+  lmusicoversigt_antal = xx*yy;        // 
+  int bonline=xx;                    //# of element pr line full screen 8
   int sofset=0;
   int xof=0;
   int yof=orgwinsizey-(buttonsize*2);
   char *lastslash;
-  char temptxt[200];
-  int bonline=8;                    //# of element pr line
+  char temptxt[200];  
   int ofs;
   int pline=0;
   int width = 20;
@@ -1590,8 +1605,8 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
   sofset=(_mangley/40)*8;
   char searchstring[200];
   bool cursor=true;
-  float yof_top=orgwinsizey-(buttonsizey*1)+20;                               // start ypos
   float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
+  float yof_top=orgwinsizey-(buttonsizey*1)+20;                               // start ypos
   // top
   glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1600,6 +1615,7 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
     case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
             break;
     case 1: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+            break;
     default:glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
   }
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1653,8 +1669,8 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
     glLoadName(100+i);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsize , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsizey , 0.0);
     glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
     glEnd();
     glPopMatrix();

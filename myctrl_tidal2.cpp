@@ -51,7 +51,9 @@
 #include "myctrl_readwebfile.h"
 #include "myctrl_tidal2.h"
 #include "myctrl_glprint.h"
+#include "myth_config.h"
 
+extern config_icons config_menu;
 
 const char *tidal_gfx_path = "tidal_gfx/";
 
@@ -4691,7 +4693,13 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       bool cursor=true;
       if (cursor) glcRenderString("_"); else glcRenderString(" ");
       yof=orgwinsizey-((buttonsizey*2));                                        // start ypos
-    } else yof=orgwinsizey-(buttonsizey);                                        // start ypos
+    } else yof=orgwinsizey-(buttonsizey);
+    int xx=(float) config_menu.config_tidal_main_window_sizex/(buttonsize+60);
+    int yy=(float) (config_menu.config_tidal_main_window_sizey/220);
+    lstreamoversigt_antal = xx*yy;        // 
+    yof=config_menu.config_tidal_main_window_sizey-(buttonsizey);        // start ypos
+    //  orgwinsizey-(buttonsizey);
+    // show back button
 
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       // load texture if not loaded
