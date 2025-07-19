@@ -1366,7 +1366,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 // ****************************************************************************************
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
-  int lfilmoversigt_antal=4*8;
+  int lfilmoversigt_antal=8*4;
   int film_nr=0;
   bool cover3d=false;
   char *lastslash;
@@ -1389,6 +1389,11 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int buttonsizey=180;
   int xof=5;
   int yof=orgwinsizey-(buttonsizey);
+  
+  int xx=(float) (config_menu.config_movie_main_window_sizex/config_menu.config_movie_main_window_icon_sizex)-1;
+  int yy=(float) (config_menu.config_movie_main_window_sizey/config_menu.config_movie_main_window_icon_sizey)-2;
+  lfilmoversigt_antal = xx*yy;        // 
+
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
     movie_oversigt_gfx_loading=true;

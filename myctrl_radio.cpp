@@ -23,6 +23,10 @@
 #include "readjpg.h"
 #include "loadpng.h"
 #include "myctrl_glprint.h"
+#include "myth_config.h"
+
+extern config_icons config_menu;
+
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                  // used by log system
@@ -471,6 +475,11 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int i=0;
   int sofset=0;
   int lradiooversigt_antal=(bonline*5);
+  
+  int xx=(float) config_menu.config_radio_main_window_sizex/(buttonsize)-1;
+  int yy=(float) (config_menu.config_radio_main_window_sizey/180)-1;
+  lradiooversigt_antal = xx*yy;        // 
+
   int buttonzoom;
   char tmpfilename[200];
   char gfxfilename[200];
