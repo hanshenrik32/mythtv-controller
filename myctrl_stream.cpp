@@ -1554,16 +1554,17 @@ void stream_class::playstream(char *url) {
 
 void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected) {
   int j,ii,k,pos;
-  float buttonsizey=160.0f;                                                   // button size
-  float buttonsizex=200.0f;                                                   // button size
-  buttonsizex=config_menu.config_music_main_window_icon_sizex;
-  buttonsizey=config_menu.config_music_main_window_icon_sizey;
+  // float buttonsizey=160.0f;                                                   // button size
+  // float buttonsizex=200.0f;                                                   // button size
+  float buttonsizex=config_menu.config_stream_main_window_icon_sizex;
+  float buttonsizey=config_menu.config_stream_main_window_icon_sizey;
   float yof=orgwinsizey-(buttonsizey);                                        // start ypos
   float xof=0.0f;
-  int xx=(float) config_menu.config_music_main_window_sizex/(buttonsizex+60);
-  int yy=(float) (config_menu.config_music_main_window_sizey/buttonsizey)-1.0f;
-  int lstreamoversigt_antal=9*6;
-  lstreamoversigt_antal = xx*yy;        // 
+  xof=config_menu.config_stream_main_windowx;                     // start xpos
+  int xx=(float) config_menu.config_stream_main_window_sizex/(buttonsizex);
+  int yy=(float) (config_menu.config_stream_main_window_sizey/buttonsizey)-2;
+  // int lstreamoversigt_antal=9*6;
+  int lstreamoversigt_antal = xx*yy;        // 
   int i=0;                                                                    // data ofset in stack array
   unsigned int sofset=0;
   int bonline=8;                                                              // antal pr linie
@@ -1667,17 +1668,17 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   // draw icons
   while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
     if (((i % bonline)==0) && (i>0)) {
-      yof=yof-(buttonsizey+20);
-      xof=0;
+      yof=yof-(config_menu.config_stream_main_window_icon_sizey+20);
+      xof=config_menu.config_stream_main_windowx;
     }
     // selected biger
     if (i+1==(int) stream_key_selected) {
-      buttonsizey=160.0f;
-      buttonsizex=200.0f;
+      buttonsizey=config_menu.config_music_main_window_icon_sizey;
+      buttonsizex=config_menu.config_music_main_window_icon_sizex;
       show_round_corner = true;
     } else {
-      buttonsizey=160.0f;
-      buttonsizex=200.0f;
+      buttonsizey=config_menu.config_music_main_window_icon_sizey;
+      buttonsizex=config_menu.config_music_main_window_icon_sizex;
       show_round_corner = false;
     }
     if (stack[i+sofset]->textureId) {
@@ -1689,14 +1690,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       // round corner
       if (show_round_corner) {
-        /*
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-        glEnd();
-        */
         
 
         cx=100+xof;          // pos x

@@ -469,15 +469,17 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int buttonsize=200;
   int buttonsizey=180;
   int xof=5;
+  xof=config_menu.config_radio_main_windowx;
   int yof=orgwinsizey-(buttonsizey);
+  // yof=config_radio_main_windowy-(buttonsizey);
   int boffset=154;
   int bonline=8;                        // numbers of icons pr line
   int i=0;
   int sofset=0;
   int lradiooversigt_antal=(bonline*5);
   
-  int xx=(float) config_menu.config_radio_main_window_sizex/(buttonsize)-1;
-  int yy=(float) (config_menu.config_radio_main_window_sizey/180)-1;
+  int xx=(float) config_menu.config_radio_main_window_sizex/(config_menu.config_radio_main_window_icon_sizex)-1;
+  int yy=(float) (config_menu.config_radio_main_window_sizey/config_menu.config_radio_main_window_icon_sizey)-1;
   lradiooversigt_antal = xx*yy;        // 
 
   int buttonzoom;
@@ -545,7 +547,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   glPushMatrix();
   while((i<lradiooversigt_antal) && ((int) i+(int) sofset<(int) antal) && (stack[i+sofset]!=NULL)) {
     if (((i % bonline)==0) && (i>0)) {
-      xof=5;
+      xof=config_menu.config_radio_main_windowx;	// reset xof
       yof=yof-(buttonsizey+46);
     }
     if (i+1==(int) radio_key_selected) buttonsizey=180.0f; else buttonsizey=150.0f;
