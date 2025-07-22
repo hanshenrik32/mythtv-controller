@@ -26,6 +26,10 @@
 #include "myctrl_readwebfile.h"
 #include "readjpg.h"
 #include "myctrl_glprint.h"
+#include "myth_config.h"
+
+extern config_icons config_menu;
+
 
 extern char localuserhomedir[4096];                                             // user homedir
 extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
@@ -160,7 +164,7 @@ int get_tvguide_fromweb(long filetimediff) {
       if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) 
         exestring = exestring + " --days 2 --output ~/tvguide.xml 2> ~/tvguide.log";
       else 
-        exestring = exestring + " --days 2 --output ~/tvguide.xml 2> ~/tvguide.log";
+        exestring = exestring + " --gui --days 2 --output ~/tvguide.xml 2> ~/tvguide.log";
       // write debug log
       sprintf(debuglogdata,"Running tv graber, use %s: cmd : %s",configbackend_tvgraber,exestring.c_str());
       write_logfile(logfile,(char *) debuglogdata);
@@ -3951,9 +3955,14 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   timeinfo=localtime(&starttid);
   if (selectchanel>(this->vis_kanal_antal-1)) cstartofset=selectchanel-(this->vis_kanal_antal-1);
   else cstartofset=0;
-  xpos=20;
-  ypos=orgwinsizey-200;
-  xsiz=(orgwinsizex-50);
+  xpos=config_menu.config_tv_main_windowx+20;      // 20
+  ypos=config_menu.config_tv_main_window_sizey-200; // orgwinsizey-200;
+  // xpos=20;
+  // ypos=orgwinsizey-200;
+  // menu window size
+  xsiz=config_menu.config_tv_main_window_sizex-50; // orgwinsizex-50;
+  // xsiz=(orgwinsizex-50);
+
   ysiz=150;
   glPushMatrix();
   glTranslatef(10,50, 0.0f);
@@ -3980,9 +3989,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   glPushMatrix();
   glColor3f(1.0f, 1.0f, 1.0f);
   switch (screen_size) {
-    case 4: glTranslatef(xpos+320,orgwinsizey-80, 0.0f);
+    case 4: glTranslatef(xpos+320,config_menu.config_tv_main_window_sizey-80, 0.0f);
             break;
-    default:glTranslatef(xpos+560,orgwinsizey-80, 0.0f);
+    default:glTranslatef(xpos+560,config_menu.config_tv_main_window_sizey-80, 0.0f);
             break;
   }
   glScalef(40.0, 40.0,1);
@@ -4043,10 +4052,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
     switch (screen_size) {
-      case 4: glTranslatef(xpos+10,orgwinsizey-230-(n*150), 0.0f);
+      case 4: glTranslatef(xpos+10,config_menu.config_tv_main_window_sizey-230-(n*150), 0.0f);
               break;
       default:
-              glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
+              glTranslatef(xpos+10,(config_menu.config_tv_main_window_sizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
               break;
     }
     // show clock

@@ -140,7 +140,7 @@ install:
 	@mkdir -p /opt/mythtv-controller/images/mythnetvision	
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
-	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
+	@cp -r -p images tema1 tema1.json tema2 tema2.json tema3 tema3.json tema4 tema4.json tema5 tema5.json tema6 tema6.json tema7 tema7.json tema8 tema8.json tema9 tema9.json tema10 tema10.json $(DESTDIR)
 	#@cp -r xmltv_config $(DESTDIR)	
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png

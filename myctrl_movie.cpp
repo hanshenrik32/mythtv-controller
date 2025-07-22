@@ -1414,7 +1414,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     if ((film_nr+sofset)<filmoversigt_antal) {
       if (((film_nr % bonline)==0) && (film_nr>0)) {
         xpos=config_menu.config_movie_main_windowx;
-        ypos=ypos-(winsizy+60);
+        ypos=ypos-(config_menu.config_movie_main_window_icon_sizey+80);
       }
       if (film_nr+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (filmoversigt[film_nr+sofset].gettextureid()) {

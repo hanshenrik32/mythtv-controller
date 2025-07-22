@@ -15577,6 +15577,11 @@ int team_settings_load() {
     config_menu.config_tidal_main_window_icon_sizex=(iRoot["tema1"]["icons"]["tidal_main_window"].get("window_icon_sizex","0").asInt());
     config_menu.config_tidal_main_window_icon_sizey=(iRoot["tema1"]["icons"]["tidal_main_window"].get("window_icon_sizey","0").asInt());
 
+    config_menu.config_tv_main_windowx=(iRoot["tema1"]["icons"]["tv_main_window"].get("window_x","0").asInt());
+    config_menu.config_tv_main_windowy=(iRoot["tema1"]["icons"]["tv_main_window"].get("window_y","0").asInt());
+    config_menu.config_tv_main_window_sizex=(iRoot["tema1"]["icons"]["tv_main_window"].get("window_sizex","0").asInt());
+    config_menu.config_tv_main_window_sizey=(iRoot["tema1"]["icons"]["tv_main_window"].get("window_sizey","0").asInt());
+
     
   } catch (const std::exception &e) {
     cout << "Error parsing JSON: " << e.what() << endl;

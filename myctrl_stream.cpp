@@ -1562,7 +1562,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   float xof=0.0f;
   xof=config_menu.config_stream_main_windowx;                     // start xpos
   int xx=(float) config_menu.config_stream_main_window_sizex/(buttonsizex);
-  int yy=(float) (config_menu.config_stream_main_window_sizey/buttonsizey)-2;
+  int yy=(float) (config_menu.config_stream_main_window_sizey/buttonsizey);
   // int lstreamoversigt_antal=9*6;
   int lstreamoversigt_antal = xx*yy;        // 
   int i=0;                                                                    // data ofset in stack array
