@@ -164,7 +164,7 @@ int get_tvguide_fromweb(long filetimediff) {
       if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) 
         exestring = exestring + " --days 2 --output ~/tvguide.xml 2> ~/tvguide.log";
       else 
-        exestring = exestring + " --gui --days 2 --output ~/tvguide.xml 2> ~/tvguide.log";
+        exestring = exestring + " --days 2 --output ~/tvguide.xml 2> ~/tvguide.log";
       // write debug log
       sprintf(debuglogdata,"Running tv graber, use %s: cmd : %s",configbackend_tvgraber,exestring.c_str());
       write_logfile(logfile,(char *) debuglogdata);
@@ -3582,17 +3582,15 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     if (mysql_real_connect(conn, mysqlhost,mysqluser, mysqlpass, database, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
         // do select from db count nr of records
         // OLD strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
-        strcat(sqlselect,"' and endtime>='");
+        strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,abs(channel.channum),starttime");
 
-        // printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+        printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
 
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -3606,6 +3604,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
           }
         }
         // do select from db
+        // strcpy(sqlselect,"SELECT channel.name,channel.iconfile,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcpy(sqlselect,"SELECT channel.name,channel.iconfile,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
         strcat(sqlselect,"' and starttime>='");
@@ -3614,7 +3613,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
         // write_logfile(logfile,(char *) sqlselect);
 
-        //printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+        printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
 
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
