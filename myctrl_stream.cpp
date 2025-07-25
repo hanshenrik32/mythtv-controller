@@ -330,8 +330,9 @@ std::vector<std::string> sql_podcast_array={
   "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Generation Mars',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Generation Mars',NULL,NULL,'Generation Mars',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/generation-mars.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
   "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Go Morgen P3',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Go Morgen P3',NULL,NULL,'Go Morgen P3',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/gomorgenp3.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
   "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Anmelderne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Anmelderne',NULL,NULL,'Anmelderne',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/anmelderne.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
-  "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Orientering Udsyn',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Orientering Udsyn',NULL,NULL,'Orientering Udsyn',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/orientering.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)"  
-  };
+  "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Orientering Udsyn',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Orientering Udsyn',NULL,NULL,'Orientering Udsyn',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/orientering.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
+  "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Joshua Bardwell',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Joshua Bardwell',NULL,NULL,'Joshua Bardwell',0,0,NULL,'https://www.patreon.com/rss/thedroneracingengineer?auth=JS4Yb-OaQVI2Q_LsIGb9jX9imuA8eGbx&show=931863',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)"
+};
 
 
 // "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('title',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('title',NULL,NULL,'beskrivelse',0,0,NULL,'podcasturl',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)"
@@ -1554,16 +1555,17 @@ void stream_class::playstream(char *url) {
 
 void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected) {
   int j,ii,k,pos;
-  float buttonsizey=160.0f;                                                   // button size
-  float buttonsizex=200.0f;                                                   // button size
-  buttonsizex=config_menu.config_music_main_window_icon_sizex;
-  buttonsizey=config_menu.config_music_main_window_icon_sizey;
+  // float buttonsizey=160.0f;                                                   // button size
+  // float buttonsizex=200.0f;                                                   // button size
+  float buttonsizex=config_menu.config_stream_main_window_icon_sizex;
+  float buttonsizey=config_menu.config_stream_main_window_icon_sizey;
   float yof=orgwinsizey-(buttonsizey);                                        // start ypos
   float xof=0.0f;
-  int xx=(float) config_menu.config_music_main_window_sizex/(buttonsizex+60);
-  int yy=(float) (config_menu.config_music_main_window_sizey/buttonsizey)-1.0f;
-  int lstreamoversigt_antal=9*6;
-  lstreamoversigt_antal = xx*yy;        // 
+  xof=config_menu.config_stream_main_windowx;                     // start xpos
+  int xx=(float) config_menu.config_stream_main_window_sizex/(buttonsizex);
+  int yy=(float) (config_menu.config_stream_main_window_sizey/buttonsizey);
+  // int lstreamoversigt_antal=9*6;
+  int lstreamoversigt_antal = xx*yy;        // 
   int i=0;                                                                    // data ofset in stack array
   unsigned int sofset=0;
   int bonline=8;                                                              // antal pr linie
@@ -1667,17 +1669,17 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   // draw icons
   while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
     if (((i % bonline)==0) && (i>0)) {
-      yof=yof-(buttonsizey+20);
-      xof=0;
+      yof=yof-(config_menu.config_stream_main_window_icon_sizey+20);
+      xof=config_menu.config_stream_main_windowx;
     }
     // selected biger
     if (i+1==(int) stream_key_selected) {
-      buttonsizey=160.0f;
-      buttonsizex=200.0f;
+      buttonsizey=config_menu.config_music_main_window_icon_sizey;
+      buttonsizex=config_menu.config_music_main_window_icon_sizex;
       show_round_corner = true;
     } else {
-      buttonsizey=160.0f;
-      buttonsizex=200.0f;
+      buttonsizey=config_menu.config_music_main_window_icon_sizey;
+      buttonsizex=config_menu.config_music_main_window_icon_sizex;
       show_round_corner = false;
     }
     if (stack[i+sofset]->textureId) {
@@ -1689,14 +1691,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       // round corner
       if (show_round_corner) {
-        /*
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-        glEnd();
-        */
         
 
         cx=100+xof;          // pos x

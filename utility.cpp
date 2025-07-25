@@ -96,7 +96,7 @@ bool file_exists(const char * filename)
 // check file size
 // return size
 int check_zerro_bytes_file(char *filename) {
-  long size;
+  long size=0;
   FILE *f = fopen(filename, "rb");
   if (f) {
    fseek(f, 0 ,SEEK_END);

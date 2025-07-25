@@ -466,18 +466,19 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
   static bool show_all_kode_errors=false;
-  int buttonsize=200;
-  int buttonsizey=180;
-  int xof=5;
+  int buttonsizex = config_menu.config_radio_main_window_icon_sizex;
+  int buttonsizey = config_menu.config_radio_main_window_icon_sizey;
+  int xof=config_menu.config_radio_main_windowx;
   int yof=orgwinsizey-(buttonsizey);
+  yof=config_menu.config_radio_main_window_sizey-(buttonsizey);  
   int boffset=154;
   int bonline=8;                        // numbers of icons pr line
   int i=0;
   int sofset=0;
   int lradiooversigt_antal=(bonline*5);
   
-  int xx=(float) config_menu.config_radio_main_window_sizex/(buttonsize)-1;
-  int yy=(float) (config_menu.config_radio_main_window_sizey/180)-1;
+  int xx=(float) (config_menu.config_radio_main_window_sizex/config_menu.config_radio_main_window_icon_sizex)-1;
+  int yy=(float) (config_menu.config_radio_main_window_sizey/config_menu.config_radio_main_window_icon_sizey)-1;
   lradiooversigt_antal = xx*yy;        // 
 
   int buttonzoom;
@@ -497,7 +498,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   }
   if (screen_size==4) {
     bonline=7;
-    buttonsize=160;
+    buttonsizex=160;
     buttonsizey=140;
   }
   // er gfx loaded
@@ -541,12 +542,12 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       radio_oversigt_loaded=true;
       radio_oversigt_loaded_done=true;
     } else radio_oversigt_loaded_nr++;
-  }
+  } 
   glPushMatrix();
   while((i<lradiooversigt_antal) && ((int) i+(int) sofset<(int) antal) && (stack[i+sofset]!=NULL)) {
     if (((i % bonline)==0) && (i>0)) {
-      xof=5;
-      yof=yof-(buttonsizey+46);
+      xof=config_menu.config_radio_main_windowx;	// reset xof
+      yof=yof-(config_menu.config_radio_main_window_icon_sizey+46); // old buttonsizey
     }
     if (i+1==(int) radio_key_selected) buttonsizey=180.0f; else buttonsizey=150.0f;
     if (stack[i+sofset]->textureId) {
@@ -564,8 +565,8 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
       glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex, yof+buttonsizey , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex,yof , 0.0);
       glEnd();
       glPopMatrix();
       glPushMatrix();
@@ -583,8 +584,8 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
       glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
       glEnd();
       glPopMatrix();
     } else {
@@ -602,8 +603,8 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
       glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex, yof+buttonsizey , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex,yof , 0.0);
       glEnd();
       glPopMatrix();
     }
@@ -635,7 +636,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     temptxt1 = fmt::format("{:^24}",stack[i+sofset]->station_name);
     temptxt1.resize(24);
     drawText(temptxt1.c_str(), xof+2, yof-18, 0.4f,1);
-    xof=xof+buttonsize+6;
+    xof=xof+buttonsizex+6;
     i++;
   }
   radio_oversigt_antal=radiooversigt.radioantal();
@@ -654,6 +655,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
     glEnd();
     drawText("Error no radio stations load", (orgwinsizex/3)+30, 275.0f, 0.4f,15);
+    write_logfile(logfile,(char *) "Error no radio stations load.");
   }
   glPopMatrix();
   show_all_kode_errors=true;                                                  // stop loging.

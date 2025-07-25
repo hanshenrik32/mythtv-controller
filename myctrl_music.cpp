@@ -1412,10 +1412,8 @@ int musicoversigt_class::opdatere_music_oversigt_playlists() {
 
 
 void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
-  int buttonsize=180;
-  int buttonsizey=180;
-  buttonsize=config_menu.config_music_main_window_icon_sizex;
-  buttonsizey=config_menu.config_music_main_window_icon_sizey;
+  int buttonsize=config_menu.config_music_main_window_icon_sizex;
+  int buttonsizey=config_menu.config_music_main_window_icon_sizey;
   int i=0;
   int ii=0;
   int lmusicoversigt_antal=(8*5);
@@ -1424,7 +1422,9 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   lmusicoversigt_antal = xx*yy;        // 
   int sofset=0;
   int xof=0;
+  xof=config_menu.config_music_main_windowx;
   int yof=orgwinsizey-(buttonsize);
+  yof=config_menu.config_music_main_window_sizey-(config_menu.config_music_main_window_icon_sizex);
   char *lastslash;
   char temptxt[200];
   int bonline=8;                    //# of element pr line
@@ -1439,7 +1439,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
     // do new line (if not first line)
     if (((i % bonline)==0) && (i>0)) {
-      xof=0;
+      xof=config_menu.config_music_main_windowx;
       yof=yof-(buttonsizey+28);
     }
     glPushMatrix();

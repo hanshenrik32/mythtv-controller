@@ -26,6 +26,10 @@
 #include "myctrl_readwebfile.h"
 #include "readjpg.h"
 #include "myctrl_glprint.h"
+#include "myth_config.h"
+
+extern config_icons config_menu;
+
 
 extern char localuserhomedir[4096];                                             // user homedir
 extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
@@ -3578,17 +3582,15 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     if (mysql_real_connect(conn, mysqlhost,mysqluser, mysqlpass, database, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
         // do select from db count nr of records
         // OLD strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
-        strcat(sqlselect,"' and endtime>='");
+        strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,abs(channel.channum),starttime");
 
-        // printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+        printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
 
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -3602,6 +3604,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
           }
         }
         // do select from db
+        // strcpy(sqlselect,"SELECT channel.name,channel.iconfile,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcpy(sqlselect,"SELECT channel.name,channel.iconfile,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
         strcat(sqlselect,"' and starttime>='");
@@ -3610,7 +3613,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
         // write_logfile(logfile,(char *) sqlselect);
 
-        //printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+        printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
 
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -3951,9 +3954,14 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   timeinfo=localtime(&starttid);
   if (selectchanel>(this->vis_kanal_antal-1)) cstartofset=selectchanel-(this->vis_kanal_antal-1);
   else cstartofset=0;
-  xpos=20;
-  ypos=orgwinsizey-200;
-  xsiz=(orgwinsizex-50);
+  xpos=config_menu.config_tv_main_windowx+20;      // 20
+  ypos=config_menu.config_tv_main_window_sizey-200; // orgwinsizey-200;
+  // xpos=20;
+  // ypos=orgwinsizey-200;
+  // menu window size
+  xsiz=config_menu.config_tv_main_window_sizex-50; // orgwinsizex-50;
+  // xsiz=(orgwinsizex-50);
+
   ysiz=150;
   glPushMatrix();
   glTranslatef(10,50, 0.0f);
@@ -3980,9 +3988,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   glPushMatrix();
   glColor3f(1.0f, 1.0f, 1.0f);
   switch (screen_size) {
-    case 4: glTranslatef(xpos+320,orgwinsizey-80, 0.0f);
+    case 4: glTranslatef(xpos+320,config_menu.config_tv_main_window_sizey-80, 0.0f);
             break;
-    default:glTranslatef(xpos+560,orgwinsizey-80, 0.0f);
+    default:glTranslatef(xpos+560,config_menu.config_tv_main_window_sizey-80, 0.0f);
             break;
   }
   glScalef(40.0, 40.0,1);
@@ -4043,10 +4051,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
     switch (screen_size) {
-      case 4: glTranslatef(xpos+10,orgwinsizey-230-(n*150), 0.0f);
+      case 4: glTranslatef(xpos+10,config_menu.config_tv_main_window_sizey-230-(n*150), 0.0f);
               break;
       default:
-              glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
+              glTranslatef(xpos+10,(config_menu.config_tv_main_window_sizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
               break;
     }
     // show clock
