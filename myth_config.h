@@ -14,9 +14,15 @@ class config_icons {
     int config_spotifyx;
     int config_spotifyy;
     std::string config_spotify_icon;
+    int config_spotify1x;
+    int config_spotify1y;
+    std::string config_spotify1_icon;
     int config_tidalx;
     int config_tidaly;
     std::string config_tidal_icon;
+    int config_tidal1x;
+    int config_tidal1y;
+    std::string config_tidal1_icon;
     int config_musicx;
     int config_musicy;
     std::string config_music_icon;
@@ -26,6 +32,9 @@ class config_icons {
     int config_mediax;
     int config_mediay;
     std::string config_media_icon;
+    int config_media1x;
+    int config_media1y;
+    std::string config_media1_icon;
     int config_radiox;
     int config_radioy;
     std::string config_radio_icon;
@@ -41,6 +50,9 @@ class config_icons {
     int config_recordedx;
     int config_recordedy;
     std::string config_recorded_icon;
+    int config_recorded1x;
+    int config_recorded1y;
+    std::string config_recorded1_icon;
     int config_closex;
     int config_closey;
     std::string config_close_icon;
@@ -155,12 +167,23 @@ class config_icons {
       config_spotifyx = 1920;
       config_spotifyy = 696;
       config_spotify_icon = "spotify_button";
+
+      config_spotify1x = 1920;
+      config_spotify1y = 696;
+      config_spotify1_icon = "spotify_button";
+
       config_tidalx = 1920;
       config_tidaly = 696;
       config_tidal_icon = "tidal_button";
+
+      config_tidal1x = 1920;
+      config_tidal1y = 696;
+      config_tidal1_icon = "tidal_button";
+
       config_musicx = 1920;
       config_musicy = 500;
       config_music_icon = "music_button";
+
       config_music_activex = 1920;
       config_music_activey = 500;
       config_music_active_icon = "music1";
@@ -172,6 +195,11 @@ class config_icons {
       config_mediax = 1920;
       config_mediay = 696;
       config_media_icon = "media_button";
+
+      config_media1x = 1920;
+      config_media1y = 696;
+      config_media1_icon = "media_button";
+
       config_radiox = 1920;
       config_radioy = 0;
       config_radio_icon = "radio_button";
@@ -187,6 +215,11 @@ class config_icons {
       config_recordedx = 0;
       config_recordedy = 0;
       config_recorded_icon = "recorded_button";
+
+      config_recorded1x = 0;
+      config_recorded1y = 0;
+      config_recorded1_icon = "recorded_button";
+
       config_closex = 1920;
       config_closey = 302;
       config_close_icon = "close";

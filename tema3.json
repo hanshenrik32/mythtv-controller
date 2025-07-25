@@ -6,13 +6,13 @@
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
-                "x": 1920,
-                "y": 1080
+                "x": 200,
+                "y": 200
             },
             "music": {
                 "icon_path": "music_button",
-                "x": 1920,
-                "y": 1080
+                "x": 400,
+                "y": 400
             },
             "music_active": {
                 "icon_path": "music1",
@@ -21,8 +21,8 @@
             },
             "media": {
                 "icon_path": "stream_button",
-                "x": 1920,
-                "y": 696
+                "x": 600,
+                "y": 200
             },
             "spotify": {
                 "icon_path": "spotify_button",
@@ -51,18 +51,13 @@
             },
             "recorded": {
                 "icon_path": "recorded",
-                "x": 1920,
-                "y": 312
-            },
-            "podcast": {
-                "icon_path": "stream_button.png",
-                "x": 1920,
-                "y": 888
+                "x": 800,
+                "y": 20
             },
             "movie": {
                 "icon_path": "movie_button",
-                "x": 1920,
-                "y": 504
+                "x": 600,
+                "y": 20
             },
             "movie1": {
                 "icon_path": "movie1",
