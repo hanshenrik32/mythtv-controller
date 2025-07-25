@@ -59,11 +59,6 @@
                 "x": 1920,
                 "y": 696
             },
-            "flac": {
-                "icon_path": "music_button",
-                "x": 1920,
-                "y": 504
-            },
             "recorded": {
                 "icon_path": "recorded",
                 "x": 1920,
@@ -73,11 +68,6 @@
                 "icon_path": "recorded",
                 "x": 1920,
                 "y": 312
-            },
-            "podcast": {
-                "icon_path": "stream_button.png",
-                "x": 1920,
-                "y": 888
             },
             "movie": {
                 "icon_path": "movie_button",
