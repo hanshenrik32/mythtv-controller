@@ -6,6 +6,8 @@ class config_icons {
     // main icons settings from json file
     int config_tvguidex;
     int config_tvguidey;
+    int config_tvguide_icon_sizex;
+    int config_tvguide_icon_sizey;
     std::string config_tvguide_icon;
     GLuint config_tvguidex_textureId;
     std::string config_tema_path;
@@ -27,6 +29,9 @@ class config_icons {
     int config_radiox;
     int config_radioy;
     std::string config_radio_icon;
+    int config_radio1x;
+    int config_radio1y;
+    std::string config_radio1_icon;
     int config_moviex;
     int config_moviey;
     std::string config_movie_icon;
@@ -101,6 +106,11 @@ class config_icons {
     int config_radio_main_window_icon_spac;
     int config_radio_main_window_icon_sizex;
     int config_radio_main_window_icon_sizey;
+
+    int config_radio_or_music_oversigtx;
+    int config_radio_or_music_oversigty;
+    std::string config_radio_or_music_oversigt_icon;
+
     int config_stream_main_windowx;
     int config_stream_main_windowy;
     int config_stream_main_window_sizex;
@@ -139,30 +149,40 @@ class config_icons {
       config_tema_path="/opt/mythtv-controller/tema3/";
       config_tvguidex = 1920;
       config_tvguidey = 1080;
+      config_tvguide_icon_sizex = 180;
+      config_tvguide_icon_sizey = 180;
       config_tvguide_icon = "tv";
-      config_spotifyx = 0;
-      config_spotifyy = 0;
+      config_spotifyx = 1920;
+      config_spotifyy = 696;
       config_spotify_icon = "spotify_button";
-      config_tidalx = 0;
-      config_tidaly = 0;
+      config_tidalx = 1920;
+      config_tidaly = 696;
       config_tidal_icon = "tidal_button";
-      config_musicx = 0;
-      config_musicy = 0;
+      config_musicx = 1920;
+      config_musicy = 500;
       config_music_icon = "music_button";
-      config_music_activex = 0;
-      config_music_activey = 0;
+      config_music_activex = 1920;
+      config_music_activey = 500;
       config_music_active_icon = "music1";
-      config_mediax = 0;
-      config_mediay = 0;
+
+      config_radio_or_music_oversigtx=1920;
+      config_radio_or_music_oversigty=1080;
+      config_radio_or_music_oversigt_icon = "music_button";
+
+      config_mediax = 1920;
+      config_mediay = 696;
       config_media_icon = "media_button";
-      config_radiox = 0;
+      config_radiox = 1920;
       config_radioy = 0;
       config_radio_icon = "radio_button";
-      config_moviex = 0;
-      config_moviey = 0;
+      config_radio1x = 1920;
+      config_radio1y = 0;
+      config_radio1_icon = "radio_button";
+      config_moviex = 1920;
+      config_moviey = 504;
       config_movie_icon = "movie_button";
-      config_movie1x = 0;
-      config_movie1y = 0;
+      config_movie1x = 1920;
+      config_movie1y = 696;
       config_movie1_icon = "movie1";
       config_recordedx = 0;
       config_recordedy = 0;
@@ -183,7 +203,7 @@ class config_icons {
       config_loadingy = 200;
       config_loading_icon = "loading";
       config_playinfox = 1920;
-      config_playinfoy = 1920;
+      config_playinfoy = 1080;
       config_playinfo_icon = "playinfo";
       config_reset_searchx = 1920;
       config_reset_searchy = 1080;

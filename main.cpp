@@ -3134,13 +3134,18 @@ void display() {
       // Icon 1
       // tv icon or play info icon
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-
       if (vis_radio_or_music_oversigt) {
         glBindTexture(GL_TEXTURE_2D, spotifybutton);                         // default show music/radio/film/stream/spotify play info
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glLoadName(82);                                                           // Info icon nr 82 spotify
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_spotifyx-200 ,  orgwinsizey-(iconspacey*1) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_spotifyx-200,   orgwinsizey-(iconspacey*1)+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_spotifyx-200+iconsizex,orgwinsizey-(iconspacey*1)+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_spotifyx-200+iconsizex,   orgwinsizey-(iconspacey*1) , 0.0);
+        glEnd();
       } else {
           // play info icon
           if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
@@ -3149,20 +3154,26 @@ void display() {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glColor4f(1.0f, 1.0f, 1.0f,1.0f);
             glLoadName(27);                                                           // Info icon nr 27
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f( config_menu.config_playinfox-200 ,  config_menu.config_playinfoy-(iconspacey*1) , 0.0);
+            glTexCoord2f(0, 1); glVertex3f( config_menu.config_playinfox-200,   config_menu.config_playinfoy-(iconspacey*1)+iconsizex , 0.0);
+            glTexCoord2f(1, 1); glVertex3f( config_menu.config_playinfox-200+iconsizex,config_menu.config_playinfoy-(iconspacey*1)+iconsizex , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( config_menu.config_playinfox-200+iconsizex,   config_menu.config_playinfoy-(iconspacey*1) , 0.0);
+            glEnd();
           } else {                                                                    // else default tv
             glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                            // Tv texture icon
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
             glLoadName(1);                                                            // Tv guide icon nr 1
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f( config_menu.config_tvguidex-200 ,  config_menu.config_tvguidey-(iconspacey*1) , 0.0);
+            glTexCoord2f(0, 1); glVertex3f( config_menu.config_tvguidex-200,   config_menu.config_tvguidey-(iconspacey*1)+iconsizex , 0.0);
+            glTexCoord2f(1, 1); glVertex3f( config_menu.config_tvguidex-200+iconsizex, config_menu.config_tvguidey-(iconspacey*1)+iconsizex , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( config_menu.config_tvguidex-200+iconsizex, config_menu.config_tvguidey-(iconspacey*1) , 0.0);
+            glEnd();
           }
       }
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( config_menu.config_tvguidex-200 ,  orgwinsizey-(iconspacey*1) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( config_menu.config_tvguidex-200,   orgwinsizey-(iconspacey*1)+iconsizex , 0.0);
-      glTexCoord2f(1, 1); glVertex3f( config_menu.config_tvguidex-200+iconsizex,orgwinsizey-(iconspacey*1)+iconsizex , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( config_menu.config_tvguidex-200+iconsizex,   orgwinsizey-(iconspacey*1) , 0.0);
-      glEnd();
       // Icon 2
       if (vis_radio_or_music_oversigt) {
         glBindTexture(GL_TEXTURE_2D, tidalbutton);                                // tidal button
@@ -3170,24 +3181,61 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glLoadName(83);                                                           // Info icon nr 83 tidal
+        glBegin(GL_QUADS);
+        /*
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_tidalx-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_tidalx-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_tidalx-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_tidalx-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+        */
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_tidalx-200 , config_menu.config_tidaly , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_tidalx-200,   config_menu.config_tidaly+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_tidalx-200+iconsizex,config_menu.config_tidaly+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_tidalx-200+iconsizex,   config_menu.config_tidaly , 0.0);
+        glEnd();
       } else if (vis_stream_or_movie_oversigt) {
         glBindTexture(GL_TEXTURE_2D, streambutton);                               // steam button
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glLoadName(80);                                                           // Info icon nr stream
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_musicx-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_musicx-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_musicx-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_musicx-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+        glEnd();
       } else if (vis_spotify_oversigt) {
         glBindTexture(GL_TEXTURE_2D, spotifybutton);                         // default show music/radio/film/stream/spotify play info
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glLoadName(2);                                                           // Info icon nr 82 spotify
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_spotifyx-200, config_menu.config_spotifyy , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_spotifyx-200, config_menu.config_spotifyy+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_spotifyx-200+iconsizex, config_menu.config_spotifyy+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_spotifyx-200+iconsizex, config_menu.config_spotifyy , 0.0);
+        glEnd();
       } else if (vis_tidal_oversigt) { 
         glBindTexture(GL_TEXTURE_2D, tidalbutton);                               // default show music/radio/film/stream/spotify play info
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glLoadName(2);                                                           // Info icon nr 82 spotify
+        glBegin(GL_QUADS);
+        /*
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_tidalx-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_tidalx-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_tidalx-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_tidalx-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+        */
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_tidalx-200 , config_menu.config_tidaly , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_tidalx-200,   config_menu.config_tidaly+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_tidalx-200+iconsizex,config_menu.config_tidaly+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_tidalx-200+iconsizex,   config_menu.config_tidaly , 0.0);
+        
+        glEnd();
       } else {
         // movie stuf
         if (vis_film_oversigt) {
@@ -3196,89 +3244,193 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(3); 			                                                    // film icon name 3
+          glBegin(GL_QUADS);
+          /*
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_moviex-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_moviex-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_moviex-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_moviex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+          */
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_movie1x-200 ,  config_menu.config_movie1y , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_movie1x-200,   config_menu.config_movie1y+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_movie1x-200+iconsizex,config_menu.config_movie1y+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_movie1x-200+iconsizex,   config_menu.config_movie1y , 0.0);
+
+          glEnd();
         } else if (vis_stream_oversigt) {
           glBindTexture(GL_TEXTURE_2D,streambutton);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(3); 			                                                    // film icon name 3
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_mediax-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_mediax-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_mediax-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_mediax-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+          /*
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_mediax-200, config_menu.config_mediay , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_mediax-200, config_menu.config_mediay+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_mediax-200+iconsizex, config_menu.config_mediay+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_mediax-200+iconsizex, config_menu.config_mediay , 0.0);
+          */
+          glEnd();
         } else if (vis_music_oversigt) {
           glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);                   //
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(2); 			// Overwrite the first name in the buffer
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_musicx-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_musicx-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_musicx-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_musicx-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+          glEnd();
         } else if (vis_radio_oversigt) {
           glBindTexture(GL_TEXTURE_2D,radiobutton);                   //
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(2); 			// Overwrite the first name in the buffer
+          glBegin(GL_QUADS);
+
+          /*
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_radiox-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_radiox-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_radiox-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_radiox-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+          */
+
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_radio1x-200, config_menu.config_radio1y , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_radio1x-200, config_menu.config_radio1y+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_radio1x-200+iconsizex, config_menu.config_radio1y+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_radio1x-200+iconsizex, config_menu.config_radio1y , 0.0);
+
+          glEnd();
         } else if (vis_spotify_oversigt) {
           glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                        // music icon spotify
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(2); 			// Overwrite the first name in the buffer
+          glBegin(GL_QUADS);
+          /*
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_spotifyx-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_spotifyx-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_spotifyx-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_spotifyx-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+          */
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_spotifyx-200 ,  config_menu.config_spotifyy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_spotifyx-200,   config_menu.config_spotifyy+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_spotifyx-200+iconsizex,config_menu.config_spotifyy+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_spotifyx-200+iconsizex,   config_menu.config_spotifyy , 0.0);
+          glEnd();
         } else if (vis_tidal_oversigt) {
           glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                        // music icon spotify
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(2); 			// Overwrite the first name in the buffer
+          glBegin(GL_QUADS);
+          /*          
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_musicx-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_musicx-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_musicx-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_musicx-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
+          */
+
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_tidalx-200, config_menu.config_tidaly-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_tidalx-200, config_menu.config_tidaly-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_tidalx-200+iconsizex, config_menu.config_tidaly-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_tidalx-200+iconsizex, config_menu.config_tidaly-(iconspacey*2) , 0.0);
+
+          glEnd();
         } else {
           glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                        // music icon spotify
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(2); 			// Overwrite the first name in the buffer
+          glBegin(GL_QUADS);
+          /*
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_musicx-200, orgwinsizey-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_musicx-200, orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_musicx-200+iconsizex, orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_musicx-200+iconsizex, orgwinsizey-(iconspacey*2) , 0.0);
+          */
+
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_musicx-200, config_menu.config_musicy-(iconspacey*2) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_musicx-200, config_menu.config_musicy-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_musicx-200+iconsizex, config_menu.config_musicy-(iconspacey*2)+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_musicx-200+iconsizex, config_menu.config_musicy-(iconspacey*2) , 0.0);
+
+          glEnd();
         }
       }
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( config_menu.config_musicx-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( config_menu.config_musicx-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
-      glTexCoord2f(1, 1); glVertex3f( config_menu.config_musicx-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( config_menu.config_musicx-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
-      glEnd();
       // Icon 3
       if (vis_radio_or_music_oversigt) {
-          glBindTexture(GL_TEXTURE_2D,radiobutton);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(80); 			                                                  // radio icon name 80
+        glBindTexture(GL_TEXTURE_2D,radiobutton);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        glLoadName(80); 			                                                  // radio icon name 80
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_radiox-200 ,  config_menu.config_radioy , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_radiox-200,   config_menu.config_radioy+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_radiox-200+iconsizex,config_menu.config_radioy+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_radiox-200+iconsizex,   config_menu.config_radioy , 0.0);
+        glEnd();
       } else if (vis_stream_or_movie_oversigt) {
         glBindTexture(GL_TEXTURE_2D, moviebutton);                              // steam button
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glLoadName(81);                                                           // Info icon nr movie
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( config_menu.config_moviex-200 ,  config_menu.config_moviey , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( config_menu.config_moviex-200,   config_menu.config_moviey+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( config_menu.config_moviex-200+iconsizex,config_menu.config_moviey+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( config_menu.config_moviex-200+iconsizex,   config_menu.config_moviey , 0.0);
+        glEnd();
       } else {
-          //film icon or pil up
-          if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
-            glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-            glLoadName(23); 			// Overwrite the first name in the buffer
+        //film icon or pil up
+        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
+          glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+          glLoadName(23); 			// Overwrite the first name in the buffer
+          glBegin(GL_QUADS);
+          /*
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_moviex-200 ,  config_menu.config_moviey , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_moviex-200,   config_menu.config_moviey+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_moviex-200+iconsizex,config_menu.config_moviey+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_moviex-200+iconsizex,   config_menu.config_moviey , 0.0);
+          */
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_upx-200 , config_menu.config_upy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_upx-200,  config_menu.config_upy+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_upx-200+iconsizex,config_menu.config_upy+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_upx-200+iconsizex, config_menu.config_upy , 0.0);
+          glEnd();
+        } else {
+          if ((vis_film_oversigt) || (vis_stream_oversigt)) {
+            glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
           } else {
-            if ((vis_film_oversigt) || (vis_stream_oversigt)) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
-            } else {
-              glBindTexture(GL_TEXTURE_2D, _textureIdfilm);				// default film
-            }
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-            glLoadName(3); 			// Overwrite the first name in the buffer
+            glBindTexture(GL_TEXTURE_2D, _textureIdfilm);				// default film
           }
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+          glLoadName(3); 			// Overwrite the first name in the buffer
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_moviex-200 ,  config_menu.config_moviey , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_moviex-200,   config_menu.config_moviey+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_moviex-200+iconsizex,config_menu.config_moviey+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_moviex-200+iconsizex,   config_menu.config_moviey , 0.0);
+          glEnd();
+        }
       }
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( config_menu.config_moviex-200 ,  config_menu.config_moviey , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( config_menu.config_moviex-200,   config_menu.config_moviey+iconsizex , 0.0);
-      glTexCoord2f(1, 1); glVertex3f( config_menu.config_moviex-200+iconsizex,config_menu.config_moviey+iconsizex , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( config_menu.config_moviex-200+iconsizex,   config_menu.config_moviey , 0.0);
-      glEnd();
       // Icon 4
       if (vis_radio_or_music_oversigt) {
           glBindTexture(GL_TEXTURE_2D,musicbutton);
@@ -3286,15 +3438,35 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(81); 			                                                  // music icon name 81
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f( config_menu.config_recordedx-200 , config_menu.config_recordedy , 0.0);
+            glTexCoord2f(0, 1); glVertex3f( config_menu.config_recordedx-200,  config_menu.config_recordedy+iconsizex , 0.0);
+            glTexCoord2f(1, 1); glVertex3f( config_menu.config_recordedx-200+iconsizex,config_menu.config_recordedy+iconsizex , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( config_menu.config_recordedx-200+iconsizex, config_menu.config_recordedy , 0.0);
+            glEnd();
       } else {
-          // recorded icon
+          // pil down
           if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
             glBindTexture(GL_TEXTURE_2D,_textureIdpdown);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glColor4f(1.0f, 1.0f, 1.0f,1.0f);
             glLoadName(24); 			                                                // load film icon name
+            glBegin(GL_QUADS);
+            /*
+            glTexCoord2f(0, 0); glVertex3f( config_menu.config_recordedx-200 , config_menu.config_recordedy , 0.0);
+            glTexCoord2f(0, 1); glVertex3f( config_menu.config_recordedx-200,  config_menu.config_recordedy+iconsizex , 0.0);
+            glTexCoord2f(1, 1); glVertex3f( config_menu.config_recordedx-200+iconsizex,config_menu.config_recordedy+iconsizex , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( config_menu.config_recordedx-200+iconsizex, config_menu.config_recordedy , 0.0);
+            */
+            glTexCoord2f(0, 0); glVertex3f( config_menu.config_downx-200 , config_menu.config_downy , 0.0);
+            glTexCoord2f(0, 1); glVertex3f( config_menu.config_downx-200,  config_menu.config_downy+iconsizex , 0.0);
+            glTexCoord2f(1, 1); glVertex3f( config_menu.config_downx-200+iconsizex,config_menu.config_downy+iconsizex , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( config_menu.config_downx-200+iconsizex, config_menu.config_downy , 0.0);
+
+            glEnd();
           } else {
+            // recorded icon
             if (vis_recorded_oversigt) {
               glBindTexture(GL_TEXTURE_2D, _textureIdrecorded); // _textureIdrecorded_aktiv);
             } else {
@@ -3304,15 +3476,14 @@ void display() {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glColor4f(1.0f, 1.0f, 1.0f,1.0f);
             glLoadName(4);                                                        //
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f( config_menu.config_recordedx-200 , config_menu.config_recordedy , 0.0);
+            glTexCoord2f(0, 1); glVertex3f( config_menu.config_recordedx-200,  config_menu.config_recordedy+iconsizex , 0.0);
+            glTexCoord2f(1, 1); glVertex3f( config_menu.config_recordedx-200+iconsizex,config_menu.config_recordedy+iconsizex , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( config_menu.config_recordedx-200+iconsizex, config_menu.config_recordedy , 0.0);
+            glEnd();
           }
       }
-      // config_menu.config_recored; 
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( config_menu.config_recordedx-200 , config_menu.config_recordedy , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( config_menu.config_recordedx-200,  config_menu.config_recordedy+iconsizex , 0.0);
-      glTexCoord2f(1, 1); glVertex3f( config_menu.config_recordedx-200+iconsizex,config_menu.config_recordedy+iconsizex , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( config_menu.config_recordedx-200+iconsizex, config_menu.config_recordedy , 0.0);
-      glEnd();
       // Icon 5
       if (vis_radio_or_music_oversigt) {
         glBindTexture(GL_TEXTURE_2D, _textureclosemain);
@@ -3362,10 +3533,18 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(5);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
-          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+          /*
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_setupx-200, orgwinsizey-1050 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_setupx-200, orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_setupx-200+iconsizex, orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_setupx-200+iconsizex, orgwinsizey-1050 , 0.0);
+          */
+
+          glTexCoord2f(0, 0); glVertex3f( config_menu.config_setupx-200, config_menu.config_setupy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( config_menu.config_setupx-200, config_menu.config_setupy+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( config_menu.config_setupx-200+iconsizex, config_menu.config_setupy+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( config_menu.config_setupx-200+iconsizex, config_menu.config_setupy , 0.0);
+
           glEnd();
         }
       }
@@ -6078,6 +6257,7 @@ void display() {
     // load all new textures
     // free all loaded menu + icon gfx
     freegfx();                                                                // free gfx loaded
+    team_settings_load();                                         // load new team settings
     loadgfx();                                                                // reload all menu + icon gfx
   }
   //
@@ -15464,7 +15644,7 @@ int team_settings_load() {
     config_menu.config_music_icon=(iRoot["tema1"]["icons"]["music"].get("icon_path","0").asString());
 
     config_menu.config_mediax=(iRoot["tema1"]["icons"]["media"].get("x","0").asInt());
-    config_menu.config_mediax=(iRoot["tema1"]["icons"]["media"].get("y","0").asInt());
+    config_menu.config_mediay=(iRoot["tema1"]["icons"]["media"].get("y","0").asInt());
     config_menu.config_media_icon=(iRoot["tema1"]["icons"]["media"].get("icon_path","0").asString());
 
     config_menu.config_spotifyx=(iRoot["tema1"]["icons"]["spotify"].get("x","0").asInt());
@@ -15479,9 +15659,18 @@ int team_settings_load() {
     config_menu.config_radioy=(iRoot["tema1"]["icons"]["radio"].get("y","0").asInt());
     config_menu.config_radio_icon=(iRoot["tema1"]["icons"]["radio"].get("icon_path","0").asString());
 
+    config_menu.config_radio1x=(iRoot["tema1"]["icons"]["radio1"].get("x","0").asInt());
+    config_menu.config_radio1y=(iRoot["tema1"]["icons"]["radio1"].get("y","0").asInt());
+    config_menu.config_radio1_icon=(iRoot["tema1"]["icons"]["radio1"].get("icon_path","0").asString());
+
     config_menu.config_moviex=(iRoot["tema1"]["icons"]["movie"].get("x","0").asInt());
     config_menu.config_moviey=(iRoot["tema1"]["icons"]["movie"].get("y","0").asInt());
     config_menu.config_movie_icon=(iRoot["tema1"]["icons"]["movie"].get("icon_path","0").asString());
+
+    config_menu.config_movie1x=(iRoot["tema1"]["icons"]["movie1"].get("x","0").asInt());
+    config_menu.config_movie1y=(iRoot["tema1"]["icons"]["movie1"].get("y","0").asInt());
+    config_menu.config_movie1_icon=(iRoot["tema1"]["icons"]["movie1"].get("icon_path","0").asString());
+
 
     config_menu.config_recordedx=(iRoot["tema1"]["icons"]["recorded"].get("x","0").asInt());
     config_menu.config_recordedy=(iRoot["tema1"]["icons"]["recorded"].get("y","0").asInt());
@@ -15534,6 +15723,10 @@ int team_settings_load() {
     config_menu.config_exitx=(iRoot["tema1"]["icons"]["exit"].get("x","0").asInt());
     config_menu.config_exity=(iRoot["tema1"]["icons"]["exit"].get("y","0").asInt());
     config_menu.config_exit_icon=(iRoot["tema1"]["icons"]["exit"].get("icon_path","0").asString());
+
+    config_menu.config_radio_or_music_oversigtx=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asInt());
+    config_menu.config_radio_or_music_oversigty=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asInt());
+    config_menu.config_radio_or_music_oversigt_icon=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asString());
 
     config_menu.config_music_main_windowx=(iRoot["tema1"]["icons"]["music_main_window"].get("window_x","0").asInt());
     config_menu.config_music_main_windowy=(iRoot["tema1"]["icons"]["music_main_window"].get("window_y","0").asInt());

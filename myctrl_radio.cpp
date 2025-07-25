@@ -477,7 +477,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int sofset=0;
   int lradiooversigt_antal=(bonline*5);
   
-  int xx=(float) config_menu.config_radio_main_window_sizex/(config_menu.config_radio_main_window_icon_sizex)-1;
+  int xx=(float) (config_menu.config_radio_main_window_sizex/config_menu.config_radio_main_window_icon_sizex)-1;
   int yy=(float) (config_menu.config_radio_main_window_sizey/config_menu.config_radio_main_window_icon_sizey)-1;
   lradiooversigt_antal = xx*yy;        // 
 
