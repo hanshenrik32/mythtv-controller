@@ -24,12 +24,27 @@
                 "x": 1920,
                 "y": 696
             },
+            "media1": {
+                "icon_path": "stream_button",
+                "x": 1920,
+                "y": 696
+            },
             "spotify": {
+                "icon_path": "spotify_button",
+                "x": 1920,
+                "y": 888
+            },
+            "spotify1": {
                 "icon_path": "spotify_button",
                 "x": 1920,
                 "y": 696
             },
             "tidal": {
+                "icon_path": "tidal_button",
+                "x": 1920,
+                "y": 696
+            },
+            "tidal1": {
                 "icon_path": "tidal_button",
                 "x": 1920,
                 "y": 696
@@ -50,6 +65,11 @@
                 "y": 504
             },
             "recorded": {
+                "icon_path": "recorded",
+                "x": 1920,
+                "y": 312
+            },
+            "recorded1": {
                 "icon_path": "recorded",
                 "x": 1920,
                 "y": 312

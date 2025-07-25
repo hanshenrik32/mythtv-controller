@@ -6,13 +6,13 @@
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
-                "x": 200,
-                "y": 200
+                "x": 1920,
+                "y": 1080
             },
             "music": {
                 "icon_path": "music_button",
-                "x": 400,
-                "y": 400
+                "x": 1920,
+                "y": 1080
             },
             "music_active": {
                 "icon_path": "music1",
@@ -21,15 +21,30 @@
             },
             "media": {
                 "icon_path": "stream_button",
-                "x": 600,
-                "y": 200
+                "x": 1920,
+                "y": 696
+            },
+            "media1": {
+                "icon_path": "stream_button",
+                "x": 1920,
+                "y": 696
             },
             "spotify": {
+                "icon_path": "spotify_button",
+                "x": 1920,
+                "y": 888
+            },
+            "spotify1": {
                 "icon_path": "spotify_button",
                 "x": 1920,
                 "y": 696
             },
             "tidal": {
+                "icon_path": "tidal_button",
+                "x": 1920,
+                "y": 696
+            },
+            "tidal1": {
                 "icon_path": "tidal_button",
                 "x": 1920,
                 "y": 696
@@ -51,13 +66,23 @@
             },
             "recorded": {
                 "icon_path": "recorded",
-                "x": 800,
-                "y": 20
+                "x": 1920,
+                "y": 312
+            },
+            "recorded1": {
+                "icon_path": "recorded",
+                "x": 1920,
+                "y": 312
+            },
+            "podcast": {
+                "icon_path": "stream_button.png",
+                "x": 1920,
+                "y": 888
             },
             "movie": {
                 "icon_path": "movie_button",
-                "x": 600,
-                "y": 20
+                "x": 1920,
+                "y": 504
             },
             "movie1": {
                 "icon_path": "movie1",
