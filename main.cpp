@@ -792,8 +792,11 @@ GLuint onlineradio192;                    //
 GLuint onlineradio320;                    //
 GLuint radiooptions;                      //
 GLuint radiobutton;                       //
+GLuint radiobutton1;                       //
 GLuint tidalbutton;                       //
+GLuint tidalbutton1;                       //
 GLuint spotifybutton;                     //
+GLuint spotifybutton1;                     //
 GLuint spotify_askplay;                   //
 GLuint spotify_askopen;                   //
 GLuint spotify_search;                    // button in spotify search
@@ -3188,7 +3191,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( config_menu.config_mediax+iconsizex, config_menu.config_mediay , 0.0);
         glEnd();
       } else if (vis_spotify_oversigt) {
-        glBindTexture(GL_TEXTURE_2D, spotifybutton);                         // default show music/radio/film/stream/spotify play info
+        glBindTexture(GL_TEXTURE_2D, spotifybutton1);                         // default show music/radio/film/stream/spotify play info
         glLoadName(2);                                                           // Info icon nr 82 spotify
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( config_menu.config_spotify1x, config_menu.config_spotify1y , 0.0);
@@ -3197,7 +3200,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( config_menu.config_spotify1x+iconsizex, config_menu.config_spotify1y , 0.0);
         glEnd();
       } else if (vis_tidal_oversigt) { 
-        glBindTexture(GL_TEXTURE_2D, tidalbutton);                               // default show music/radio/film/stream/spotify play info
+        glBindTexture(GL_TEXTURE_2D, tidalbutton1);                               // default show music/radio/film/stream/spotify play info
         glLoadName(2);                                                           // Info icon nr 82 spotify
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( config_menu.config_tidal1x, config_menu.config_tidal1y , 0.0);
@@ -3235,7 +3238,7 @@ void display() {
           glTexCoord2f(1, 0); glVertex3f( config_menu.config_music_activex+iconsizex, config_menu.config_music_activey , 0.0);
           glEnd();
         } else if (vis_radio_oversigt) {
-          glBindTexture(GL_TEXTURE_2D,radiobutton);                   //
+          glBindTexture(GL_TEXTURE_2D,radiobutton1);                   //
           glLoadName(2); 			// Overwrite the first name in the buffer
           glBegin(GL_QUADS);
           glTexCoord2f(0, 0); glVertex3f( config_menu.config_radio1x, config_menu.config_radio1y , 0.0);
@@ -3354,7 +3357,7 @@ void display() {
           } else {
             // recorded icon
             if (vis_recorded_oversigt) {
-              glBindTexture(GL_TEXTURE_2D, _textureIdrecorded); // _textureIdrecorded_aktiv);
+              glBindTexture(GL_TEXTURE_2D, _textureIdrecorded_aktiv); // _textureIdrecorded_aktiv);
               glLoadName(4);                                                        //
               glBegin(GL_QUADS);
               glTexCoord2f(0, 0); glVertex3f( config_menu.config_recorded1x, config_menu.config_recorded1y , 0.0);
@@ -15121,6 +15124,7 @@ void loadgfx() {
     
     // radiobutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "radio_button");
     radiobutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_radio_icon.c_str());     // "radio_button");				// setup menu
+    radiobutton1          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_radio1_icon.c_str());     // "radio_button");				// setup menu
 
     // musicbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "music_button");
     musicbutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());     // "radio_button");				// setup menu
@@ -15137,9 +15141,11 @@ void loadgfx() {
     
     // spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     spotifybutton         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_spotify_icon.c_str());     // "spotify_button");				// setup menu
+    spotifybutton1         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_spotify1_icon.c_str());     // "spotify_button");				// setup menu
 
     // tidalbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "tidal_button");
     tidalbutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tidal_icon.c_str());     // "tidal_button");				// setup menu
+    tidalbutton1          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tidal1_icon.c_str());     // "tidal_button1");				// setup menu
 
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
     tidal_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_ecover");
@@ -15325,6 +15331,7 @@ void freegfx() {
     glDeleteTextures( 1, &onlineradio192);			    // radio icon
     glDeleteTextures( 1, &onlineradio320);			    // radio icon
     glDeleteTextures( 1, &radiobutton);             //
+    glDeleteTextures( 1, &radiobutton1);             //
     glDeleteTextures( 1, &onlinestream);            // stream default icons
     glDeleteTextures( 1, &onlinestream_empty);      // stream default icons
     glDeleteTextures( 1, &onlinestream_empty1);     // stream default icons
@@ -15334,7 +15341,10 @@ void freegfx() {
     glDeleteTextures( 1, &spotify_search_back);     // back button in spotify search view
     glDeleteTextures( 1, &spotify_askplay);         //
     glDeleteTextures( 1, &spotifybutton);           //
+    glDeleteTextures( 1, &spotifybutton1);           //
     glDeleteTextures( 1, &spotify_ecover);          //
+    glDeleteTextures( 1, &tidalbutton);          //
+    glDeleteTextures( 1, &tidalbutton1);          //
     glDeleteTextures( 1, &tidal_ecover);            //
     glDeleteTextures( 1, &spotify_pil);             //
     glDeleteTextures( 1, &big_search_bar_playlist); // Spotify stuf
