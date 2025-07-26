@@ -1407,6 +1407,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   xpos=config_menu.config_movie_main_windowx;
   // ypos=700;
   ypos=config_menu.config_movie_main_window_sizey-(config_menu.config_movie_main_window_icon_sizey*2);
+  ypos=orgwinsizey-(config_menu.config_movie_main_window_icon_sizey*2); // orgwinsizey-(buttonsizey)+400;
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   while((film_nr<lfilmoversigt_antal) && (film_nr+sofset<filmoversigtsize)) {

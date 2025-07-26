@@ -470,7 +470,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int buttonsizey = config_menu.config_radio_main_window_icon_sizey;
   int xof=config_menu.config_radio_main_windowx;
   int yof=orgwinsizey-(buttonsizey);
-  yof=config_menu.config_radio_main_window_sizey-(buttonsizey);  
+  // yof=config_menu.config_radio_main_window_sizey-(buttonsizey);
   int boffset=154;
   int bonline=8;                        // numbers of icons pr line
   int i=0;
