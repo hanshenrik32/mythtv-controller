@@ -1,8 +1,8 @@
 {
     "tema1": {
-        "name": "Tema 2",
-        "icon": "tema2.png",
-        "iconpath": "/opt/mythtv-controller/tema2/",
+        "name": "Tema 5",
+        "icon": "tema5.png",
+        "iconpath": "/opt/mythtv-controller/tema5/",
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
