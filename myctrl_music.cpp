@@ -1424,7 +1424,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   int xof=0;
   xof=config_menu.config_music_main_windowx;
   int yof=orgwinsizey-(buttonsize);
-  yof=config_menu.config_music_main_window_sizey-(config_menu.config_music_main_window_icon_sizex);
+  // yof=config_menu.config_music_main_window_sizey-(config_menu.config_music_main_window_icon_sizex);
   char *lastslash;
   char temptxt[200];
   int bonline=8;                    //# of element pr line

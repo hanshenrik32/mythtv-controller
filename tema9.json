@@ -6,87 +6,87 @@
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
-                "x": 1920,
+                "x": 1720,
                 "y": 1080
             },
             "music": {
                 "icon_path": "music_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 1080
             },
             "music_active": {
                 "icon_path": "music1",
-                "x": 1920,
+                "x": 1720,
                 "y": 888
             },
             "media": {
                 "icon_path": "stream_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 696
             },
             "media1": {
                 "icon_path": "stream_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 696
             },
             "spotify": {
                 "icon_path": "spotify_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 888
             },
             "spotify1": {
                 "icon_path": "spotify_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 696
             },
             "tidal": {
                 "icon_path": "tidal_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 696
             },
             "tidal1": {
                 "icon_path": "tidal_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 696
             },
             "radio": {
                 "icon_path": "radio_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 504
             },
             "radio1": {
                 "icon_path": "radio_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 696
             },
             "recorded": {
                 "icon_path": "recorded",
-                "x": 1920,
+                "x": 1720,
                 "y": 312
             },
             "recorded1": {
                 "icon_path": "recorded",
-                "x": 1920,
+                "x": 1720,
                 "y": 312
             },
             "movie": {
                 "icon_path": "movie_button",
-                "x": 1920,
+                "x": 1720,
                 "y": 504
             },
             "movie1": {
                 "icon_path": "movie1",
-                "x": 1920,
+                "x": 1720,
                 "y": 696
             },
             "closemain": {
                 "icon_path": "closemain",
-                "x": 1920,
+                "x": 1720,
                 "y": 312
             },
             "setup": {
                 "icon_path": "setupmenu",
-                "x": 1920,
+                "x": 1720,
                 "y": 30
             },
             "exit": {
@@ -106,7 +106,7 @@
             },
             "playinfo_icon": {
                 "icon_path": "playinfo",
-                "x": 1920,
+                "x": 1720,
                 "y": 1080
             },
             "reset_search": {
@@ -116,17 +116,17 @@
             },
             "down": {
                 "icon_path": "pdown",
-                "x": 1920,
+                "x": 1720,
                 "y": 312
             },
             "up": {
                 "icon_path": "pup",
-                "x": 1920,
+                "x": 1720,
                 "y": 504
             },
             "close": {
                 "icon_path": "close",
-                "x": 1920,
+                "x": 1720,
                 "y": 302
             },
             "search": {

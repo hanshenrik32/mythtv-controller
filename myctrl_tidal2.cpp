@@ -4697,7 +4697,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
     int xx=(float) config_menu.config_tidal_main_window_sizex/(buttonsize+60);
     int yy=(float) (config_menu.config_tidal_main_window_sizey/220);
     lstreamoversigt_antal = xx*yy;        // 
-    yof=config_menu.config_tidal_main_window_sizey-(buttonsizey);        // start ypos
+    // yof=config_menu.config_tidal_main_window_sizey-(buttonsizey);        // start ypos
     //  orgwinsizey-(buttonsizey);
     // show back button
 
