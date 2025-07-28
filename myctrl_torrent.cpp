@@ -111,7 +111,9 @@ int torrent_loader::add_torrent(char *filename) {
     torrent_status=this->s.add_torrent(torrentp);
     handles.push_back(torrent_status);
   } catch (const std::exception& e) {
-    std::cerr << "Kunne ikke åbne torrent: " << e.what() << std::endl;
+    std::cerr << "File torrent_loader.txt not found." << std::endl;
+    loginfo=fmt::format("TORRENT: File torrent_loader.txt not found.");
+    write_logfile(logfile,(char *) loginfo.c_str());
     return 1;
   }
   return 0;
@@ -129,7 +131,11 @@ int torrent_loader::load_torrent() {
   std::string tline;
   std::string loginfo;
   std::ifstream file("torrent_loader.txt");
-  if (file.is_open()) {
+  if (!(file.is_open())) {
+    loginfo=fmt::format("TORRENT: torrent_loader.txt file not found.");
+    write_logfile(logfile,(char *) loginfo.c_str());
+    return(0);
+  } else {
     while((!(file.eof())) && (antal<TORRENT_ANTAL)) {
       std::getline(file,tline);
       if (tline.length()>0) {
