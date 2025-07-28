@@ -42,6 +42,11 @@
 #include <vector>
 #include <thread>
 #include <jsoncpp/json/json.h>
+// torrent lib
+#include <libtorrent/session.hpp>
+#include <libtorrent/magnet_uri.hpp>
+#include <libtorrent/torrent_info.hpp>
+#include <iostream>
 
 // type used
 using namespace std;
@@ -157,6 +162,8 @@ extern char __BUILD_NUMBER;
 // #include "myth_picture.h"
 
 #include "myth_config.h"
+
+#include "myctrl_torrent.h"
 
 extern rss_stream_class rssstreamoversigt;
 
@@ -373,6 +380,7 @@ unsigned int do_show_play_open_select_line_ofset=0;       // bruges til at vælg
 bool show_radio_options = false;                          //
 int radio_select_iconnr=0;                                //
 float _rangley;                                           //
+bool do_show_torrent = false;
 bool do_show_setup = false;                               // show setup menu
 bool do_show_setup_sound = false;                         // Show sound setup view
 bool do_show_setup_screen = false;                        // Show screen setuo view
@@ -517,6 +525,7 @@ int audio_channels;
 int sdlmusic;
 #endif
 
+torrent_loader torrent_downloader;
 
 // ****************************************************************************************
 //
@@ -830,6 +839,7 @@ GLuint setuptemaback;
 GLuint setupfontback;
 GLuint setupkeysback;
 GLuint setuprssback;
+GLuint torrent_background;
 GLuint setuptidalback;
 GLuint _texturesetupclose;
 GLuint mobileplayer_icon;                   // mobile pplayer icon
@@ -2802,6 +2812,7 @@ void display() {
   if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_tv_oversigt))) show_background();
   //visur=1;
   // printf("tidal_oversigt.get_tidal_playing_flag() %d  music_oversigt.play() %d \n",tidal_oversigt.get_tidal_playing_flag(),musicoversigt.play());
+
   if (visur) {
     glPushMatrix();
     switch (urtype) {
@@ -3128,6 +3139,9 @@ void display() {
   }
   // show menu **********************************************************************
   // main menu
+
+  torrent_downloader.opdate_progress();
+
   if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer == 0)) {
       //
       glPushMatrix();
@@ -5869,7 +5883,10 @@ void display() {
         // F1 in tv_guide view (show tv guidde setup)
         if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);   // tv graber
       }
-      // glPopMatrix();
+      // show torrent status
+      if (do_show_torrent) {
+        torrent_downloader.show_torrent_oversigt(0,0);
+      }
   }
   // end radio stuf
   // create uv meter
@@ -8472,6 +8489,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
       }
+      if (do_show_torrent) {
+        if ((!(fundet)) && ((GLubyte) names[i*4+3]==40)) {
+          do_show_torrent =! do_show_torrent;
+          fundet = true;
+        }
+      }
 
       if (!(ask_tv_record)) {
         // show old recorded and close
@@ -9626,7 +9649,11 @@ void handlespeckeypress(int key,int x,int y) {
                 remove("mythtv-controller.lock");
                 exit(2);
                 break;
-        case 3: // F3 start mythtv og luk mythtv_controller
+        case 3: if ((!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_film_oversigt)) && (!(vis_spotify_oversigt))) {
+                  do_show_torrent =  ! do_show_torrent;
+                }
+                // F3 start mythtv og luk mythtv_controller
+                /*
                 if (strcmp(configkeyslayout[0].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[0].cmdname,"playlistrestore")==0) {
@@ -9636,6 +9663,7 @@ void handlespeckeypress(int key,int x,int y) {
                   doexitcommand();
                   //exit(100);
                 }
+                */
                 break;
         case 4: // F4 start mythtv og luk mythtv_controller
                 if (strcmp(configkeyslayout[1].cmdname,"playlistbackup")==0) {
@@ -15092,6 +15120,7 @@ void loadgfx() {
     setupfontback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupfontback");
     setupkeysback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeysback");
     setuprssback         	= loadgfxfile(temapath,(char *) "images/",(char *) "setuprssback");
+    torrent_background   	= loadgfxfile(temapath,(char *) "images/",(char *) "torrent_background");
     setuptidalback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptidalscreen");
     _texturesaveplaylist  = loadgfxfile(temapath,(char *) "images/",(char *) "filename");
     mobileplayer_icon     = loadgfxfile(temapath,(char *) "images/",(char *) "mobileplayer");
@@ -15306,7 +15335,7 @@ void freegfx() {
     glDeleteTextures( 1, &setupfontback);           //
     glDeleteTextures( 1, &setupkeysback);           // setup keys
     glDeleteTextures( 1, &setuprssback);            // rss setup background
-    glDeleteTextures( 1, &setuprssback);            // rss setup background 
+    glDeleteTextures( 1, &torrent_background);      // torrent background
     glDeleteTextures( 1, &setuptidalback);          // tidal setup background
     glDeleteTextures( 1, &_texturesetupmenu);       // setup menu
     glDeleteTextures( 1, &_texturesaveplaylist);    //
@@ -15721,6 +15750,13 @@ int main(int argc, char** argv) {
     sprintf(debuglogdata,"Mythtv-controller Version %s",SHOWVER);
     printf("Build date %s\n",build_str);
     write_logfile(logfile,(char *) debuglogdata);
+
+    // torrent_loader torrent_downloader;
+    // torrent_downloader.torrent("torrent.torrent");
+    // torrent_downloader.torrent("ubuntu-24.04.2-live-server-amd64.iso.torrent");
+    // torrent_downloader.torrent("ubuntu-24.04.2-desktop-amd64.iso.torrent");
+    torrent_downloader.load_torrent();
+
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
@@ -16100,6 +16136,4 @@ int main(int argc, char** argv) {
     write_logfile(logfile,(char *) "Exit program.");
     return(EXIT_SUCCESS);
 }
-
-
 
