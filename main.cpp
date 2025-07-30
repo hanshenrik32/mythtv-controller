@@ -381,6 +381,7 @@ bool show_radio_options = false;                          //
 int radio_select_iconnr=0;                                //
 float _rangley;                                           //
 bool do_show_torrent = false;
+bool do_show_torrent_options = false;
 bool do_show_setup = false;                               // show setup menu
 bool do_show_setup_sound = false;                         // Show sound setup view
 bool do_show_setup_screen = false;                        // Show screen setuo view
@@ -511,6 +512,9 @@ int tvsubvalgtrecordnr=0;                               // valgte tv sub recorde
 int tvvisvalgtnrtype=1;
 int tvvisvalgttype=1;
 char aktivsongstatus[40];
+
+int torrent_info_line_nr=0;
+
 // fmod stuf
 #if defined USE_FMOD_MIXER
 FMOD_OPENSTATE openstate;
@@ -5886,6 +5890,9 @@ void display() {
       // show torrent status
       if (do_show_torrent) {
         torrent_downloader.show_torrent_oversigt(0,0);
+        if (do_show_torrent_options) {
+          torrent_downloader.show_torrent_options();
+        }
       }
   }
   // end radio stuf
@@ -10325,6 +10332,12 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
 */
+                if ((do_show_torrent) && (do_show_torrent_options == false)) {
+                  torrent_downloader.next_edit_line();                  
+                }
+                if ((do_show_torrent) && (do_show_torrent_options)) {
+                  torrent_downloader.next_edit_line_info();
+                }
                 break;
         case 101: // up key
                 // bruges af ask_open_dir_or_play
@@ -10621,6 +10634,15 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
 */
+                // torrent view
+                if (do_show_torrent) {
+                  torrent_downloader.last_edit_line();
+                }
+                if (do_show_torrent_options) {
+                  torrent_downloader.last_edit_line_info();
+                }
+
+
                 break;
         case GLUT_KEY_PAGE_UP:
                 if ((vis_music_oversigt) && (music_select_iconnr>numbers_cd_covers_on_line)) {
@@ -11120,7 +11142,6 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
           }
           #endif
-
           if (key=='S') {
             // (disable save as askbox) if 'S' is pressed again.
             if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
@@ -11821,6 +11842,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                 do_show_tvgraber=false;
                 key=0;
               } else key=0;
+              if (do_show_torrent) {
+                if (do_show_torrent_options) do_show_torrent_options=false; else do_show_torrent=false;
+                key=0;
+              }
               break;
             case '*':
               // update spotify or tidal
@@ -12405,6 +12430,21 @@ void handleKeypress(unsigned char key, int x, int y) {
                   if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                   fprintf(stderr,"next line %d \n",do_show_setup_select_linie);
                 }
+              }
+              if (do_show_torrent) {
+                printf("enter pressed\n ");
+                if (do_show_torrent_options) {
+                  if (torrent_downloader.get_torrent_info_line_nr()==0) {
+                    torrent_downloader.pause_torrent(torrent_downloader.get_edit_line());
+                    do_show_torrent_options = false;
+                  }
+                  if (torrent_downloader.get_torrent_info_line_nr()==1) {
+                    // torrent_downloader.delete_torrent(0);
+                  }
+                  if (torrent_downloader.get_torrent_info_line_nr()==2) {
+                    // torrent_downloader.delete_torrent(0);
+                  }
+                } else do_show_torrent_options = true;
               }
               break;
         }
