@@ -44,10 +44,8 @@ class torrent_loader {
         void next_edit_line() { if (edit_line_nr+1<torrent_list_antal) edit_line_nr++; }
         void last_edit_line() { if (edit_line_nr>0) edit_line_nr--; }
         int get_edit_line() { return(edit_line_nr); }
-
         void next_edit_line_info() { if (torrent_info_line_nr+1<3) torrent_info_line_nr++; }
         void last_edit_line_info() { if (torrent_info_line_nr>0) torrent_info_line_nr--; }
-
         int antal() { return(torrent_list_antal); }
         void set_torrent_active(int n,bool activ) { torrent_list[n].active=activ; }
         void set_torrent_paused(int n,bool pause) { torrent_list[n].paused=pause; }
@@ -57,6 +55,7 @@ class torrent_loader {
         void show_torrent_options();
         void pause_torrent(int nr);
         void delete_torrent(int nr);
+        void move_torrent(int nr);
         int load_torrent();                                                                     // load files from torrent_loader.txt
 };
 

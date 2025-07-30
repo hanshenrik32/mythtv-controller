@@ -12434,16 +12434,19 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (do_show_torrent) {
                 printf("enter pressed\n ");
                 if (do_show_torrent_options) {
+                  // pause
                   if (torrent_downloader.get_torrent_info_line_nr()==0) {
                     torrent_downloader.pause_torrent(torrent_downloader.get_edit_line());
-                    do_show_torrent_options = false;
                   }
+                  // move
                   if (torrent_downloader.get_torrent_info_line_nr()==1) {
-                    // torrent_downloader.delete_torrent(0);
+                    torrent_downloader.move_torrent(torrent_downloader.get_edit_line());
                   }
+                  // delete
                   if (torrent_downloader.get_torrent_info_line_nr()==2) {
-                    // torrent_downloader.delete_torrent(0);
+                    torrent_downloader.delete_torrent(torrent_downloader.get_edit_line());
                   }
+                  do_show_torrent_options = false;
                 } else do_show_torrent_options = true;
               }
               break;

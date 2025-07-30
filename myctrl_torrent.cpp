@@ -76,7 +76,7 @@ torrent_loader::torrent_loader() {
 
 // ****************************************************************************************
 //
-// show trackers
+// Show trackers
 //
 // ****************************************************************************************
 
@@ -120,7 +120,8 @@ int torrent_loader::torrent_nodes() {
 
 // ****************************************************************************************
 //
-// private: Set torrent file to download in thread
+// Private: Set torrent file to download in thread
+// used in load_torrent()
 //
 // ****************************************************************************************
 
@@ -247,32 +248,52 @@ void torrent_loader::opdate_progress() {
 
 // ****************************************************************************************
 //
-// set torrent on hold
+// Set torrent on running/pause
 //
 // ****************************************************************************************
 
 void torrent_loader::pause_torrent(int nr) {
   printf("torrent_info_line_nr = %d \n ",torrent_info_line_nr);
   if (nr<torrent_list_antal) {
-    if (torrent_list[nr].paused) set_torrent_paused(nr,false);
-    else set_torrent_paused(nr,true);
-    handles[nr].pause();    
+    if (torrent_list[nr].paused) {
+      set_torrent_paused(nr,false);
+      handles[nr].pause();                                       // pause in libtorrent
+    } else {
+      set_torrent_paused(nr,true);
+      handles[nr].resume();                                      // resume in libtorrent
+    }    
   }
 }
 
 // ****************************************************************************************
 //
-//
+// Delete torrent
 //
 // ****************************************************************************************
 
 void torrent_loader::delete_torrent(int nr) {
-  this->s.remove_torrent(handles[nr]);
+  if (nr<torrent_list_antal) {
+    this->s.remove_torrent(handles[nr]);
+    set_torrent_active(nr,false);                   // disable torrent
+  }
+}
+
+
+// ****************************************************************************************
+//
+// Move torrent
+//
+// ****************************************************************************************
+
+void torrent_loader::move_torrent(int nr) {
+  if (nr<torrent_list_antal) {
+    // set_torrent_active(nr,false);                   // disable torrent
+  }
 }
 
 // ****************************************************************************************
 //
-// draw cursor on screen at pos
+// Draw cursor on screen at pos
 //
 // ****************************************************************************************
 
@@ -302,7 +323,7 @@ void coursornow(int cxpos,int cypos,int txtlength) {
 
 // ****************************************************************************************
 //
-// show options from show_torrent
+// Show options from show_torrent
 //
 // ****************************************************************************************
 
@@ -366,7 +387,7 @@ void torrent_loader::show_torrent_options() {
 
 // ****************************************************************************************
 //
-// show torrent overview
+// Show torrent overview
 //
 // ****************************************************************************************
 
