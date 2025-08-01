@@ -47,6 +47,7 @@
 #include <libtorrent/magnet_uri.hpp>
 #include <libtorrent/torrent_info.hpp>
 #include <iostream>
+#include <regex>
 
 // type used
 using namespace std;
@@ -382,6 +383,10 @@ int radio_select_iconnr=0;                                //
 float _rangley;                                           //
 bool do_show_torrent = false;
 bool do_show_torrent_options = false;
+bool do_show_torrent_options_move = false;
+bool do_move_torrent_file = false;                        // do the move
+bool do_move_torrent_file_now = false;                    // is it running now
+float do_move_torrent_file_now_done = 0.0f;               // is it running now
 bool do_show_setup = false;                               // show setup menu
 bool do_show_setup_sound = false;                         // Show sound setup view
 bool do_show_setup_screen = false;                        // Show screen setuo view
@@ -5893,6 +5898,14 @@ void display() {
         if (do_show_torrent_options) {
           torrent_downloader.show_torrent_options();
         }
+        if (do_show_torrent_options_move) {
+          torrent_downloader.show_move_options();
+        }
+        // show we move the file
+        if (do_move_torrent_file_now) {
+          torrent_downloader.show_file_move();
+        }
+
       }
   }
   // end radio stuf
@@ -10332,11 +10345,16 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
 */
-                if ((do_show_torrent) && (do_show_torrent_options == false)) {
-                  torrent_downloader.next_edit_line();                  
-                }
-                if ((do_show_torrent) && (do_show_torrent_options)) {
-                  torrent_downloader.next_edit_line_info();
+                if (do_show_torrent) {
+                  if (do_show_torrent_options == false) {
+                    torrent_downloader.next_edit_line();
+                  } else {
+                    if (do_show_torrent_options_move == false) {
+                      torrent_downloader.next_edit_line_info();  
+                    } else {
+                      torrent_downloader.next_edit_line_move_info();
+                    }
+                  }
                 }
                 break;
         case 101: // up key
@@ -10636,12 +10654,16 @@ void handlespeckeypress(int key,int x,int y) {
 */
                 // torrent view
                 if (do_show_torrent) {
-                  torrent_downloader.last_edit_line();
+                  if (do_show_torrent_options==false) {
+                    torrent_downloader.last_edit_line();
+                  } else {
+                    if (do_show_torrent_options_move == false) {
+                      torrent_downloader.last_edit_line_info();  
+                    } else {
+                      torrent_downloader.last_edit_line_move_info();
+                    }
+                  }
                 }
-                if (do_show_torrent_options) {
-                  torrent_downloader.last_edit_line_info();
-                }
-
 
                 break;
         case GLUT_KEY_PAGE_UP:
@@ -11830,7 +11852,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_tidal_oversigt=false;
                 keybufferopenwin=false;
                 key=0;
-              } else if ((!(do_show_setup)) && (key==27)) {                       // exit program
+              } else if ((!(do_show_setup)) && (do_show_torrent==false) && (key==27)) {                       // exit program
                 remove("mythtv-controller.lock");
                 runwebserver=false;
                 order_channel_list();
@@ -11841,11 +11863,19 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // Close tv_graber view from tv_oversigt
                 do_show_tvgraber=false;
                 key=0;
+              } else if (do_show_torrent) {
+                // torrent stuf
+                if (do_show_torrent_options_move) {
+                  do_show_torrent_options_move = false;
+                  key=0;
+                } else if (do_show_torrent_options) {
+                  do_show_torrent_options = false;
+                  key=0;
+                } else if (do_show_torrent) {
+                  do_show_torrent = false;
+                  key=0;
+                }
               } else key=0;
-              if (do_show_torrent) {
-                if (do_show_torrent_options) do_show_torrent_options=false; else do_show_torrent=false;
-                key=0;
-              }
               break;
             case '*':
               // update spotify or tidal
@@ -12433,21 +12463,33 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               if (do_show_torrent) {
                 printf("enter pressed\n ");
-                if (do_show_torrent_options) {
+                if ((do_show_torrent_options) && (do_show_torrent_options_move==false)) {
                   // pause
                   if (torrent_downloader.get_torrent_info_line_nr()==0) {
                     torrent_downloader.pause_torrent(torrent_downloader.get_edit_line());
+                    do_show_torrent_options = false;
                   }
                   // move
                   if (torrent_downloader.get_torrent_info_line_nr()==1) {
-                    torrent_downloader.move_torrent(torrent_downloader.get_edit_line());
+                    torrent_downloader.move_torrent(torrent_downloader.get_edit_line());    // move torrent file to selected dir in thread. This function call set the flag
                   }
                   // delete
                   if (torrent_downloader.get_torrent_info_line_nr()==2) {
                     torrent_downloader.delete_torrent(torrent_downloader.get_edit_line());
                   }
-                  do_show_torrent_options = false;
-                } else do_show_torrent_options = true;
+                  // do_show_torrent_options = false;
+                } else {
+                  if ((do_show_torrent_options) && (do_show_torrent_options_move==false)) {
+                    do_show_torrent_options_move = true;
+                  } else {
+                    if (do_show_torrent_options==false) {
+                      do_show_torrent_options = true;
+                    } else {
+                      printf("Move file \n");
+                      do_move_torrent_file = true; // set flag for do the move in thread in datainfoloader_webserver_v2
+                    }
+                  }
+                }
               }
               break;
         }
@@ -14172,7 +14214,7 @@ void datainfoloader_music_v2() {
 // ****************************************************************************************
 //
 // in use
-// phread dataload Film
+// Dataload Film
 //
 // ****************************************************************************************
 
@@ -14225,6 +14267,7 @@ void *datainfoloader_movie(void *data) {
 //
 // ****************************************************************************************
 
+/*
 void *datainfoloader_stream(void *data) {
   // write debug log
   write_logfile(logfile,(char *) "loader thread starting - Loading stream info from rss feed.");
@@ -14234,38 +14277,23 @@ void *datainfoloader_stream(void *data) {
   do_update_rss_show=false;
   pthread_exit(NULL);
 }
+*/
 
-// ****************************************************************************************
-//
-// phread dataload spotify
-//
-// ****************************************************************************************
-
-void *datainfoloader_spotify(void *data) {
-  #ifdef ENABLE_SPOTIFY
-  spotify_oversigt_loaded_begin=true;
-  // write debug log
-  write_logfile(logfile,(char *) "loader thread starting - Loading spotify info from db.");
-
-  spotify_oversigt.opdatere_spotify_oversigt(0);                                // update from db
-
-  spotify_oversigt.set_search_loaded();                           // triger icon loader
-  // spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
-  // spotify_oversigt.load_spotify_iconoversigt();
-  write_logfile(logfile,(char *) "loader thread done loaded spotify.");
-  spotify_oversigt_loaded_begin=false;
-  #endif
-  pthread_exit(NULL);
-}
 
 
 // ****************************************************************************************
 //
+// IN USE by datainfoloader_spotify_v2
 // phread dataload webserver spotify/tidal
 //
 // ****************************************************************************************
 
 void datainfoloader_webserver_v2() {
+  // char buf[BUFSIZ];
+  size_t size;
+  std::string sourcefile="";
+  std::string destfile="";
+  int status;
   struct tm* t;
   static time_t lasttime=0;
   static time_t nowdate;
@@ -14308,7 +14336,6 @@ void datainfoloader_webserver_v2() {
     // get search result after search text is done.
     if (do_hent_tidal_search_online) {
       printf("do_hent_tidal_search_online=%d\n",do_hent_tidal_search_online);
-
       tidal_oversigt.search_tidal_online_done=false;
       fprintf(stderr,"Update tidal search result thread.\n");
       write_logfile(logfile,(char *) "Tidal start search result thread");
@@ -14335,7 +14362,7 @@ void datainfoloader_webserver_v2() {
                 break;
         default:tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
       }
-      printf("Done Update tidal search result thread.\n");
+      // printf("Done Update tidal search result thread.\n");
       write_logfile(logfile,(char *) "Tidal done search result thread");
       tidal_oversigt.search_tidal_online_done=true;
       tidal_oversigt_loaded_begin=false;
@@ -14344,6 +14371,60 @@ void datainfoloader_webserver_v2() {
       tidal_oversigt.search_loaded=true;
     }
     #endif
+    // torrent file move to movie dir from tmp dir
+    if ((do_move_torrent_file) && (do_show_torrent_options_move)) {
+      do_move_torrent_file = false;           // only to it 1 time
+      do_show_torrent_options_move = false;
+      do_show_torrent_options = false;
+      do_move_torrent_file_now = true;
+      do_move_torrent_file_now_done = 0.0f;
+      write_logfile(logfile,(char *) "TORRENT: Copy file start : ");
+      write_logfile(logfile,(char *) torrent_downloader.get_name(torrent_downloader.get_edit_line()));
+      printf("%s \n ", torrent_downloader.get_name(torrent_downloader.get_edit_line()));
+      sourcefile = "/tmp/";
+      sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
+      destfile = "/data2/Movie/";
+      destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
+      char buf[BUFSIZ];
+
+      size_t size;      
+      std::regex special_re(R"([ \(\)\[\]])");  // matcher space, (, ), [, ]
+      std::string result;
+      std::sregex_iterator begin(sourcefile.begin(), sourcefile.end(), special_re);
+      std::sregex_iterator end;
+      size_t last_pos = 0;
+      for (auto it = begin; it != end; ++it) {
+          std::smatch match = *it;
+          result += sourcefile.substr(last_pos, match.position() - last_pos); // tilføj ikke-matchede tegn
+          result += '\\';                   // tilføj backslash
+          // result.append(1,92);
+          result += match.str();            // tilføj selve det matchede tegn
+          last_pos = match.position() + match.length();
+      }
+      result += sourcefile.substr(last_pos);  // tilføj resten
+      std::cout << result << std::endl;
+      sourcefile = result;
+
+      last_pos = 0;
+      result="";
+      std::sregex_iterator begin2(destfile.begin(), destfile.end(), special_re);
+      for (auto it = begin2; it != end; ++it) {
+          std::smatch match = *it;
+          result += destfile.substr(last_pos, match.position() - last_pos); // tilføj ikke-matchede tegn
+          result += '\\';                   // tilføj backslash
+          // result.append(1,92);
+          result += match.str();            // tilføj selve det matchede tegn
+          last_pos = match.position() + match.length();
+      }
+      result += destfile.substr(last_pos);  // tilføj resten
+      destfile = result;
+      if (torrent_downloader.copy_file(sourcefile,destfile)) {
+        do_move_torrent_file_now = false;
+        torrent_downloader.pause_torrent(torrent_downloader.get_edit_line());
+      } else {
+        do_move_torrent_file_now = false;
+      }
+    }
   }
 }
 
@@ -14563,6 +14644,7 @@ void datainfoloader_xmltv_v2() {
 //
 // ****************************************************************************************
 
+/*
 void *update_rss_phread_loader() {
   if (true) {
     pthread_t loaderthread2;           // load tvguide xml file in to db
@@ -14573,7 +14655,7 @@ void *update_rss_phread_loader() {
     }
   }
 }
-
+*/
 
 // ****************************************************************************************
 //

@@ -29,6 +29,8 @@ extern GLuint torrent_background;
 extern GLuint _textureclose; 	                  // close icon
 extern FILE *logfile;                           // global logfile
 extern GLuint _texturemusicplayer;
+extern bool do_show_torrent_options_move;
+extern float do_move_torrent_file_now_done;               // is it running now
 
 // ****************************************************************************************
 //
@@ -70,7 +72,8 @@ torrent_loader::torrent_loader() {
     torrent_list[i].downloaded_size = 0;
   }
   edit_line_nr = 0;
-  torrent_info_line_nr= 0 ;
+  torrent_info_line_nr= 0;
+  torrent_info_move_line_nr = 0;
 }
 
 
@@ -193,7 +196,7 @@ float torrent_loader::get_progress(int nr) {
 
 // ****************************************************************************************
 //
-// progress opdate
+// progress opdate set status
 //
 // ****************************************************************************************
 
@@ -229,7 +232,7 @@ void torrent_loader::opdate_progress() {
               if (torrent_list[tnr].active) {
                 torrent_list[tnr].downloaded=true;
                 printf("File done ******************************************************************\n");
-                torrent_list[tnr].active=false;
+                // torrent_list[tnr].active=false;
               }
               break;
             case libtorrent::torrent_status::finished:
@@ -287,9 +290,44 @@ void torrent_loader::delete_torrent(int nr) {
 
 void torrent_loader::move_torrent(int nr) {
   if (nr<torrent_list_antal) {
-    // set_torrent_active(nr,false);                   // disable torrent
+    // set_torrent_active(nr,false);                   // disable torrent    
+    do_show_torrent_options_move = true;
+    printf("Show move \n");
   }
 }
+
+// **********************************************************************************
+//
+// copy file/dir
+//
+// **********************************************************************************
+
+
+bool torrent_loader::copy_file(const std::string& source, const std::string& destination) {
+    std::ifstream src(source, std::ios::binary);
+    std::ofstream dst(destination, std::ios::binary);
+    if (!src.is_open()) {
+        std::cerr << "Kunne ikke åbne source file: " << source << "\n";
+        return false;
+    }
+    if (!dst.is_open()) {
+        std::cerr << "Kunne ikke åbne destinations file: " << destination << "\n";
+        return false;
+    }
+    const std::size_t buffer_size = 4096; // 4 KB buffer
+    std::vector<char> buffer(buffer_size);
+    while (src) {
+        src.read(buffer.data(), buffer.size());
+        std::streamsize bytes_read = src.gcount();
+        if (bytes_read > 0) {
+            dst.write(buffer.data(), bytes_read);
+            do_move_torrent_file_now_done = do_move_torrent_file_now_done + bytes_read;
+        }
+    }
+    std::cout << "Filen blev kopieret fra '" << source << "' til '" << destination << "'\n";
+    return true;
+}
+
 
 // ****************************************************************************************
 //
@@ -319,6 +357,124 @@ void coursornow(int cxpos,int cypos,int txtlength) {
   }
   glPopMatrix();
 }
+
+
+
+// ****************************************************************************************
+//
+// Show file copy of torrent (called from main line 5905)
+//
+// ****************************************************************************************
+
+
+void torrent_loader::show_file_move() {
+  int xpos=20;
+  int ypos=20;
+  std::string showtxt;
+  int xof=300;
+  int yof=400;
+  int xxof=0;
+  float procentdone=0.0f;
+  glPushMatrix();
+  // background
+  glEnable(GL_TEXTURE_2D);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,_texturemusicplayer);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f( xpos+225 + xof,ypos+180 + yof , 0.0);
+  glTexCoord2f(0, 1); glVertex3f( xpos+225 + xof,ypos+250 + yof, 0.0);
+  glTexCoord2f(1, 1); glVertex3f( xpos+225+400 + xof,ypos+250 + yof, 0.0);
+  glTexCoord2f(1, 0); glVertex3f( xpos+225+400 + xof,ypos+180 + yof, 0.0);
+  glEnd();
+  glEnable(GL_TEXTURE_2D);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  xof=350;
+  yof=500;
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D,0);
+  glColor3f(0.2f, 0.8f, 0.2f);
+  procentdone=do_move_torrent_file_now_done/torrent_list[edit_line_nr].total_wanted;
+  for(int xx=0;xx<(procentdone*100)/2;xx++) {
+    xxof=xx*7;
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f( xpos+200 + xof + xxof,ypos+100 + yof , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xpos+200 + xof + xxof,ypos+130 + yof, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xpos+200+5 + xof + xxof,ypos+130 + yof, 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xpos+200+5 + xof + xxof,ypos+100 + yof, 0.0);
+    glEnd();
+  }
+  // showtxt=fmt::format("{} bytes of {} done.", do_move_torrent_file_now_done, total_to_download);
+  // myglprintbig((char *) showtxt.c_str());
+  glPopMatrix();
+}
+
+
+
+
+// ****************************************************************************************
+//
+// Show options from show_torrent
+//
+// ****************************************************************************************
+
+void torrent_loader::show_move_options() {
+  const char *options_text[]={"Movie","Music"};
+  int xpos=0;
+  int ypos=0;
+  std::string showtxt;
+  int xof=300;
+  int yof=400;
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,_texturemusicplayer);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f( xpos+225 + xof,ypos+100 + yof , 0.0);
+  glTexCoord2f(0, 1); glVertex3f( xpos+225 + xof,ypos+350 + yof, 0.0);
+  glTexCoord2f(1, 1); glVertex3f( xpos+225+350 + xof,ypos+350 + yof, 0.0);
+  glTexCoord2f(1, 0); glVertex3f( xpos+225+350 + xof,ypos+100 + yof, 0.0);
+  glEnd();
+  glPopMatrix();
+  
+  glPushMatrix();  
+  glEnable(GL_TEXTURE_2D);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  // glTranslatef(350 + xof, 280 + yof, 0.0f);
+  xof=350;
+  yof=600;
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  for (int n=0;n<2;n++) {
+    // glRasterPos2f(0.0f, 0.0f+(n*28));
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D,0);
+    if (n==torrent_info_move_line_nr) glColor3f(0.2f, 0.8f, 0.2f); else glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f( 200 + xof,100 + yof , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( 200 + xof,130 + yof, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( 200+300 + xof,130 + yof, 0.0);
+    glTexCoord2f(1, 0); glVertex3f( 200+300 + xof,100 + yof, 0.0);
+    glEnd();
+    yof=yof-50;
+  }
+  glColor3f(0.5f, 0.5f, 0.0f);
+  glTranslatef(650.0f, 658.0f, 0.0f);
+  yof=600;
+  for (int n=0;n<2;n++) {
+    glDisable(GL_TEXTURE_2D);
+    glRasterPos2f(0.0f, 0.0f+(n*50));
+    showtxt=fmt::format(" {:.25} ", options_text[n]);
+    myglprintbig((char *) showtxt.c_str());    
+  }
+  glPopMatrix();    
+}
+
 
 
 // ****************************************************************************************
@@ -457,25 +613,31 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
         if ((torrent_list[n].total_wanted/1024)>1024) {
           if ((torrent_list[n].total_wanted/1024/1024)>1024) {
             if (torrent_list[n].paused) {
-              showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} Mb {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size/1024/1024,  torrent_list[n].total_wanted/1024/1024, "Paused");
+              showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} Mb {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size/1024/1024, torrent_list[n].total_wanted/1024/1024, "Paused");
             } else {
-              showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} Mb {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size/1024/1024,  torrent_list[n].total_wanted/1024/1024, torrent_list[n].state_text);
+              showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} Mb {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size/1024/1024, torrent_list[n].total_wanted/1024/1024, torrent_list[n].state_text);
             }
           } else {
             if (torrent_list[n].paused) {
-              showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} Kb {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size/1024,  torrent_list[n].total_wanted/1024, "Paused");
+              showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} Kb {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size/1024, torrent_list[n].total_wanted/1024, "Paused");
             } else {
-              showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} Kb {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size/1024,  torrent_list[n].total_wanted/1024, torrent_list[n].state_text);
+              showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} Kb {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size/1024, torrent_list[n].total_wanted/1024, torrent_list[n].state_text);
             }
           }
         } else {
           if (torrent_list[n].paused) {
-            showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} B {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size,  torrent_list[n].total_wanted, "Paused");
+            showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} B {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size, torrent_list[n].total_wanted, "Paused");
           } else {
-            showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} B {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size,  torrent_list[n].total_wanted, torrent_list[n].state_text);
+            showtxt=fmt::format(" {:70} {:>6.2} %   {:4} of {:4} B {:>20} ", torrent_list[n].torrent_name, torrent_list[n].progress, torrent_list[n].downloaded_size, torrent_list[n].total_wanted, torrent_list[n].state_text);
           }
         }
-      } else showtxt=fmt::format(" {:70} {:>6.2} % {:>40} ",torrent_list[n].torrent_name,torrent_list[n].progress,"Downloaded.");
+      } else {
+        if ((torrent_list[n].total_wanted/1024)>1024) {
+          if ((torrent_list[n].total_wanted/1024/1024)>1024) {
+            showtxt=fmt::format(" {:70} 100.00 %       {:4} Mb {:>21} ",torrent_list[n].torrent_name, torrent_list[n].total_wanted/1024/1024, "Downloaded.");
+          } else showtxt=fmt::format(" {:70} 100.00 %       {:4} Kb {:>21} ",torrent_list[n].torrent_name, torrent_list[n].total_wanted/1024, "Downloaded.");
+        } else showtxt=fmt::format(" {:70} 100.00 %       {:4} b {:>21} ",torrent_list[n].torrent_name, torrent_list[n].total_wanted, "Downloaded.");
+      }
     } else {      
       showtxt=no_torrent_text[0];
     }
