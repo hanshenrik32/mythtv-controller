@@ -14386,7 +14386,10 @@ void datainfoloader_webserver_v2() {
       if (torrent_downloader.get_edit_line_move_info()==0) {
         sourcefile = "/tmp/";
         sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
-        destfile = "/data2/Music/";
+        // destfile = "/data2/Music/";
+        // destfile = configmusicpath;
+        destfile = configdefaultmusicpath;
+        if (destfile.empty() || destfile.back() != '/') destfile += '/';
         destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
         if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
           do_move_torrent_file_now = false;
@@ -14398,7 +14401,9 @@ void datainfoloader_webserver_v2() {
       if (torrent_downloader.get_edit_line_move_info()==1) {
         sourcefile = "/tmp/";
         sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
-        destfile = "/data2/Movie/";
+        // destfile = "/data2/Movie/";
+        destfile = configmoviepath;
+        if (destfile.empty() || destfile.back() != '/') destfile += '/';
         destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
         if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
           do_move_torrent_file_now = false;

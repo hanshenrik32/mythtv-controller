@@ -60,12 +60,12 @@ class torrent_loader {
         torrent_loader();
         void opdate_progress();
         void show_torrent_oversigt(int sofset,int key_selected);
-        void show_torrent_options();
-        void show_move_options();
-        void pause_torrent(int nr);
-        void delete_torrent(int nr);
-        void move_torrent(int nr);
-        void show_file_move();                                                                  
+        void show_torrent_options();                                                            // show pause/move/delete optios in opengl
+        void show_move_options();                                                               // show options in opengl
+        void pause_torrent(int nr);                                                             // Pause torrent file
+        void delete_torrent(int nr);                                                            // Delete torrent file
+        void move_torrent(int nr);                                                              // Set Show move in opengl flag
+        void show_file_move();                                                                  // show the info in opengl
         int load_torrent();                                                                     // load files from torrent_loader.txt
         bool copy_file(const std::string& source, const std::string& destination);
         bool copy_disk_entry(const std::string& source, const std::string& destination);
