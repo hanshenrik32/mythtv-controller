@@ -23,7 +23,7 @@
 namespace lt = libtorrent;
 
 using namespace std;
-
+namespace fs = std::filesystem;
 
 extern int orgwinsizey,orgwinsizex;
 extern GLuint torrent_background;
@@ -71,6 +71,8 @@ torrent_loader::torrent_loader() {
     torrent_list[i].paused = false;
     torrent_list[i].total_wanted = 0;
     torrent_list[i].downloaded_size = 0;
+    torrent_list[i].is_finished = false;
+    torrent_list[i].num_connections = 0;    
   }
   edit_line_nr = 0;
   torrent_info_line_nr= 0;
@@ -122,6 +124,8 @@ int torrent_loader::torrent_nodes() {
   return(0);
 }
 
+
+
 // ****************************************************************************************
 //
 // Private: Set torrent file to download in thread
@@ -149,6 +153,8 @@ int torrent_loader::add_torrent(char *filename) {
   }
   return 0;
 }
+
+
 
 // ****************************************************************************************
 //
@@ -185,6 +191,9 @@ int torrent_loader::load_torrent() {
   return(1);
 }
 
+
+
+
 // ****************************************************************************************
 //
 // Get progress
@@ -194,6 +203,8 @@ int torrent_loader::load_torrent() {
 float torrent_loader::get_progress(int nr) {
   return(torrent_list[0].progress);
 }
+
+
 
 // ****************************************************************************************
 //
@@ -211,13 +222,14 @@ void torrent_loader::opdate_progress() {
       for (auto& h : handles) {
         if (h.is_valid()) {
           h.set_upload_limit(1);
-          // status = torrent_status.status(); 
           lt::torrent_status status = h.status();
-          torrent_list[tnr].progress = status.progress * 100;    
-          torrent_list[tnr].added_time = status.added_time;    
+          torrent_list[tnr].is_finished = status.is_finished;
+          torrent_list[tnr].progress = status.progress * 100;
+          torrent_list[tnr].added_time = status.added_time;
           torrent_list[tnr].torrent_name = status.name;
           torrent_list[tnr].total_wanted = status.total_wanted;
           torrent_list[tnr].downloaded_size = status.total_done;
+          torrent_list[tnr].num_connections = status.num_connections;
           switch(status.state) {
             case libtorrent::torrent_status::checking_files:
               torrent_list[tnr].state_text = "Checking files...";
@@ -231,7 +243,7 @@ void torrent_loader::opdate_progress() {
             case libtorrent::torrent_status::seeding:
               torrent_list[tnr].state_text = "Done/Seeding.";
               if (torrent_list[tnr].active) {
-                torrent_list[tnr].downloaded=true;
+                if (status.is_finished) torrent_list[tnr].downloaded=true;
                 printf("File done ******************************************************************\n");
                 // torrent_list[tnr].active=false;
               }
@@ -269,6 +281,8 @@ void torrent_loader::pause_torrent(int nr) {
   }
 }
 
+
+
 // ****************************************************************************************
 //
 // Delete torrent
@@ -297,12 +311,14 @@ void torrent_loader::move_torrent(int nr) {
   }
 }
 
+
+
+
 // **********************************************************************************
 //
 // copy file
 //
 // **********************************************************************************
-
 
 bool torrent_loader::copy_file(const std::string& source, const std::string& destination) {
 
@@ -336,8 +352,6 @@ bool torrent_loader::copy_file(const std::string& source, const std::string& des
 // copy directory
 //
 // **********************************************************************************
-
-namespace fs = std::filesystem;
 
 bool torrent_loader::copy_disk_entry(const std::string& source, const std::string& destination) {
   fs::path sourcePath(source);
@@ -373,6 +387,9 @@ bool torrent_loader::copy_disk_entry(const std::string& source, const std::strin
   return(true);
 }
 
+
+
+
 // ****************************************************************************************
 //
 // Draw cursor on screen at pos
@@ -406,10 +423,9 @@ void coursornow(int cxpos,int cypos,int txtlength) {
 
 // ****************************************************************************************
 //
-// Show file copy of torrent (called from main line 5905)
+// Show status for file copy of torrent (called from main line 5906)
 //
 // ****************************************************************************************
-
 
 void torrent_loader::show_file_move() {
   int xpos=20;
@@ -450,8 +466,6 @@ void torrent_loader::show_file_move() {
     glTexCoord2f(1, 0); glVertex3f( xpos+200+5 + xof + xxof,ypos+100 + yof, 0.0);
     glEnd();
   }
-  // showtxt=fmt::format("{} bytes of {} done.", do_move_torrent_file_now_done, total_to_download);
-  // myglprintbig((char *) showtxt.c_str());
   glPopMatrix();
 }
 
@@ -647,6 +661,14 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
   // list of torrent running status.
   glDisable(GL_TEXTURE_2D);
   glColor3f(1.0f, 1.0f, 1.0f);
+  
+   
+  glRasterPos2f(350.0f, 0.0f+(750.0f));
+  int tconections=0;
+  for (int n=0;n<TORRENT_ANTAL-1;n++) tconections= tconections + torrent_list[n].num_connections;
+  std::string tempstr=fmt::format("Total connections {}",tconections);
+  myglprint((char *) tempstr.c_str());
+
   glTranslatef(300, 480, 0.0f);
   glRasterPos2f(0.0f, 0.0f+(230.0f));
   myglprint((char *) "Name.                                                                              Progress.            Status.");

@@ -14380,17 +14380,32 @@ void datainfoloader_webserver_v2() {
       do_move_torrent_file_now_done = 0.0f;
       write_logfile(logfile,(char *) "TORRENT: Copy file start : ");
       write_logfile(logfile,(char *) torrent_downloader.get_name(torrent_downloader.get_edit_line()));
-      printf("%s \n ", torrent_downloader.get_name(torrent_downloader.get_edit_line()));
-      sourcefile = "/tmp/";
-      sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
-      destfile = "/data2/Movie/";
-      destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
-      // char buf[BUFSIZ];
-      if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
-        do_move_torrent_file_now = false;
-        torrent_downloader.pause_torrent(torrent_downloader.get_edit_line());
-      } else {
-        do_move_torrent_file_now = false;
+
+      printf("valgt %d file name %s \n ", torrent_downloader.get_edit_line_move_info(), torrent_downloader.get_name(torrent_downloader.get_edit_line()));
+
+      if (torrent_downloader.get_edit_line_move_info()==0) {
+        sourcefile = "/tmp/";
+        sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
+        destfile = "/data2/Music/";
+        destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
+        if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
+          do_move_torrent_file_now = false;
+          torrent_downloader.pause_torrent(torrent_downloader.get_edit_line());
+        } else {
+          do_move_torrent_file_now = false;
+        }
+      }
+      if (torrent_downloader.get_edit_line_move_info()==1) {
+        sourcefile = "/tmp/";
+        sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
+        destfile = "/data2/Movie/";
+        destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
+        if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
+          do_move_torrent_file_now = false;
+          torrent_downloader.pause_torrent(torrent_downloader.get_edit_line());
+        } else {
+          do_move_torrent_file_now = false;
+        }
       }
     }
   }

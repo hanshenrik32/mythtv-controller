@@ -15,7 +15,8 @@ struct torrent_loader_struct {
     bool active;
     bool downloaded;
     bool paused;
-    std::string torrent_fname;
+    bool is_finished;
+    long num_connections;
     std::string state_text;
     float progress;
     std::time_t added_time;    
@@ -51,7 +52,7 @@ class torrent_loader {
 
         void next_edit_line_move_info() { if (torrent_info_move_line_nr+1<2) torrent_info_move_line_nr++; }
         void last_edit_line_move_info() { if (torrent_info_move_line_nr>0) torrent_info_move_line_nr--; }
-
+        int get_edit_line_move_info() { return(torrent_info_move_line_nr); }
 
         int antal() { return(torrent_list_antal); }
         void set_torrent_active(int n,bool activ) { torrent_list[n].active=activ; }
