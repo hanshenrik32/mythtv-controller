@@ -1,23 +1,23 @@
 {
     "tema1": {
-        "name": "Tema 2",
-        "icon": "tema2.png",
-        "iconpath": "/opt/mythtv-controller/tema2/",
+        "name": "Tema 9",
+        "icon": "tema9.png",
+        "iconpath": "/opt/mythtv-controller/tema9/",
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
                 "x": 1720,
-                "y": 1080
+                "y": 888
             },
             "music": {
                 "icon_path": "music_button",
                 "x": 1720,
-                "y": 1080
+                "y": 696
             },
             "music_active": {
-                "icon_path": "music1",
+                "icon_path": "music_button1",
                 "x": 1720,
-                "y": 888
+                "y": 696
             },
             "media": {
                 "icon_path": "stream_button",
@@ -25,7 +25,7 @@
                 "y": 696
             },
             "media1": {
-                "icon_path": "stream_button",
+                "icon_path": "stream_button1",
                 "x": 1720,
                 "y": 696
             },
@@ -35,7 +35,7 @@
                 "y": 888
             },
             "spotify1": {
-                "icon_path": "spotify_button",
+                "icon_path": "spotify_button1",
                 "x": 1720,
                 "y": 696
             },
@@ -45,7 +45,7 @@
                 "y": 696
             },
             "tidal1": {
-                "icon_path": "tidal_button",
+                "icon_path": "tidal_button1",
                 "x": 1720,
                 "y": 696
             },
@@ -55,7 +55,7 @@
                 "y": 504
             },
             "radio1": {
-                "icon_path": "radio_button",
+                "icon_path": "radio_button1",
                 "x": 1720,
                 "y": 696
             },
@@ -65,7 +65,7 @@
                 "y": 312
             },
             "recorded1": {
-                "icon_path": "recorded",
+                "icon_path": "recorded_selected",
                 "x": 1720,
                 "y": 312
             },
@@ -75,7 +75,7 @@
                 "y": 504
             },
             "movie1": {
-                "icon_path": "movie1",
+                "icon_path": "movie_button1",
                 "x": 1720,
                 "y": 696
             },
@@ -107,11 +107,11 @@
             "playinfo_icon": {
                 "icon_path": "playinfo",
                 "x": 1720,
-                "y": 1080
+                "y": 888
             },
             "reset_search": {
                 "icon_path": "reset_search",
-                "x": 1920,
+                "x": 1720,
                 "y": 30
             },
             "down": {

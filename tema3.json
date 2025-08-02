@@ -1,8 +1,8 @@
 {
     "tema1": {
-        "name": "Tema 2",
-        "icon": "tema2.png",
-        "iconpath": "/opt/mythtv-controller/tema2/",
+        "name": "Tema 3",
+        "icon": "tema3.png",
+        "iconpath": "/opt/mythtv-controller/tema3/",
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
@@ -15,7 +15,7 @@
                 "y": 10
             },
             "music_active": {
-                "icon_path": "music1",
+                "icon_path": "music_button1",
                 "x": 220,
                 "y": 10
             },
@@ -45,7 +45,7 @@
                 "y": 10
             },
             "tidal1": {
-                "icon_path": "tidal_button",
+                "icon_path": "tidal_button1",
                 "x": 220,
                 "y": 10
             },
@@ -55,7 +55,7 @@
                 "y": 10
             },
             "radio1": {
-                "icon_path": "radio_button",
+                "icon_path": "radio_button1",
                 "x": 220,
                 "y": 10
             },
@@ -65,7 +65,7 @@
                 "y": 10
             },
             "recorded1": {
-                "icon_path": "recorded",
+                "icon_path": "recorded_selected",
                 "x": 620,
                 "y": 10
             },
@@ -75,7 +75,7 @@
                 "y": 10
             },
             "movie1": {
-                "icon_path": "movie1",
+                "icon_path": "movie_button1",
                 "x": 420,
                 "y": 10
             },

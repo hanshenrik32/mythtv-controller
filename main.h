@@ -115,7 +115,7 @@ const char *spotify_firsttime_pleasewait[]={"Please wait.","Vent venlist.","Plea
 //
 // English, danish, france, tysk, Arabic
 // tidal stuf
-const char *tidal_firsttime_line1[]={"Do you wants to start the first time spotify update ?","Ønsker du at starte første gangs spotify opdatering ?","Voulez-vous démarrer la première mise à jour de Spotify ?","Möchten Sie das Spotify-Update zum ersten starten?"};
+const char *tidal_firsttime_line1[]={"Do you wants to start the first time tidal update ?","Ønsker du at starte første gangs Tidal opdatering ?","Voulez-vous démarrer la première mise à jour de Tidal ?","Möchten Sie das Tidal-Update zum ersten starten?"};
 const char *tidal_firsttime_line2[]={"It can take some time to complete.","Det kan godt tage lidt tid at gemmenføre.","It can take some time to complete.","It can take some time to complete."};
 const char *tidal_firsttime_line3[]={"It will download you playlist collection.","Det henter din playliste samling.","Il vous téléchargera la collection de playlist.","Es wird Ihre Wiedergabelistensammlung herunterladen."};
 const char *tidal_firsttime_line4[]={"You can use '*' now to start the update now.","Du skal bruge * til at starte opdateringen.","You can use '*' now to start the update now.","You can use '*' now to start the update now."};
