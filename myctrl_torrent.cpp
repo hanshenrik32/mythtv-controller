@@ -5,7 +5,6 @@
 #include <libtorrent/torrent_status.hpp>
 #include <libtorrent/torrent_info.hpp>
 #include <libtorrent/torrent_handle.hpp>
-
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -14,6 +13,8 @@
 #include <GL/glu.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <filesystem>
+#include <string>
 #include "utility.h"
 #include "myctrl_torrent.h"
 #include "myctrl_glprint.h"
@@ -298,12 +299,13 @@ void torrent_loader::move_torrent(int nr) {
 
 // **********************************************************************************
 //
-// copy file/dir
+// copy file
 //
 // **********************************************************************************
 
 
 bool torrent_loader::copy_file(const std::string& source, const std::string& destination) {
+
     std::ifstream src(source, std::ios::binary);
     std::ofstream dst(destination, std::ios::binary);
     if (!src.is_open()) {
@@ -328,6 +330,48 @@ bool torrent_loader::copy_file(const std::string& source, const std::string& des
     return true;
 }
 
+
+// **********************************************************************************
+//
+// copy directory
+//
+// **********************************************************************************
+
+namespace fs = std::filesystem;
+
+bool torrent_loader::copy_disk_entry(const std::string& source, const std::string& destination) {
+  fs::path sourcePath(source);
+  fs::path destPath(destination);
+  fs::directory_entry Directory{source};
+  if (Directory.is_directory()) {
+    try {
+      if (!fs::exists(destPath)) {
+        fs::create_directory(destPath);
+        // Gå gennem alle filer og mapper i source
+        for (const auto& entry : fs::recursive_directory_iterator(sourcePath)) {
+            const auto& path = entry.path();
+            auto relativePath = fs::relative(path, sourcePath);
+            auto targetPath = destPath / relativePath;
+            if (fs::is_directory(path)) {
+                fs::create_directories(targetPath); // opret undermapper
+            } else if (fs::is_regular_file(path)) {
+                std::string source_path_string{path.u8string()};
+                std::string dest_path_string{targetPath.u8string()};
+                copy_file(source_path_string,dest_path_string);
+            } else {
+                std::cerr << "Skipping non-regular file: " << path << '\n';
+            }
+        }
+      }
+    } catch (const fs::filesystem_error& e) {
+        std::cerr << "Filesystem error: " << e.what() << '\n';
+        return false;
+    }
+  } else {
+    copy_file(source,destination);
+  }
+  return(true);
+}
 
 // ****************************************************************************************
 //

@@ -14385,40 +14385,8 @@ void datainfoloader_webserver_v2() {
       sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
       destfile = "/data2/Movie/";
       destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
-      char buf[BUFSIZ];
-
-      size_t size;      
-      std::regex special_re(R"([ \(\)\[\]])");  // matcher space, (, ), [, ]
-      std::string result;
-      std::sregex_iterator begin(sourcefile.begin(), sourcefile.end(), special_re);
-      std::sregex_iterator end;
-      size_t last_pos = 0;
-      for (auto it = begin; it != end; ++it) {
-          std::smatch match = *it;
-          result += sourcefile.substr(last_pos, match.position() - last_pos); // tilføj ikke-matchede tegn
-          result += '\\';                   // tilføj backslash
-          // result.append(1,92);
-          result += match.str();            // tilføj selve det matchede tegn
-          last_pos = match.position() + match.length();
-      }
-      result += sourcefile.substr(last_pos);  // tilføj resten
-      std::cout << result << std::endl;
-      sourcefile = result;
-
-      last_pos = 0;
-      result="";
-      std::sregex_iterator begin2(destfile.begin(), destfile.end(), special_re);
-      for (auto it = begin2; it != end; ++it) {
-          std::smatch match = *it;
-          result += destfile.substr(last_pos, match.position() - last_pos); // tilføj ikke-matchede tegn
-          result += '\\';                   // tilføj backslash
-          // result.append(1,92);
-          result += match.str();            // tilføj selve det matchede tegn
-          last_pos = match.position() + match.length();
-      }
-      result += destfile.substr(last_pos);  // tilføj resten
-      destfile = result;
-      if (torrent_downloader.copy_file(sourcefile,destfile)) {
+      // char buf[BUFSIZ];
+      if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
         do_move_torrent_file_now = false;
         torrent_downloader.pause_torrent(torrent_downloader.get_edit_line());
       } else {
