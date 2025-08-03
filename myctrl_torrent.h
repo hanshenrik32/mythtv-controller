@@ -69,6 +69,7 @@ class torrent_loader {
         int load_torrent();                                                                     // load files from torrent_loader.txt
         bool copy_file(const std::string& source, const std::string& destination);
         bool copy_disk_entry(const std::string& source, const std::string& destination);
+        void opdate_torrent();
 };
 
 #endif

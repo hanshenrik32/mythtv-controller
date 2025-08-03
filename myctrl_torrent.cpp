@@ -216,7 +216,7 @@ void torrent_loader::opdate_progress() {
   int tnr=0;
   static int checkit=0;
   checkit++;
-  if (checkit==50) {
+  if (checkit==20) {
     checkit=0;
     if (torrent_list_antal>0) {
       for (auto& h : handles) {
@@ -419,6 +419,21 @@ void coursornow(int cxpos,int cypos,int txtlength) {
   glPopMatrix();
 }
 
+
+
+// ****************************************************************************************
+//
+// opdate torrent
+//
+// ****************************************************************************************
+
+void torrent_loader::opdate_torrent() {
+  std::vector<lt::alert*> alerts;
+  s.pop_alerts(&alerts);
+  for (lt::alert* a : alerts) {
+    std::cout << a->message() << std::endl;
+  }
+}
 
 
 // ****************************************************************************************

@@ -14412,6 +14412,8 @@ void datainfoloader_webserver_v2() {
           do_move_torrent_file_now = false;
         }
       }
+      torrent_downloader.opdate_torrent();
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
   }
 }
@@ -16017,14 +16019,12 @@ int main(int argc, char** argv) {
         tidal_oversigt.get_artist_from_file((char *) "");
       }      
       tidal_oversigt.opdatere_tidal_oversigt(0);
-      tidal_oversigt.opdatere_tidal_userCollections2("");
+      tidal_oversigt.opdatere_tidal_userCollections2((char *) "");
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
     }
     // works
-
-
     
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {
