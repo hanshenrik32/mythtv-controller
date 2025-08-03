@@ -777,6 +777,7 @@ GLuint _textureId9_2; 	                  // askbox music image
 GLuint _textureIdplayicon; 	              // play icon
 GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
+GLuint _textureloadfile;
 GLuint _textureclosemain;                 // close menu icon
 GLuint _textureclose_small;               // close icon small
 GLuint _textureswap; 	                    // swap icon
@@ -14664,29 +14665,6 @@ void update_spotify_phread_loader_v2() {
 
 
 
-// ****************************************************************************************
-//
-// rss loader start from main loop then trigged by date
-//
-// ****************************************************************************************
-
-void update_rss_phread_loader_v2() {
-  // std::thread t1(datainfoloader_stream_v2, "");
-  // t1.join();
-}
-
-
-// ****************************************************************************************
-//
-// xmltv loader start from main loop then trigged by date
-//
-// ****************************************************************************************
-
-void update_xmltv_phread_loader_v2() {
-  // std::thread t1(datainfoloader_xmltv_v2, "");
-  // t1.join();
-}
-
 
 
 // ****************************************************************************************
@@ -15149,6 +15127,8 @@ void loadgfx() {
     _textureIdplayicon   	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
     _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
     _textureclose        	= loadgfxfile(temapath,(char *) "images/",(char *) "close");
+
+    _textureloadfile      = loadgfxfile(temapath,(char *) "images/",(char *) "load_file");
     
     _textureclosemain    	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_closemain_icon.c_str()); // "closemain");
 
@@ -15372,6 +15352,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdplayicon);			// play icon
     glDeleteTextures( 1, &_textureopen);            // open icon
     glDeleteTextures( 1, &_textureclose);			      // no dont play icon
+    glDeleteTextures( 1, &_textureloadfile);        // load file icons
     glDeleteTextures( 1, &_textureclosemain);			      // no dont play icon
     glDeleteTextures( 1, &_textureclose_small);			      // no dont play icon
     glDeleteTextures( 1, &_textureswap);			      // no dont play icon

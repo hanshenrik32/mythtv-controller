@@ -28,6 +28,7 @@ namespace fs = std::filesystem;
 extern int orgwinsizey,orgwinsizex;
 extern GLuint torrent_background;
 extern GLuint _textureclose; 	                  // close icon
+extern GLuint _textureloadfile;
 extern FILE *logfile;                           // global logfile
 extern GLuint _texturemusicplayer;
 extern bool do_show_torrent_options_move;
@@ -45,10 +46,31 @@ void myglprint(char *string) {
   for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_9_BY_15, string[i]);
 }
 
+
+
+
+
 void myglprintbig(char *string) {
   int len,i;
   len = (int) strlen(string);
   for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+}
+
+
+
+// ****************************************************************************************
+//
+// Select file name
+//
+// call torrent_downloader.select_file_name();
+// 
+// ****************************************************************************************
+
+void torrent_loader::select_file_name() {
+  char filename[1024];
+  FILE *f = popen("/usr/bin/zenity --file-selection  --modal --title=\"Select file to load\"", "r");
+  fgets(filename, 1024, f);
+  if (f) fclose(f);
 }
 
 
@@ -62,6 +84,7 @@ void myglprintbig(char *string) {
 torrent_loader::torrent_loader() {
   torrent_list_antal=0;
   for (int i=0;i<TORRENT_ANTAL-1;i++) {
+
     torrent_list[i].progress = 0;
     torrent_list[i].torrent_name = "";
     torrent_list[i].state_text = "";
@@ -244,7 +267,6 @@ void torrent_loader::opdate_progress() {
               torrent_list[tnr].state_text = "Done/Seeding.";
               if (torrent_list[tnr].active) {
                 if (status.is_finished) torrent_list[tnr].downloaded=true;
-                printf("File done ******************************************************************\n");
                 // torrent_list[tnr].active=false;
               }
               break;
@@ -672,6 +694,36 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
   glPopMatrix();
+
+
+
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glBindTexture(GL_TEXTURE_2D,_textureloadfile);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  winsizx=188;
+  winsizy=81;
+  xpos=400;
+  ypos=-500;
+  glLoadName(40);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glEnd();
+  glPopMatrix();
+
+
+
+
+
+
   glPushMatrix();
   // list of torrent running status.
   glDisable(GL_TEXTURE_2D);

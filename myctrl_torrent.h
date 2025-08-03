@@ -42,6 +42,7 @@ class torrent_loader {
         int torrent_info_line_nr;
         int torrent_info_move_line_nr;
     public:
+        void select_file_name();
         char *get_name(int nr) { return((char *) torrent_list[nr].torrent_name.c_str()); }
         int get_torrent_info_line_nr() { return(torrent_info_line_nr); }
         void next_edit_line() { if (edit_line_nr+1<torrent_list_antal) edit_line_nr++; }
