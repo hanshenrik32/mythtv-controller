@@ -386,6 +386,8 @@ bool do_show_torrent_options = false;
 bool do_show_torrent_options_move = false;
 bool do_move_torrent_file = false;                        // do the move
 bool do_move_torrent_file_now = false;                    // is it running now
+bool do_show_load__torrent_file = false;
+std::string do_show_load__torrent_file_string = "";
 float do_move_torrent_file_now_done = 0.0f;               // is it running now
 bool do_show_setup = false;                               // show setup menu
 bool do_show_setup_sound = false;                         // Show sound setup view
@@ -5906,7 +5908,10 @@ void display() {
         if (do_move_torrent_file_now) {
           torrent_downloader.show_file_move();
         }
-
+        if (do_show_load__torrent_file) {
+          torrent_downloader.select_file_name();
+          do_show_load__torrent_file = false;
+        }
       }
   }
   // end radio stuf
@@ -8515,6 +8520,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_torrent =! do_show_torrent;
           fundet = true;
         }
+        if ((!(fundet)) && ((GLubyte) names[i*4+3]==41)) {
+          do_show_load__torrent_file =! do_show_load__torrent_file;
+          fundet = true;
+        }
+
       }
 
       if (!(ask_tv_record)) {

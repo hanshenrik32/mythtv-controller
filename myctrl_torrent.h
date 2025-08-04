@@ -55,7 +55,7 @@ class torrent_loader {
         void last_edit_line_move_info() { if (torrent_info_move_line_nr>0) torrent_info_move_line_nr--; }
         int get_edit_line_move_info() { return(torrent_info_move_line_nr); }
 
-        int antal() { return(torrent_list_antal); }
+        int antal() { return(torrent_list_antal-1); }
         void set_torrent_active(int n,bool activ) { torrent_list[n].active=activ; }
         void set_torrent_paused(int n,bool pause) { torrent_list[n].paused=pause; }
         torrent_loader();
