@@ -107,7 +107,7 @@ void torrent_loader::select_file_name() {
     if (torrentfile) {
       torrentfile << filename << "\n";
       torrentfile.close();
-    }
+    }    
   }
 }
 
@@ -198,6 +198,7 @@ int torrent_loader::add_torrent(char *filename) {
   // Start session
   // test code this->torrentp.save_path = "/tmp/";
   torrent_list[torrent_list_antal].torrent_name=filename;
+  torrent_list[torrent_list_antal].torrent_file_name=filename;
   torrent_list[torrent_list_antal].active=true;
   this->torrentp.save_path = torrent_list[torrent_list_antal].save_path;
   torrent_list_antal++;
@@ -348,14 +349,19 @@ void torrent_loader::pause_torrent(int nr) {
 //
 // ****************************************************************************************
 
-void torrent_loader::delete_torrent(int nr) {
-  int n;
+bool torrent_loader::delete_torrent(int nr) {
+  int n=0;
+  std::string husknavn = torrent_list[nr].torrent_file_name;
+  std::string line = "";
   if (nr<torrent_list_antal) {
-    this->s.remove_torrent(handles[nr]);
+    try {
+      this->s.remove_torrent(handles[nr]);
+    } catch (const std::exception& e) {
+      cout << "error remove torrent " << std::endl;
+    }
     set_torrent_active(nr,false);                   // disable torrent
-    torrent_list_antal--;
-    if (nr<torrent_list_antal-1) {
-      for(n=nr;nr<torrent_list_antal-1;n++) {
+    if (nr<=torrent_list_antal-1) {
+      for(n=nr;n<torrent_list_antal;n++) {
         torrent_list[n].nr = torrent_list[n+1].nr;
         torrent_list[n].active = torrent_list[n+1].active;
         torrent_list[n].downloaded = torrent_list[n+1].downloaded;
@@ -366,11 +372,13 @@ void torrent_loader::delete_torrent(int nr) {
         torrent_list[n].progress = torrent_list[n+1].progress;
         torrent_list[n].added_time = torrent_list[n+1].added_time;
         torrent_list[n].torrent_name = torrent_list[n+1].torrent_name;
+        torrent_list[n].torrent_file_name = torrent_list[n+1].torrent_file_name;
         torrent_list[n].save_path = torrent_list[n+1].save_path;
         torrent_list[n].added_time = torrent_list[n+1].added_time;
         torrent_list[n].total_wanted = torrent_list[n+1].total_wanted;
         torrent_list[n].downloaded_size = torrent_list[n+1].downloaded_size;
       }
+      torrent_list_antal--;
       torrent_list[torrent_list_antal].nr=0;
       torrent_list[torrent_list_antal].active=false;
       torrent_list[torrent_list_antal].downloaded=false;
@@ -381,12 +389,36 @@ void torrent_loader::delete_torrent(int nr) {
       torrent_list[torrent_list_antal].progress=0.0f;
       torrent_list[torrent_list_antal].added_time=0;
       torrent_list[torrent_list_antal].torrent_name="";
+      torrent_list[torrent_list_antal].torrent_file_name="";
       torrent_list[torrent_list_antal].save_path="";
       torrent_list[torrent_list_antal].added_time=0;
       torrent_list[torrent_list_antal].total_wanted=0;
       torrent_list[torrent_list_antal].downloaded_size=0;
+      // clean up torrent file list.
+      std::ifstream src("torrent_loader.txt", std::ios::binary);
+      std::ofstream dest("torrent_loader_new.txt", std::ios::binary);
+      if (!src.is_open()) {
+          std::cerr << "Kunne ikke åbne source file: torrent_loader.txt\n";
+          return false;
+      }
+      if (!dest.is_open()) {
+          std::cerr << "Kunne ikke åbne destinations file: torrent_loader_new.txt\n";
+          return false;
+      }
+      while(std::getline(src, line)) {
+        if (line.compare(husknavn) != 0) {
+          dest << line << endl;
+        }
+      }
+      src.close();
+      dest.close();
+      if (std::rename("torrent_loader_new.txt", "torrent_loader.txt")) {
+        std::cerr << "Kunne ikke rename file: torrent_loader_new.txt to torrent_loader.txt\n";
+        return false;
+      }
     }
   }
+  return(true);
 }
 
 

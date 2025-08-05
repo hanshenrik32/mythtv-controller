@@ -12487,6 +12487,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // delete
                   if (torrent_downloader.get_torrent_info_line_nr()==2) {
                     torrent_downloader.delete_torrent(torrent_downloader.get_edit_line());
+                    do_show_torrent_options = false;
                   }
                   // do_show_torrent_options = false;
                 } else {

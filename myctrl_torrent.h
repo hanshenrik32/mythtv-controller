@@ -19,8 +19,9 @@ struct torrent_loader_struct {
     long num_connections;
     std::string state_text;
     float progress;
-    std::time_t added_time;    
+    std::time_t added_time;
     std::string torrent_name;
+    std::string torrent_file_name;
     std::string save_path;
     std::int64_t total_wanted;
     std::int64_t downloaded_size;
@@ -64,7 +65,7 @@ class torrent_loader {
         void show_torrent_options();                                                            // show pause/move/delete optios in opengl
         void show_move_options();                                                               // show options in opengl
         void pause_torrent(int nr);                                                             // Pause torrent file
-        void delete_torrent(int nr);                                                            // Delete torrent file
+        bool delete_torrent(int nr);                                                            // Delete torrent file
         void move_torrent(int nr);                                                              // Set Show move in opengl flag
         void show_file_move();                                                                  // show the info in opengl
         int load_torrent();                                                                     // load files from torrent_loader.txt
