@@ -28,10 +28,12 @@ namespace fs = std::filesystem;
 extern int orgwinsizey,orgwinsizex;
 extern GLuint torrent_background;
 extern GLuint _textureclose; 	                  // close icon
+extern GLuint _textureloadfile;
 extern FILE *logfile;                           // global logfile
 extern GLuint _texturemusicplayer;
 extern bool do_show_torrent_options_move;
 extern float do_move_torrent_file_now_done;               // is it running now
+extern std::string do_show_load__torrent_file_string;
 
 // ****************************************************************************************
 //
@@ -45,12 +47,69 @@ void myglprint(char *string) {
   for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_9_BY_15, string[i]);
 }
 
+
+
+
+
 void myglprintbig(char *string) {
   int len,i;
   len = (int) strlen(string);
   for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
 }
 
+
+
+// ****************************************************************************************
+//
+// Select file name
+//
+// call torrent_downloader.select_file_name();
+// 
+// ****************************************************************************************
+
+
+
+void torrent_loader::select_file_name() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filenamepath1;
+  std::string filename="";
+  std::string tmp;
+  std::string dest_file="";
+  std::string realpath="";
+  std::ofstream torrentfile;
+  FILE *f = popen("/usr/bin/zenity --file-selection  --modal --title=\"Select file to load\"", "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return;
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    // do_show_load__torrent_file_string=filenamepath;
+    filename = fs::path(filenamepath).filename();
+    filename.erase(std::remove(filename.begin(), filename.end(), '\n'), filename.cend());
+    tmp = "/home/hans/datadisk/mythtv-controller-0.38/";
+    tmp = tmp + filename;
+    dest_file = tmp;
+    filenamepath1 = filenamepath;
+    filenamepath1.erase(std::remove(filenamepath1.begin(), filenamepath1.end(), '\n'), filenamepath1.cend());
+    // copy torrent file to homedir
+    ifstream source(filenamepath1, ios::binary);
+    ofstream dest(dest_file, ios::binary);
+    if (source) {
+      dest << source.rdbuf();
+      source.close();
+      dest.close();
+    }
+    add_torrent((char *) filename.c_str());
+    // add filename to torrlent_file.txt to load it after next reboot of mythtv-controller
+    torrentfile.open("torrent_loader.txt", std::ios_base::app);
+    if (torrentfile) {
+      torrentfile << filename << "\n";
+      torrentfile.close();
+    }    
+  }
+}
 
 
 // ****************************************************************************************
@@ -62,6 +121,7 @@ void myglprintbig(char *string) {
 torrent_loader::torrent_loader() {
   torrent_list_antal=0;
   for (int i=0;i<TORRENT_ANTAL-1;i++) {
+
     torrent_list[i].progress = 0;
     torrent_list[i].torrent_name = "";
     torrent_list[i].state_text = "";
@@ -138,6 +198,7 @@ int torrent_loader::add_torrent(char *filename) {
   // Start session
   // test code this->torrentp.save_path = "/tmp/";
   torrent_list[torrent_list_antal].torrent_name=filename;
+  torrent_list[torrent_list_antal].torrent_file_name=filename;
   torrent_list[torrent_list_antal].active=true;
   this->torrentp.save_path = torrent_list[torrent_list_antal].save_path;
   torrent_list_antal++;
@@ -216,7 +277,7 @@ void torrent_loader::opdate_progress() {
   int tnr=0;
   static int checkit=0;
   checkit++;
-  if (checkit==50) {
+  if (checkit==20) {
     checkit=0;
     if (torrent_list_antal>0) {
       for (auto& h : handles) {
@@ -244,7 +305,6 @@ void torrent_loader::opdate_progress() {
               torrent_list[tnr].state_text = "Done/Seeding.";
               if (torrent_list[tnr].active) {
                 if (status.is_finished) torrent_list[tnr].downloaded=true;
-                printf("File done ******************************************************************\n");
                 // torrent_list[tnr].active=false;
               }
               break;
@@ -289,11 +349,76 @@ void torrent_loader::pause_torrent(int nr) {
 //
 // ****************************************************************************************
 
-void torrent_loader::delete_torrent(int nr) {
+bool torrent_loader::delete_torrent(int nr) {
+  int n=0;
+  std::string husknavn = torrent_list[nr].torrent_file_name;
+  std::string line = "";
   if (nr<torrent_list_antal) {
-    this->s.remove_torrent(handles[nr]);
+    try {
+      this->s.remove_torrent(handles[nr]);
+    } catch (const std::exception& e) {
+      cout << "error remove torrent " << std::endl;
+    }
     set_torrent_active(nr,false);                   // disable torrent
+    if (nr<=torrent_list_antal-1) {
+      for(n=nr;n<torrent_list_antal;n++) {
+        torrent_list[n].nr = torrent_list[n+1].nr;
+        torrent_list[n].active = torrent_list[n+1].active;
+        torrent_list[n].downloaded = torrent_list[n+1].downloaded;
+        torrent_list[n].paused = torrent_list[n+1].paused;
+        torrent_list[n].is_finished = torrent_list[n+1].is_finished;
+        torrent_list[n].num_connections = torrent_list[n+1].num_connections;
+        torrent_list[n].state_text = torrent_list[n+1].state_text;
+        torrent_list[n].progress = torrent_list[n+1].progress;
+        torrent_list[n].added_time = torrent_list[n+1].added_time;
+        torrent_list[n].torrent_name = torrent_list[n+1].torrent_name;
+        torrent_list[n].torrent_file_name = torrent_list[n+1].torrent_file_name;
+        torrent_list[n].save_path = torrent_list[n+1].save_path;
+        torrent_list[n].added_time = torrent_list[n+1].added_time;
+        torrent_list[n].total_wanted = torrent_list[n+1].total_wanted;
+        torrent_list[n].downloaded_size = torrent_list[n+1].downloaded_size;
+      }
+      torrent_list_antal--;
+      torrent_list[torrent_list_antal].nr=0;
+      torrent_list[torrent_list_antal].active=false;
+      torrent_list[torrent_list_antal].downloaded=false;
+      torrent_list[torrent_list_antal].paused=false;
+      torrent_list[torrent_list_antal].is_finished=false;
+      torrent_list[torrent_list_antal].num_connections=0;
+      torrent_list[torrent_list_antal].state_text="";
+      torrent_list[torrent_list_antal].progress=0.0f;
+      torrent_list[torrent_list_antal].added_time=0;
+      torrent_list[torrent_list_antal].torrent_name="";
+      torrent_list[torrent_list_antal].torrent_file_name="";
+      torrent_list[torrent_list_antal].save_path="";
+      torrent_list[torrent_list_antal].added_time=0;
+      torrent_list[torrent_list_antal].total_wanted=0;
+      torrent_list[torrent_list_antal].downloaded_size=0;
+      // clean up torrent file list.
+      std::ifstream src("torrent_loader.txt", std::ios::binary);
+      std::ofstream dest("torrent_loader_new.txt", std::ios::binary);
+      if (!src.is_open()) {
+          std::cerr << "Kunne ikke åbne source file: torrent_loader.txt\n";
+          return false;
+      }
+      if (!dest.is_open()) {
+          std::cerr << "Kunne ikke åbne destinations file: torrent_loader_new.txt\n";
+          return false;
+      }
+      while(std::getline(src, line)) {
+        if (line.compare(husknavn) != 0) {
+          dest << line << endl;
+        }
+      }
+      src.close();
+      dest.close();
+      if (std::rename("torrent_loader_new.txt", "torrent_loader.txt")) {
+        std::cerr << "Kunne ikke rename file: torrent_loader_new.txt to torrent_loader.txt\n";
+        return false;
+      }
+    }
   }
+  return(true);
 }
 
 
@@ -419,6 +544,21 @@ void coursornow(int cxpos,int cypos,int txtlength) {
   glPopMatrix();
 }
 
+
+
+// ****************************************************************************************
+//
+// opdate torrent
+//
+// ****************************************************************************************
+
+void torrent_loader::opdate_torrent() {
+  std::vector<lt::alert*> alerts;
+  s.pop_alerts(&alerts);
+  for (lt::alert* a : alerts) {
+    std::cout << a->message() << std::endl;
+  }
+}
 
 
 // ****************************************************************************************
@@ -657,6 +797,32 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
   glPopMatrix();
+
+
+
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glBindTexture(GL_TEXTURE_2D,_textureloadfile);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  winsizx=188;
+  winsizy=81;
+  xpos=-140;
+  ypos=650;
+  glLoadName(41);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glEnd();
+  glPopMatrix();
+
+
   glPushMatrix();
   // list of torrent running status.
   glDisable(GL_TEXTURE_2D);

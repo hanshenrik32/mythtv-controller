@@ -386,6 +386,8 @@ bool do_show_torrent_options = false;
 bool do_show_torrent_options_move = false;
 bool do_move_torrent_file = false;                        // do the move
 bool do_move_torrent_file_now = false;                    // is it running now
+bool do_show_load__torrent_file = false;
+std::string do_show_load__torrent_file_string = "";
 float do_move_torrent_file_now_done = 0.0f;               // is it running now
 bool do_show_setup = false;                               // show setup menu
 bool do_show_setup_sound = false;                         // Show sound setup view
@@ -777,6 +779,7 @@ GLuint _textureId9_2; 	                  // askbox music image
 GLuint _textureIdplayicon; 	              // play icon
 GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
+GLuint _textureloadfile;
 GLuint _textureclosemain;                 // close menu icon
 GLuint _textureclose_small;               // close icon small
 GLuint _textureswap; 	                    // swap icon
@@ -5905,7 +5908,10 @@ void display() {
         if (do_move_torrent_file_now) {
           torrent_downloader.show_file_move();
         }
-
+        if (do_show_load__torrent_file) {
+          torrent_downloader.select_file_name();
+          do_show_load__torrent_file = false;
+        }
       }
   }
   // end radio stuf
@@ -8514,6 +8520,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_torrent =! do_show_torrent;
           fundet = true;
         }
+        if ((!(fundet)) && ((GLubyte) names[i*4+3]==41)) {
+          do_show_load__torrent_file =! do_show_load__torrent_file;
+          fundet = true;
+        }
+
       }
 
       if (!(ask_tv_record)) {
@@ -12476,6 +12487,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // delete
                   if (torrent_downloader.get_torrent_info_line_nr()==2) {
                     torrent_downloader.delete_torrent(torrent_downloader.get_edit_line());
+                    do_show_torrent_options = false;
                   }
                   // do_show_torrent_options = false;
                 } else {
@@ -14386,7 +14398,10 @@ void datainfoloader_webserver_v2() {
       if (torrent_downloader.get_edit_line_move_info()==0) {
         sourcefile = "/tmp/";
         sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
-        destfile = "/data2/Music/";
+        // destfile = "/data2/Music/";
+        // destfile = configmusicpath;
+        destfile = configdefaultmusicpath;
+        if (destfile.empty() || destfile.back() != '/') destfile += '/';
         destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
         if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
           do_move_torrent_file_now = false;
@@ -14398,7 +14413,9 @@ void datainfoloader_webserver_v2() {
       if (torrent_downloader.get_edit_line_move_info()==1) {
         sourcefile = "/tmp/";
         sourcefile = sourcefile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
-        destfile = "/data2/Movie/";
+        // destfile = "/data2/Movie/";
+        destfile = configmoviepath;
+        if (destfile.empty() || destfile.back() != '/') destfile += '/';
         destfile = destfile + torrent_downloader.get_name(torrent_downloader.get_edit_line());
         if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
           do_move_torrent_file_now = false;
@@ -14407,6 +14424,8 @@ void datainfoloader_webserver_v2() {
           do_move_torrent_file_now = false;
         }
       }
+      torrent_downloader.opdate_torrent();
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
   }
 }
@@ -14656,29 +14675,6 @@ void update_spotify_phread_loader_v2() {
 }
 
 
-
-// ****************************************************************************************
-//
-// rss loader start from main loop then trigged by date
-//
-// ****************************************************************************************
-
-void update_rss_phread_loader_v2() {
-  // std::thread t1(datainfoloader_stream_v2, "");
-  // t1.join();
-}
-
-
-// ****************************************************************************************
-//
-// xmltv loader start from main loop then trigged by date
-//
-// ****************************************************************************************
-
-void update_xmltv_phread_loader_v2() {
-  // std::thread t1(datainfoloader_xmltv_v2, "");
-  // t1.join();
-}
 
 
 
@@ -15142,6 +15138,8 @@ void loadgfx() {
     _textureIdplayicon   	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
     _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
     _textureclose        	= loadgfxfile(temapath,(char *) "images/",(char *) "close");
+
+    _textureloadfile      = loadgfxfile(temapath,(char *) "images/",(char *) "load_file");
     
     _textureclosemain    	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_closemain_icon.c_str()); // "closemain");
 
@@ -15365,6 +15363,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdplayicon);			// play icon
     glDeleteTextures( 1, &_textureopen);            // open icon
     glDeleteTextures( 1, &_textureclose);			      // no dont play icon
+    glDeleteTextures( 1, &_textureloadfile);        // load file icons
     glDeleteTextures( 1, &_textureclosemain);			      // no dont play icon
     glDeleteTextures( 1, &_textureclose_small);			      // no dont play icon
     glDeleteTextures( 1, &_textureswap);			      // no dont play icon
@@ -16012,14 +16011,12 @@ int main(int argc, char** argv) {
         tidal_oversigt.get_artist_from_file((char *) "");
       }      
       tidal_oversigt.opdatere_tidal_oversigt(0);
-      tidal_oversigt.opdatere_tidal_userCollections2("");
+      tidal_oversigt.opdatere_tidal_userCollections2((char *) "");
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
     }
     // works
-
-
     
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {

@@ -19,8 +19,9 @@ struct torrent_loader_struct {
     long num_connections;
     std::string state_text;
     float progress;
-    std::time_t added_time;    
+    std::time_t added_time;
     std::string torrent_name;
+    std::string torrent_file_name;
     std::string save_path;
     std::int64_t total_wanted;
     std::int64_t downloaded_size;
@@ -42,6 +43,7 @@ class torrent_loader {
         int torrent_info_line_nr;
         int torrent_info_move_line_nr;
     public:
+        void select_file_name();
         char *get_name(int nr) { return((char *) torrent_list[nr].torrent_name.c_str()); }
         int get_torrent_info_line_nr() { return(torrent_info_line_nr); }
         void next_edit_line() { if (edit_line_nr+1<torrent_list_antal) edit_line_nr++; }
@@ -54,21 +56,22 @@ class torrent_loader {
         void last_edit_line_move_info() { if (torrent_info_move_line_nr>0) torrent_info_move_line_nr--; }
         int get_edit_line_move_info() { return(torrent_info_move_line_nr); }
 
-        int antal() { return(torrent_list_antal); }
+        int antal() { return(torrent_list_antal-1); }
         void set_torrent_active(int n,bool activ) { torrent_list[n].active=activ; }
         void set_torrent_paused(int n,bool pause) { torrent_list[n].paused=pause; }
         torrent_loader();
         void opdate_progress();
         void show_torrent_oversigt(int sofset,int key_selected);
-        void show_torrent_options();
-        void show_move_options();
-        void pause_torrent(int nr);
-        void delete_torrent(int nr);
-        void move_torrent(int nr);
-        void show_file_move();                                                                  
+        void show_torrent_options();                                                            // show pause/move/delete optios in opengl
+        void show_move_options();                                                               // show options in opengl
+        void pause_torrent(int nr);                                                             // Pause torrent file
+        bool delete_torrent(int nr);                                                            // Delete torrent file
+        void move_torrent(int nr);                                                              // Set Show move in opengl flag
+        void show_file_move();                                                                  // show the info in opengl
         int load_torrent();                                                                     // load files from torrent_loader.txt
         bool copy_file(const std::string& source, const std::string& destination);
         bool copy_disk_entry(const std::string& source, const std::string& destination);
+        void opdate_torrent();
 };
 
 #endif

@@ -98,7 +98,8 @@ int vlc_controller::playmedia(char *path) {
       is_playing=true;
       return(1);
     }
-  } else return(0);  
+  } 
+  return(0);  
 }
 
 
