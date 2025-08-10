@@ -888,20 +888,20 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
           if ((torrent_list.at(n).total_wanted/1024)>1024) {
             if ((torrent_list.at(n).total_wanted/1024/1024)>1024) {
               if (get_automove_done(n)) {
-                showtxt = fmt::format(" {:70} 100.00 %       {:4} Mb {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted/1024/1024, "          Downloaded/Movied.");
+                showtxt = fmt::format(" {:70} 100.00 %       {:4} Mb {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted/1024/1024, "          Downloaded/Moved.");
               } else {
                 showtxt = fmt::format(" {:70} 100.00 %       {:4} Mb {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted/1024/1024, "Downloaded.");
               }
             } else {
               if (get_automove_done(n)) {
-                showtxt = fmt::format(" {:70} 100.00 %       {:4} Kb {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted/1024, "          Downloaded/Movied");
+                showtxt = fmt::format(" {:70} 100.00 %       {:4} Kb {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted/1024, "          Downloaded/Moved");
               } else {
                 showtxt = fmt::format(" {:70} 100.00 %       {:4} Kb {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted/1024, "Downloaded.");
               }
             }
           } else {
             if (get_automove_done(n)) {
-              showtxt = fmt::format(" {:70} 100.00 %       {:4} b {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted, "          Downloaded/Movied.");
+              showtxt = fmt::format(" {:70} 100.00 %       {:4} b {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted, "          Downloaded/Moved.");
             } else {
               showtxt = fmt::format(" {:70} 100.00 %       {:4} b {:>21} ",torrent_list.at(n).torrent_name, torrent_list.at(n).total_wanted, "Downloaded.");
             }
