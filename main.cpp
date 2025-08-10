@@ -14512,9 +14512,16 @@ void datainfoloader_webserver_v2() {
         destfile = configmoviepath;
         if (destfile.empty() || destfile.back() != '/') destfile += '/';
         destfile = destfile + torrent_downloader.get_name(0);
+
+        do_move_torrent_file_now = true;
+        do_move_torrent_file_now_done = 0.0f;
+
         if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
           write_logfile(logfile,(char *) "TORRENT: Move file done.");
+          // remove source file after copy
+          // std::remove(sourcefile.c_str()); // remove source file
         }
+        do_move_torrent_file_now = false;       // stop show move
         torrent_downloader.set_automove_done(0);
       }
     }    
