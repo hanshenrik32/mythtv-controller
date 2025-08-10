@@ -394,6 +394,7 @@ bool do_show_setup_sound = false;                         // Show sound setup vi
 bool do_show_setup_screen = false;                        // Show screen setuo view
 bool do_show_setup_tema = false;                          // show tema setup view
 bool do_show_setup_sql = false;                           // Show sql db setup view
+bool do_show_setup_torrent = false;
 bool do_show_setup_network = false;                       // Show network setup view
 bool do_show_setup_font = false;                          // font setup view
 bool do_show_setup_keys = false;                          // show keys setup view
@@ -844,6 +845,7 @@ GLuint setuptexture;                      //
 GLuint setuptvgraberback;
 GLuint setupsoundback;
 GLuint setupsqlback;
+GLuint setuptorrent_background;
 GLuint setupnetworkback;
 GLuint setupnetworkwlanback;
 GLuint setupscreenback;
@@ -942,7 +944,7 @@ char localuserhomedir[4096];
 
 // define for use before function is created v2
 void update_spotify_phread_loader_v2();
-void update_webserver_phread_loader_v2();
+// void update_webserver_phread_loader_v2();
 void webupdate_loader_spotify_v2();
 void webupdate_loader_tidal_v2();
 void datainfoloader_movie_v2();
@@ -5873,6 +5875,9 @@ void display() {
         if (do_show_setup_sql) {
           show_setup_sql();                            //
         }
+        if (do_show_setup_torrent) {
+          show_setup_torrent();                            //
+        }
         if (do_show_setup_tema) show_setup_tema();                          // select tema
         if (do_show_setup_network) {                                        //
           show_setup_network();
@@ -6971,6 +6976,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // test screen setup
@@ -6985,6 +6991,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_tvgraber = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // test for gfx opløsning
@@ -6999,9 +7006,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_tvgraber = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
-        // test for tema setup
+        // test for screen setup
         if (((GLubyte) names[i*4+3]==33)  && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
           do_show_setup_sound = false;
           do_show_setup_screen = true;
@@ -7013,13 +7021,15 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_tvgraber = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
-        // test for sql setup/info
+        // test for torrent setup/info
         if (((GLubyte) names[i*4+3]==34) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
           do_show_setup_sound = false;
           do_show_setup_screen = false;
-          do_show_setup_sql = true;
+          // do_show_setup_sql = true;
+          do_show_setup_torrent = true;
           do_show_setup_network = false;
           do_show_setup_tema = false;
           do_show_setup_font = false;
@@ -7041,6 +7051,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_font = true;
           do_show_tvgraber = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // test for F keys setup/info
@@ -7055,6 +7066,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_keys = true;
           do_show_tvgraber = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // test for setupclose
@@ -7070,6 +7082,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup = false;
           do_show_tvgraber = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
           do_save_config = true;             // save setup now
         }
@@ -7084,6 +7097,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_keys = false;
           do_show_tvgraber = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // do_show_tvgraber
@@ -7098,11 +7112,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_tvgraber = true;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // test for close windows again icon for all other windows in setup glLoadName(40)
         //
-        if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
+        if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_torrent) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
           do_show_setup_sound = false;
           do_show_setup_screen = false;
           do_show_setup_sql = false;
@@ -7113,6 +7128,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           if (do_show_setup_font) {
             if (debugmode) fprintf(stderr,"Set aktiv font to '%s' \n",aktivfont.typeinfo[setupfontselectofset].fontname);
             strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
@@ -7150,6 +7166,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_rss = true;
           do_show_setup_spotify = false;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
 
@@ -7169,6 +7186,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_rss = false;
           do_show_setup_spotify = true;
           do_show_setup_tidal = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // test for tidal setup
@@ -7187,6 +7205,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
           do_show_setup_tidal = true;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         //
@@ -7211,6 +7230,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_stream_or_movie_oversigt = false;
           vis_tidal_oversigt = false;
           do_show_tvgraber = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // test for menu select music
@@ -7227,6 +7247,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_spotify_oversigt=false;
           vis_tidal_oversigt = false;
           vis_stream_or_movie_oversigt = false;
+          do_show_setup_torrent = false;
           do_show_tvgraber = false;
           fundet = true;
         }
@@ -7244,6 +7265,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_tidal_oversigt = false;
           vis_radio_or_music_oversigt = false;
           do_show_tvgraber = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
         // test for menu select recorded
@@ -7259,6 +7281,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_stream_oversigt = false;
           vis_stream_or_movie_oversigt = false;
           do_show_tvgraber = false;
+          do_show_setup_torrent = false;
           fundet = true;
         }
       }
@@ -7279,6 +7302,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_tvgraber = false;
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
+          do_show_setup_torrent = false;
           if (do_show_setup) write_logfile(logfile,(char *) "Show setup menu."); else write_logfile(logfile,(char *) "close setup menu.");
           fundet = true;
         }
@@ -7295,6 +7319,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_tidal_oversigt = false;
           vis_stream_or_movie_oversigt = false;
           do_show_tvgraber = false;
+          do_show_setup_torrent = false;
           fundet = true;
           remove("mythtv-controller.lock");
           runwebserver=false;
@@ -9680,9 +9705,13 @@ void handlespeckeypress(int key,int x,int y) {
                 remove("mythtv-controller.lock");
                 exit(2);
                 break;
-        case 3: if ((!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_film_oversigt)) && (!(vis_spotify_oversigt))) {
+        case 3: do_show_torrent =  ! do_show_torrent;
+                break;
+                /*
+                if ((!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_film_oversigt)) && (!(vis_spotify_oversigt))) {
                   do_show_torrent =  ! do_show_torrent;
                 }
+                */
                 // F3 start mythtv og luk mythtv_controller
                 /*
                 if (strcmp(configkeyslayout[0].cmdname,"playlistbackup")==0) {
@@ -10298,6 +10327,11 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
                   }
 
+                  // setup torrent window
+                  if (do_show_setup_torrent) {
+                    if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
+                  }
+
                   // tv graber setup
                   if (do_show_tvgraber) {
                     if ((do_show_setup_select_linie+tvchannel_startofset)>0) {
@@ -10599,6 +10633,11 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_tidal) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }                   
+
+                  if (do_show_setup_torrent) {
+                    if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                  }                   
+
                   // config af xmltv graber
                   if (do_show_tvgraber) {
                     if (do_show_setup_select_linie>0) {
@@ -11073,6 +11112,22 @@ void handleKeypress(unsigned char key, int x, int y) {
         }
       }
       #endif
+      if (do_show_setup_torrent) {
+        switch (do_show_setup_select_linie) {
+          case 0: if (torrent_downloader.trash_torrent) strcpy(keybuffer,"Y"); else strcpy(keybuffer,"N");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 1: if (torrent_downloader.automove_to_movie_path) strcpy(keybuffer,"Y"); else strcpy(keybuffer,"N");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 2: strcpy(keybuffer,torrent_downloader.downloadpath.c_str());
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          default:strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+        }
+      }
+
       if (do_show_setup_screen) {
         switch (do_show_setup_select_linie) {
           case 0: break;
@@ -11433,6 +11488,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
               }
+            } else if (do_show_setup_torrent) {
+              if (key!=13) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';	// else input key text in buffer
+              }
             } else if (do_show_videoplayer) {
               // video player setting
               if (do_show_setup_select_linie==0) {
@@ -11669,6 +11730,19 @@ void handleKeypress(unsigned char key, int x, int y) {
              }
          }
          #endif
+
+         if (do_show_setup_torrent) {
+             switch(do_show_setup_select_linie) {
+               case 0: if (strcmp(keybuffer,"Y")) torrent_downloader.trash_torrent=true; else torrent_downloader.trash_torrent=false;
+                       break;
+               case 1: if (strcmp(keybuffer,"Y")) torrent_downloader.automove_to_movie_path=true; else torrent_downloader.automove_to_movie_path=false;
+                       break;
+               case 2: torrent_downloader.downloadpath = keybuffer;
+                       break;
+             }
+         }
+
+
          if (do_show_setup_keys) {
              switch(do_show_setup_select_linie) {
                  case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
@@ -11800,6 +11874,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   key=0;
                 } else if (do_show_setup_tidal) {
                   do_show_setup_tidal=false;
+                  key=0;
+                } else if (do_show_setup_torrent) {
+                  do_show_setup_torrent=false;
                   key=0;
                 } else do_show_setup=false;
                 key=0;
@@ -14424,9 +14501,23 @@ void datainfoloader_webserver_v2() {
           do_move_torrent_file_now = false;
         }
       }
-      torrent_downloader.opdate_torrent();
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
+    if ((torrent_downloader.automove_to_movie_path) && (torrent_downloader.get_torrent_download_status(0) == true )) {
+      // move torrent file to movie path
+      if (torrent_downloader.get_automove_done(0)==false) {
+        write_logfile(logfile,(char *) "TORRENT: Move file started.");
+        sourcefile = "/tmp/";
+        sourcefile = sourcefile + torrent_downloader.get_name(0);
+        // destfile = "/data2/Movie/";
+        destfile = configmoviepath;
+        if (destfile.empty() || destfile.back() != '/') destfile += '/';
+        destfile = destfile + torrent_downloader.get_name(0);
+        if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
+          write_logfile(logfile,(char *) "TORRENT: Move file done.");
+        }
+        torrent_downloader.set_automove_done(0);
+      }
+    }    
   }
 }
 
@@ -14436,7 +14527,7 @@ void datainfoloader_webserver_v2() {
 
 // ****************************************************************************************
 //
-// phread dataload spotify BRUGES
+// dataload spotify BRUGES
 //
 // ****************************************************************************************
 
@@ -14473,7 +14564,7 @@ void datainfoloader_spotify_v2(string msg) {
 
 // ****************************************************************************************
 //
-// Phread datadb update from spotify (online)
+// datadb update from spotify (online)
 // add all the users playlist to the system db, used to show in spotifyoversigt
 //
 // ****************************************************************************************
@@ -14547,7 +14638,7 @@ void webupdate_loader_spotify_v2() {
 
 // ****************************************************************************************
 //
-// Phread datadb update from tidal (online)
+// datadb update from tidal (online)
 // add all the users play list to the system db to be show in tidaloversigt
 //
 // ****************************************************************************************
@@ -14640,24 +14731,6 @@ void datainfoloader_xmltv_v2() {
 }
 
 
-// ****************************************************************************************
-//
-// rss loader start from main loop then trigged by date
-//
-// ****************************************************************************************
-
-/*
-void *update_rss_phread_loader() {
-  if (true) {
-    pthread_t loaderthread2;           // load tvguide xml file in to db
-    int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
-    if (rc2) {
-      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
-      exit(-1);
-    }
-  }
-}
-*/
 
 // ****************************************************************************************
 //
@@ -14675,29 +14748,12 @@ void update_spotify_phread_loader_v2() {
 }
 
 
-
-
-
-// ****************************************************************************************
-//
-// rss loader start from main loop start webserver
-//
-// ****************************************************************************************
-
-
-void update_webserver_phread_loader_v2() {
-  /*
-  std::thread t2(datainfoloader_webserver_v2, "");
-  t2.join();
-  */
-}
-
 //
 // xbmc client
 // sql lite
 //
 
-CXBMCClient *xbmcclient=new CXBMCClient("");
+// CXBMCClient *xbmcclient=new CXBMCClient("");
 int configxbmcver=1;
 xbmcsqlite *xbmcSQL=NULL;
 
@@ -15219,6 +15275,7 @@ void loadgfx() {
     // ****************** backgrounds **************************************
     setupsoundback      	= loadgfxfile(temapath,(char *) "images/",(char *) "setup-soundback");
     setupsqlback        	= loadgfxfile(temapath,(char *) "images/",(char *) "setupsqlback");
+    setuptorrent_background = loadgfxfile(temapath,(char *) "images/",(char *) "setuptorrent_background");
     setuptemaback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptemaback");
     setupnetworkback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setupnetworkback");
     setupnetworkwlanback  = loadgfxfile(temapath,(char *) "images/",(char *) "setupnetworkwlanback");
@@ -15435,6 +15492,7 @@ void freegfx() {
     glDeleteTextures( 1, &_tvnewprgrecordedbutton); //
     glDeleteTextures( 1, &setupsoundback);          //
     glDeleteTextures( 1, &setupsqlback);            //
+    glDeleteTextures( 1, &setuptorrent_background);
     glDeleteTextures( 1, &setuptemaback);           //
     glDeleteTextures( 1, &setupnetworkback);        //
     glDeleteTextures( 1, &setupnetworkwlanback);    //
@@ -15819,6 +15877,19 @@ int team_settings_load() {
 
 
 
+// ****************************************************************************************
+//
+// thread running the torrent update function
+//
+// ****************************************************************************************
+
+
+void opdate_threadfunction() {
+  while (true) {
+    torrent_downloader.opdate_torrent(); // Update torrent function
+  }
+  // printf("Opdate torrent \n");
+}
 
 // ****************************************************************************************
 //
@@ -16090,6 +16161,9 @@ int main(int argc, char** argv) {
         */
       }
     }
+
+    thread t1(opdate_threadfunction); // start thread to update torrent
+
     // Normal in use
     // do update rss
     do_update_rss_show=true;
@@ -16239,6 +16313,7 @@ int main(int argc, char** argv) {
     #endif
     freegfx();                                                  // free gfx
     write_logfile(logfile,(char *) "Exit program.");
+    t1.join(); // wait for thread to finish
     return(EXIT_SUCCESS);
 }
 

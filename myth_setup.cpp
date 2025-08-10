@@ -30,6 +30,7 @@
 #include "checknet.h"
 #include "utility.h"
 #include "myctrl_tvprg.h"
+#include "myctrl_torrent.h"
 
 using namespace std;
 
@@ -98,6 +99,9 @@ extern int configdefaultplayer_screenmode;
 extern int configland;
 extern char *configlandsprog[];
 extern int configxbmcver;
+
+extern torrent_loader torrent_downloader;
+
 extern GLuint setuptvgraberback;
 extern GLuint _texturesetupclose;
 extern GLuint setuptexture;
@@ -115,6 +119,7 @@ extern GLuint setupkeysbar1;
 extern GLuint setupkeysbar2;
 extern GLuint setupsoundback;
 extern GLuint setupsqlback;
+extern GLuint setuptorrent_background;
 extern GLuint setupnetworkback;
 extern GLuint setupnetworkwlanback;
 extern GLuint setupscreenback;
@@ -173,6 +178,16 @@ void myglprint5(char *string)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, string[i]);
   }
 }
+
+void myglprint18(char *string)
+{
+  int len,i;
+  len = (int) strlen(string);
+  for (i = 0; i < len; i++) {
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
+  }
+}
+
 
 
 // ****************************************************************************************
@@ -3966,6 +3981,69 @@ void show_setup_tv_graber(int startofset) {
 
 // ****************************************************************************************
 //
+// Setup torrent settings
+//
+// ****************************************************************************************
+
+void show_setup_torrent() {
+  int winsizx=500;
+  int winsizy=650;
+  int xpos=0;
+  int ypos=0;
+  // background
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glColor3f(0.6f, 0.6f, 0.6f);
+  glBindTexture(GL_TEXTURE_2D,setuptorrent_background);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
+  glEnd();
+  glPopMatrix();
+
+  glPushMatrix();
+  glTranslatef(winsizx + 250 , winsizy + 10 , 0.0f);
+  glColor3f(1.0f,1.0f,1.0f);
+  glRasterPos2f(0.0f, 80.0f);
+  myglprint18((char *) "Trash torrent file.........: ");
+  glRasterPos2f(0.0f, 40.0f);
+  myglprint18((char *) "Auto move file to movie db.: ");
+  glRasterPos2f(0.0f, 0.0f);
+  myglprint18((char *) "   path.: ");
+  glPopMatrix();
+  glPushMatrix();
+  glTranslatef(448 , 510  , 0.0f); 
+  switch (do_show_setup_select_linie) {
+    case 0: showcoursornow(120,80,0);
+            break;
+    case 1: showcoursornow(170,40,0);
+            break;
+    case 2: showcoursornow(0,0,0);
+              break;
+    default:
+            showcoursornow(0,0,0);
+            break;
+  }
+  glPopMatrix();
+  glPushMatrix();
+  glTranslatef(winsizx + 318 , 660  , 0.0f); // 438
+  glRasterPos2f(0.0f, 0.0f);
+  myglprint4((char *) torrent_downloader.downloadpath.c_str());
+  glRasterPos2f(170.0f, 40.0f);
+  if (torrent_downloader.automove_to_movie_path) myglprint4((char *) "Y"); else myglprint4((char *) "N");
+  glRasterPos2f(120.0f, 80.0f);
+  if (torrent_downloader.trash_torrent==true) myglprint4((char *) "Y"); else myglprint4((char *) "N");
+  glPopMatrix();
+}
+
+// ****************************************************************************************
+//
 // Setup start interface * select sub menu
 //
 // ****************************************************************************************
@@ -4059,7 +4137,7 @@ void show_setup_interface() {
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
   //***********************************************************************************************
-  // buttons
+  // button for torrent
   xpos=200;
   ypos=300;
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
