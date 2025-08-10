@@ -82,7 +82,6 @@ class rss_stream_class {
 
 // test
 void showrss_list();
-
 // create xml channel config file
 int txmltvgraber_createconfig();
 //
@@ -97,9 +96,7 @@ void order_channel_list();
 int order_channel_list_in_tvguide_db();
 //
 int killrunninggraber();
-
 void showcoursornow(int cxpos,int cypos,int txtlength);
-
 void show_setup_interface();
 void show_setup_screen();
 void show_setup_video();
@@ -112,7 +109,6 @@ void show_setup_keys();
 void show_setup_tv_graber(int startofset);
 void show_setup_rss(unsigned int startofset);                                   // rss reader setup
 void show_wlan_networks(int valgtnr);
-
-
+void show_setup_torrent();
 int team_settings_load();
 #endif

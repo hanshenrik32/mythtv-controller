@@ -19,6 +19,7 @@ struct torrent_loader_struct {
     long num_connections;
     std::string state_text;
     float progress;
+    bool automove_done_to_moviepath;
     std::time_t added_time;
     std::string torrent_name;
     std::string torrent_file_name;
@@ -30,10 +31,10 @@ struct torrent_loader_struct {
 class torrent_loader {
         lt::torrent_handle torrent_status;
         lt::torrent_status status;
-        lt::session s;
+        // lt::session s;
         lt::add_torrent_params torrentp;
         std::vector<lt::torrent_handle> handles;
-        torrent_loader_struct torrent_list[TORRENT_ANTAL];
+        std::vector<torrent_loader_struct> torrent_list;
         int torrent_list_antal;
         int add_torrent(char *filename);
         int torrent_trackers();
@@ -43,7 +44,13 @@ class torrent_loader {
         int torrent_info_line_nr;
         int torrent_info_move_line_nr;
     public:
+        lt::settings_pack pack;        
+        lt::session s;
+        std::string downloadpath;
+        bool trash_torrent;
+        bool automove_to_movie_path;
         void select_file_name();
+        bool get_torrent_download_status(int nr) { return(torrent_list[nr].is_finished); }
         char *get_name(int nr) { return((char *) torrent_list[nr].torrent_name.c_str()); }
         int get_torrent_info_line_nr() { return(torrent_info_line_nr); }
         void next_edit_line() { if (edit_line_nr+1<torrent_list_antal) edit_line_nr++; }
@@ -69,6 +76,8 @@ class torrent_loader {
         void move_torrent(int nr);                                                              // Set Show move in opengl flag
         void show_file_move();                                                                  // show the info in opengl
         int load_torrent();                                                                     // load files from torrent_loader.txt
+        void set_automove_done(int nr);
+        bool get_automove_done(int nr);
         bool copy_file(const std::string& source, const std::string& destination);
         bool copy_disk_entry(const std::string& source, const std::string& destination);
         void opdate_torrent();

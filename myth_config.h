@@ -1,6 +1,8 @@
 #ifndef MYCTRL_MENUCONFIG_H
 #define MYCTRL_MENUCONFIG_H
 
+#include <sqlite3.h>                    // sqlite interface to xbmc(kodi)
+
 class config_icons {
   public:
     // main icons settings from json file
@@ -318,6 +320,27 @@ class config_icons {
       config_tv_main_window_sizex = 1920;
       config_tv_main_window_sizey = 1080;
       config_tv_main_window_icon_spac = 28;
+    }
+};
+
+
+
+
+// sqllite class for 
+// for in use from now
+
+class mythtv_xbmcsqlite {
+  int configxbmcver;
+  sqlite3 *xbmcSQL;
+  public:
+    mythtv_xbmcsqlite() {
+      configxbmcver = 1;
+      xbmcSQL = nullptr;
+    }
+    ~mythtv_xbmcsqlite() {
+      if (xbmcSQL) {
+        sqlite3_close(xbmcSQL);
+      }
     }
 };
 
