@@ -96,7 +96,7 @@ void torrent_loader::select_file_name() {
     dest_file = tmp;
     filenamepath1 = filenamepath;
     filenamepath1.erase(std::remove(filenamepath1.begin(), filenamepath1.end(), '\n'), filenamepath1.cend());
-    // copy torrent file to homedir
+    // copy torrent file to homedir    
     ifstream source(filenamepath1, ios::binary);
     ofstream dest(dest_file, ios::binary);
     if (source) {
@@ -110,10 +110,49 @@ void torrent_loader::select_file_name() {
     if (torrentfile) {
       torrentfile << filename << "\n";
       torrentfile.close();
-    }    
+    } 
   }
 }
 
+// ****************************************************************************************
+//
+// Copy file to other path (selected in this function).
+//
+// ****************************************************************************************
+
+void torrent_loader::select_file_name_and_copy_to_otherdir(char *filepath) {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filenamepath1;
+  std::string filename="";
+  std::string tmp;
+  std::string source_file="";
+  std::string dest_file="";
+  std::string realpath="";
+  std::ofstream torrentfile;
+  FILE *f = popen("/usr/bin/zenity --file-selection --file-filter=*.torrent --modal --title=\"Select destination directory.\" --directory 2> /dev/null", "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return;
+  }
+  fclose(f);
+  if ((strlen(filepath)>0) && (strlen(filenamepath)>0)) {    
+    source_file = filepath;
+    source_file.erase(std::remove(source_file.begin(), source_file.end(), '\n'), source_file.cend());
+    std::string tmpfilename = fs::path(filepath).filename();
+    dest_file = filenamepath;
+    dest_file = dest_file + "/";
+    dest_file = dest_file + tmpfilename;
+    dest_file.erase(std::remove(dest_file.begin(), dest_file.end(), '\n'), dest_file.cend());
+    ifstream source(source_file, ios::binary);
+    ofstream dest(dest_file, ios::binary);
+    if (source) {
+      dest << source.rdbuf();
+      source.close();
+      dest.close();
+    }
+  }
+}
 
 // ****************************************************************************************
 //
@@ -143,6 +182,29 @@ torrent_loader::torrent_loader() {
   torrent_info_data.num_connections = 0;
   torrent_info_data.automove_done_to_moviepath = false;
   torrent_list.clear(); // Clear the vector before resizing
+}
+
+
+
+// ****************************************************************************************
+//
+// check download status and return the nr
+//
+// ****************************************************************************************
+
+int torrent_loader::get_torrent_download_status() { 
+  bool found = false;
+  int nr = 0;
+  for (nr=0;nr<this->torrent_list.size();nr++) {
+    if (torrent_list[nr].active) {
+      if (torrent_list[nr].is_finished) {
+        return(nr);
+        found = true;
+        break;
+      }
+    }
+  }
+  if (found) return(nr); else return(0);
 }
 
 
@@ -630,7 +692,7 @@ void torrent_loader::show_file_move() {
 // ****************************************************************************************
 
 void torrent_loader::show_move_options() {
-  const char *options_text[]={"Movie","Music"};
+  const char *options_text[]={"Movie","Music","Other"};
   int xpos=0;
   int ypos=0;
   std::string showtxt;
@@ -659,7 +721,7 @@ void torrent_loader::show_move_options() {
   xof=350;
   yof=600;
   glTranslatef(0.0f, 0.0f, 0.0f);
-  for (int n=0;n<2;n++) {
+  for (int n=0;n<3;n++) {
     // glRasterPos2f(0.0f, 0.0f+(n*28));
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,0);
@@ -673,9 +735,9 @@ void torrent_loader::show_move_options() {
     yof=yof-50;
   }
   glColor3f(0.5f, 0.5f, 0.0f);
-  glTranslatef(650.0f, 658.0f, 0.0f);
+  glTranslatef(650.0f, 608.0f, 0.0f);
   yof=600;
-  for (int n=0;n<2;n++) {
+  for (int n=0;n<3;n++) {
     glDisable(GL_TEXTURE_2D);
     glRasterPos2f(0.0f, 0.0f+(n*50));
     showtxt=fmt::format(" {:.25} ", options_text[n]);
