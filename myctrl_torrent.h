@@ -50,7 +50,8 @@ class torrent_loader {
         bool trash_torrent;
         bool automove_to_movie_path;
         void select_file_name();
-        bool get_torrent_download_status(int nr) { return(torrent_list[nr].is_finished); }
+        void select_file_name_and_copy_to_otherdir(char *filepath);
+        int get_torrent_download_status();
         char *get_name(int nr) { return((char *) torrent_list[nr].torrent_name.c_str()); }
         int get_torrent_info_line_nr() { return(torrent_info_line_nr); }
         void next_edit_line() { if (edit_line_nr+1<torrent_list_antal) edit_line_nr++; }
@@ -59,7 +60,7 @@ class torrent_loader {
         void next_edit_line_info() { if (torrent_info_line_nr+1<3) torrent_info_line_nr++; }
         void last_edit_line_info() { if (torrent_info_line_nr>0) torrent_info_line_nr--; }
 
-        void next_edit_line_move_info() { if (torrent_info_move_line_nr+1<2) torrent_info_move_line_nr++; }
+        void next_edit_line_move_info() { if (torrent_info_move_line_nr+1<3) torrent_info_move_line_nr++; }
         void last_edit_line_move_info() { if (torrent_info_move_line_nr>0) torrent_info_move_line_nr--; }
         int get_edit_line_move_info() { return(torrent_info_move_line_nr); }
 
