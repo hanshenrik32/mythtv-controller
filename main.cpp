@@ -14542,6 +14542,7 @@ void datainfoloader_webserver_v2() {
         }
         do_move_torrent_file_now = false;       // stop show move
         torrent_downloader.set_automove_done(recc);
+        // torrent_downloader.delete_torrent(recc); // delete torrent file from view after move
       }
     }
   }

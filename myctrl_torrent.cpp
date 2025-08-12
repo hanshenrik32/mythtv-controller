@@ -182,6 +182,14 @@ torrent_loader::torrent_loader() {
   torrent_info_data.num_connections = 0;
   torrent_info_data.automove_done_to_moviepath = false;
   torrent_list.clear(); // Clear the vector before resizing
+  // Højere forbindelsesgrænser
+  pack.set_int(lt::settings_pack::connections_limit, 500);  // total connections
+  pack.set_int(lt::settings_pack::connections_slack, 50);
+  pack.set_int(lt::settings_pack::max_peerlist_size, 2000);
+  // Tillad mange aktive downloads
+  pack.set_int(lt::settings_pack::active_downloads, -1); // ubegrænset
+  pack.set_int(lt::settings_pack::active_seeds, -1);
+  pack.set_int(lt::settings_pack::active_limit, -1);
 }
 
 
@@ -304,6 +312,8 @@ int torrent_loader::add_torrent(char *filename) {
   torrent_info_data.automove_done_to_moviepath = false;
   this->torrentp.save_path = torrent_info_data.save_path;
   pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:6881,[::]:6881");
+
+ 
   // add torrent info to vector
   torrent_list.push_back(torrent_info_data); // 
   // pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
