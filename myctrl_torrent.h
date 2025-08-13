@@ -54,8 +54,8 @@ class torrent_loader {
         int get_torrent_download_status();
         char *get_name(int nr) { return((char *) torrent_list[nr].torrent_name.c_str()); }
         int get_torrent_info_line_nr() { return(torrent_info_line_nr); }
-        void next_edit_line() { if (edit_line_nr+1<torrent_list_antal) edit_line_nr++; }
-        void last_edit_line() { if (edit_line_nr>0) edit_line_nr--; }
+        void next_edit_line();
+        void last_edit_line();
         int get_edit_line() { return(edit_line_nr); }
         void next_edit_line_info() { if (torrent_info_line_nr+1<3) torrent_info_line_nr++; }
         void last_edit_line_info() { if (torrent_info_line_nr>0) torrent_info_line_nr--; }

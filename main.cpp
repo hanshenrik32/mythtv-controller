@@ -7307,7 +7307,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
         // test for exit selected                                               // exit program
-        if ((GLubyte) names[i*4+3]==6) {
+        if (((GLubyte) names[i*4+3]==6) && (do_show_torrent==false)) {        // exit program
           // close all other setup windows
           vis_music_oversigt = false;
           vis_film_oversigt = false;
@@ -12571,6 +12571,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   if (torrent_downloader.get_torrent_info_line_nr()==2) {
                     torrent_downloader.delete_torrent(torrent_downloader.get_edit_line());
                     do_show_torrent_options = false;
+                    
                   }
                   // do_show_torrent_options = false;
                 } else {
@@ -14540,8 +14541,9 @@ void datainfoloader_webserver_v2() {
           // remove source file after copy
           // std::remove(sourcefile.c_str()); // remove source file
         }
-        do_move_torrent_file_now = false;       // stop show move
-        torrent_downloader.set_automove_done(recc);
+        do_move_torrent_file_now = false;           // stop show move
+        torrent_downloader.set_automove_done(recc); // set automove done
+        // torrent_downloader.delete_torrent(recc); // delete torrent file from view after move
       }
     }
   }
