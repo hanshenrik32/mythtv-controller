@@ -436,7 +436,8 @@ void torrent_loader::opdate_progress() {
         tnr++;
       }
     } else {
-      torrent_list.at(0).progress = 0.0f;
+      // kan crash
+      if (torrent_list.size()>0) torrent_list.at(0).progress = 0.0f;
     }
   }
 }
@@ -498,32 +499,38 @@ bool torrent_loader::delete_torrent(int nr) {
   int n=0;
   std::string husknavn = torrent_list[nr].torrent_file_name;
   std::string line = "";
-  if (nr<torrent_list_antal) {
+  if (nr<torrent_list.size()) {
     try {
-      this->s.remove_torrent(handles[nr]);
-      set_torrent_active(nr,false);                                               // disable torrent
-      torrent_list.erase(torrent_list.begin() + nr);                              // Remove the torrent from the vector
+      if (nr<handles.size()) this->s.remove_torrent(handles[nr]);      
+      if (nr<torrent_list.size()) {
+        set_torrent_active(nr,false);                                               // disable torrent
+        torrent_list.erase(torrent_list.begin() + nr);                              // Remove the torrent from the vector
+      }
     } catch (const std::exception& e) {
       cout << "error remove torrent " << std::endl;
     }
     // clean up torrent file list.
-    std::ifstream src("torrent_loader.txt", std::ios::binary);
-    std::ofstream dest("torrent_loader_new.txt", std::ios::binary);
-    if (!src.is_open()) {
-        std::cerr << "Kunne ikke åbne source file: torrent_loader.txt\n";
-        return false;
-    }
-    if (!dest.is_open()) {
-        std::cerr << "Kunne ikke åbne destinations file: torrent_loader_new.txt\n";
-        return false;
-    }
-    while(std::getline(src, line)) {
-      if (line.compare(husknavn) != 0) {
-        dest << line << endl;
+    try {
+      std::ifstream src("torrent_loader.txt", std::ios::binary);
+      std::ofstream dest("torrent_loader_new.txt", std::ios::binary);
+      if (!src.is_open()) {
+          std::cerr << "Kunne ikke åbne source file: torrent_loader.txt\n";
+          return false;
       }
+      if (!dest.is_open()) {
+          std::cerr << "Kunne ikke åbne destinations file: torrent_loader_new.txt\n";
+          return false;
+      }
+      while(std::getline(src, line)) {
+        if (line.compare(husknavn) != 0) {
+          dest << line << endl;
+        }
+      }
+      src.close();
+      dest.close();
+    } catch (const std::exception& e) {
+      cout << "error cleanup torrent_loader.txt" << std::endl;
     }
-    src.close();
-    dest.close();
     if ((edit_line_nr>0) && (edit_line_nr>=torrent_list.size())) edit_line_nr--; // Decrease edit line number after deletion
     if (std::rename("torrent_loader_new.txt", "torrent_loader.txt")) {
       std::cerr << "Kunne ikke rename file: torrent_loader_new.txt to torrent_loader.txt\n";
