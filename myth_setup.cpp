@@ -4024,7 +4024,7 @@ void show_setup_torrent() {
             break;
     case 1: showcoursornow(170,40,0);
             break;
-    case 2: showcoursornow(0,0,0);
+    case 2: showcoursornow(0,0,strlen(torrent_downloader.downloadpath.c_str()));
               break;
     default:
             showcoursornow(0,0,0);

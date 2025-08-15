@@ -12568,7 +12568,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     torrent_downloader.move_torrent(torrent_downloader.get_edit_line());    // move torrent file to selected dir in thread. This function call set the flag
                   }
                   // delete
-                  if (torrent_downloader.get_torrent_info_line_nr()==2) {
+                  if ((torrent_downloader.get_torrent_info_line_nr()==2) && (do_show_torrent_options)) {
                     torrent_downloader.delete_torrent(torrent_downloader.get_edit_line());
                     do_show_torrent_options = false;
                     
@@ -16342,4 +16342,3 @@ int main(int argc, char** argv) {
     t1.join(); // wait for thread to finish
     return(EXIT_SUCCESS);
 }
-
