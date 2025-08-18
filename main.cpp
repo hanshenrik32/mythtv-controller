@@ -12567,9 +12567,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   if (torrent_downloader.get_torrent_info_line_nr()==1) {
                     torrent_downloader.move_torrent(torrent_downloader.get_edit_line());    // move torrent file to selected dir in thread. This function call set the flag
                   }
-                  // delete
+                  // delete select torrent
                   if ((torrent_downloader.get_torrent_info_line_nr()==2) && (do_show_torrent_options)) {
-                    torrent_downloader.delete_torrent(torrent_downloader.get_edit_line());
+                    torrent_downloader.delete_torrent();
                     do_show_torrent_options = false;
                     
                   }
@@ -14523,15 +14523,15 @@ void datainfoloader_webserver_v2() {
     // automove torrent file to movie path
     if ((torrent_downloader.automove_to_movie_path) && (torrent_downloader.get_torrent_download_status() > 0 )) {
       // move torrent file to movie path
-      recc=torrent_downloader.get_torrent_download_status();
-      if (torrent_downloader.get_automove_done(recc)==false) {
+      recc=torrent_downloader.get_torrent_download_status();     // get downloaded record (is_finished flag)
+      if ((recc-1>=0) && (torrent_downloader.get_automove_done(recc-1)==false)) {
         write_logfile(logfile,(char *) "TORRENT: Move file started.");
         sourcefile = "/tmp/";
-        sourcefile = sourcefile + torrent_downloader.get_name(recc);
+        sourcefile = sourcefile + torrent_downloader.get_name(recc-1);
         // destfile = "/data2/Movie/";
         destfile = configmoviepath;
         if (destfile.empty() || destfile.back() != '/') destfile += '/';
-        destfile = destfile + torrent_downloader.get_name(recc);
+        destfile = destfile + torrent_downloader.get_name(recc-1);
 
         do_move_torrent_file_now = true;
         do_move_torrent_file_now_done = 0.0f;
@@ -14542,8 +14542,8 @@ void datainfoloader_webserver_v2() {
           // std::remove(sourcefile.c_str()); // remove source file
         }
         do_move_torrent_file_now = false;           // stop show move
-        torrent_downloader.set_automove_done(recc); // set automove done
-        // torrent_downloader.delete_torrent(recc); // delete torrent file from view after move
+        torrent_downloader.set_automove_done(recc-1); // set automove done
+        // torrent_downloader.delete_torrent(recc-1); // delete torrent file from view after move
       }
     }
   }
