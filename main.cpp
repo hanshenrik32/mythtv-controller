@@ -1054,7 +1054,7 @@ int parse_config(char *filename) {
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
                    settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath, \
                    setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize, \
-                   streamfontsize,moviefontsize,spotifydefaultdevice,starred_playlistname,startspotifyonboot,rssgraberupdate};
+                   streamfontsize,moviefontsize,spotifydefaultdevice,starred_playlistname,startspotifyonboot,rssgraberupdate,trash_torrent_files,torrent_automove_file};
     int commandlength;
     char value[200];
     bool command = false;
@@ -1215,6 +1215,14 @@ int parse_config(char *filename) {
               command = true;
               command_nr=startspotifyonboot;
               commandlength=17;
+            } else if (strncmp(buffer+n,"trash_torrent_files",19)==0) {
+              command = true;
+              command_nr=trash_torrent_files;
+              commandlength=18;
+            } else if (strncmp(buffer+n,"automove_file",13)==0) {
+              command = true;
+              command_nr=torrent_automove_file;
+              commandlength=12;
             } else {
               command = false;
             }
@@ -1399,6 +1407,10 @@ int parse_config(char *filename) {
               } else {
                 configbackend_openspotify_player=false;
               }
+            } else if (command_nr==trash_torrent_files) {
+              if (strcmp(value,"yes")==0) torrent_downloader.trash_torrent=true; else torrent_downloader.trash_torrent=false;
+            } else if (command_nr==torrent_automove_file) {
+              if (strcmp(value,"yes")==0) torrent_downloader.automove_to_movie_path=true; else torrent_downloader.automove_to_movie_path=false;
             }
           }
         }
@@ -1513,6 +1525,17 @@ int save_config(char * filename) {
         sprintf(temp,"startspotifyonboot=no\n");
         fputs(temp,file);
       }
+      if (torrent_downloader.trash_torrent) 
+        sprintf(temp,"trash_torrent_files=yes\n"); 
+      else 
+        sprintf(temp,"trash_torrent_files=no\n");
+      fputs(temp,file);
+      if (torrent_downloader.automove_to_movie_path) {
+        sprintf(temp,"automove_file=yes\n");
+      } else {
+        sprintf(temp,"automove_file=no\n");
+      }
+      fputs(temp,file);
       fclose(file);
     } else error = true;
     file = fopen("mythtv-controller.keys", "w");
