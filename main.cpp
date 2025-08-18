@@ -14532,18 +14532,19 @@ void datainfoloader_webserver_v2() {
         destfile = configmoviepath;
         if (destfile.empty() || destfile.back() != '/') destfile += '/';
         destfile = destfile + torrent_downloader.get_name(recc-1);
-
         do_move_torrent_file_now = true;
         do_move_torrent_file_now_done = 0.0f;
-
-        if (torrent_downloader.copy_disk_entry(sourcefile,destfile)) {
+        if (torrent_downloader.copy_disk_entry(sourcefile,destfile)==1) {
+          torrent_downloader.set_automove_done(recc-1); // set automove done
+          // auto delete torrent file after move
+          if (torrent_downloader.trash_torrent) {
+            torrent_downloader.delete_torrent(recc-1); // delete torrent file from view after auto move ok.
+            write_logfile(logfile,(char *) "TORRENT: Delete torrent file after move.");
+            std::remove(sourcefile.c_str()); // remove file from disk.
+          }
           write_logfile(logfile,(char *) "TORRENT: Move file done.");
-          // remove source file after copy
-          // std::remove(sourcefile.c_str()); // remove source file
-        }
+        } else write_logfile(logfile,(char *) "TORRENT: Error move file.");
         do_move_torrent_file_now = false;           // stop show move
-        torrent_downloader.set_automove_done(recc-1); // set automove done
-        // torrent_downloader.delete_torrent(recc-1); // delete torrent file from view after move
       }
     }
   }

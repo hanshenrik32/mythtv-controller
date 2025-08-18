@@ -551,6 +551,63 @@ bool torrent_loader::delete_torrent() {
 
 // ****************************************************************************************
 //
+// Delete torrent from view and torrent_loader.txt
+//
+// nr is the torrent number in the list
+//
+// ****************************************************************************************
+
+bool torrent_loader::delete_torrent(int nr) {
+  int n = 0;
+  std::string husknavn = torrent_list[edit_line_nr].torrent_file_name;
+  std::string line = "";
+  // int nr = edit_line_nr;                                                         // the active record in the list
+  if (nr<torrent_list.size()) {
+    torrent_list_antal--;
+    try {
+      if (nr<handles.size()) this->s.remove_torrent(handles[nr]);      
+      if (nr<torrent_list.size()) {
+        set_torrent_active(nr,false);                                               // disable torrent
+        torrent_list.erase(torrent_list.begin() + nr);                              // Remove the torrent from the vector
+      }
+    } catch (const std::exception& e) {
+      cout << "error remove torrent " << std::endl;
+    }
+    // clean up torrent file list.
+    try {
+      std::ifstream src("torrent_loader.txt", std::ios::binary);
+      std::ofstream dest("torrent_loader_new.txt", std::ios::binary);
+      if (!src.is_open()) {
+          std::cerr << "Kunne ikke åbne source file: torrent_loader.txt\n";
+          return false;
+      }
+      if (!dest.is_open()) {
+          std::cerr << "Kunne ikke åbne destinations file: torrent_loader_new.txt\n";
+          return false;
+      }
+      while(std::getline(src, line)) {
+        if (line.compare(husknavn) != 0) {
+          dest << line << endl;
+        }
+      }
+      src.close();
+      dest.close();
+    } catch (const std::exception& e) {
+      cout << "error cleanup torrent_loader.txt" << std::endl;
+    }
+    if ((edit_line_nr>0) && (edit_line_nr>=torrent_list.size())) edit_line_nr--; // Decrease edit line number after deletion
+    if (std::rename("torrent_loader_new.txt", "torrent_loader.txt")) {
+      std::cerr << "Kunne ikke rename file: torrent_loader_new.txt to torrent_loader.txt\n";
+      return false;
+    }
+  }
+  return(true);
+}
+
+
+
+// ****************************************************************************************
+//
 // Move torrent
 //
 // ****************************************************************************************
@@ -626,7 +683,7 @@ int torrent_loader::copy_disk_entry(const std::string& source, const std::string
         }
       }
     } catch (const fs::filesystem_error& e) {
-      std::cerr << "Filesystem error: " << e.what() << '\n';
+      std::cerr << "Dest file exist: " << e.what() << '\n';
       return (-1);
     }
   } else {
