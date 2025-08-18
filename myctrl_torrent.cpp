@@ -216,13 +216,13 @@ int torrent_loader::get_torrent_download_status() {
       }
     }
   }
-  if (found) return(nr+1); else return(0);
+  if (found) return(nr+1); else return(-1);
 }
 
 
 // ****************************************************************************************
 //
-// set torrent moved file flag to true
+// set torrent moved file is done flag to true
 //
 // ****************************************************************************************
 
@@ -1057,10 +1057,10 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
             showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), torrent_list.at(n).state_text);
           }  
         } else {
-          if (get_automove_done(n)) {
-            showtxt = fmt::format(" {:64} 100.00 % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, torrent_list.at(n).downloaded_size/1024/1024, format_bits(torrent_list.at(n).total_wanted), "          Downloaded/Moved.");
+          if (get_automove_done(n)) {            
+            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {} Downloaded/Moved.", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), "");
           } else {
-            showtxt = fmt::format(" {:64} 100.00 % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), "Downloaded.");
+            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {} Downloaded.", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).total_wanted), format_bits(torrent_list.at(n).total_wanted), "");
           }
         }
       } else {      
