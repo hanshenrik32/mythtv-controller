@@ -73,7 +73,8 @@ class torrent_loader {
         void show_torrent_options();                                                            // show pause/move/delete optios in opengl
         void show_move_options();                                                               // show options in opengl
         void pause_torrent(int nr);                                                             // Pause torrent file
-        bool delete_torrent();                                                                  // Delete torrent file
+        bool delete_torrent();                                                                  // Delete torrent from view and torrent_loader.txt
+        bool delete_torrent(int nr);
         void move_torrent(int nr);                                                              // Set Show move in opengl flag
         void show_file_move();                                                                  // show the info in opengl
         int load_torrent();                                                                     // load files from torrent_loader.txt
