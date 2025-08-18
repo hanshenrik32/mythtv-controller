@@ -692,7 +692,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                   if (res2) {
                     while ((row2 = mysql_fetch_row(res2)) != NULL) {
                       dirfindes=true;
-                      printf("***** DIR Fundet %s \n",de->d_name);
+                      // printf("***** DIR Fundet %s \n",de->d_name);
                     }
                   }              
                   mysql_close(conn2);
@@ -838,7 +838,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                               mysql_close(conn1);
                             }
                           }
-                          printf("\t Update dir/music song %20s \n" , de2->d_name);
+                          // printf("\t Update dir/music song %20s \n" , de2->d_name);
+                          fprintf(stderr,".");
                         }
                       }
                       closedir(dirp2);
@@ -863,7 +864,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                           res1 = mysql_store_result(conn1);
                           mysql_close(conn1);  
                         }
-                        printf("\t Update music song %20s \n", de->d_name);
+                        // printf("\t Update music song %20s \n", de->d_name);
+                        fprintf(stderr,".");
                       }
                     }
                     i++;  // next dir record
@@ -877,6 +879,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
         if (dirp) closedir(dirp);
       }
     }
+    fprintf(stderr,"\n");
     musicoversigt_antal=i-1;
     if (conn) mysql_close(conn);
     strcpy(music_db_update_loader,"");

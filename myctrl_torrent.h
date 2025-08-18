@@ -73,14 +73,16 @@ class torrent_loader {
         void show_torrent_options();                                                            // show pause/move/delete optios in opengl
         void show_move_options();                                                               // show options in opengl
         void pause_torrent(int nr);                                                             // Pause torrent file
-        bool delete_torrent(int nr);                                                            // Delete torrent file
+        bool delete_torrent();                                                                  // Delete torrent file
         void move_torrent(int nr);                                                              // Set Show move in opengl flag
         void show_file_move();                                                                  // show the info in opengl
         int load_torrent();                                                                     // load files from torrent_loader.txt
         void set_automove_done(int nr);
         bool get_automove_done(int nr);
+        bool save_torrent_file_to_db(int nr, bool active, bool is_finished, const std::string& torrent_file_name, int size);
+        bool opdate_done_flag_in_db(const std::string& torrent_file_name, int size);
         bool copy_file(const std::string& source, const std::string& destination);
-        bool copy_disk_entry(const std::string& source, const std::string& destination);
+        int copy_disk_entry(const std::string& source, const std::string& destination);
         void opdate_torrent();
 };
 

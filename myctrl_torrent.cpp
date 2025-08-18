@@ -15,10 +15,14 @@
 #include <fmt/format.h>
 #include <filesystem>
 #include <string>
+#include <mysql.h>                      // mysql stuf
 #include "utility.h"
 #include "myctrl_torrent.h"
 #include "myctrl_glprint.h"
 
+extern char configmysqluser[256];                              // /mythtv/mysql access info
+extern char configmysqlpass[256];                              //
+extern char configmysqlhost[256];                              //
 
 namespace lt = libtorrent;
 
@@ -206,13 +210,13 @@ int torrent_loader::get_torrent_download_status() {
   for (nr=0;nr<this->torrent_list.size();nr++) {
     if (torrent_list[nr].active) {
       if (torrent_list[nr].is_finished) {
-        return(nr);
+        return(nr+1); // return nr+1, so we can use 0 as not found
         found = true;
         break;
       }
     }
   }
-  if (found) return(nr); else return(0);
+  if (found) return(nr+1); else return(0);
 }
 
 
@@ -312,8 +316,8 @@ int torrent_loader::add_torrent(char *filename) {
   torrent_info_data.automove_done_to_moviepath = false;
   this->torrentp.save_path = torrent_info_data.save_path;
   pack.set_str(lt::settings_pack::listen_interfaces, "0.0.0.0:6881,[::]:6881");
-
- 
+  // save to db
+  save_torrent_file_to_db(torrent_list_antal, true, false, torrent_info_data.torrent_file_name , torrent_info_data.total_wanted);
   // add torrent info to vector
   torrent_list.push_back(torrent_info_data); // 
   // pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
@@ -395,7 +399,7 @@ void torrent_loader::opdate_progress() {
   checkit++;
   if (checkit==20) {
     checkit=0;
-    if (torrent_list_antal>0) {
+    if (torrent_list.size()>0) {
       for (auto& h : handles) {
         if (h.is_valid()) {
           h.set_upload_limit(1);
@@ -421,6 +425,8 @@ void torrent_loader::opdate_progress() {
               torrent_list.at(tnr).state_text = "Done/Seeding.";
               if (torrent_list.at(tnr).active) {
                 if (status.is_finished) {
+                  if (torrent_list.at(tnr).downloaded == false) 
+                    opdate_done_flag_in_db(torrent_list.at(tnr).torrent_file_name, status.total_wanted);
                   torrent_list.at(tnr).downloaded=true;
                   torrent_list.at(tnr).is_finished=true;
                 }
@@ -450,7 +456,7 @@ void torrent_loader::opdate_progress() {
 // ****************************************************************************************
 
 void torrent_loader::pause_torrent(int nr) {
-  if (nr<torrent_list_antal) {
+  if (nr<torrent_list.size()) {
     if (torrent_list[nr].paused) {
       set_torrent_paused(nr,false);
       handles[nr].pause();                                       // pause in libtorrent
@@ -495,11 +501,13 @@ void torrent_loader::last_edit_line() {
 //
 // ****************************************************************************************
 
-bool torrent_loader::delete_torrent(int nr) {
-  int n=0;
-  std::string husknavn = torrent_list[nr].torrent_file_name;
+bool torrent_loader::delete_torrent() {
+  int n = 0;
+  std::string husknavn = torrent_list[edit_line_nr].torrent_file_name;
   std::string line = "";
+  int nr = edit_line_nr;                                                         // the active record in the list
   if (nr<torrent_list.size()) {
+    torrent_list_antal--;
     try {
       if (nr<handles.size()) this->s.remove_torrent(handles[nr]);      
       if (nr<torrent_list.size()) {
@@ -548,7 +556,7 @@ bool torrent_loader::delete_torrent(int nr) {
 // ****************************************************************************************
 
 void torrent_loader::move_torrent(int nr) {
-  if (nr<torrent_list_antal) {
+  if (nr<torrent_list.size()) {
     // set_torrent_active(nr,false);                   // disable torrent    
     do_show_torrent_options_move = true;
   }
@@ -593,7 +601,7 @@ bool torrent_loader::copy_file(const std::string& source, const std::string& des
 //
 // **********************************************************************************
 
-bool torrent_loader::copy_disk_entry(const std::string& source, const std::string& destination) {
+int torrent_loader::copy_disk_entry(const std::string& source, const std::string& destination) {
   fs::path sourcePath(source);
   fs::path destPath(destination);
   fs::directory_entry Directory{source};
@@ -619,12 +627,12 @@ bool torrent_loader::copy_disk_entry(const std::string& source, const std::strin
       }
     } catch (const fs::filesystem_error& e) {
       std::cerr << "Filesystem error: " << e.what() << '\n';
-      return false;
+      return (-1);
     }
   } else {
     copy_file(source,destination);
   }
-  return(true);
+  return(1);
 }
 
 
@@ -675,6 +683,70 @@ void torrent_loader::opdate_torrent() {
   }
   // Sleep to avoid busy waiting
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+
+// ****************************************************************************************
+//
+// save torrent status to database
+//
+// ****************************************************************************************
+
+bool torrent_loader::save_torrent_file_to_db(int nr, bool active, bool is_finished, const std::string& torrent_file_name, int size) {
+  // This function is a placeholder for saving torrent file information to a database.
+  // Implementation details would depend on the specific database and schema used.
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  std::string sqlselect;
+  std::string sqlcreate;
+  sqlcreate = "CREATE TABLE IF NOT EXISTS torrent_file_list (nr int(10) unsigned DEFAULT NULL,active tinyint(1) DEFAULT 0,is_finished  tinyint(1) DEFAULT NULL,added_time timestamp NULL DEFAULT NULL,torrent_file_name varchar(1024) DEFAULT NULL,size int(10) unsigned DEFAULT NULL,id int(10) unsigned NOT NULL AUTO_INCREMENT,PRIMARY KEY (id)) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
+  sqlselect = fmt::format("insert into torrent_file_list(nr, active ,is_finished, added_time, torrent_file_name, size) values ({}, {}, {}, CURRENT_TIMESTAMP(), '{}', {})",nr, active, is_finished, torrent_file_name, size,0);
+  // cout << "SQL: " << sqlselect << std::endl;
+  // mysql stuf
+  char *database = (char *) "mythtvcontroller";
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    mysql_query(conn,sqlcreate.c_str());
+    res = mysql_store_result(conn);
+    mysql_query(conn,sqlselect.c_str());
+    res = mysql_store_result(conn);
+    mysql_close(conn);
+  }
+  return(1);
+}
+
+// ****************************************************************************************
+//
+// update size and done flag in database
+//
+// ****************************************************************************************
+
+bool torrent_loader::opdate_done_flag_in_db(const std::string& torrent_file_name, int size) {
+  // This function is a placeholder for saving torrent file information to a database.
+  // Implementation details would depend on the specific database and schema used.
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  std::string sqlselect;
+  cout << " **********************   opdate_done_flag_in_db: " << torrent_file_name << " size: " << size << std::endl;
+  sqlselect = fmt::format("update torrent_file_list set size={},is_finished=1 where torrent_file_name like '{}'" ,size , torrent_file_name);
+  // cout << "SQL: " << sqlselect << std::endl;
+  // mysql stuf
+  char *database = (char *) "mythtvcontroller";
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    // mysql_query(conn,"set NAMES 'utf8'");
+    // res = mysql_store_result(conn);
+    mysql_query(conn,sqlselect.c_str());
+    res = mysql_store_result(conn);
+    mysql_close(conn);
+  }
+  return(1);
 }
 
 
@@ -939,9 +1011,6 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
   glPopMatrix();
-
-
-
   glPushMatrix();
   glEnable(GL_TEXTURE_2D);
   //glBlendFunc(GL_ONE, GL_ONE);
@@ -983,9 +1052,9 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
       if (torrent_list.at(n).active) {
         if (!(torrent_list.at(n).downloaded)) {
           if (torrent_list.at(n).paused) {
-            showtxt = fmt::format(" {:64} {:>6.2} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, torrent_list.at(n).downloaded_size/1024/1024, format_bits(torrent_list.at(n).total_wanted), "Paused");
+            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, torrent_list.at(n).downloaded_size/1024/1024, format_bits(torrent_list.at(n).total_wanted), "Paused");
           } else {
-            showtxt = fmt::format(" {:64} {:>6.2} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), torrent_list.at(n).state_text);
+            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), torrent_list.at(n).state_text);
           }  
         } else {
           if (get_automove_done(n)) {
