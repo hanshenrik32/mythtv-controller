@@ -1054,7 +1054,7 @@ int parse_config(char *filename) {
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
                    settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath, \
                    setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize, \
-                   streamfontsize,moviefontsize,spotifydefaultdevice,starred_playlistname,startspotifyonboot,rssgraberupdate,trash_torrent_files,torrent_automove_file};
+                   streamfontsize,moviefontsize,spotifydefaultdevice,starred_playlistname,startspotifyonboot,rssgraberupdate,trash_torrent_files,torrent_automove_file,torrent_download_path};
     int commandlength;
     char value[200];
     bool command = false;
@@ -1223,6 +1223,10 @@ int parse_config(char *filename) {
               command = true;
               command_nr=torrent_automove_file;
               commandlength=12;
+            } else if (strncmp(buffer+n,"torrent_download_path",21)==0) {
+              command = true;
+              command_nr=torrent_download_path;
+              commandlength=20;
             } else {
               command = false;
             }
@@ -1411,6 +1415,8 @@ int parse_config(char *filename) {
               if (strcmp(value,"yes")==0) torrent_downloader.trash_torrent=true; else torrent_downloader.trash_torrent=false;
             } else if (command_nr==torrent_automove_file) {
               if (strcmp(value,"yes")==0) torrent_downloader.automove_to_movie_path=true; else torrent_downloader.automove_to_movie_path=false;
+            } else if (command_nr==torrent_download_path) {
+              torrent_downloader.torrent_download_path=value;          // set torrent download path
             }
           }
         }
@@ -1535,6 +1541,8 @@ int save_config(char * filename) {
       } else {
         sprintf(temp,"automove_file=no\n");
       }
+      fputs(temp,file);
+      sprintf(temp,"torrent_download_path=%s\n",torrent_downloader.torrent_download_path.c_str());
       fputs(temp,file);
       fclose(file);
     } else error = true;
@@ -5896,10 +5904,10 @@ void display() {
         if (do_show_setup_screen) show_setup_screen();                      //
         if (do_show_videoplayer) show_setup_video();                        //
         if (do_show_setup_sql) {
-          show_setup_sql();                            //
+          show_setup_sql();                                                 //
         }
         if (do_show_setup_torrent) {
-          show_setup_torrent();                            //
+          show_setup_torrent();                                             //
         }
         if (do_show_setup_tema) show_setup_tema();                          // select tema
         if (do_show_setup_network) {                                        //
@@ -10351,12 +10359,10 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_tidal) {
                     if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
                   }
-
                   // setup torrent window
                   if (do_show_setup_torrent) {
                     if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
                   }
-
                   // tv graber setup
                   if (do_show_tvgraber) {
                     if ((do_show_setup_select_linie+tvchannel_startofset)>0) {
@@ -10660,11 +10666,9 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_tidal) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }                   
-
                   if (do_show_setup_torrent) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }                   
-
                   // config af xmltv graber
                   if (do_show_tvgraber) {
                     if (do_show_setup_select_linie>0) {
@@ -11518,8 +11522,18 @@ void handleKeypress(unsigned char key, int x, int y) {
             } else if (do_show_setup_torrent) {
               if (key!=13) {
                 keybuffer[keybufferindex]=key;
-                keybufferindex++;
-                keybuffer[keybufferindex]='\0';	// else input key text in buffer
+                if (do_show_setup_select_linie==0) {
+                  keybuffer[0]=key;
+                  keybuffer[1]='\0';
+                }
+                if (do_show_setup_select_linie==1) {
+                  keybuffer[0]=key;
+                  keybuffer[1]='\0';
+                }
+                if (do_show_setup_select_linie==2) {
+                  keybufferindex++;
+                  keybuffer[keybufferindex]='\0';	// else input key text in buffer
+                }
               }
             } else if (do_show_videoplayer) {
               // video player setting
@@ -11757,7 +11771,6 @@ void handleKeypress(unsigned char key, int x, int y) {
              }
          }
          #endif
-
          if (do_show_setup_torrent) {
              switch(do_show_setup_select_linie) {
                case 0: if (strcmp(keybuffer,"Y")) torrent_downloader.trash_torrent=true; else torrent_downloader.trash_torrent=false;
@@ -11768,8 +11781,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                        break;
              }
          }
-
-
          if (do_show_setup_keys) {
              switch(do_show_setup_select_linie) {
                  case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);

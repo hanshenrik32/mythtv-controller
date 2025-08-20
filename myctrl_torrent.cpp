@@ -167,7 +167,8 @@ void torrent_loader::select_file_name_and_copy_to_otherdir(char *filepath) {
 torrent_loader::torrent_loader() {
   torrent_loader_struct torrent_info_data;
   torrent_list_antal=0;
-  downloadpath = "/tmp/";                                       // default download path
+  downloadpath = "/tmp/";                                                // default download path
+  torrent_download_path = "/tmp/";                                       // default torrent download path
   edit_line_nr = 0;
   torrent_info_line_nr= 0;
   torrent_info_move_line_nr = 0;

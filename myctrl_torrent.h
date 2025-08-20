@@ -47,6 +47,7 @@ class torrent_loader {
         lt::settings_pack pack;        
         lt::session s;
         std::string downloadpath;
+        std::string torrent_download_path;
         bool trash_torrent;
         bool automove_to_movie_path;
         void select_file_name();

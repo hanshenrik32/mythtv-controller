@@ -1674,12 +1674,12 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     }
     // selected biger
     if (i+1==(int) stream_key_selected) {
-      buttonsizey=config_menu.config_music_main_window_icon_sizey;
-      buttonsizex=config_menu.config_music_main_window_icon_sizex;
+      buttonsizey=config_menu.config_stream_main_window_icon_sizey;
+      buttonsizex=config_menu.config_stream_main_window_icon_sizex;
       show_round_corner = true;
     } else {
-      buttonsizey=config_menu.config_music_main_window_icon_sizey;
-      buttonsizex=config_menu.config_music_main_window_icon_sizex;
+      buttonsizey=config_menu.config_stream_main_window_icon_sizey;
+      buttonsizex=config_menu.config_stream_main_window_icon_sizex;
       show_round_corner = false;
     }
     if (stack[i+sofset]->textureId) {
@@ -1691,13 +1691,11 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       // round corner
       if (show_round_corner) {
-        
-
-        cx=100+xof;          // pos x
-        cy=80+yof;               // pos y
+        cx=100+xof;                 // pos x
+        cy=80+yof;                  // pos y
         dx=buttonsizex-20;          // siz y
         dy=buttonsizey-30;          // siz x
-        r=20;            // radius
+        r=20;                       // radius
         a=0.0;
         da=1.5707963267948966192313216916398/float(n);
         dx-=r+r;

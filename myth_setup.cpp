@@ -4015,7 +4015,7 @@ void show_setup_torrent() {
   glRasterPos2f(0.0f, 40.0f);
   myglprint18((char *) "Auto move file to movie db.: ");
   glRasterPos2f(0.0f, 0.0f);
-  myglprint18((char *) "   path.: ");
+  myglprint18((char *) "Torrent Download path......: ");
   glPopMatrix();
   glPushMatrix();
   glTranslatef(448 , 510  , 0.0f); 
@@ -4024,7 +4024,7 @@ void show_setup_torrent() {
             break;
     case 1: showcoursornow(170,40,0);
             break;
-    case 2: showcoursornow(0,0,strlen(torrent_downloader.downloadpath.c_str()));
+    case 2: showcoursornow(120,0,strlen(torrent_downloader.downloadpath.c_str()));
               break;
     default:
             showcoursornow(0,0,0);
@@ -4033,7 +4033,7 @@ void show_setup_torrent() {
   glPopMatrix();
   glPushMatrix();
   glTranslatef(winsizx + 318 , 660  , 0.0f); // 438
-  glRasterPos2f(0.0f, 0.0f);
+  glRasterPos2f(164.0f, 0.0f);
   myglprint4((char *) torrent_downloader.downloadpath.c_str());
   glRasterPos2f(170.0f, 40.0f);
   if (torrent_downloader.automove_to_movie_path) myglprint4((char *) "Y"); else myglprint4((char *) "N");

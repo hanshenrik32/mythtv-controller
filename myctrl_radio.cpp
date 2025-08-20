@@ -547,9 +547,15 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   while((i<lradiooversigt_antal) && ((int) i+(int) sofset<(int) antal) && (stack[i+sofset]!=NULL)) {
     if (((i % bonline)==0) && (i>0)) {
       xof=config_menu.config_radio_main_windowx;	// reset xof
-      yof=yof-(config_menu.config_radio_main_window_icon_sizey+46); // old buttonsizey
+      yof=yof-(config_menu.config_radio_main_window_icon_sizey+20); // old buttonsizey
     }
-    if (i+1==(int) radio_key_selected) buttonsizey=180.0f; else buttonsizey=150.0f;
+    if (i+1==(int) radio_key_selected) {
+      buttonsizex=config_menu.config_radio_main_window_icon_sizex;
+      buttonsizey=config_menu.config_radio_main_window_icon_sizey;
+    } else {
+      buttonsizex=config_menu.config_radio_main_window_icon_sizex-5;
+      buttonsizey=config_menu.config_radio_main_window_icon_sizey-5;
+    }
     if (stack[i+sofset]->textureId) {
       // radio default icon
       glPushMatrix();
