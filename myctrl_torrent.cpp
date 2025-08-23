@@ -167,7 +167,8 @@ void torrent_loader::select_file_name_and_copy_to_otherdir(char *filepath) {
 torrent_loader::torrent_loader() {
   torrent_loader_struct torrent_info_data;
   torrent_list_antal=0;
-  downloadpath = "/tmp/";                                       // default download path
+  downloadpath = "/tmp/";                                                // default download path
+  torrent_download_path = "/tmp/";                                       // default torrent download path
   edit_line_nr = 0;
   torrent_info_line_nr= 0;
   torrent_info_move_line_nr = 0;
@@ -319,7 +320,7 @@ int torrent_loader::add_torrent(char *filename) {
   // save to db
   save_torrent_file_to_db(torrent_list_antal, true, false, torrent_info_data.torrent_file_name , torrent_info_data.total_wanted);
   // add torrent info to vector
-  torrent_list.push_back(torrent_info_data); // 
+  torrent_list.push_back(torrent_info_data);                                           //  add record to vector
   // pack.set_bool(lt::settings_pack::enable_incoming_utp, true);
   // pack.set_bool(lt::settings_pack::enable_incoming_tcp, true);
   try {
@@ -1106,15 +1107,20 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
   for (int n=0;n<TORRENT_ANTAL-1;n++) {
     glRasterPos2f(0.0f, 0.0f+(200-(n*18)));
     if (n<torrent_list.size()) {
+      std::string torrent_name = torrent_list.at(n).torrent_name;
+      if (torrent_name.size()>64) {
+        torrent_name.resize(60); // Ensure the name is 64 characters long
+        torrent_name += "..."; // Add ellipsis if truncated
+      }
       if (torrent_list.at(n).active) {
         if (!(torrent_list.at(n).downloaded)) {
           if (torrent_list.at(n).paused) {
             showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, torrent_list.at(n).downloaded_size/1024/1024, format_bits(torrent_list.at(n).total_wanted), "Paused");
           } else {
-            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), torrent_list.at(n).state_text);
-          }  
+            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {:>14}", torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), torrent_list.at(n).state_text);
+          }
         } else {
-          if (get_automove_done(n)) {            
+          if (get_automove_done(n)) {
             showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {} Downloaded/Moved.", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), "");
           } else {
             showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {} Downloaded.", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).total_wanted), format_bits(torrent_list.at(n).total_wanted), "");

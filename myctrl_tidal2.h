@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <vector>
 #include "json-parser/json.h"
 
 // web server
@@ -85,7 +86,8 @@ class tidal_active_play_info_type {                // sample data down here
 class tidal_class {
   private:
     enum { maxantal=5000 };					                                        // MAX antal rss stream in wiew
-    tidal_oversigt_type *stack[maxantal];			                            // tidal playlist stack
+    // tidal_oversigt_type *stack[maxantal];			                            // tidal playlist stack
+    std::vector<tidal_oversigt_type> stack;
     tidal_device_def tidal_device[10];
     int tidal_device_antal;                                               // antal device found
     tidal_active_play_info_type tidal_aktiv_song[200];                      //
@@ -210,12 +212,12 @@ class tidal_class {
     int total_aktiv_songs() { return(tidal_aktiv_song_antal); };                                                          // # of songs in playlist
 
     // return type playlist
-    int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
+    int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr].type); else return(0); }
     // GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
     int antal_tidal_streams() { return antalplaylists; };
-    char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
-    char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
-    char *get_tidal_feed_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
+    char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr].feed_gfx_url); else return(0); }
+    char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr].feed_showtxt); else return(0); }
+    char *get_tidal_feed_artistname(int nr) { if ( nr < antal ) return(stack[nr].feed_artist); else return(0); }
   
     char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
     char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].playurl ); else return(0); }
@@ -251,13 +253,13 @@ class tidal_class {
     // void thread_convert_m4a_to_flac(void *path);
     int tidal_download_image(char *imgurl,char *filename);
 
-    void set_tidal_feed_showtxt(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_showtxt,name); }
-    void set_tidal_feed_artistname(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_artist,name); }
-    void set_tidal_feed_name(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_name,name); }
-    void set_tidal_feed_desc(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_desc,name); }
-    void set_tidal_feed_gfx_url(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_gfx_url,name); }
-    void set_tidal_feed_release_date(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->feed_release_date,name); }
-    void set_tidal_playlistid(char *name,int nr) { if (stack[nr]) strcpy(stack[nr]->playlistid,name); }    
+    void set_tidal_feed_showtxt(char *name,int nr) { strcpy(stack[nr].feed_showtxt,name); }
+    void set_tidal_feed_artistname(char *name,int nr) { strcpy(stack[nr].feed_artist,name); }
+    void set_tidal_feed_name(char *name,int nr) { strcpy(stack[nr].feed_name,name); }
+    void set_tidal_feed_desc(char *name,int nr) { strcpy(stack[nr].feed_desc,name); }
+    void set_tidal_feed_gfx_url(char *name,int nr) { strcpy(stack[nr].feed_gfx_url,name); }
+    void set_tidal_feed_release_date(char *name,int nr) { strcpy(stack[nr].feed_release_date,name); }
+    void set_tidal_playlistid(char *name,int nr) { strcpy(stack[nr].playlistid,name); }    
 
     int opdatere_tidal_userCollections(char *uid);
     int opdatere_tidal_userCollections2(char *uid);
