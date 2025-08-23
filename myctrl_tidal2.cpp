@@ -913,14 +913,10 @@ bool tidal_class::delete_record_in_view(long tidalknapnr) {
   n=tidalknapnr;
   db_recnr=stack[n].intnr;
   playlistid = stack[n].playlistid;
-  // remove element from view
-  while(n<antalplaylists-2) {
-    stack[n]=stack[n+1];
-    n++;
-  }
-  // delete stack[n];              // delete last element
-  // delete from db
-  if (tidalknapnr<=antalplaylists) {
+  if (tidalknapnr<=stack.size()) {
+    // remove element from view
+    stack.erase(stack.begin()+n);    // remove element from vector
+    // delete from db
     antalplaylists--;  
     // clean up in db to.
     if (atoi(stack[tidalknapnr].playlistid)>0) {
@@ -2806,29 +2802,27 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {
     if (res) {
       while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
         if (antal<maxantal) {
-          // stack[antal]=new (struct tidal_oversigt_type);
-          // if (stack[antal]) {
-            strcpy(stack[antal].feed_showtxt,"");          	            // show name
-            strcpy(stack[antal].feed_name,"");		                        // mythtv db feedtitle
-            strcpy(stack[antal].feed_desc,"");                           // desc
-            strcpy(stack[antal].feed_gfx_url,"");
-            strcpy(stack[antal].feed_release_date,"");
-            strcpy(stack[antal].playlisturl,"");
-            stack[antal].feed_group_antal=0;
-            stack[antal].feed_path_antal=0;
-            stack[antal].textureId=0;
-            stack[antal].intnr=atoi(row[4]);                               // id
-            stack[antal].nyt=false;
-            stack[antal].type=0;            
-            // top level (load playlist)
-            // load playlist songs
-            strncpy(stack[antal].feed_showtxt,row[0],tidal_pathlength);
-            strncpy(stack[antal].feed_name,row[0],tidal_namelength);
-            strncpy(stack[antal].feed_gfx_url,row[1],tidal_namelength);
-            stack[antal].type=1;              
-            strcpy(stack[antal].playlistid,row[2]);                              // id is path here
-            antal++;
-          // }
+          strcpy(new_tidal_record.feed_showtxt,"");          	            // show name
+          strcpy(new_tidal_record.feed_name,"");		                        // mythtv db feedtitle
+          strcpy(new_tidal_record.feed_desc,"");                           // desc
+          strcpy(new_tidal_record.feed_gfx_url,"");
+          strcpy(new_tidal_record.feed_release_date,"");
+          strcpy(new_tidal_record.playlisturl,"");
+          new_tidal_record.feed_group_antal=0;
+          new_tidal_record.feed_path_antal=0;
+          new_tidal_record.textureId=0;
+          new_tidal_record.intnr=atoi(row[4]);                               // id
+          new_tidal_record.nyt=false;
+          new_tidal_record.type=0;            
+          // top level (load playlist)
+          // load playlist songs
+          strncpy(new_tidal_record.feed_showtxt,row[0],tidal_pathlength);
+          strncpy(new_tidal_record.feed_name,row[0],tidal_namelength);
+          strncpy(new_tidal_record.feed_gfx_url,row[1],tidal_namelength);
+          new_tidal_record.type=1;              
+          strcpy(new_tidal_record.playlistid,row[2]);                              // id is path here
+          stack.push_back(new_tidal_record);                                       // add to stack
+          antal++;
         }
       }
       mysql_close(conn);
@@ -3009,46 +3003,39 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
             if (( depth == 11 ) && ( x == 0 )) {
               antalplaylists++;
               antal++;
-              // stack[antal]=new (struct tidal_oversigt_type);    
-              // set playlistid + artist
-              // update rec and go to next rec
-              // if (stack[antal]) {
-                size_t lastSlash = playlisturl.find_last_of('/');
-                playlistid = (lastSlash != std::string::npos) ? playlisturl.substr(lastSlash + 1) : "";
-                strcpy(stack[antal].playlistid,playlistid.c_str());
-                strcpy(stack[antal].feed_showtxt,playlistname.c_str());
-                strcpy(stack[antal].feed_artist,artist.c_str());
-                strcpy(stack[antal].feed_release_date ,release_date.c_str());
-                strcpy(stack[antal].playlisturl ,playlisturl.c_str());
-                strcpy(stack[antal].feed_gfx_url,gfxurl.c_str());
-                strcpy(stack[antal].type_of_media , "ALBUM" );
-                stack[antal].type=1;                                             // playlist type
-                get_webfilename(downloadfilename,(char *) gfxurl.c_str());
-                strcpy(downloadfilenamelong,localuserhomedir);
-                strcat(downloadfilenamelong,"/tidal_gfx/");
-                strcat(downloadfilenamelong,playlistid.c_str());
-                strcat(downloadfilenamelong,".jpg");
-                // download image
-                tidal_download_image((char *) gfxurl.c_str(),downloadfilenamelong);
-                // update gfx file name
-                strcpy(stack[antal].feed_gfx_url, downloadfilenamelong);
-                stack[antal].textureId = 0;
-                stack[antal].type = 2;                                             // playlist type
-                playlistname = "";
-                release_date = "";
-                playlisturl = "";
-                gfxurl = "";
-                setimg = 0;
-              // }
+              size_t lastSlash = playlisturl.find_last_of('/');
+              playlistid = (lastSlash != std::string::npos) ? playlisturl.substr(lastSlash + 1) : "";
+              strcpy(new_tidal_record.playlistid,playlistid.c_str());
+              strcpy(new_tidal_record.feed_showtxt,playlistname.c_str());
+              strcpy(new_tidal_record.feed_artist,artist.c_str());
+              strcpy(new_tidal_record.feed_release_date ,release_date.c_str());
+              strcpy(new_tidal_record.playlisturl ,playlisturl.c_str());
+              strcpy(new_tidal_record.feed_gfx_url,gfxurl.c_str());
+              strcpy(new_tidal_record.type_of_media , "ALBUM" );
+              new_tidal_record.type=1;                                             // playlist type
+              get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+              strcpy(downloadfilenamelong,localuserhomedir);
+              strcat(downloadfilenamelong,"/tidal_gfx/");
+              strcat(downloadfilenamelong,playlistid.c_str());
+              strcat(downloadfilenamelong,".jpg");
+              // download image
+              tidal_download_image((char *) gfxurl.c_str(),downloadfilenamelong);
+              // update gfx file name
+              strcpy(new_tidal_record.feed_gfx_url, downloadfilenamelong);
+              new_tidal_record.textureId = 0;
+              new_tidal_record.type = 2;                                             // playlist type
+              playlistname = "";
+              release_date = "";
+              playlisturl = "";
+              gfxurl = "";
+              setimg = 0;
+              stack.push_back(new_tidal_record);                                       // add to stack
             }
           }
-          
         }
-
         if (tidal_process_title) {
           tidal_process_title= false;
         }
-
         
         // 1.
         /*
@@ -3495,241 +3482,6 @@ void tidal_class::set_tidal_playing_flag(bool flag) {
   tidal_is_playing=flag;  
 }
 
-// *********************************************************************************************************
-//
-// convert m4a files to flac then fmod can play it
-//
-// *********************************************************************************************************
-
-
-/*
-void *thread_convert_m4a_to_flac(void *path) {
-  DIR *dir;
-  struct dirent *ent;
-  std::string temptxt;
-  std::string dirtocheck;
-  std::string filename;
-  std::size_t found;
-  std::string checkfilexist_name;
-  std::filesystem::path dir_files;
-  std::vector<std::string> files;
-  std::string playlist_id;
-  std::string sql1;
-  std::string dbfilename;
-  char sql[8192];
-  char *database = (char *) "mythtvcontroller";
-  MYSQL *conn;
-  MYSQL_RES *mysql_res;
-  MYSQL_ROW mysql_row;
-  int i = 0;
-  int error;
-  struct dirent *ep;
-  FILE *fp;
-  bool dir_found=false;
-  conn=mysql_init(NULL);
-  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-  dirtocheck=tidal_download_home + (char *) path;
-  // first check if it have dirs that have m4a files check 4 dirs
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD1/";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ent = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ent->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD1/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);
-  }
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD2/";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ent = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ent->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD2/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);
-  }
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD3/";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ent = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ent->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD3/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);
-  }
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD4/";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ep->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD4/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);    
-  }
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD5";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ep->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD5/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);
-  }
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD6";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ep->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD6/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);
-  }
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD7";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ep->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD7/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);
-  }
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD8";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ep->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD8/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);
-  }
-  temptxt = dirtocheck;
-  temptxt = temptxt + "/CD9";
-  if ((dir = opendir (temptxt.c_str())) != NULL) {
-    while (((ep = readdir (dir)) != NULL)) {
-      dir_found=true;
-      filename=ep->d_name;
-      if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-        dir_files=filename;
-        dbfilename= "CD9/" + dir_files.stem().string();
-        files.push_back(dbfilename);
-      }
-    }
-    if (dir) closedir (dir);
-  }
-  // normal no subdirs
-  if (dir_found == false) {
-    dir = opendir (dirtocheck.c_str());
-    if (dir != NULL) {
-      while (ep = readdir (dir)) {
-        filename=ep->d_name;
-        dir_files=filename;
-        if ((filename.find(".m4a") != std::string::npos) || (filename.find(".flac") != std::string::npos)) {
-          dbfilename= dir_files.stem().string();
-          files.push_back(dbfilename);  
-        }
-      }
-      if (dir) closedir (dir);
-    }
-  }
-  // get id from tidal-dl AlbumInfo.txt file
-  dirtocheck = dirtocheck + "/AlbumInfo.txt";
-  std::ifstream myfile (dirtocheck);
-  if (myfile.is_open()) {
-    getline(myfile,playlist_id);
-    playlist_id.erase(0,14);                                                  // get playlistid
-    myfile.close();
-  }
-  while(i<files.size()) {
-    checkfilexist_name = tidal_download_home;
-    checkfilexist_name = checkfilexist_name + (char *) path;
-    checkfilexist_name = checkfilexist_name + "/";
-    checkfilexist_name = checkfilexist_name + files[i];
-    checkfilexist_name = checkfilexist_name + ".wav";
-    if (!(file_exists(checkfilexist_name.c_str()))) {
-      temptxt = "ffmpeg -y -i \"";
-      temptxt = temptxt + tidal_download_home;
-      temptxt = temptxt + (char *) path;
-      temptxt = temptxt + "/";
-      temptxt = temptxt + files[i];
-      temptxt = temptxt + ".flac\" \"";
-      temptxt = temptxt + tidal_download_home;
-      temptxt = temptxt + (char *) path;
-      temptxt = temptxt + "/";      
-      temptxt = temptxt + files[i];
-      temptxt = temptxt + ".wav\"";
-      error=system(temptxt.c_str());
-      if (error!=0) {
-        write_logfile(logfile,(char *) "Tidal error: can not convert m4a files to wav.");
-      }
-      // store in db
-      if ((conn) && (error==0)) {
-        mysql_query(conn,"set NAMES 'utf8'");
-        mysql_res = mysql_store_result(conn);
-        checkfilexist_name = tidal_download_home;
-        checkfilexist_name = checkfilexist_name + (char *) path;
-        checkfilexist_name = checkfilexist_name + "/";
-        checkfilexist_name = checkfilexist_name + files[i];
-        checkfilexist_name = checkfilexist_name + ".wav";        
-        // create records if needed
-        sql1="insert into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, id) values (\"" + files[i] + "\",\"\",\"" + checkfilexist_name + "\"," + playlist_id + "," + "0)";
-        // printf("sql %s \n",sql1.c_str());
-        if (conn) {
-          if (mysql_query(conn,sql1.c_str())!=0) {
-            write_logfile(logfile,(char *) "mysql create table error. (tidalcontent)");
-            printf("error sql %s \n",sql1.c_str());
-            // exit by error
-            exit(1);
-          }
-          mysql_res=mysql_store_result(conn);
-        }
-      }
-    }
-    i++;
-  }
-  if (conn) mysql_close(conn);
-}
-
-*/
 
 
 
@@ -4216,23 +3968,10 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         // convert the rest of the m4a files we have downloed to be able to play it in fmod
         // no thread version
         convert_m4a_to_flac(stack[tidalknapnr].playlistid);
-        /*
-        // there is thread version
-        //
-        pthread_t loaderthread; // thread_convert_m4a_to_flac() used to convert m4a files
-        int rc2 = pthread_create( &loaderthread , NULL , thread_convert_m4a_to_flac , (void *) stack[tidalknapnr]->feed_showtxt);
-        if (rc2) {
-          fprintf(stderr,"ERROR webupdate_loader_tidal function\nreturn code from pthread_create() is %d\n", rc2);
-          exit(-1);
-        }
-        // wait for thread is done downloading songs
-        pthread_join(loaderthread,NULL);
-        */
 
         // update play count in db
         sqlstring = fmt::format("update mythtvcontroller.tidalcontent set play_count=play_count+1 where playlistid={}",stack[tidalknapnr].playlistid);
         mysql_query(conn,sqlstring.c_str());
-
 
         // hent song names from db
         std::string sql1;
