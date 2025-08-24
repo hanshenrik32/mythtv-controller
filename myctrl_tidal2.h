@@ -265,6 +265,9 @@ class tidal_class {
     int opdatere_tidal_userCollections2(char *uid);
     void show_setup_tidal();
     void clear_tidal_aktiv_songlist();
+
+    std::string get_artist_cover_image(char *albumid);
+
 };
 
 #endif

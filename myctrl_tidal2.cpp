@@ -27,7 +27,7 @@
 #include <vector>
 #include <fmt/format.h>
 #include <sqlite3.h>                    // sqlite interface to xbmc
-
+#include <unistd.h>
 
 // sound system include fmod
 
@@ -1765,11 +1765,22 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
             strcpy(new_tidal_record.playlisturl ,playlisturl.c_str());
             strcpy(new_tidal_record.feed_gfx_url,gfxurl.c_str());
             strcpy(new_tidal_record.type_of_media , "ALBUM" );
-            get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+            if (gfxurl.length()>0) {
+              get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+            }
             strcpy(downloadfilenamelong,localuserhomedir);
             strcat(downloadfilenamelong,"/tidal_gfx/");
             strcat(downloadfilenamelong,tidal_playlistid);
             strcat(downloadfilenamelong,".jpg");
+
+            
+            unsigned int microsecond = 1000000;
+            usleep(0.3 * microsecond);                  //sleep 0.5 sec
+
+            // get url for artist cover image
+            gfxurl=get_artist_cover_image(tidal_playlistid);
+            strcpy(new_tidal_record.feed_gfx_url, gfxurl.c_str());
+
             // download image
             tidal_download_image((char *) gfxurl.c_str(),downloadfilenamelong);
             // update gfx file name
@@ -1806,7 +1817,7 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
         if ((antal>=0) && ( depth == 10 ) && ( x == 0 )) {
           // get cover file url
           if ((setimg==4) && (gfxurl.length()==0)) {
-            gfxurl=value->u.string.ptr;            
+            gfxurl=value->u.string.ptr;
           }
           setimg++;
         }      
@@ -1867,6 +1878,7 @@ std::string escapeSingleQuotesOss(const std::string& input) {
 // get all albums by artistid,force download + create db if not exist
 //
 // ****************************************************************************************
+// MAIN CALL
 
 
 int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
@@ -2064,6 +2076,100 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   //get_users_album("012345");
   if (create_new_record_antal==0) write_logfile(logfile,(char *) "Tidal can not download artist json file.");
   return(create_new_record_antal);
+}
+
+
+// ****************************************************************************************
+//
+//  get artist cover image
+//  
+// ****************************************************************************************
+
+std::string tidal_class::get_artist_cover_image(char *albumid) {
+  std::string userfilename;
+  FILE *userfile;
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  std::string curlstr;
+  FILE * stream;
+  const int max_buffer = 256;
+  char buffer[max_buffer];
+  std::string data;
+  char post_playlist_data[4096];
+  int httpCode=0;
+  int error;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=NULL;
+  /*
+  // test code with libcurl
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + tidaltoken;
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if ((curl) && (strlen(auth_kode.c_str())>0)) {
+    
+    header = curl_slist_append(header, "accept: application/vnd.api+json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+    userfile=fopen("tidal_album_cover.txt","w");
+    if (userfile) {
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+      res = curl_easy_perform(curl);
+      fclose(userfile);
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+  }
+  // always cleanup
+  curl_easy_cleanup(curl);
+  curl_global_cleanup();
+  // end test code
+  */
+
+  auth_kode = " -H 'Authorization: Bearer ";
+  auth_kode = auth_kode + tidaltoken;
+  auth_kode = auth_kode + "'";
+  url="curl -s -X GET 'https://openapi.tidal.com/v2/albums/";
+  url=url + albumid;
+  url=url + "/relationships/coverArt?countryCode=US&include=coverArt'";
+  userfilename = localuserhomedir;
+  userfilename = userfilename + "/";
+  userfilename = userfilename + "/tidal_gfx/";
+  userfilename = userfilename + "tidal_album_cover_";
+  userfilename = userfilename + albumid;
+  userfilename = userfilename + ".json";
+  curlstr=url;
+  curlstr=curlstr + " -H 'accept: application/vnd.api+json' ";
+  curlstr=curlstr + auth_kode;
+  curlstr=curlstr + " > ";
+  curlstr=curlstr + userfilename;  
+  error=system(curlstr.c_str());
+  curlstr="grep -o 'https://[^\"]*' ";
+  curlstr = curlstr + userfilename;
+  curlstr = curlstr + "| tail -n 2 | head -n 1";
+  stream = popen(curlstr.c_str(), "r");
+  if (stream) {
+    while (!feof(stream))
+      if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+    pclose(stream);
+  }
+  data.erase(std::remove(data.begin(), data.end(), '\n'), data.end());
+  return(data);
 }
 
 
