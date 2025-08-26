@@ -5677,13 +5677,7 @@ void display() {
       write_logfile(logfile,(char *) "Tidal start search result thread");
       do_hent_tidal_search_online=false;
       tidal_oversigt_loaded_begin=true;
-
-      tidal_oversigt.search_tidal_online_done=false;
-      fprintf(stderr,"Update tidal search result thread.\n");
-      write_logfile(logfile,(char *) "Tidal start search result thread");
-      do_hent_tidal_search_online=false;
-      tidal_oversigt_loaded_begin=true;
-      // clear old
+      // clear old vector
       tidal_oversigt.clean_tidal_oversigt();
       // update from search
       int tidal_search_status=0;
