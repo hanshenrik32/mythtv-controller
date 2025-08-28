@@ -4206,6 +4206,31 @@ void display() {
       drawText(temptxt, xof+20.0f,yof+10.0f+5.0f, 0.4f,1);
       showcoursornow(266,460+5,strlen(keybuffer));
     }
+    // show loading status of tidal online search
+    if (tidal_oversigt_loaded_begin) {
+      xof = 500;
+      yof = 600;
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+      glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS); // draw ask box
+      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
+      glEnd(); //End quadrilateral coordinates
+      glPopMatrix();
+      // drawText("Loading Tidal result.", xof+80.0f,yof+10.0f+5.0f, 0.4f,1);
+
+      drawText("Loading Tidal result.", 650, 620, 0.4f,1);
+
+    }
   }
   // save playlist to file
   if ((vis_music_oversigt) && (save_ask_save_playlist)) {
@@ -5675,29 +5700,9 @@ void display() {
       tidal_oversigt.search_tidal_online_done=false;
       fprintf(stderr,"Update tidal search result thread.\n");
       write_logfile(logfile,(char *) "Tidal start search result thread");
-      do_hent_tidal_search_online=false;
+      // do_hent_tidal_search_online=false;
+      // trigger search in thread
       tidal_oversigt_loaded_begin=true;
-      // clear old vector
-      tidal_oversigt.clean_tidal_oversigt();
-      // update from search
-      int tidal_search_status=0;
-      switch(tidal_oversigt.searchtype) {
-        case 0: tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
-                break;
-        case 1: tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,1);               // ARTISTS
-                break;
-        case 2: tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,2);               // TRACKS
-                break;
-        default:tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
-      }
-      printf("Done Update tidal search result thread. STATUS : %d \n",tidal_search_status);
-      if (tidal_search_status==-1) write_logfile(logfile,(char *) "Tidal error search result thread");
-      else write_logfile(logfile,(char *) "Tidal ok search result thread");
-      tidal_oversigt.search_tidal_online_done=true;
-      tidal_oversigt_loaded_begin=false;
-      tidal_oversigt.set_search_loaded();                                 // load icons
-      tidal_oversigt.reset_amin_in_viewer();                              // reset anim
-      tidal_oversigt.search_loaded=true;
     }
   }
 
@@ -14472,7 +14477,6 @@ void datainfoloader_webserver_v2() {
       tidal_oversigt.search_tidal_online_done=false;
       fprintf(stderr,"Update tidal search result thread.\n");
       write_logfile(logfile,(char *) "Tidal start search result thread");
-      do_hent_tidal_search_online=false;
       tidal_oversigt_loaded_begin=true;
       // clear old
       tidal_oversigt.clean_tidal_oversigt();
@@ -14612,7 +14616,7 @@ void datainfoloader_spotify_v2(string msg) {
     do_update_xmltv=false;
     do_update_xmltv_show=false;            // set done
   }
-  datainfoloader_webserver_v2();  
+  datainfoloader_webserver_v2();
 }
 
 

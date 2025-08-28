@@ -11,12 +11,9 @@
 
 #include "mongoose-master/mongoose.h"
 
-
 const int tidal_playlisttype=0;                         // playlist type
 const int tidal_songlisttype=1;                         // song list type
-
 const std::string tidal_download_home="/home/hans/download/";
-
 
 //
 // device struct
@@ -102,16 +99,12 @@ class tidal_class {
     int antalplaylists;                                                     // antal playlist in view
     bool tidal_is_playing;                                                // do we play ?
     bool tidal_is_pause;                                                  // do we pause
-    //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
-    // bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
-    // bool search_loaded;
     // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
     void process_object_tidal_search_result(json_value* value, int depth);
     void process_array_tidal_search_result(json_value* value, int depth);
     // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
     void process_tidal_search_result(json_value* value, int depth,int x);
     // process_tidal_search_result is used in opdatere_tidal_oversigt_searchtxt_online
-
     // json parser subs.
     void process_value_token(json_value* value, int depth,int x);
     void process_object_token(json_value* value, int depth);
@@ -127,12 +120,10 @@ class tidal_class {
     bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
     bool startplay;
     bool texture_loaded;
-
     bool reset_amin_in_viewer();
     bool anim_viewer;
     bool anim_viewer_search;
     float anim_angle;
-
     bool set_search_loaded() { search_loaded=true; return(1); }
     bool get_tidal_update_flag();
     void set_tidal_update_flag(bool flag);
@@ -189,7 +180,7 @@ class tidal_class {
     int tidal_next_play();                                                // play next song
     int get_tidal_playlistid();
     char *get_tidal_name(int nr);                                         // get record name
-    char *get_tidal_playlistid(int nr);                                   // get id to play        
+    char *get_tidal_playlistid(int nr);                                   // get id to play
     char *get_active_tidal_device_name();                                 //
     int tidal_refresh_token();
     int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
@@ -225,7 +216,7 @@ class tidal_class {
     void process_value_playlist(json_value* value, int depth,int x);
     void process_object_playlist(json_value* value, int depth);
     void process_array_playlist(json_value* value, int depth);
-    int get_playlist_from_file(char *filename);                                                     // read/import playlists from file       
+    int get_playlist_from_file(char *filename);                                                     // read/import playlists from file
     //  in use from here and down.
     // download album by artist id
     int tidal_get_album_by_artist(char *artistid);
@@ -233,7 +224,6 @@ class tidal_class {
     int tidal_get_album_items(char *albumid);
     // download all albums by artist id
     int tidal_get_artists_all_albums(char *artistid,bool force);
-
 
     int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
     int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
@@ -259,13 +249,12 @@ class tidal_class {
     void set_tidal_feed_desc(char *name,int nr) { strcpy(stack[nr].feed_desc,name); }
     void set_tidal_feed_gfx_url(char *name,int nr) { strcpy(stack[nr].feed_gfx_url,name); }
     void set_tidal_feed_release_date(char *name,int nr) { strcpy(stack[nr].feed_release_date,name); }
-    void set_tidal_playlistid(char *name,int nr) { strcpy(stack[nr].playlistid,name); }    
+    void set_tidal_playlistid(char *name,int nr) { strcpy(stack[nr].playlistid,name); }
 
     int opdatere_tidal_userCollections(char *uid);
     int opdatere_tidal_userCollections2(char *uid);
     void show_setup_tidal();
     void clear_tidal_aktiv_songlist();
-
     std::string get_artist_cover_image(char *albumid);
 
 };

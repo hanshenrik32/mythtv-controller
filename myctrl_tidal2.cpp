@@ -255,10 +255,10 @@ void tidal_class::process_value_token(json_value* value, int depth,int x) {
       process_array_token(value, depth+1);
       break;
     case json_integer:
-      printf("int: %10" PRId64 "\n", value->u.integer);
+      // printf("int: %10" PRId64 "\n", value->u.integer);
       break;
     case json_double:
-      fprintf(stdout,"double: %f\n", value->u.dbl);
+      // fprintf(stdout,"double: %f\n", value->u.dbl);
       break;
     case json_string:
       // printf("Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
@@ -2937,13 +2937,15 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {
           new_tidal_record.type=0;            
           // top level (load playlist)
           // load playlist songs
-          strncpy(new_tidal_record.feed_showtxt,row[0],tidal_pathlength);
-          strncpy(new_tidal_record.feed_name,row[0],tidal_namelength);
-          strncpy(new_tidal_record.feed_gfx_url,row[1],tidal_namelength);
-          new_tidal_record.type=1;              
-          strcpy(new_tidal_record.playlistid,row[2]);                              // id is path here
-          stack.push_back(new_tidal_record);                                       // add to stack
-          antal++;
+          if (row[0]) {
+            strncpy(new_tidal_record.feed_showtxt,row[0],tidal_pathlength);
+            strncpy(new_tidal_record.feed_name,row[0],tidal_namelength);
+            if (row[1]) strncpy(new_tidal_record.feed_gfx_url,row[1],tidal_namelength);
+            new_tidal_record.type=1;              
+            if (row[2]) strcpy(new_tidal_record.playlistid,row[2]);                              // id is path here
+            stack.push_back(new_tidal_record);                                                   // add to stack
+            antal++;
+          }
         }
       }
       mysql_close(conn);
@@ -2973,7 +2975,7 @@ void tidal_class::process_object_tidal_search_result(json_value* value, int dept
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     // print_depth_shift(depth);
-    fprintf(stderr,"x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
+    // fprintf(stderr,"x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name , "attributes")==0) {      
       tidal_process_attributes=true;
     } else if (strcmp(value->u.object.values[x].name , "id" )==0) {
@@ -3070,7 +3072,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
         process_array_tidal_search_result(value, depth+1);
         break;
       case json_integer:
-        fprintf(stderr,"int: %10" PRId64 "\n", value->u.integer);
+        // fprintf(stderr,"int: %10" PRId64 "\n", value->u.integer);
         if ((depth==7) && (x==3)) numberOfTracks = value->u.integer;
         break;
       case json_double:
@@ -3078,7 +3080,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
         //if (debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
         break;
       case json_string:        
-        fprintf(stderr,"x = %d depth=%d    string: %s\n", x , depth, value->u.string.ptr);
+        // fprintf(stderr,"x = %d depth=%d    string: %s\n", x , depth, value->u.string.ptr);
         // 1.
         if (tidal_process_attributes) {
           // fprintf(stderr,"%s depth = %d x = %d \n ",value->u.string.ptr ,depth,x);
@@ -3246,26 +3248,22 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
   }
   url="curl  -X 'GET'   'https://openapi.tidal.com/v2/searchResults/";
   url = url + searchbuffer;
-  url = url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums'";
   switch (type) {
             // albums
-    case 0: // old url=url + "/relationships/albums?countryCode=US&include=albums' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            // url=url + "/relationships/albums?countryCode=US&include=albums' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + " -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
+    case 0: url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
             break;
             // artist
-    case 1: // url=url + "/relationships/artists?countryCode=US&include=artists'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + "/relationships/artists?countryCode=US&include=artists' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+    case 1: url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
             break;
             // tracks
-    case 2: // url=url + "/relationships/tracks?countryCode=US&include=tracks'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + "/relationships/tracks?countryCode=US&include=tracks'  -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+    case 2: url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=tracks' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
             break;
             // default albums
-    default:// url=url + "/relationships/albums?countryCode=US&include=albums'  -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
-            url=url + "/relationships/albums?countryCode=US&include=albums' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+    default: 
+            url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
+            break;            
   }
-  printf("url = %s \n",url.c_str());
+  // printf("url = %s \n",url.c_str());
   error=system(url.c_str());
   // if no error we have json file have the search result
   if (error==0) {
