@@ -5690,7 +5690,8 @@ void display() {
                 break;
         default:tidal_search_status=tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
       }
-      printf("Done Update tidal search result thread. STATUS : %d \n",tidal_search_status);
+      printf("Done Update tidal search result thread. STATUS : ");
+      if (tidal_search_status==-1) printf("ERROR\n"); else printf("OK\n");
       if (tidal_search_status==-1) write_logfile(logfile,(char *) "Tidal error search result thread");
       else write_logfile(logfile,(char *) "Tidal ok search result thread");
       tidal_oversigt.search_tidal_online_done=true;
