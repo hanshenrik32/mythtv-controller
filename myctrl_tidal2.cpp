@@ -489,7 +489,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
   if (strlen(artistname)==0) use_artistname="Unknown"; else use_artistname=artistname;
   if (conn) {
     // First inset into playlist db
-    sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,antal_play,id) values (\"";
+    sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,play_count,id) values (\"";
     sql_insert = sql_insert + playlistfilename;                            // playlist name
     sql_insert = sql_insert + "\",'";
     sql_insert = sql_insert + cover_path;                                  // cover
