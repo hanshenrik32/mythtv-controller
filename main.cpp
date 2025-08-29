@@ -810,6 +810,7 @@ GLuint tidal_big_search_bar_album;
 // radio view icons
 GLuint onlineradio;                       // default radio icon
 GLuint onlineradio_empty;                 //
+GLuint onlineradio_selected;                 //
 GLuint onlineradio192;                    //
 GLuint onlineradio320;                    //
 GLuint radiooptions;                      //
@@ -12269,7 +12270,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   if (ask_save_playlist) {
                     save_ask_save_playlist = true;        // set save flag
                   }
-                  if (do_show_tidal_search_oversigt) {
+                  if ((do_show_tidal_search_oversigt) && (ask_save_playlist==false)) {
                     do_hent_tidal_search_online=true;
                     printf("do_hent_tidal_search_online=%d\n",do_hent_tidal_search_online);  
                   }
@@ -15369,6 +15370,7 @@ void loadgfx() {
     spotify_icon_border   = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_icon_border.png");
 
     onlineradio_empty     = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
+    onlineradio_selected  = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_selected");
     onlineradio           = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
     onlineradio192        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
     onlineradio320        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
@@ -15580,6 +15582,7 @@ void freegfx() {
     glDeleteTextures( 1, &_tvbar3);                 //
     glDeleteTextures( 1, &spotify_icon_border);     // spotify icon border
     glDeleteTextures( 1, &onlineradio_empty);       //
+    glDeleteTextures( 1, &onlineradio_selected);    // selected radio icon
     glDeleteTextures( 1, &onlineradio);		          // radio icon
     glDeleteTextures( 1, &onlineradio192);			    // radio icon
     glDeleteTextures( 1, &onlineradio320);			    // radio icon

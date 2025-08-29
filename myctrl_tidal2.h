@@ -239,8 +239,6 @@ class tidal_class {
     int load_tidal_iconoversigt();                                                                  // load all icons
     int get_access_token(char *loginbase64);                                                        // get token
     int get_users_album(char *albumid);                                                             // download json file for album id
-    // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
-    // void thread_convert_m4a_to_flac(void *path);
     int tidal_download_image(char *imgurl,char *filename);
 
     void set_tidal_feed_showtxt(char *name,int nr) { strcpy(stack[nr].feed_showtxt,name); }

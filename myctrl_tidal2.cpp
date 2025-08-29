@@ -469,6 +469,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
   std::string sql_insert;
   std::string sql_search;
   std::string playlistid;
+  std::string use_artistname;
   bool fundet;
   std::string temptxt;
   unsigned int i;
@@ -485,6 +486,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
   mysql_query(conn,"set NAMES 'utf8'");
   res = mysql_store_result(conn);
+  if (strlen(artistname)==0) use_artistname="Unknown"; else use_artistname=artistname;
   if (conn) {
     // First inset into playlist db
     sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,antal_play,id) values (\"";
@@ -496,7 +498,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
     sql_insert = sql_insert + "',";
     sql_insert = sql_insert + "now()";                                     // dato
     sql_insert = sql_insert + ",'";
-    sql_insert = sql_insert + artistname;                                  // artist name
+    sql_insert = sql_insert + use_artistname.c_str();                      // artist name
     sql_insert = sql_insert + "',0,0)";
     // printf("PLAYLIST SQL : %s \n ",sql_insert.c_str());
     mysql_query(conn,sql_insert.c_str());
@@ -2461,8 +2463,6 @@ bool tidal_class::get_tidal_update_flag() {
 void tidal_class::set_tidal_update_flag(bool flag) {
   tidal_update_loaded_begin=flag;
 }
-
-
 
 
 // ****************************************************************************************

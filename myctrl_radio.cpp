@@ -52,6 +52,7 @@ extern int do_music_icon_anim_icon_ofset;                     //
 extern GLuint _textureIdback1;                                //
 extern GLuint onlineradio;					                          //
 extern GLuint onlineradio_empty;				                      //
+extern GLuint onlineradio_selected;				                    //
 extern GLuint onlineradio192;					                        //
 extern GLuint onlineradio320;					                        //
 extern GLuint radiooptions;                                   //
@@ -564,8 +565,12 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       if (stack[i+sofset]->online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,onlineradio_empty);
+      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL); 
+      if ((i+1==(int) radio_key_selected)) {
+        glBindTexture(GL_TEXTURE_2D,onlineradio_selected);
+      } else {
+        glBindTexture(GL_TEXTURE_2D,onlineradio_empty);
+      }
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -602,7 +607,11 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,onlineradio);
+      if ((i+1==(int) radio_key_selected)) {
+        glBindTexture(GL_TEXTURE_2D,onlineradio_selected);
+      } else {
+        glBindTexture(GL_TEXTURE_2D,onlineradio);
+      }
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(100+i+sofset);
