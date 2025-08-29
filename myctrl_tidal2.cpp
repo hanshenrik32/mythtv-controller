@@ -463,7 +463,6 @@ int Get_albums_by_artist() {
 //
 // *******************************************************************************************
 
-
 int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid,char *artistname) {
   bool fault;
   std::string sql_insert;
@@ -521,7 +520,6 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
       i=0;
       while(i<tidal_aktiv_song_antal) {
         temptxt=fmt::format("insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,play_count,id) values ('{}','{}','{}','{}',0,0) ON DUPLICATE KEY UPDATE playpath='{}'", tidal_aktiv_song[i].song_name, tidal_aktiv_song[i].cover_image_url, tidal_aktiv_song[i].playurl,playlstid,tidal_aktiv_song[i].playurl);
-        // printf("SQL : %s \n ",temptxt);
         mysql_query(conn,temptxt.c_str());
         res = mysql_store_result(conn);
         if (res) fault=false;
@@ -532,7 +530,6 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
     write_logfile(logfile,(char *) "Tidal playlist save done.");
   } else {
     write_logfile(logfile,(char *) "Tidal playlist save error. No access to mariadb.");
-
   }
   return(!(fault));
 }
@@ -2714,7 +2711,7 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
   
   tidal_oversigt_type new_tidal_record;
 
-  const char *sql = "SELECT playlistname,paththumb,playlistid,release_date,artistid,id from tidalcontentplaylist group by (playlistname)";
+  const char *sql = "SELECT playlistname,paththumb,playlistid,release_date,artistid,id from tidalcontentplaylist group by (playlistname) order by play_count desc";
   // const char *sql = "SELECT playlistname,paththumb,playlistid,release_date,artistid,id from tidalcontentplaylist";
   const char *sql_antal = "SELECT COUNT(*) from tidalcontentplaylist";
   char *data = (char *) "sqlitedb_obj_tidal";
@@ -2762,7 +2759,7 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
     // find records after type (0 = root, else = refid)
     if (refid == NULL) {
       show_search_result=false;
-      sprintf(sqlselect,"select playlistname,paththumb,playlistid,release_date,artistid,id from mythtvcontroller.tidalcontentplaylist group by (playlistname) order by artistid,release_date desc,playlistname");
+      sprintf(sqlselect,"select playlistname,paththumb,playlistid,release_date,artistid,id from mythtvcontroller.tidalcontentplaylist group by (playlistname) order by play_count desc,artistid,release_date desc,playlistname");
       // sprintf(sqlselect,"select playlistname,paththumb,playlistid,release_date,artistid,id from mythtvcontroller.tidalcontentplaylist order by artistid,release_date desc,playlistname");
       getart = 0;
     } else {

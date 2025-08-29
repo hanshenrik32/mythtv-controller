@@ -88,6 +88,7 @@ class tidal_class {
     tidal_device_def tidal_device[10];
     int tidal_device_antal;                                               // antal device found
     tidal_active_play_info_type tidal_aktiv_song[200];                      //
+    std::vector<tidal_active_play_info_type> tidal_aktiv_song1; // change to vector (NOT DONE for now)
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
     bool tidal_update_loaded_begin;
