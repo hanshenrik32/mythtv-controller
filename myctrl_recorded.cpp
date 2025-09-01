@@ -61,9 +61,7 @@ recorded_oversigt_type::recorded_oversigt_type() {
 //
 // ****************************************************************************************
 
-void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,char *enddag,char *filepath,char *desc,char *channr)
-
-{
+void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,char *enddag,char *filepath,char *desc,char *channr) {
   strcpy(title,tit);
   strcpy(subtitle,subtit);
   strcpy(recordedpath,filepath);
@@ -78,9 +76,7 @@ void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,
 //
 // ****************************************************************************************
 
-void recorded_oversigt_type::get_recorded(int recnr,char *tit,char *subtit,char *startdag,char *enddag,char *desc,char *channr)
-
-{
+void recorded_oversigt_type::get_recorded(int recnr,char *tit,char *subtit,char *startdag,char *enddag,char *desc,char *channr) {
   strcpy(tit,title);
   strcpy(subtit,subtitle);
   strcpy(startdag,startdato);
@@ -93,9 +89,7 @@ void recorded_oversigt_type::get_recorded(int recnr,char *tit,char *subtit,char 
 //
 // ****************************************************************************************
 
-void recorded_oversigt_type::get_recorded_filepath(char *filepath)
-
-{
+void recorded_oversigt_type::get_recorded_filepath(char *filepath) {
   strcpy(filepath,recordedpath);
 }
 
@@ -105,9 +99,7 @@ void recorded_oversigt_type::get_recorded_filepath(char *filepath)
 //
 // ****************************************************************************************
 
-recorded_top_type::recorded_top_type()
-
-{
+recorded_top_type::recorded_top_type() {
   strcpy(title,"");
   prg_antal=0;
 }
@@ -116,9 +108,7 @@ recorded_top_type::recorded_top_type()
 //
 // ****************************************************************************************
 
-void recorded_top_type::put_recorded_top(char *title)
-
-{
+void recorded_top_type::put_recorded_top(char *title) {
   strcpy(this->title,title);
 }
 
@@ -127,9 +117,7 @@ void recorded_top_type::put_recorded_top(char *title)
 //
 // ****************************************************************************************
 
-void recorded_top_type::get_recorded_top(char *title)
-
-{
+void recorded_top_type::get_recorded_top(char *title) {
     strcpy(title,this->title);
 }
 
@@ -153,9 +141,7 @@ void draw_ccover() {
 //
 // ****************************************************************************************
 
-void recorded_overigt::get_recorded_filepath(char *filepath,int valgtnr,int subvalgtnr)
-
-{
+void recorded_overigt::get_recorded_filepath(char *filepath,int valgtnr,int subvalgtnr) {
   char temptxt[255];
   programs[valgtnr].recorded_programs[subvalgtnr].get_recorded_filepath(temptxt);
   strcpy(filepath,temptxt);
@@ -296,8 +282,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
 // ****************************************************************************************
 
 
-void myglprint3(char *string)
-{
+void myglprint3(char *string) {
   int len,i;
   len = (int) strlen(string);
   for (i = 0; i < len; i++) {
@@ -506,5 +491,3 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     glEnd();
   }
 }
-
-

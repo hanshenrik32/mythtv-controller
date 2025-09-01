@@ -88,6 +88,7 @@ class tidal_class {
     tidal_device_def tidal_device[10];
     int tidal_device_antal;                                               // antal device found
     tidal_active_play_info_type tidal_aktiv_song[200];                      //
+    std::vector<tidal_active_play_info_type> tidal_aktiv_song1; // change to vector (NOT DONE for now)
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
     bool tidal_update_loaded_begin;
@@ -110,10 +111,11 @@ class tidal_class {
     void process_object_token(json_value* value, int depth);
     void process_array_token(json_value* value, int depth);
     // used by tidal_get_artists_all_albums
-    void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
-    // used by process_tidal_get_artists_all_albums to process json files
-    void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
-    void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
+    void process_object(json_value* value, int depth);
+    void process_value(json_value* value, int depth);
+    void process_array(json_value* value, int depth);
+
+    int tidal_get_artists_all_albums(char *artistid,bool force);
     int update_playcount(const char *playpath);
   public:
     bool search_loaded;
@@ -223,7 +225,7 @@ class tidal_class {
     // download albums items
     int tidal_get_album_items(char *albumid);
     // download all albums by artist id
-    int tidal_get_artists_all_albums(char *artistid,bool force);
+    int tidal_get_artistalbums_all_albums(char *artistid,bool force);
 
     int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
     int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
@@ -239,8 +241,6 @@ class tidal_class {
     int load_tidal_iconoversigt();                                                                  // load all icons
     int get_access_token(char *loginbase64);                                                        // get token
     int get_users_album(char *albumid);                                                             // download json file for album id
-    // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
-    // void thread_convert_m4a_to_flac(void *path);
     int tidal_download_image(char *imgurl,char *filename);
 
     void set_tidal_feed_showtxt(char *name,int nr) { strcpy(stack[nr].feed_showtxt,name); }
