@@ -111,10 +111,11 @@ class tidal_class {
     void process_object_token(json_value* value, int depth);
     void process_array_token(json_value* value, int depth);
     // used by tidal_get_artists_all_albums
-    void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
-    // used by process_tidal_get_artists_all_albums to process json files
-    void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
-    void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
+    void process_object(json_value* value, int depth);
+    void process_value(json_value* value, int depth);
+    void process_array(json_value* value, int depth);
+
+    int tidal_get_artists_all_albums(char *artistid,bool force);
     int update_playcount(const char *playpath);
   public:
     bool search_loaded;
@@ -224,7 +225,7 @@ class tidal_class {
     // download albums items
     int tidal_get_album_items(char *albumid);
     // download all albums by artist id
-    int tidal_get_artists_all_albums(char *artistid,bool force);
+    int tidal_get_artistalbums_all_albums(char *artistid,bool force);
 
     int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
     int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
