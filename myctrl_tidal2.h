@@ -89,6 +89,7 @@ class tidal_class {
     int tidal_device_antal;                                               // antal device found
     tidal_active_play_info_type tidal_aktiv_song[200];                      //
     std::vector<tidal_active_play_info_type> tidal_aktiv_song1; // change to vector (NOT DONE for now)
+    
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
     bool tidal_update_loaded_begin;
@@ -101,6 +102,7 @@ class tidal_class {
     bool tidal_is_playing;                                                // do we play ?
     bool tidal_is_pause;                                                  // do we pause
     // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
+
     void process_object_tidal_search_result(json_value* value, int depth);
     void process_array_tidal_search_result(json_value* value, int depth);
     // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
@@ -118,6 +120,9 @@ class tidal_class {
     int tidal_get_artists_all_albums(char *artistid,bool force);
     int update_playcount(const char *playpath);
   public:
+
+    std::vector<std::string> tidal_start_playlist_array;                       // vector for start overview id's
+
     bool search_loaded;
     bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
     bool startplay;
@@ -256,7 +261,11 @@ class tidal_class {
     void show_setup_tidal();
     void clear_tidal_aktiv_songlist();
     std::string get_artist_cover_image(char *albumid);
+    
+    void setup_tidal_start_entry();
 
+    int get_artist_from_file_and_update_for_editor(char *filename);
+    int save_tidal_artistlist(char *filename);
 };
 
 #endif

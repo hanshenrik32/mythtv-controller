@@ -55,6 +55,8 @@
 
 extern config_icons config_menu;
 
+extern unsigned int do_show_editor_select_linie;
+
 const char *tidal_gfx_path = "tidal_gfx/";
 
 const int tidal_pathlength=80;
@@ -99,6 +101,9 @@ extern GLuint setuprssback;
 extern GLuint setuptidalback;
 extern GLuint _textureclose;
 extern GLuint setupkeysbar1;
+
+extern GLuint setupscreenback;
+
 extern float configsoundvolume;                           // default sound volume
 
 extern unsigned int do_show_setup_select_linie;
@@ -159,6 +164,31 @@ define('MPD_TIDAL_URL','tidal://track/');
 
 
 // #define TIDAL_ALBUM_URL 'https://openapi.tidal.com/v2/albums/';
+
+
+
+
+
+
+// ****************************************************************************************
+//
+// glprint text
+//
+// ****************************************************************************************
+
+void myglprint6(char *string) {
+  int len,i;
+  len = (int) strlen(string);
+  for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_9_BY_15, string[i]);
+}
+
+void myglprint18_1(char *string) {
+  int len,i;
+  len = (int) strlen(string);
+  for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
+}
+
+
 
 // web port
 static const char *s_http_port = "8100";
@@ -1211,6 +1241,66 @@ bool checkartistdbexist() {
 }
 
 
+// **************************************************************************
+//
+// update editor
+//
+// **************************************************************************
+
+int tidal_class::get_artist_from_file_and_update_for_editor(char *filename) {
+  FILE *fp;
+  char *artistidtxt=NULL;
+  ssize_t read;
+  size_t len=0;
+  bool readok=false;
+  if (strlen(filename)==0) {
+    // open default name
+    fp=fopen("tidal_start_artistlists.txt","r");
+  } else {
+    fp=fopen(filename,"r");
+  }
+  if (fp) {
+    readok=true;
+    while ((read = getline(&artistidtxt , &len, fp)) != -1) {
+      artistidtxt[strcspn(artistidtxt,"\n")]=0;                                   // remove \n from string
+      if (artistidtxt) {
+        if (*artistidtxt!='#') {
+          tidal_start_playlist_array.push_back( artistidtxt );
+        }
+      }
+    }
+    readok=true;
+    fclose(fp);
+  }
+  if (artistidtxt) free(artistidtxt);
+  if (readok) return(1); else return(0);
+}
+
+
+
+// **************************************************************************
+//
+// save editor
+//
+// **************************************************************************
+
+int tidal_class::save_tidal_artistlist(char *filename) {
+  int nr=0;
+  std::ofstream ofs;
+  ofs.open("tidal_start_artistlists.txt", std::ofstream::out | std::ofstream::trunc);
+  if (ofs.is_open()) {
+    do {
+        if (tidal_start_playlist_array[nr].length()) {
+            ofs << tidal_start_playlist_array[nr] << std::endl;
+        }
+        nr++;
+    } while (nr<tidal_start_playlist_array.size());
+    ofs.close();
+  }
+  return(1);
+}
+
+
 // ****************************************************************************************
 //
 // download albums from file.
@@ -1236,6 +1326,7 @@ int tidal_class::get_artist_from_file(char *filename) {
       if (artistidtxt) {
         if (*artistidtxt!='#') {
           if (tidal_get_artists_all_albums((char *) artistidtxt,true)) sleep(3);
+          tidal_start_playlist_array.push_back( artistidtxt );
         }
       }
     }
@@ -3715,7 +3806,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
       write_logfile(logfile,(char *) "mysql select table error.");
       fprintf(stdout,"ERROR SQL : %s\n",sql);
     }
-    // set artist name + cover iamge path on disk
+    // set artist name + cover image path on disk
     mysql_res = mysql_store_result(conn);
     if (mysql_res) {
       while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
@@ -4750,9 +4841,96 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
 }
 
 
+
 // ****************************************************************************************
 //
-// ********************* show setup tidal stuf like dev and clientid/secrect ************
+// Show tidal start entry list from file
+//
+// ****************************************************************************************
+
+
+void tidal_class::setup_tidal_start_entry() {
+  int winsizx=1300;
+  int winsizy=975;
+  int xpos=0;
+  int ypos=0;
+  char text[200];
+  char temptxt[200];
+  int n;
+  int startofset=0;
+  std::string showtxt;
+  // background
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,setupscreenback);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // background
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f( 200,100 , 0.0);
+  glTexCoord2f(0, 1); glVertex3f( 200,975 , 0.0);
+  glTexCoord2f(1, 1); glVertex3f( 200+1300,975 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( 200+1300,100 , 0.0);
+  glEnd();
+  glPopMatrix();
+  // close buttons
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glBindTexture(GL_TEXTURE_2D,_textureclose);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  winsizx=188;
+  winsizy=81;
+  xpos=400;
+  ypos=-10;
+  glLoadName(40);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glEnd();
+  glPopMatrix();
+  glPushMatrix();
+  // overskrift
+  // glEnable(GL_TEXTURE_2D);
+  glDisable(GL_TEXTURE_2D);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glTranslatef(300, 900, 0.0f);
+  glRasterPos2f(0.0f, 0.0f);
+  myglprint18_1((char *) "Tidal id.");
+  glPopMatrix();
+  for (int n=0;n<28;n++) {
+    glPushMatrix();
+    glTranslatef(300 , 860-(n*20) , 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    if (n==do_show_editor_select_linie-1) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
+    if ((startofset+n+1)<tidal_start_playlist_array.size()) {
+      showtxt=tidal_start_playlist_array.at(0+startofset+n);
+    } else {
+      strcpy(keybuffer,"");
+      showtxt=keybuffer;
+    }
+    myglprint6((char *) showtxt.c_str());
+    glPopMatrix();
+  }
+  glColor3f(1.0f,1.0f,1.0f);
+  if ((startofset)<tidal_start_playlist_array.size()) showcoursornow(-70+(showtxt.length()*8),710-(do_show_editor_select_linie*20),tidal_start_playlist_array.at(do_show_editor_select_linie).length());
+}
+
+
+
+
+// ****************************************************************************************
+//
+//                       show setup tidal stuf like dev and clientid/secrect
 //
 // ****************************************************************************************
 
@@ -4855,3 +5033,5 @@ void tidal_class::show_setup_tidal() {
   drawText("| Album folder format - {AlbumID}", 650, 350, 0.4f,1);
   drawText("| Playlist folder format - Playlist/{PlaylistName} [{PlaylistUUID}]", 650, 300, 0.4f,1);   
 }
+
+
