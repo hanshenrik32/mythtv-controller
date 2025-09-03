@@ -56,6 +56,8 @@
 extern config_icons config_menu;
 
 extern unsigned int do_show_editor_select_linie;
+extern GLuint _textureupdatetidalview; 	        // update icon tidal playlist in editor
+
 
 const char *tidal_gfx_path = "tidal_gfx/";
 
@@ -1976,9 +1978,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
           antalplaylists=0;                                                             // reset antal
 
           process_value(value, 0);                             // process to stack variable
-          
-          // process_tidal_get_artists_all_albums(value, 0,0);                             // process to stack variable
-          
+               
           if (file_contents) free(file_contents);                                       // free memory again
           json_value_free(value);                                                       // json clean up
           // the array is ready
@@ -4898,6 +4898,30 @@ void tidal_class::setup_tidal_start_entry() {
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
   glPopMatrix();
+
+  // update tidal view (load file)
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glBindTexture(GL_TEXTURE_2D,_textureupdatetidalview);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  winsizx=188;
+  winsizy=81;
+  xpos=-100;
+  ypos=-10;
+  glLoadName(42);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+  glEnd();
+  glPopMatrix();
+
   glPushMatrix();
   // overskrift
   // glEnable(GL_TEXTURE_2D);
@@ -4924,6 +4948,8 @@ void tidal_class::setup_tidal_start_entry() {
   glColor3f(1.0f,1.0f,1.0f);
   if ((startofset)<tidal_start_playlist_array.size()) showcoursornow(-70+(showtxt.length()*8),710-(do_show_editor_select_linie*20),tidal_start_playlist_array.at(do_show_editor_select_linie).length());
 }
+
+
 
 
 

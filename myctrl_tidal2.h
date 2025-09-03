@@ -230,7 +230,7 @@ class tidal_class {
     // download albums items
     int tidal_get_album_items(char *albumid);
     // download all albums by artist id
-    int tidal_get_artistalbums_all_albums(char *artistid,bool force);
+    // int tidal_get_artistalbums_all_albums(char *artistid,bool force);
 
     int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
     int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
