@@ -353,7 +353,7 @@ bool do_hent_spotify_search_online=false;                 // skal vi starte sear
 bool search_spotify_string_changed=false;
 
 bool do_hent_tidal_search_online=false;                   // skal vi starte search online (do it)
-bool search_tidal_string_changed=false;
+// bool search_tidal_string_changed=false;
 bool hent_tidal_search_online=false;                      // skal vi starte search online
 
 bool do_hent_music_search_online=false;                   // skal vi starte search 
@@ -3667,29 +3667,6 @@ void display() {
       if (keybufferindex>=2) {
         // start the search online
         do_hent_spotify_search_online=true;
-        //keybufferindex=1;
-      }
-    }
-  }
-  #endif
-  // update after search
-  #ifdef ENABLE_TIDAL
-  const int tidal_start_search_action_waittime=4;
-  struct tm* t2;
-  static time_t lasttime2=0;
-  static time_t nowdate2;
-  time(&nowdate2);
-  if (do_show_tidal_search_oversigt) {
-    if ((search_tidal_string_changed) && (difftime(nowdate2, lasttime2)>tidal_start_search_action_waittime)) {
-      time(&lasttime2);
-      hent_tidal_search_online=true;
-      search_tidal_string_changed=false;
-    }
-    if (hent_tidal_search_online) {
-      hent_tidal_search_online=false;
-      if (keybufferindex>=2) {
-        // start the search online now diabled use ENTER KEY
-        // do_hent_tidal_search_online=true;
         //keybufferindex=1;
       }
     }
@@ -11318,7 +11295,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
                 // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
-                search_tidal_string_changed=true;
+                // search_tidal_string_changed=true;
               }
             }
           }
