@@ -120,8 +120,13 @@ class tidal_class {
     int tidal_get_artists_all_albums(char *artistid,bool force);
     int update_playcount(const char *playpath);
   public:
+    bool do_setup_tidal_start_entry;                                            // show tidal start id entrys
+    bool do_update_tidal_start_entry;                                           // do the udpate and save / load settings
+         
 
     std::vector<std::string> tidal_start_playlist_array;                       // vector for start overview id's
+    std::string show_update_process_string;
+    std::string show_update_process_artist;
 
     bool search_loaded;
     bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
@@ -188,7 +193,6 @@ class tidal_class {
     int get_tidal_playlistid();
     char *get_tidal_name(int nr);                                         // get record name
     char *get_tidal_playlistid(int nr);                                   // get id to play
-    char *get_active_tidal_device_name();                                 //
     int tidal_refresh_token();
     int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
     void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
@@ -225,7 +229,7 @@ class tidal_class {
     void process_array_playlist(json_value* value, int depth);
     int get_playlist_from_file(char *filename);                                                     // read/import playlists from file
     //  in use from here and down.
-    // download album by artist id
+    // download album json file by artist id
     int tidal_get_album_by_artist(char *artistid);
     // download albums items
     int tidal_get_album_items(char *albumid);
@@ -240,7 +244,7 @@ class tidal_class {
     int get_users_playlist_plus_favorite(bool cleandb);
     void set_tidal_playing_flag(bool flag);    
     bool get_tidal_playing_flag();
-    int get_artist_from_file(char *filename);                                                       // load artis playlists in db
+    int get_artist_from_file(char *filename, bool update_start_playlist);                                                       // load artis playlists in db
     int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
     int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
     int load_tidal_iconoversigt();                                                                  // load all icons
