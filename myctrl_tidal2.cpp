@@ -4993,7 +4993,6 @@ void tidal_class::setup_tidal_start_entry() {
 
 
 
-
 // ****************************************************************************************
 //
 //                       show setup tidal stuf like dev and clientid/secrect
