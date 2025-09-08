@@ -122,7 +122,6 @@ class tidal_class {
   public:
     bool do_setup_tidal_start_entry;                                            // show tidal start id entrys
     bool do_update_tidal_start_entry;                                           // do the udpate and save / load settings
-         
 
     std::vector<std::string> tidal_start_playlist_array;                       // vector for start overview id's
     std::string show_update_process_string;
@@ -172,7 +171,7 @@ class tidal_class {
     // end webserver
     tidal_class();
     ~tidal_class();
-    int streamantal() { return(antal-1); }                                  //
+    int streamantal() { return( stack.size()); }                                  //
     void tidal_set_token(char *token,char *refresh);
     char *tidal_get_token() { return(tidaltoken); };                    // get token from struct
     int tidal_get_user_id();
@@ -182,7 +181,6 @@ class tidal_class {
     int tidal_get_user_playlists(bool force,int startoffset);
     char *get_device_id(int nr) { return(tidal_device[nr].id); };         // get active dev id
     char *get_device_name(int nr) { return(tidal_device[nr].name); };     // get active dev id
-
 
     // check if done
     int tidal_do_we_play();                                               // Do we play song now
@@ -216,7 +214,6 @@ class tidal_class {
     // return type playlist
     int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr].type); else return(0); }
     // GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
-    int antal_tidal_streams() { return antalplaylists; };
     char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr].feed_gfx_url); else return(0); }
     char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr].feed_showtxt); else return(0); }
     char *get_tidal_feed_artistname(int nr) { if ( nr < antal ) return(stack[nr].feed_artist); else return(0); }

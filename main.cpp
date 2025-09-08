@@ -9745,6 +9745,7 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case 3: 
                 do_show_torrent =  ! do_show_torrent;
+                tidal_oversigt.do_setup_tidal_start_entry = false;
                 break;
                 /*
                 if ((!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_film_oversigt)) && (!(vis_spotify_oversigt))) {
@@ -9766,6 +9767,7 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case 4: // F4 start mythtv og luk mythtv_controller
                 tidal_oversigt.do_setup_tidal_start_entry = ! tidal_oversigt.do_setup_tidal_start_entry;
+                do_show_torrent = false;
                 /*
                 if (strcmp(configkeyslayout[1].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
@@ -10032,7 +10034,7 @@ void handlespeckeypress(int key,int x,int y) {
                 #ifdef ENABLE_TIDAL
                 if ((vis_tidal_oversigt) && (!(ask_open_dir_or_play_tidal)) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
                   if (do_show_tidal_search_oversigt==false) {
-                    if ((tidalknapnr+tidal_selected_startofset)<tidal_oversigt.streamantal()+1) {
+                    if ((tidalknapnr+tidal_selected_startofset)<tidal_oversigt.streamantal()) {
                       if (tidalknapnr+1>40) {
                         tidal_selected_startofset+=8;
                         tidalknapnr-=(tidal_selected_startofset-1);
@@ -10202,12 +10204,12 @@ void handlespeckeypress(int key,int x,int y) {
                       }
                     } else {
                       // move coursor
-                      if ((tidalknapnr+tidal_selected_startofset+tnumbersoficonline)<tidal_oversigt.antal_tidal_streams()+1) {
+                      if ((tidalknapnr+tidal_selected_startofset+tnumbersoficonline)<tidal_oversigt.streamantal()+1) {
                         if ((((tidalknapnr+tnumbersoficonline)>40) && (do_show_tidal_search_oversigt==false)) || (((tidalknapnr+tnumbersoficonline)>32) && (do_show_tidal_search_oversigt==true))) {
-                          if ((tidalknapnr+tnumbersoficonline)<tidal_oversigt.antal_tidal_streams()) {
+                          if ((tidalknapnr+tnumbersoficonline)<tidal_oversigt.streamantal()) {
                             tidal_selected_startofset+=8;
                           } else {
-                            if ((tidalknapnr-1)<tidal_oversigt.antal_tidal_streams()) {
+                            if ((tidalknapnr-1)<tidal_oversigt.streamantal()) {
                               tidalknapnr++;
                               tidal_key_selected+=1;
                               tidal_select_iconnr+=1;
@@ -11224,6 +11226,9 @@ void handleKeypress(unsigned char key, int x, int y) {
           if ((vis_tidal_oversigt) && (key==127)) {
             printf("delete record in overview %d \n",(tidalknapnr-1)+tidal_selected_startofset);
             tidal_oversigt.delete_record_in_view((tidalknapnr-1)+tidal_selected_startofset);
+            if ((tidalknapnr-1)+tidal_selected_startofset>tidal_oversigt.streamantal()) {
+              if (tidal_selected_startofset==0) tidalknapnr--;
+            }
           }
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
             if (key==32) {
@@ -11302,7 +11307,6 @@ void handleKeypress(unsigned char key, int x, int y) {
 
           // delete record
           if ((tidal_oversigt.do_setup_tidal_start_entry) && (key==127)) {
-            // printf("array size %d  linie nr %d \n",tidal_oversigt.tidal_start_playlist_array.size(),do_show_editor_select_linie);
             if ((tidal_oversigt.tidal_start_playlist_array.size() > 0 ) && ((do_show_editor_select_linie) < (tidal_oversigt.tidal_start_playlist_array.size()-1))) {
               tidal_oversigt.tidal_start_playlist_array.erase(tidal_oversigt.tidal_start_playlist_array.begin()+(do_show_editor_select_linie));
               if (do_show_editor_select_linie>tidal_oversigt.tidal_start_playlist_array.size()) do_show_editor_select_linie--;
@@ -12039,18 +12043,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_tidal_oversigt=false;
                 keybufferopenwin=false;
                 key=0;
-              } else if ((!(do_show_setup)) && (do_show_torrent==false) && (do_show_torrent==false) && (key==27)) {                       // exit program
+              } else if ((!(do_show_setup)) && (do_show_torrent==false) && (key==27) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {                       // exit program
                 remove("mythtv-controller.lock");
                 runwebserver=false;
                 order_channel_list();
                 save_channel_list();
                 write_logfile(logfile,(char *) "Exit program.");
                 exit(0);                                                        //  exit program
-              } else if ((vis_tv_oversigt) && (do_show_torrent==false) && (do_show_tvgraber)) {
+              } else if ((vis_tv_oversigt) && (do_show_torrent==false) && (do_show_tvgraber) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
                 // Close tv_graber view from tv_oversigt
                 do_show_tvgraber=false;
                 key=0;
-              } else if (do_show_torrent) {
+              } else if ((do_show_torrent) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
                 // torrent stuf
                 if (do_show_torrent_options_move) {
                   do_show_torrent_options_move = false;
@@ -12062,6 +12066,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   do_show_torrent = false;
                   key=0;
                 }
+              } else if (tidal_oversigt.do_setup_tidal_start_entry) {
+                tidal_oversigt.do_setup_tidal_start_entry=false;
+                key=0;
               } else key=0;
               break;
             case '*':
@@ -12311,6 +12318,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               break;
             case 13:
+              // ENTER key
               if (do_show_torrent == false) {
                 if (vis_music_oversigt) {
                   if (do_show_music_search_oversigt) {
@@ -12335,11 +12343,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                     do_hent_tidal_search_online=true;
                     printf("do_hent_tidal_search_online=%d\n",do_hent_tidal_search_online);  
                   }
-
                   if ((tidalknapnr>0) && (do_show_tidal_search_oversigt==false)) {
                     // set play playlist flag
-                    // it is not playing (find error)
+
+                    printf("tidal_selected_startofset = %d  tidalknapnr = %d ",tidal_selected_startofset,tidalknapnr);
+
                     do_play_tidal=tidalknapnr;
+                    tidal_oversigt.startplay=true;
                   }
                   if (do_show_tidal_search_oversigt==false) {
                     hent_tidal_search=true;
@@ -12551,7 +12561,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     // do back
                     if (sknapnr==0) {
                       streamoversigt.clean_stream_oversigt();
-                      streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
+                      streamoversigt.opdatere_stream_oversigt((char *) "",(char *) "");
                       //streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),streamoversigt.get_stream_path(sknapnr));
                       do_play_stream=false;
                       stream_key_selected=1;
