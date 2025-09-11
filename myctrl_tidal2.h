@@ -265,6 +265,8 @@ class tidal_class {
     
     void setup_tidal_start_entry();
 
+    
+
     int get_artist_from_file_and_update_for_editor(char *filename);
     int save_tidal_artistlist(char *filename);
 };

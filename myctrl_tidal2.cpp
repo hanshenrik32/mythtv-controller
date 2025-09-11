@@ -3965,6 +3965,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
           if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
         }
+
         sqlstring = fmt::format("update tidalcontentplaylist set play_count=play_count+1 where playlistid={}",stack[tidalknapnr].playlistid);
         mysql_query(conn,sqlstring.c_str());
 

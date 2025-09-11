@@ -5,6 +5,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <vector>
 
 //#include <irrKlang.h>
 
@@ -45,6 +46,7 @@ class radiostation_class {
     private:
         enum { maxantal=753 };				          		                            // MAX antal radio stationer
         radio_oversigt_type *stack[maxantal];				                            // radio stack
+        std::vector<radio_oversigt_type> stack1;
         int antal;							                                            // Antal
         radiotype_type radiosortopt[radiooptionsmax];			                        // radio typer
         int radiooptionsselect;						                                    // bruges til valgt af radio type som skal vises
