@@ -2127,7 +2127,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
         }
       }
     } else {
-      write_logfile(logfile,"Tidal return http code 404.");
+      write_logfile(logfile,"Tidal return http code 404/401.");
     }
   }
   // sample

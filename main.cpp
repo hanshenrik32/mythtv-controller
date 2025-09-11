@@ -11224,10 +11224,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         } else {
           // delete key
           if ((vis_tidal_oversigt) && (key==127)) {
-            printf("delete record in overview %d \n",(tidalknapnr-1)+tidal_selected_startofset);
+            printf("delete record in overview %d      del nr %d         antal %d \n",(tidalknapnr)+tidal_selected_startofset,(tidalknapnr-1)+tidal_selected_startofset,tidal_oversigt.streamantal());
             tidal_oversigt.delete_record_in_view((tidalknapnr-1)+tidal_selected_startofset);
-            if ((tidalknapnr-1)+tidal_selected_startofset>tidal_oversigt.streamantal()) {
-              if (tidal_selected_startofset==0) tidalknapnr--;
+            if ((tidalknapnr)+tidal_selected_startofset>tidal_oversigt.streamantal()) {
+              tidalknapnr--;
             }
           }
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
@@ -16228,8 +16228,9 @@ int main(int argc, char** argv) {
       tidal_oversigt.opdatere_tidal_oversigt(0);
       tidal_oversigt.opdatere_tidal_userCollections2((char *) "");
     } else {
-      printf("Unable to find file tidal_playlists.txt \n");
+      printf("Token is missing i code.\n");
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
+      exit(0);
     }
     // works
     
