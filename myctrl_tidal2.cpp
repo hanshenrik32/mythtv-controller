@@ -16,7 +16,6 @@
 #include <curl/curl.h>                  // lib curl
 #include <unistd.h>
 #include <stdlib.h>
-#include <curl/curl.h>
 #include <string>
 #include <algorithm>
 #include <string.h>
@@ -1125,7 +1124,7 @@ int tidal_class::get_access_token(char *loginbase64) {
     } else strcpy(tidaltoken,"");
     // clean up
     std::remove("tidal_token.json"); // delete file
-    std::remove("tidal_token.txt"); // delete file
+    std::remove("tidal_token.txt");  // delete file
   }
   if (error) return(0); else return(1);
 }
@@ -1205,7 +1204,9 @@ int tidal_class::get_playlist_from_file(char *filename) {
   size_t len=0;
   bool readok=false;
   fp=fopen(filename,"r");
-  if (fp) {
+  if (!fp) {
+    return(0);
+  } else {
     readok=true;
     while ((read = getline(&playlisttxt , &len, fp)) != -1) {
       playlisttxt[strcspn(playlisttxt,"\n")]=0;                                   // remove \n from string
@@ -1219,7 +1220,7 @@ int tidal_class::get_playlist_from_file(char *filename) {
     fclose(fp);
   }
   if (playlisttxt) free(playlisttxt);
-  if (readok) return(1); else return(0);
+  return(1);
 }
 
 
@@ -1531,88 +1532,82 @@ int tidal_class::get_users_album(char *albumid) {
       }
       tt=0;
       while(tt<antalplaylists) {
-        // if (stack[tt]) {
-          // check if playlist exist
-          playlistexist=false;
-          refid = 0;
-          snprintf(sql,sizeof(sql),"select id from mythtvcontroller.tidalcontent where name like '%s' limit 1", albumid);
-          mysql_query(conn,sql);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              refid=atoi(row[0]);
-              playlistexist=true;
-            }
+        // check if playlist exist
+        playlistexist=false;
+        refid = 0;
+        snprintf(sql,sizeof(sql),"select id from mythtvcontroller.tidalcontent where name like '%s' limit 1", albumid);
+        mysql_query(conn,sql);
+        res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            refid=atoi(row[0]);
+            playlistexist=true;
           }
-          //
-          // create playlist in db
-          //
-          replace_char(stack[tt].feed_gfx_url, '\'', '_');
-          replace_char(stack[tt].feed_showtxt, '\'', '_');
-
-          //replace_char(stack[tt]->feed_gfx_url, '/', '_');
-          std::string sql1;
-          if (!(playlistexist)) {
-            // snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontent (name,paththumb, playpath, playlistid ,id) values ('%s','%s','%s',%d)", albumid , stack[0]->feed_gfx_url, albumid, "", 0 );
-            sql1 = fmt::format("insert into mythtvcontroller.tidalcontent (name,paththumb, playpath, playlistid, play_count ,id) values ('{}','{}','{}',{})", albumid , stack[0].feed_gfx_url, albumid, "",0 , 0 );
-            //fprintf(stdout,"SQL : %s\n",sql);
-            if (mysql_query(conn,sql1.c_str())!=0) {
-              write_logfile(logfile,(char *) "mysql create table error.");
-              fprintf(stdout,"ERROR SQL : %s\n",sql);
-            }          
-            res=mysql_store_result(conn);
+        }
+        //
+        // create playlist in db
+        //
+        replace_char(stack[tt].feed_gfx_url, '\'', '_');
+        replace_char(stack[tt].feed_showtxt, '\'', '_');
+        //replace_char(stack[tt]->feed_gfx_url, '/', '_');
+        std::string sql1;
+        if (!(playlistexist)) {
+          // snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontent (name,paththumb, playpath, playlistid ,id) values ('%s','%s','%s',%d)", albumid , stack[0]->feed_gfx_url, albumid, "", 0 );
+          sql1 = fmt::format("insert into mythtvcontroller.tidalcontent (name,paththumb, playpath, playlistid, play_count ,id) values ('{}','{}','{}',{})", albumid , stack[0].feed_gfx_url, albumid, "",0 , 0 );
+          //fprintf(stdout,"SQL : %s\n",sql);
+          if (mysql_query(conn,sql1.c_str())!=0) {
+            write_logfile(logfile,(char *) "mysql create table error.");
+            fprintf(stdout,"ERROR SQL : %s\n",sql);
+          }          
+          res=mysql_store_result(conn);
+        }
+        playlistexist=false;
+        snprintf(sql,sizeof(sql),"select id from mythtvcontroller.tidalcontentplaylist where playlistid like '%s' limit 1", albumid );
+        mysql_query(conn,sql);
+        res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            playlistexist=true;
           }
-
-          // if (stack[tt]) {
-          playlistexist=false;
-          snprintf(sql,sizeof(sql),"select id from mythtvcontroller.tidalcontentplaylist where playlistid like '%s' limit 1", albumid );
-          mysql_query(conn,sql);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              playlistexist=true;
-            }
+        }
+        //
+        // check if exist
+        //  
+        playlistsongexist=false;      
+        snprintf(sql,sizeof(sql),"select id from mythtvcontroller.tidalcontentarticles where name like '%s' and paththumb like '%s' and gfxfilename like '%s' and player like '%s' and playlistid like '%s' and artist like '%s')", stack[tt].feed_showtxt , stack[tt].feed_gfx_url ,stack[tt].feed_gfx_url, stack[tt].playlisturl, albumid , stack[tt].feed_artist);
+        mysql_query(conn,sql);
+        res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            playlistsongexist=true;
           }
-          //
-          // check if exist
-          //  
-          playlistsongexist=false;      
-          snprintf(sql,sizeof(sql),"select id from mythtvcontroller.tidalcontentarticles where name like '%s' and paththumb like '%s' and gfxfilename like '%s' and player like '%s' and playlistid like '%s' and artist like '%s')", stack[tt].feed_showtxt , stack[tt].feed_gfx_url ,stack[tt].feed_gfx_url, stack[tt].playlisturl, albumid , stack[tt].feed_artist);
-          mysql_query(conn,sql);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              playlistsongexist=true;
-            }
+        }
+        //
+        // insert record created if not exist ( song name )
+        //  
+        if (playlistsongexist==false) {
+          snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt].feed_showtxt , stack[tt].feed_gfx_url ,stack[tt].feed_gfx_url, stack[tt].playlisturl, albumid , stack[tt].feed_artist , 0 );
+          if (mysql_query(conn,sql)!=0) {
+            write_logfile(logfile,(char *) "mysql create table error.");
+            fprintf(stdout,"Error SQL : %s\n",sql);
           }
-          //
-          // insert record created if not exist ( song name )
-          //  
-          if (playlistsongexist==false) {
-            snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt].feed_showtxt , stack[tt].feed_gfx_url ,stack[tt].feed_gfx_url, stack[tt].playlisturl, albumid , stack[tt].feed_artist , 0 );
-            if (mysql_query(conn,sql)!=0) {
-              write_logfile(logfile,(char *) "mysql create table error.");
-              fprintf(stdout,"Error SQL : %s\n",sql);
-            }
-            mysql_store_result(conn);
+          mysql_store_result(conn);
+        }
+        //
+        // insert record created playlist if not exist ( playlist name )
+        //  
+        if (playlistexist==false) {            
+          snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid, play_count, nr_of_songs ,id) values (\"%s\",'%s','%s','%s','%s',%d,%d)",  stack[tt].feed_showtxt , stack[tt].feed_gfx_url, albumid, stack[tt].feed_release_date,stack[tt].feed_artist, 0 , stack[tt].numberOfTracks, 0);
+          //fprintf(stdout,"SQL : %s\n",sql);
+          if (mysql_query(conn,sql)!=0) {
+            write_logfile(logfile,(char *) "mysql create table error.");
+            fprintf(stdout,"Error SQL : %s\n",sql);
           }
-          //
-          // insert record created playlist if not exist ( playlist name )
-          //  
-          if (playlistexist==false) {            
-            snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid, play_count, nr_of_songs ,id) values (\"%s\",'%s','%s','%s','%s',%d,%d)",  stack[tt].feed_showtxt , stack[tt].feed_gfx_url, albumid, stack[tt].feed_release_date,stack[tt].feed_artist, 0 , stack[tt].numberOfTracks, 0);
-            //fprintf(stdout,"SQL : %s\n",sql);
-            if (mysql_query(conn,sql)!=0) {
-              write_logfile(logfile,(char *) "mysql create table error.");
-              fprintf(stdout,"Error SQL : %s\n",sql);
-            }
-            mysql_store_result(conn);
-            logdata="TIDAL Update album id ";
-            logdata=logdata + albumid;
-            write_logfile(logfile,(char *) logdata.c_str());
-          }
-          // }
-        // }
+          mysql_store_result(conn);
+          logdata="TIDAL Update album id ";
+          logdata=logdata + albumid;
+          write_logfile(logfile,(char *) logdata.c_str());
+        }
         tt++;
       }
       mysql_close(conn);
@@ -2221,8 +2216,8 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
   }
   curlstr="grep -o 'https://[^\"]*' ";
   curlstr = curlstr + userfilename;
-  // get filename for cover image in 160*160 there is multi sizes you can select to use.
-  curlstr = curlstr + "| tail -n 2 | head -n 1";
+  // get filename for cover image in 320*320 there is multi sizes you can select to use.
+  curlstr = curlstr + "| tail -n 3 | head -n 1";
   stream = popen(curlstr.c_str(), "r");
   if (stream) {
     while (!feof(stream))
@@ -2949,7 +2944,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {
     res = mysql_store_result(conn);
     if (mysql_query(conn,sqlselect.c_str())!=0) {
       fprintf(stderr,"mysql insert error.\n");
-      fprintf(stderr,"SQL %s \n",sqlselect);
+      fprintf(stderr,"SQL %s \n",sqlselect.c_str());
     }
     res = mysql_store_result(conn);
     if (res) {
