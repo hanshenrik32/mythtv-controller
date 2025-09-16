@@ -9716,7 +9716,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (state==GLUT_UP) {
               fprintf(stderr,"Right mouse button pressed\n");
               if (tidal_oversigt.get_tidal_playing_flag()) {
-                do_zoom_tidal_cover=!do_zoom_tidal_cover;
+                if (ask_open_dir_or_play_tidal) {
+                  ask_open_dir_or_play_tidal=false;				// flag luk vindue igen
+                } else {
+                  do_zoom_tidal_cover=!do_zoom_tidal_cover;
+                }
               }
               if (musicoversigt.get_music_is_playing()) {
                 if (do_zoom_music_cover) ask_open_dir_or_play = false;				// flag luk vindue igen
