@@ -3709,7 +3709,9 @@ void display() {
       glPushMatrix();
       //aktivfont.selectfont("DejaVu Sans");
       film_oversigt.show_film_oversigt(_fangley,fknapnr);
-      // printf("fknapnr = %d _fangley = %d \n",fknapnr,_fangley);
+
+      // printf("film_oversigt1.antal = %d \n",film_oversigt.filmoversigt1.size());
+
       glPopMatrix();
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else if (vis_stream_oversigt) {
@@ -6882,9 +6884,28 @@ void display() {
   }  
   // ******************************************************************************************************************
   //
-  // *********************** do start movie player ********************************************************************
+  // do start movie player
+  // 
+  // ******************************************************************************************************************
   if ((startmovie) && (do_zoom_film_cover)) {
     // non default player use the batch file startmovie.sh from path where vi are installed
+    #if defined USE_FMOD_MIXER
+    if ((sound) && (snd)) {
+      // stop any sound playing
+      result=channel->stop();                         // stop fmod player
+      // release any sound system again
+      result=sound->release();
+      // stop uv meters
+      dsp=0;
+      snd=0;
+      sound = 0;
+    }
+    #endif
+    #if defined USE_SDL_MIXER
+    Mix_PauseMusic();
+    Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
+    sdlmusicplayer=NULL;
+    #endif
     if (strcmp("default",configdefaultplayer)!=0)  {
       // write debug log
       sprintf(debuglogdata,"Start movie nr %d Player is vlc path :%s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
@@ -6908,26 +6929,6 @@ void display() {
       // stop music if play before start movie
       // write to log
       write_logfile(logfile,(char *) "Stop playing music/radio.");
-      #if defined USE_FMOD_MIXER
-      if ((sound) && (snd)) {
-        // stop any sound playing
-        result=channel->stop();                         // stop fmod player
-        // release any sound system again
-        result=sound->release();
-        // stop uv meters
-        dsp=0;
-      }
-      #endif
-      #if defined USE_SDL_MIXER
-      Mix_PauseMusic();
-      Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
-      sdlmusicplayer=NULL;
-      #endif
-      // no play sound flag
-      #if defined USE_FMOD_MIXER
-      snd=0;
-      sound = 0;
-      #endif
       // clean music playlist
       aktiv_playlist.clean_playlist();                // clean play list (reset) play list
       do_play_music_aktiv_table_nr=1;			            // reset play start nr
@@ -6945,7 +6946,7 @@ void display() {
         vis_error_timeout = 60;
         //playmedia
       } else {
-        sprintf(debuglogdata,"Error start movie %s ",film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
+        sprintf(debuglogdata,"Start movie %s ",film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
         write_logfile(logfile,(char *) debuglogdata);
       }
     }
@@ -9379,11 +9380,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               // nu er mknapnr/fknapnr/rknapnr/spotifyknapnr/tidalknapnr=den som er trykket på bliver sat i gl_select
               // retfunc er !=0 hvis der er trykket på en knap up/down
               // give error
-
-
-              if (vis_tidal_oversigt) printf("tidalknapnr = %d  retfunc = %d button = %d \n",tidalknapnr,retfunc,button);
-
-
               if (debugmode & 2) {
                 if ((vis_music_oversigt) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
                   //fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
@@ -9507,7 +9503,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     }
                   }
                   // next play
-                  if (retfunc==6) {
+                  if (retfunc==106) {                                                     // old 6
                     do_play_spotify=0;
                     do_open_spotifyplaylist=1;
                     // write debug log
@@ -9515,7 +9511,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     spotify_oversigt.spotify_next_play();
                   }
                   // last play
-                  if (retfunc==7) {
+                  if (retfunc==107) {                                                   // old 7
                     do_play_spotify=0;
                     do_open_spotifyplaylist=1;
                     // write debug log
@@ -9715,18 +9711,26 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
             if (state==GLUT_UP) {
               fprintf(stderr,"Right mouse button pressed\n");
-              if (tidal_oversigt.get_tidal_playing_flag()) {
-                if (ask_open_dir_or_play_tidal) {
-                  ask_open_dir_or_play_tidal=false;				// flag luk vindue igen
+              if ((vis_film_oversigt==false) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false)) {
+                if (tidal_oversigt.get_tidal_playing_flag()) {
+                  if (ask_open_dir_or_play_tidal) {
+                    ask_open_dir_or_play_tidal=false;				// flag luk vindue igen
+                  } else {
+                    do_zoom_tidal_cover=!do_zoom_tidal_cover;
+                  }
+                }
+                if ((musicoversigt.get_music_is_playing()) && (vis_film_oversigt==false)) {
+                  if (ask_open_dir_or_play) {
+                    ask_open_dir_or_play=false;				// flag luk vindue igen
+                    do_zoom_music_cover=false;
+                  } else {
+                    do_zoom_music_cover=!do_zoom_music_cover;
+                  }
                 } else {
-                  do_zoom_tidal_cover=!do_zoom_tidal_cover;
+                  ask_open_dir_or_play=false;				// flag luk vindue igen
+                  if (do_zoom_music_cover) do_zoom_music_cover=false;
                 }
               }
-              if (musicoversigt.get_music_is_playing()) {
-                if (do_zoom_music_cover) ask_open_dir_or_play = false;				// flag luk vindue igen
-                do_zoom_music_cover=!do_zoom_music_cover;
-              }
-              
               if (radiooversigt.playing) {
                 do_zoom_radio=!do_zoom_radio;
               }
@@ -9869,8 +9873,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         }
       }
     }
-
-    //printf("spotify playlist nr %d type = %d \n ",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
     #ifdef ENABLE_SPOTIFY
     if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) {
       // scroll spotify up/down
@@ -9924,7 +9926,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     break;
             default: fprintf(stderr,"Error in type. Type found %d  \n",spotify_oversigt.get_spotify_type(spotifyknapnr-1));
                     break;
-
           }
           //
           radiooversigt.playing=false;
@@ -10989,7 +10990,7 @@ void handlespeckeypress(int key,int x,int y) {
                   // stream_select_iconnr = the real nr in the array
                   // stream_key_selected = the number on the screen
                   if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
-                    if (stream_key_selected>=(snumbersoficonline*5)) {
+                    if (stream_key_selected>=(snumbersoficonline*4)) {
                       if ((stream_key_selected+((_sangley/RADIO_CS)*snumbersoficonline))<streamoversigt.streamantal()) _sangley+=RADIO_CS;
                     } else {
                       if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_key_selected+=snumbersoficonline;
@@ -16981,7 +16982,7 @@ int main(int argc, char** argv) {
     #endif
 
     recordoversigt.opdatere_recorded_oversigt();
-    film_oversigt.opdatere_film_oversigt();
+    // film_oversigt.opdatere_film_oversigt1();
 
     if (configbackend_openspotify_player) {
       // check if running do not start new.

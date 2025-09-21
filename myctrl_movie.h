@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <GL/gl.h>
+#include <vector>
 #include "myth_vlcplayer.h"
 
 // #include <vlc/vlc.h>
@@ -37,7 +38,7 @@ class film_oversigt_type {
     char *film_filename;                // path to file 256
     char *film_adddate;			            // date added to db
     bool cover3d;		                   	// show 3d cover in movie display
-  public:
+public:
     char *film_subtitle;                // film info (sub title) 1024
     char *category_name;		            // film type (tal = database) size = 128
     char *genre;			                  // size = 200
@@ -118,18 +119,14 @@ class film_oversigt_typem : vlc_controller {
       bool get_search_view() { return (show_search_view); }
       void set_search_view(bool val) { show_search_view=val; }
       bool film_is_playing;                                                     // playing ?
-      film_oversigt_type *filmoversigt;                                         // all movie array to show in movie overview
+      // film_oversigt_type *filmoversigt;                                         // all movie array to show in movie overview
+      std::vector<film_oversigt_type> filmoversigt;                     // vector of movies
       void sortfilm(int type);
       unsigned int film_antal(void) { return(filmoversigt_antal); }
       void set_film_antal(unsigned int antal) { filmoversigt_antal=antal; }
       int get_film_antal() { return (filmoversigt_antal); }
-      // show movie oversigt
-      void show_film_oversigt(float _mangley,int filmnr);			// new ver
       // show startup new added movies
       void show_minifilm_oversigt(float _mangley,int filmnr);
-      // overload func
-      int opdatere_film_oversigt(void);
-      int opdatere_film_oversigt(char *movietitle);
       void resetallefilm();
       int load_film_dvcovers();
       int playmovie(int nr);
@@ -141,8 +138,13 @@ class film_oversigt_typem : vlc_controller {
       void setcolume(int volume);                                         // do not store volume in volume member int vaule
       void softstopmovie();
       void pausemovie();      
+      void show_film_oversigt(float _mangley,int filmnr);
       film_oversigt_typem(unsigned int antal);
       ~film_oversigt_typem();
+      // overload func
+      int opdatere_film_oversigt(void);
+      int opdatere_film_oversigt(char *movietitle);
+
 };
 
 
