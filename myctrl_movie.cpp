@@ -684,6 +684,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
   std::time_t t = std::time(0);   // get time now
   std::tm* now = std::localtime(&t);
   filmoversigt.clear();
+  filmoversigt_antal=0;
   // mysql stuf
   int checkdirexist=0;
   write_logfile(logfile,(char *) "Opdatere Film oversigt fra db :");
@@ -1137,6 +1138,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
     if (conn) {
       filmoversigt.clear();
       filmantal=0;
+      filmoversigt_antal=0;
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);

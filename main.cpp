@@ -10426,6 +10426,9 @@ void handlespeckeypress(int key,int x,int y) {
     MOVIE_CS=46.0f;					                            // movie dvd cover side
     MUSIC_CS=41.0;					                            // music cd cover side
     RADIO_CS=41.0;					                            // radio cd cover side
+
+    printf("film_key_selected = %d film_select_iconnr = %d  vector size %d \n",film_key_selected,film_select_iconnr,film_oversigt.filmoversigt.size());
+
     switch(key) {
         // F1 setup menu
         case 1: if (vis_tv_oversigt) {
@@ -10801,13 +10804,14 @@ void handlespeckeypress(int key,int x,int y) {
 
                 //film_select_iconnr+film_key_selected
                 // key right
-                if ((vis_film_oversigt) && ((int unsigned) (film_select_iconnr)<film_oversigt.film_antal()-1) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
-                  if ((film_key_selected % (mnumbersoficonline*3)==0) || ((film_select_iconnr==14) && (film_key_selected % mnumbersoficonline==0))) {
+                if ((vis_film_oversigt) && ((int unsigned) (film_select_iconnr+1)<film_oversigt.filmoversigt.size()-1) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                  if ((film_key_selected % (mnumbersoficonline*4)==0) || ((film_select_iconnr==14) && (film_key_selected % mnumbersoficonline==0))) {
+                    int aaaa=film_oversigt.filmoversigt.size();
                     _fangley+=MOVIE_CS;
                     film_key_selected-=mnumbersoficonline;	// den viste på skærm af 1 til 20
-                    film_select_iconnr++;			// den rigtige valgte af 1 til film antal
+                    film_select_iconnr++;			              // den rigtige valgte af 1 til film antal
                   } else {
-                    film_select_iconnr++;			// den rigtige valgte af 1 til film antal
+                    film_select_iconnr++;			              // den rigtige valgte af 1 til film antal
                   }
                   film_key_selected++;
                 }
@@ -10963,8 +10967,8 @@ void handlespeckeypress(int key,int x,int y) {
                   #endif
                   // movie
                   // key down
-                  if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.film_antal()-1)  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
-                    if (film_key_selected>=11) {
+                  if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.filmoversigt.size()-1)  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                    if (film_key_selected>=18) {
                       _fangley+=MOVIE_CS;
                       film_select_iconnr+=fnumbersoficonline;
                     } else {
