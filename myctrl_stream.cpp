@@ -1564,8 +1564,8 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   xof=config_menu.config_stream_main_windowx;                     // start xpos
   int xx=(float) config_menu.config_stream_main_window_sizex/(buttonsizex);
   int yy=(float) (config_menu.config_stream_main_window_sizey/buttonsizey);
-  // int lstreamoversigt_antal=9*6;
-  int lstreamoversigt_antal = xx*yy;        // 
+  int lstreamoversigt_antal=8*5;
+  // int lstreamoversigt_antal = xx*(yy-1);        // 
   int i=0;                                                                    // data ofset in stack array
   unsigned int sofset=0;
   int bonline=8;                                                              // antal pr linie

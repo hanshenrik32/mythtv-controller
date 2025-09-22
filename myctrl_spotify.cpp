@@ -3845,7 +3845,7 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
     header = curl_slist_append(header, auth_kode.c_str());
     // ask libcurl to use TLS version 1.3 or later
     curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
-    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
@@ -3854,7 +3854,7 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
     curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
     curl_easy_setopt(curl, CURLOPT_POST, 1);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post.c_str());
     // set type post/put/get
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
     userfile=fopen(userfilename,"w");

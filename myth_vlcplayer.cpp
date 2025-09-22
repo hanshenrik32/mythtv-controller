@@ -141,6 +141,9 @@ int vlc_controller::playwebmedia(char *path) {
             libvlc_media_player_set_nsobject (mp, view);
       #endif
       // start play
+      libvlc_video_set_mouse_input(vlc_mp, 0); // disable VLC mouse handling
+      libvlc_video_set_key_input(vlc_mp, 0);   // disable VLC key handling
+      libvlc_media_player_set_xwindow(vlc_mp, 0);
       libvlc_media_player_play(vlc_mp);
       // set playing flag in class
       is_playing=true;
