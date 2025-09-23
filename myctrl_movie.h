@@ -4,6 +4,7 @@
 #include <string.h>
 #include <GL/gl.h>
 #include <vector>
+#include <mysql.h>                      // mysql stuf
 #include "myth_vlcplayer.h"
 
 // #include <vlc/vlc.h>
@@ -144,7 +145,7 @@ class film_oversigt_typem : vlc_controller {
       // overload func
       int opdatere_film_oversigt(void);
       int opdatere_film_oversigt(char *movietitle);
-
+      bool tidal_createdb(MYSQL *conn);
 };
 
 

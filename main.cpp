@@ -2858,7 +2858,7 @@ void display() {
   #endif
   glPushMatrix();
   // background picture if none type is selected
-  if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_tv_oversigt))) show_background();
+  if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_film_oversigt)) && (!(vis_tv_oversigt))) show_background();
   //visur=1;
   // printf("tidal_oversigt.get_tidal_playing_flag() %d  music_oversigt.play() %d \n",tidal_oversigt.get_tidal_playing_flag(),musicoversigt.play());
 
@@ -10427,7 +10427,7 @@ void handlespeckeypress(int key,int x,int y) {
     MUSIC_CS=41.0;					                            // music cd cover side
     RADIO_CS=41.0;					                            // radio cd cover side
 
-    printf("film_key_selected = %d film_select_iconnr = %d  vector size %d \n",film_key_selected,film_select_iconnr,film_oversigt.filmoversigt.size());
+    
 
     switch(key) {
         // F1 setup menu
