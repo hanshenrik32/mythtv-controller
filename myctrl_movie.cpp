@@ -633,7 +633,61 @@ int sql_movie_sqldb_callback(void *data, int argc, char **argv, char **azColName
     return 0;
 }
 
-
+bool film_oversigt_typem::tidal_createdb(MYSQL *conn) {
+  std::string sql_update;
+  MYSQL_RES *res;
+  if (!conn) return(false);
+  sql_update = "create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int, bitrate int , width int , high int, fsize int, fformat varchar(150))";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "create table IF NOT EXISTS videocategory(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, category varchar(128))";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "create table IF NOT EXISTS videogenre(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(128))";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "create table IF NOT EXISTS videocountry(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, country varchar(128))";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "create table IF NOT EXISTS videocollection(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(256), contenttype int, plot text,network varchar(128), collectionref varchar(128), certification varchar(128), genre varchar(128),releasedate date, language varchar(10),status varchar(64), rating float, ratingcount int, runtime int, banner text,fanart text,coverart text)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "create table IF NOT EXISTS videopathinfo(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, path text, contenttype int, collectionref int,recurse  int)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "create table IF NOT EXISTS videotypes(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, extension varchar(128),playcommand varchar(255), f_ignore int,  use_default int)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'txt','',1,0)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'log','',1,0)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'mpg','',0,0)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'avi','',0,1)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'vob','',0,0)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'mpeg','',0,0)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'VIDEO_TS','',0,0)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'iso','',0,0)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'img','',0,0)";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videotypes values (0,'mkv','',0,1)";
+  return(true);
+}
 
 // ****************************************************************************************
 //
@@ -701,55 +755,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       }
     } else dbexist=false;
     if (!(dbexist)) {
-      sql_update = "create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int, bitrate int , width int , high int, fsize int, fformat varchar(150))";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "create table IF NOT EXISTS videocategory(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, category varchar(128))";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "create table IF NOT EXISTS videogenre(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(128))";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "create table IF NOT EXISTS videocountry(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, country varchar(128))";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "create table IF NOT EXISTS videocollection(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(256), contenttype int, plot text,network varchar(128), collectionref varchar(128), certification varchar(128), genre varchar(128),releasedate date, language varchar(10),status varchar(64), rating float, ratingcount int, runtime int, banner text,fanart text,coverart text)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "create table IF NOT EXISTS videopathinfo(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, path text, contenttype int, collectionref int,recurse  int)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "create table IF NOT EXISTS videotypes(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, extension varchar(128),playcommand varchar(255), f_ignore int,  use_default int)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'txt','',1,0)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'log','',1,0)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'mpg','',0,0)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'avi','',0,1)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'vob','',0,0)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'mpeg','',0,0)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'VIDEO_TS','',0,0)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'iso','',0,0)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'img','',0,0)";
-      mysql_query(conn,sql_update.c_str());
-      res = mysql_store_result(conn);
-      sql_update = "insert into videotypes values (0,'mkv','',0,1)";
+      dbexist=tidal_createdb(conn);
     }
     if (!(dbexist)) {
       dirp=opendir(configmoviepath);
@@ -1151,6 +1157,9 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
           dbexist=true;
         }
       } else dbexist=false;
+      if (dbexist==false) {
+        dbexist=tidal_createdb(conn);
+      }
       if (dbexist) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);

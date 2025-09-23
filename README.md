@@ -10,6 +10,10 @@ Run on most debian based systems, like Ubuntu.
 
 Version.
 
+movie struct now use vector
+
+mythtv-controller ver 0.44.4 
+
 mythtv-controller ver 0.43.4
 
 mythtv-controller ver 0.42.6
