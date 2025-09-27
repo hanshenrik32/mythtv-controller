@@ -5,6 +5,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <vector>
 
 //#include <irrKlang.h>
 
@@ -44,7 +45,7 @@ const int radiooptionsmax=40;				                 // mxa antal typer af radio st
 class radiostation_class {
     private:
         enum { maxantal=753 };				          		                            // MAX antal radio stationer
-        radio_oversigt_type *stack[maxantal];				                            // radio stack
+        std::vector<radio_oversigt_type> stack;
         int antal;							                                            // Antal
         radiotype_type radiosortopt[radiooptionsmax];			                        // radio typer
         int radiooptionsselect;						                                    // bruges til valgt af radio type som skal vises
@@ -62,15 +63,15 @@ class radiostation_class {
         int getradiooptionsselect()  { return(radiosortopt[radiooptionsselect].radiosortoptart); }
         int set_radio_populars(int stationid);
         //
-        char *get_station_name(int nr) { return (stack[nr]->station_name); }
-        char *get_station_gfxfile(int nr) { return (stack[nr]->gfxfilename); }
-        char *get_stream_url(int nr) { return (stack[nr]->streamurl); }
-        char *get_homepage(int nr) { return (stack[nr]->homepage); }
-        char *get_desc(int nr) { return (stack[nr]->desc); }
-        void set_kbps(int nr,int kbps) { stack[nr]->kbps=kbps; }
+        char *get_station_name(int nr) { return (stack[nr].station_name); }
+        char *get_station_gfxfile(int nr) { return (stack[nr].gfxfilename); }
+        char *get_stream_url(int nr) { return (stack[nr].streamurl); }
+        char *get_homepage(int nr) { return (stack[nr].homepage); }
+        char *get_desc(int nr) { return (stack[nr].desc); }
+        void set_kbps(int nr,int kbps) { stack[nr].kbps=kbps; }
         int load_radio_stations_gfx();		                                			// load all radio stations gfx
-        GLuint get_texture(int nr) { return (stack[nr]->textureId); }
-        int get_kbps(int nr) { return (stack[nr]->kbps); }
+        GLuint get_texture(int nr) { return (stack[nr].textureId); }
+        int get_kbps(int nr) { return (stack[nr].kbps); }
         int set_radio_popular(int stationid);
         int set_radio_online(int stationid,bool onoff);
         int set_radio_aktiv(int stationid,bool onoff);

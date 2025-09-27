@@ -83,7 +83,6 @@ class tidal_active_play_info_type {                // sample data down here
 class tidal_class {
   private:
     enum { maxantal=5000 };					                                        // MAX antal rss stream in wiew
-    // tidal_oversigt_type *stack[maxantal];			                            // tidal playlist stack
     std::vector<tidal_oversigt_type> stack;
     tidal_device_def tidal_device[10];
     int tidal_device_antal;                                               // antal device found
@@ -171,9 +170,9 @@ class tidal_class {
     // end webserver
     tidal_class();
     ~tidal_class();
-    int streamantal() { return( stack.size()); }                                  //
+    int streamantal() { return( stack.size()); }                            //
     void tidal_set_token(char *token,char *refresh);
-    char *tidal_get_token() { return(tidaltoken); };                    // get token from struct
+    char *tidal_get_token() { return(tidaltoken); };                        // get token from struct
     int tidal_get_user_id();
     void clean_tidal_oversigt();
     int gettoken();                               // TEST

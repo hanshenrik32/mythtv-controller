@@ -120,8 +120,7 @@ class film_oversigt_typem : vlc_controller {
       bool get_search_view() { return (show_search_view); }
       void set_search_view(bool val) { show_search_view=val; }
       bool film_is_playing;                                                     // playing ?
-      // film_oversigt_type *filmoversigt;                                         // all movie array to show in movie overview
-      std::vector<film_oversigt_type> filmoversigt;                     // vector of movies
+      std::vector<film_oversigt_type> filmoversigt;                             // vector of movies
       void sortfilm(int type);
       unsigned int film_antal(void) { return(filmoversigt_antal); }
       void set_film_antal(unsigned int antal) { filmoversigt_antal=antal; }

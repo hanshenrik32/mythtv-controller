@@ -79,7 +79,6 @@ extern bool do_sqlite;
 
 radiostation_class::radiostation_class() : antal(0) {
   int i;
-  for(i=0;i<maxantal;i++) stack[i]=0;
   for(i=0;i<radiooptionsmax;i++) {
     strcpy(radiosortopt[i].radiosortopt,"");
     radiosortopt[i].antal=0;
@@ -109,8 +108,7 @@ radiostation_class::~radiostation_class() {
 void radiostation_class::clean_radio_oversigt() {
   startup_loaded=false;				// set radio station loaded in
   for(int i=0;i<antal;i++) {
-    if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete radio texture
-    delete stack[i];							// delete radio station
+    if (stack[i].textureId) glDeleteTextures(1, &stack[i].textureId);	// delete radio texture
   }
   antal=0;
 }
@@ -131,7 +129,7 @@ void radiostation_class::lastradiooptselect() {
 // set en radio icon image
 
 void radiostation_class::set_texture(int nr,GLuint idtexture) {
-  stack[nr]->textureId=idtexture;
+  stack[nr].textureId=idtexture;
 }
 
 // ****************************************************************************************
@@ -197,9 +195,9 @@ int radiostation_class::load_radio_stations_gfx() {
         if (file_exists(tmpfilename.c_str())) {		// den har et navn samt gfx filen findes.
           texture=loadTexture ((char *) tmpfilename.c_str());                                 // load texture
           set_texture(i,texture);                         		            // save it in radio station struct
-          strncpy(stack[i]->gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
-          strcat(stack[i]->gfxfilename,".png");
-          opdatere_radiostation_gfx(stack[i]->intnr,stack[i]->gfxfilename);           // and update db filename
+          strncpy(stack[i].gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
+          strcat(stack[i].gfxfilename,".png");
+          opdatere_radiostation_gfx(stack[i].intnr,stack[i].gfxfilename);           // and update db filename
         } else {
           tmpfilename = "/opt/mythtv-controller/images/radiostations/";
           tmpfilename = tmpfilename + radiooversigt.get_station_name(i);
@@ -207,9 +205,9 @@ int radiostation_class::load_radio_stations_gfx() {
           if (file_exists(tmpfilename.c_str())) {
             texture=loadTexture ((char *) tmpfilename.c_str());                                 // load texture
             set_texture(i,texture);     		                                            // save it in radio station struct
-            strncpy(stack[i]->gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
-            strcat(stack[i]->gfxfilename,".png");
-            opdatere_radiostation_gfx(stack[i]->intnr,stack[i]->gfxfilename);           // and update db filename
+            strncpy(stack[i].gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
+            strcat(stack[i].gfxfilename,".png");
+            opdatere_radiostation_gfx(stack[i].intnr,stack[i].gfxfilename);           // and update db filename
           }
         }
       } else {
@@ -259,30 +257,27 @@ int radiostation_class::opdatere_radio_oversigt() {
       mysql_query(conn,sqlselect_str.c_str());
       res = mysql_store_result(conn);
       if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
+        while (((row = mysql_fetch_row(res)) != NULL)) {
+          radio_oversigt_type new_station;
           // printf("Hent info om radio station nr %s %-20s\n",row[6],row[0]);
           art=atoi(row[3]);
           intnr=atoi(row[6]);
           kbps=atoi(row[7]);
           online=atoi(row[8]);
           land=atoi(row[9]);
-          if (antal<maxantal) {
-            stack[antal]=new (struct radio_oversigt_type);
-            if (stack[antal]) {
-              strncpy(stack[antal]->station_name,row[0],stationamelength);
-              strncpy(stack[antal]->desc,row[4],statiodesclength);
-              strncpy(stack[antal]->streamurl,row[1],statiourl_homepage);
-              strncpy(stack[antal]->homepage,row[2],statiourl_homepage);
-              strncpy(stack[antal]->gfxfilename,row[5],stationamelength);
-              stack[antal]->art=art;
-              stack[antal]->kbps=kbps;
-              stack[antal]->online=online;
-              stack[antal]->land=land;
-              stack[antal]->textureId=0;
-              stack[antal]->intnr=intnr;
-              antal++;
-            }
-          }
+          strncpy(new_station.station_name,row[0],stationamelength);
+          strncpy(new_station.desc,row[4],statiodesclength);
+          strncpy(new_station.streamurl,row[1],statiourl_homepage);
+          strncpy(new_station.homepage,row[2],statiourl_homepage);
+          strncpy(new_station.gfxfilename,row[5],stationamelength);
+          new_station.art=art;
+          new_station.kbps=kbps;
+          new_station.online=online;
+          new_station.land=land;
+          new_station.textureId=0;
+          new_station.intnr=intnr;
+          stack.push_back(new_station);
+          antal++;
         }
         if (antal==0) printf("No Radio station loaded");
       } else {
@@ -334,29 +329,26 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
         mysql_query(conn,sqlselect_str.c_str());
         res = mysql_store_result(conn);
         if (res) {
-          while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
+          while (((row = mysql_fetch_row(res)) != NULL)) {
+            radio_oversigt_type new_station;
             art=atoi(row[3]);
             intnr=atoi(row[6]);
             kbps=atoi(row[7]);
             online=atoi(row[8]);
             land=atoi(row[9]);
-            if (antal<maxantal) {
-              stack[antal]=new (struct radio_oversigt_type);
-              if (stack[antal]) {
-                strncpy(stack[antal]->station_name,row[0],stationamelength);
-                strncpy(stack[antal]->desc,row[4],statiodesclength);
-                strncpy(stack[antal]->streamurl,row[1],statiourl_homepage);
-                strncpy(stack[antal]->homepage,row[2],statiourl_homepage);
-                strncpy(stack[antal]->gfxfilename,row[5],stationamelength);
-                stack[antal]->art=art;
-                stack[antal]->kbps=kbps;
-                stack[antal]->online=online;
-                stack[antal]->land=land;
-                stack[antal]->textureId=0;
-                stack[antal]->intnr=intnr;
-                antal++;
-              }
-            }
+            strncpy(new_station.station_name,row[0],stationamelength);
+            strncpy(new_station.desc,row[4],statiodesclength);
+            strncpy(new_station.streamurl,row[1],statiourl_homepage);
+            strncpy(new_station.homepage,row[2],statiourl_homepage);
+            strncpy(new_station.gfxfilename,row[5],stationamelength);
+            new_station.art=art;
+            new_station.kbps=kbps;
+            new_station.online=online;
+            new_station.land=land;
+            new_station.textureId=0;
+            new_station.intnr=intnr;
+            stack.push_back(new_station);
+            antal++;
           }
         }
         if (antal>0) return(antal-1); else return(0);
@@ -413,30 +405,26 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
           mysql_query(conn,sqlselect_str.c_str());
           res = mysql_store_result(conn);
           if (res) {
-            while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-              // printf("Hent info om radio station nr %s %-20s\n",row[6],row[0]);
+            while (((row = mysql_fetch_row(res)) != NULL)) {
+              radio_oversigt_type new_station;
               art=atoi(row[3]);
               intnr=atoi(row[6]);
               kbps=atoi(row[7]);
               online=atoi(row[8]);
               land=atoi(row[9]);
-              if (antal<maxantal) {
-                stack[antal]=new (struct radio_oversigt_type);
-                if (stack[antal]) {
-                  strncpy(stack[antal]->station_name,row[0],stationamelength);
-                  strncpy(stack[antal]->desc,row[4],statiodesclength);
-                  strncpy(stack[antal]->streamurl,row[1],statiourl_homepage);
-                  strncpy(stack[antal]->homepage,row[2],statiourl_homepage);
-                  strncpy(stack[antal]->gfxfilename,row[5],stationamelength);
-                  stack[antal]->art=art;
-                  stack[antal]->kbps=kbps;
-                  stack[antal]->online=online;
-                  stack[antal]->land=land;
-                  stack[antal]->textureId=0;
-                  stack[antal]->intnr=intnr;
-                  antal++;
-                }
-              }
+              strncpy(new_station.station_name,row[0],stationamelength);
+              strncpy(new_station.desc,row[4],statiodesclength);
+              strncpy(new_station.streamurl,row[1],statiourl_homepage);
+              strncpy(new_station.homepage,row[2],statiourl_homepage);
+              strncpy(new_station.gfxfilename,row[5],stationamelength);
+              new_station.art=art;
+              new_station.kbps=kbps;
+              new_station.online=online;
+              new_station.land=land;
+              new_station.textureId=0;
+              new_station.intnr=intnr;
+              stack.push_back(new_station);
+              antal++;
             }
             if (antal==0) printf("No Radio station loaded");
           } else {
@@ -523,9 +511,9 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       if (file_exists(tmpfilename)) {
         texture=loadTexture ((char *) tmpfilename);                      						           // load texture
         set_texture(radio_oversigt_loaded_nr,texture);                  				       		            // save it in radio station struct
-        strncpy(stack[radio_oversigt_loaded_nr]->gfxfilename,get_station_name(radio_oversigt_loaded_nr),stationamelength-1);      // update station gfxfilename to station name
-        strcat(stack[radio_oversigt_loaded_nr]->gfxfilename,".png");
-        opdatere_radiostation_gfx(stack[radio_oversigt_loaded_nr]->intnr,stack[radio_oversigt_loaded_nr]->gfxfilename);           // and update db filename
+        strncpy(stack[radio_oversigt_loaded_nr].gfxfilename,get_station_name(radio_oversigt_loaded_nr),stationamelength-1);      // update station gfxfilename to station name
+        strcat(stack[radio_oversigt_loaded_nr].gfxfilename,".png");
+        opdatere_radiostation_gfx(stack[radio_oversigt_loaded_nr].intnr,stack[radio_oversigt_loaded_nr].gfxfilename);           // and update db filename
       } else {
         strcpy(tmpfilename,radiostation_iconsgfx);
         strcat(tmpfilename,radiooversigt.get_station_name(radio_oversigt_loaded_nr));
@@ -533,9 +521,9 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
         if (file_exists(tmpfilename)) {
           texture=loadTexture ((char *) tmpfilename);                                 // load texture
           set_texture(radio_oversigt_loaded_nr,texture);     		                                // save it in radio station struct
-          strncpy(stack[radio_oversigt_loaded_nr]->gfxfilename,get_station_name(radio_oversigt_loaded_nr),stationamelength-1);      // update station gfxfilename to station name
-          strcat(stack[radio_oversigt_loaded_nr]->gfxfilename,".png");
-          opdatere_radiostation_gfx(stack[radio_oversigt_loaded_nr]->intnr,stack[radio_oversigt_loaded_nr]->gfxfilename);           // and update db filename
+          strncpy(stack[radio_oversigt_loaded_nr].gfxfilename,get_station_name(radio_oversigt_loaded_nr),stationamelength-1);      // update station gfxfilename to station name
+          strcat(stack[radio_oversigt_loaded_nr].gfxfilename,".png");
+          opdatere_radiostation_gfx(stack[radio_oversigt_loaded_nr].intnr,stack[radio_oversigt_loaded_nr].gfxfilename);           // and update db filename
         }
       }
     }
@@ -545,7 +533,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     } else radio_oversigt_loaded_nr++;
   } 
   glPushMatrix();
-  while((i<lradiooversigt_antal) && ((int) i+(int) sofset<(int) antal) && (stack[i+sofset]!=NULL)) {
+  while((i<lradiooversigt_antal) && ((int) i+(int) sofset<(int) antal)) {
     if (((i % bonline)==0) && (i>0)) {
       xof=config_menu.config_radio_main_windowx;	// reset xof
       yof=yof-(config_menu.config_radio_main_window_icon_sizey+20); // old buttonsizey
@@ -557,12 +545,12 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       buttonsizex=config_menu.config_radio_main_window_icon_sizex-5;
       buttonsizey=config_menu.config_radio_main_window_icon_sizey-5;
     }
-    if (stack[i+sofset]->textureId) {
+    if (stack[i+sofset].textureId) {
       // radio default icon
       glPushMatrix();
       // is the radio station online
       // if NOT show faded colors
-      if (stack[i+sofset]->online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
+      if (stack[i+sofset].online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL); 
@@ -583,12 +571,12 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       glPushMatrix();
       // is the radio station online
       // if NOT show faded colors
-      if (stack[i+sofset]->online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
+      if (stack[i+sofset].online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
       // indside draw radio station icon
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+      glBindTexture(GL_TEXTURE_2D,stack[i+sofset].textureId);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(100+i+sofset);
@@ -603,7 +591,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       // default icon
       glPushMatrix();
 
-      if (stack[i+sofset]->online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
+      if (stack[i+sofset].online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
@@ -624,10 +612,10 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       glPopMatrix();
     }
     // draw radio station contry flags
-    if (stack[i+sofset]->land>0) {
+    if (stack[i+sofset].land>0) {
       // gfxlandemask mask
-      if (gfxlande[stack[i+sofset]->land]) {
-        glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset]->land]);       //
+      if (gfxlande[stack[i+sofset].land]) {
+        glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset].land]);       //
 
         //glBindTexture(GL_TEXTURE_2D,gfxlande[i+sofset]);
         glBegin(GL_QUADS);
@@ -639,8 +627,8 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       } else {
         //if (debugmode & 1024) printf("Contry kode %d missing flag, File name %s\n",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
         // write debug log
-        sprintf(debuglogdata,"Contry code %d missing flag, File name %d",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
-        if (gfxlande[stack[i+sofset]->land]==0) {
+        sprintf(debuglogdata,"Contry code %d missing flag, File name %d",stack[i+sofset].land,gfxlande[stack[i+sofset].land]);
+        if (gfxlande[stack[i+sofset].land]==0) {
           if (show_all_kode_errors==false) write_logfile(logfile,(char *) debuglogdata);
         } else if (show_all_kode_errors==false) write_logfile(logfile,(char *) debuglogdata);
       }
@@ -648,7 +636,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     // print radios station name
     // strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
     std::string temptxt1;
-    temptxt1 = fmt::format("{:^24}",stack[i+sofset]->station_name);
+    temptxt1 = fmt::format("{:^24}",stack[i+sofset].station_name);
     temptxt1.resize(24);
     drawText(temptxt1.c_str(), xof+2, yof-18, 0.4f,1);
     xof=xof+buttonsizex+6;
@@ -763,7 +751,7 @@ int radiostation_class::set_radio_popular(int stationid) {
   MYSQL_RES *res;
   // write debug log
   write_logfile(logfile,(char *) "Update played radio station.");
-  sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid]->intnr);  
+  sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid].intnr);  
   conn=mysql_init(NULL);
   // Connect to database
   if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
@@ -792,8 +780,8 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
   MYSQL_RES *res;
   MYSQL_ROW row;
   write_logfile(logfile,(char *) "Update played radio station online.");
-  if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid]->intnr);
-    else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid]->intnr);
+  if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid].intnr);
+    else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid].intnr);
   conn=mysql_init(NULL);
   // Connect to database
   if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
@@ -809,7 +797,7 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
     mysql_close(conn);
     return(1);
   }
-  stack[stationid]->online=onoff;
+  stack[stationid].online=onoff;
   return(0);
 }
 
@@ -820,8 +808,8 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
 // ****************************************************************************************
 
 int radiostation_class::get_radio_online(int stationid) {
-  if (((unsigned int) stationid<(unsigned int) antal) && (stack[stationid])) {
-      return(stack[stationid]->online);
+  if (((unsigned int) stationid<(unsigned int) antal)) {
+      return(stack[stationid].online);
   } else {
       return(-1);
   }
@@ -834,7 +822,7 @@ int radiostation_class::get_radio_online(int stationid) {
 // ****************************************************************************************
 
 int radiostation_class::set_radio_intonline(int arraynr) {
-  if (((unsigned int) arraynr<(unsigned int) antal) && (stack[arraynr])) stack[arraynr]->online=true; else return(0);
+  if (((unsigned int) arraynr<(unsigned int) antal)) stack[arraynr].online=true; else return(0);
   return(1);
 }
 
@@ -874,7 +862,7 @@ bool radiostation_class::check_radio_online_bool() {
 
 int radiostation_class::set_radio_aktiv(int stationid,bool onoff) {
 //    stack[stationid]->intnr;
-  stack[stationid]->aktiv=onoff;
+  stack[stationid].aktiv=onoff;
   return(0);
 }
 
@@ -1010,10 +998,10 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
             // find radio station
             nfundet=false;
             while ((nn<antal) && (nfundet==false)) {
-              if  (stack[nn]->station_name) {
+              if  (stack[nn].station_name) {
                 // if found set active again
-                if (strcmp(stack[nn]->station_name,st_name)==0) {
-                  if (radiook) stack[nn]->online=1; else stack[nn]->online=0;
+                if (strcmp(stack[nn].station_name,st_name)==0) {
+                  if (radiook) stack[nn].online=1; else stack[nn].online=0;
                   nfundet=true;
                 } else nn++;
               } else nn++;

@@ -13,7 +13,7 @@ DESTIMG    = /opt/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi20307linux.tar.gz
+FMODFILE   = fmodstudioapi20307linux
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -121,7 +121,6 @@ installsound:
 	cd $(DESTDIR)
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
-	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
 	#remove old link
 	if test -e /usr/lib/libfmod.so.12; then rm /usr/lib/libfmod.so.12; fi
 	if test -e /usr/lib/libfmod.so.13; then rm /usr/lib/libfmod.so.13; fi

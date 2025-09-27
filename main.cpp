@@ -5364,215 +5364,7 @@ void display() {
   }
   #endif
 
-  // ******************************************************************************************************************
-  // ******************************************************************************************************************
-  // ******************************************************************************************************************
-  //
-  // ********************************** Tidal show play stuf **********************************************************
-  //
-  #ifdef ENABLE_TIDAL
-  if ((vis_tidal_oversigt)  && (do_zoom_tidal_cover) && (!(visur))) {
-    /*
-    do_we_play_check=0;
-    if (do_we_play_check==0) {
-      tidal_oversigt.tidal_do_we_play();
-    }
-    do_we_play_check++;
-    // check again ?
-    if (do_we_play_check>50) do_we_play_check=0;
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-    // window texture
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D, _texturetidalplayer);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox ,  config_menu.config_tidalplayer_infoy , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox,400+config_menu.config_tidalplayer_infoy, 0.0);
-    glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+640,400+config_menu.config_tidalplayer_infoy , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+640,config_menu.config_tidalplayer_infoy, 0.0);
-    glEnd();
-    // tidal play info icon
-    glEnable(GL_BLEND);
-    if (tidal_oversigt.tidal_aktiv_cover_image_url()) {
-      //do file exist and have we not loaded it before then load it.
-      if ((tidal_oversigt.get_tidal_aktiv_cover_image()==0) && (tidal_oversigt.aktiv_song_tidal_icon==0)) {
-        GLuint img;
-        img=loadTexture(tidal_oversigt.tidal_aktiv_cover_image_url());                                                    // download icon 
-        tidal_oversigt.aktiv_song_tidal_icon=img;
-        if (img) tidal_oversigt.set_tidal_aktiv_cover_image(img);                                                         // assign to aktiv play list
-      } else {
-        if (tidal_oversigt.aktiv_song_tidal_icon) {
-          glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
-          tidal_oversigt.aktiv_song_tidal_icon=tidal_oversigt.get_tidal_aktiv_cover_image();                            // update show icon
-        } else {
-          if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
-          else glBindTexture(GL_TEXTURE_2D,tidal_ecover);
-        }
-      }
-    } else {
-      glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
-    }
-    if (tidal_oversigt.aktiv_song_tidal_icon) {
-      glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);          // set active icon
-    } else {
-      glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
-      // printf("No Tidal icon\n");
-    }
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+395 ,   370 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+395,200+370, 0.0);
-    glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+395+200,200+370 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+395+200,370, 0.0);
-    glEnd();
-    // backward button
-    glEnable(GL_BLEND);
-    glBindTexture(GL_TEXTURE_2D,_texturemlast);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glLoadName(10);                        // 10 = forward(10)
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+50 ,  320 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+50,100+320, 0.0);
-    glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+50+100,100+320 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+50+100,320, 0.0);
-    glEnd();
-    // stop button
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBindTexture(GL_TEXTURE_2D,_texturemstop);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glLoadName(9);                        // 9 = stop
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+150 ,  320 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+150,100+320, 0.0);
-    glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+150+100,100+320 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+150+100,320, 0.0);
-    glEnd();
-    // forward button
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBindTexture(GL_TEXTURE_2D,_texturemnext);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glLoadName(11);                        // 10 = forward(10)
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+250 ,  320 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+250,100+320, 0.0);
-    glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+250+100,100+320 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+250+100,320, 0.0);
-    glEnd();
-    // play list name or artist name
-    // show playlist or artist name
-    int textofset=140;
-    if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
-      drawText("         ",520.0f, 640.0f, 0.4f,1);
-    } else {
-      // show value
-      drawText("Playlist ",520.0f, 640.0f, 0.4f,1);
-      if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
-        else drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
-    }
-    // show tidal songname
-    drawText("Songname ", 520.0f, 620.0f, 0.4f,1);
-    // show tidal songname value
-    sprintf(temptxt1,"%s",(char *) tidal_oversigt.tidal_aktiv_song_name());
-    temptxt1[40]=0;
-    drawText(temptxt1, 520.0f+textofset, 620.0f, 0.4f,1);
-    // show tidal artist
-    if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
-      drawText("Artist    ", 520.0f, 600.0f, 0.4f,1);
-    } else {
-      drawText("Album     ", 520.0f, 600.0f, 0.4f,1);
-    }
-    // show artist value/or none
-    if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
-      sprintf(temptxt1,"%s",(char *) tidal_oversigt.tidal_aktiv_artist_name());
-      drawText(temptxt1, 520.0f+textofset, 600.0f, 0.4f,1);
-    } else {
-      drawText(tidal_oversigt.tidal_aktiv_artist_name(),520.0f+textofset, 600.0f, 0.4f,1);
-    }
-    // # of songs
-    drawText("song ", 520.0f, 580.0f, 0.4f,1);
-    // # of songs + active nr
-    if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs()+1);
-      else sprintf(temptxt1,"1/1");
-    drawText(temptxt1, 520.0f+textofset, 580.0f, 0.4f,1);
-    // player play status background
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBindTexture(GL_TEXTURE_2D,0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glColor4f(0.7f, 0.41f, 1.0f, 0.6f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+170 ,        555-20 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+170 ,     19+555-20 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+170+200,  19+555-20 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+170+200,     555-20 , 0.0);
-    glEnd();
-    glPopMatrix();
-    // show playtime as gfx box
-    drawText("playtime  ", 520.0f, 540.0f, 0.4f,1);
-    glPushMatrix();
-    glColor3f(1.0f, 1.0f, 1.0f);
-    unsigned int ms;
-    unsigned int playtime_songlength;
-    result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
-    if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-      ERRCHECK(result,do_play_music_aktiv_table_nr);
-    }
-    // get play length new version
-    result=sound->getLength(&playtime_songlength,FMOD_TIMEUNIT_MS);
-    if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-      ERRCHECK(result,do_play_music_aktiv_table_nr);
-    }
-    result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
-    if (result!=FMOD_OK) {
-      ERRCHECK(result,do_play_music_aktiv_table_nr);
-    }
-    if ((playtime_songlength>0) && (result==FMOD_OK)) {
-      kbps = (lenbytes/(playtime_songlength/1000)*8)/1000;			// calc bit rate
-    }
-    int statuswxpos = 432;
-    int statuswypos = 557-20;
-    float y=ms/1000;
-    float ll=playtime_songlength/1000;
-    int xxx;
-    if ((y>0) && (ll>0)) {
-      xxx = ((y/ll)*16);
-    } else xxx=0;
-    glDisable(GL_TEXTURE_2D);
-    for(int x=0;x<xxx;x++) {
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), statuswypos+(15), 0.0);
-      glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos+(15) , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos , 0.0);
-      glEnd();
-    }
-    glPopMatrix();
-    float frequency;
-    #if defined USE_FMOD_MIXER
-    channel->getFrequency(&frequency);
-    #endif
-    drawText("Samplerate ", 520.0f, 560.0f, 0.4f,1);
-    sprintf(temptxt1,"%5.0f/%d Kbits",frequency,kbps);
-    drawText(temptxt1, 520.0f+textofset, 560.0f, 0.4f,1);
-    // updated date on tidal
-    drawText("Release   ", 520.0f, 500.0f, 0.4f,1);
-    sprintf(temptxt1,"%s",tidal_oversigt.tidal_aktiv_song_release_date());
-    drawText(temptxt1, 520.0f+textofset, 500.0f, 0.4f,1);
-    */
-  }
-  #endif
+
   // ******************************************************************************************************************
   // ******************************************************************************************************************
   // ******************************************************************************************************************
@@ -5929,6 +5721,8 @@ void display() {
 
       }
 
+      // printf("zoom_tidal=%s zoom_spotify=%s zoom_music=%s zoom_radio=%s  zoom_stream=%s \n",do_zoom_tidal_cover ? "true" : "false",do_zoom_spotify_cover ? "true" : "false",do_zoom_music_cover ? "true" : "false",do_zoom_radio ? "true" : "false",do_zoom_stream_cover ? "true" : "false ");
+      
       if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
         // show tidal player
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -9711,25 +9505,23 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
             if (state==GLUT_UP) {
               fprintf(stderr,"Right mouse button pressed\n");
-              if ((vis_film_oversigt==false) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false)) {
-                if (tidal_oversigt.get_tidal_playing_flag()) {
-                  if (ask_open_dir_or_play_tidal) {
-                    ask_open_dir_or_play_tidal=false;				// flag luk vindue igen
-                  } else {
-                    do_zoom_tidal_cover=!do_zoom_tidal_cover;
-                  }
-                }
-                if ((musicoversigt.get_music_is_playing()) && (vis_film_oversigt==false)) {
-                  if (ask_open_dir_or_play) {
-                    ask_open_dir_or_play=false;				// flag luk vindue igen
-                    do_zoom_music_cover=false;
-                  } else {
-                    do_zoom_music_cover=!do_zoom_music_cover;
-                  }
+              if (tidal_oversigt.get_tidal_playing_flag()) {
+                if (ask_open_dir_or_play_tidal) {
+                  ask_open_dir_or_play_tidal=false;				// flag luk vindue igen
                 } else {
-                  ask_open_dir_or_play=false;				// flag luk vindue igen
-                  if (do_zoom_music_cover) do_zoom_music_cover=false;
+                  do_zoom_tidal_cover=!do_zoom_tidal_cover;
                 }
+              }
+              if ((musicoversigt.get_music_is_playing()) && (vis_film_oversigt==false)) {
+                if (ask_open_dir_or_play) {
+                  ask_open_dir_or_play=false;				// flag luk vindue igen
+                  do_zoom_music_cover=false;
+                } else {
+                  do_zoom_music_cover=!do_zoom_music_cover;
+                }
+              } else {
+                ask_open_dir_or_play=false;				// flag luk vindue igen
+                if (do_zoom_music_cover) do_zoom_music_cover=false;
               }
               if (radiooversigt.playing) {
                 do_zoom_radio=!do_zoom_radio;
