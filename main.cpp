@@ -9512,7 +9512,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   do_zoom_tidal_cover=!do_zoom_tidal_cover;
                 }
               }
-              if ((musicoversigt.get_music_is_playing()) && (vis_film_oversigt==false)) {
+              if ((musicoversigt.get_music_is_playing())) {
                 if (ask_open_dir_or_play) {
                   ask_open_dir_or_play=false;				// flag luk vindue igen
                   do_zoom_music_cover=false;
@@ -9530,7 +9530,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 do_zoom_spotify_cover=!do_zoom_spotify_cover;              
               }
             }
-
+            
 
             /*
             if (vis_music_oversigt) {

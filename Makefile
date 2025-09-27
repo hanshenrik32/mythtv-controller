@@ -117,7 +117,7 @@ installsound:
 	@echo "Install fmod sound system ver 4.44.41"
 	#@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	mkdir -p $(DESTDIR)
-	cp $(FMODFILE) $(DESTDIR)
+	cp -r $(FMODFILE) $(DESTDIR)
 	cd $(DESTDIR)
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
