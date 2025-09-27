@@ -28,6 +28,8 @@
 #include <sqlite3.h>                    // sqlite interface to xbmc
 #include <unistd.h>
 
+#include <sys/wait.h>
+#include <iostream>
 // sound system include fmod
 
 #include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod.hpp"
@@ -3688,27 +3690,27 @@ void convert_m4a_to_flac(char *path) {
       if (error!=0) {
         write_logfile(logfile,(char *) "Tidal error: can not convert m4a files to wav.");
       }
-      // store in db
-      if ((conn) && (error==0)) {
-        mysql_query(conn,"set NAMES 'utf8'");
-        mysql_res = mysql_store_result(conn);
-        checkfilexist_name = tidal_download_home;
-        checkfilexist_name = checkfilexist_name + (char *) path;
-        checkfilexist_name = checkfilexist_name + "/";
-        checkfilexist_name = checkfilexist_name + files[i];
-        checkfilexist_name = checkfilexist_name + ".flac";
-        // create records if needed
-        sql1="insert into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, play_count, id) values (\"" + files[i] + "\",\"\",\"" + checkfilexist_name + "\"," + playlist_id + "," + "0,0)";
-        // printf("add record to tidal db sql %s \n",sql1.c_str());
-        if (conn) {
-          if (mysql_query(conn,sql1.c_str())!=0) {
-            write_logfile(logfile,(char *) "mysql create table error. (tidalcontent)");
-            printf("error sql %s \n",sql1.c_str());
-            // exit by error
-            exit(1);
-          }
-          mysql_res=mysql_store_result(conn);
+    }
+    // store in db
+    if ((conn) && (error==0)) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      mysql_res = mysql_store_result(conn);
+      checkfilexist_name = tidal_download_home;
+      checkfilexist_name = checkfilexist_name + (char *) path;
+      checkfilexist_name = checkfilexist_name + "/";
+      checkfilexist_name = checkfilexist_name + files[i];
+      checkfilexist_name = checkfilexist_name + ".flac";
+      // create records if needed
+      sql1="insert into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, play_count, id) values (\"" + files[i] + "\",\"\",\"" + checkfilexist_name + "\"," + playlist_id + "," + "0,0)";
+      // printf("add record to tidal db sql %s \n",sql1.c_str());
+      if (conn) {
+        if (mysql_query(conn,sql1.c_str())!=0) {
+          write_logfile(logfile,(char *) "mysql create table error. (tidalcontent)");
+          printf("error sql %s \n",sql1.c_str());
+          // exit by error
+          exit(1);
         }
+        mysql_res=mysql_store_result(conn);
       }
     }
     i++;
@@ -3773,7 +3775,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
 
   conn=mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-  // check playlist exist
+  // check playlist exist in db
   sqlstring = "select name,playpath,playlistid from tidalcontent where playlistid like ";
   sqlstring = sqlstring + stack[tidalknapnr].playlistid;
   if (mysql_query(conn,sqlstring.c_str())!=0) {
@@ -3855,6 +3857,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
     // temptxt = temptxt + stack[tidalknapnr]->feed_showtxt;
     temptxt = temptxt + stack[tidalknapnr].playlistid;
     temptxt = temptxt + "/";
+    printf("Trying to open directory: %s\n", temptxt.c_str());
     if ((dir = opendir (temptxt.c_str())) != NULL) {
       while (((ent = readdir (dir)) != NULL) && (found==false)) {
         found = filename.find("flac");
@@ -3881,6 +3884,31 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
       // Bits  6-0 = Signal number that killed the process.
       error = error / 256;                                      // get exit code
     }
+
+    /*
+    if (true) {
+      int pipefd[2];
+      pid_t pid = fork();
+      pipe(pipefd)
+      // const char* argv[8];
+      const char* argv[] = { "/bin/gnome-terminal","--wait"," -t 'tidal'"," -- bash"," -c '/home/hans/.local/bin/tidal-dl","-l",sysstring.c_str(), NULL };
+      if (pid == 0) {
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        dup2(pipefd[1], STDERR_FILENO); // hvis du også vil have stderr
+        close(pipefd[1]);
+        sysstring = "https://listen.tidal.com/album/";
+        sysstring = sysstring + playlist_song;
+        if (file_exists("/bin/gnome-terminal")) {
+
+        }
+        execvp(argv[0], (char* const*)argv);
+        perror("execvp");
+      }
+    }
+    */
+
+
     // then downloaded play the stuf
     // first set homedir from global var have the users homedir
     if ((sndsystem) && (error==0)) {
