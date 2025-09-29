@@ -608,30 +608,149 @@ void hentcast(struct film_oversigt_type *film, unsigned int refnr) {
 
 // ****************************************************************************************
 //
-// hent antal elementer i directory dirname
+// select conver file in movie edit mode
 //
 // ****************************************************************************************
 
-int countEntriesInDir(const char* dirname) {
-    int n=0;
-    dirent* d;
-    DIR* dir = opendir(dirname);
-    if (dir == NULL) return 0;
-    while((d = readdir(dir))!=NULL) n++;
-    closedir(dir);
-    return n;
+
+std::string film_oversigt_typem::select_file_name(std::string startpath) {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filenamepath1;
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --file-selection --file-filter=*.* --filename='";
+  popenstring=popenstring + startpath + "' --modal --title=\"Select cover file.\" 2> /dev/null"; 
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+    // filename.erase(std::remove(filename.begin(), filename.end(), '\n'), filename.cend());
+    /* 
+    filename = fs::path(filenamepath).filename();
+    filename.erase(std::remove(filename.begin(), filename.end(), '\n'), filename.cend());
+    tmp = "/home/hans/datadisk/mythtv-controller-0.38/";
+    tmp = tmp + filename;
+    dest_file = tmp;
+    filenamepath1 = filenamepath;
+    filenamepath1.erase(std::remove(filenamepath1.begin(), filenamepath1.end(), '\n'), filenamepath1.cend());
+    */
+  }
+  return(filename);
 }
+
+
+// ****************************************************************************************
+//
+// select movie type
+//
+// ****************************************************************************************
+
+
+std::string film_oversigt_typem::select_movie_type() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg en værdi\" --radiolist --column=\"Vælg\" --column=\"Type\" TRUE Action   FALSE Romance   FALSE Gyser";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ****************************************************************************************
+//
+// updatedb
+//
+// ****************************************************************************************
+
+
+bool film_oversigt_typem::update_movierec_in_db(int recnr) {
+  std::string sql_update;
+  MYSQL_RES *res;
+  MYSQL *conn;
+  MYSQL_ROW row;
+  conn=mysql_init(NULL);
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+    sql_update = "update videometadata set coverfile='";
+    sql_update = sql_update + filmoversigt[recnr].getfilmcoverfile();
+    sql_update = sql_update + "' where filename='";
+    sql_update = sql_update + filmoversigt[recnr].getfilmfilename();
+    sql_update = sql_update + "'";
+    mysql_query(conn,sql_update.c_str());
+    res = mysql_store_result(conn);
+    mysql_close(conn);
+    return(true);
+  }
+}
+
+// ****************************************************************************************
+//
+// updatedb all
+//
+// ****************************************************************************************
+
+
+bool film_oversigt_typem::update_movierec_in_db_all(int recnr) {
+  std::string sql_update;
+  MYSQL_RES *res;
+  MYSQL *conn;
+  MYSQL_ROW row;
+  conn=mysql_init(NULL);
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+    sql_update = "update videometadata set coverfile='";
+    sql_update = sql_update + filmoversigt[recnr].getfilmcoverfile();    
+    sql_update = sql_update + "', title='";
+    sql_update = sql_update + filmoversigt[recnr].getfilmtitle(); 
+    sql_update = sql_update + "', year=";
+    sql_update = sql_update + std::to_string(filmoversigt[recnr].getfilmaar());
+    sql_update = sql_update + ", length=";
+    sql_update = sql_update + std::to_string(filmoversigt[recnr].getfilmlength());
+    sql_update = sql_update + ", userrating='";
+    sql_update = sql_update + std::to_string(filmoversigt[recnr].getfilmrating());
+    sql_update = sql_update + "', category=";
+    if ((filmoversigt[recnr].getfilmgenre(),"Action")==0) sql_update = sql_update + "1"; else 
+    if ((filmoversigt[recnr].getfilmgenre(),"Romance")==0) sql_update = sql_update + "2"; else
+    if ((filmoversigt[recnr].getfilmgenre(),"Gyser")==0) sql_update = sql_update + "3"; 
+    else sql_update = sql_update + "0";
+     sql_update = sql_update + " where filename='"; 
+    sql_update = sql_update + filmoversigt[recnr].getfilmfilename();
+    sql_update = sql_update + "'";
+    mysql_query(conn,sql_update.c_str());
+    res = mysql_store_result(conn);
+    mysql_close(conn);
+    return(true);
+  }
+}
+
+
 
 
 sqlite3 *sqlitedb_obj_movie;
 
 int sql_movie_sqldb_callback(void *data, int argc, char **argv, char **azColName) {
-    int i;
-    for (i=0; i<argc; i++) {
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-    }
-    return 0;
+  int i;
+  for (i=0; i<argc; i++) {
+      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+  }
+  return 0;
 }
+
+
+
+
 
 bool film_oversigt_typem::tidal_createdb(MYSQL *conn) {
   std::string sql_update;
@@ -689,10 +808,14 @@ bool film_oversigt_typem::tidal_createdb(MYSQL *conn) {
   return(true);
 }
 
+
+
+
+
 // ****************************************************************************************
 //
-// overloaded function in .h file
-// hent film oversigt
+// Overloaded function.
+// loading film oversigt
 // create if not exist (mythtv/internal)
 //
 // ****************************************************************************************
@@ -755,7 +878,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       }
     } else dbexist=false;
     if (!(dbexist)) {
-      dbexist=tidal_createdb(conn);
+      dbexist=tidal_createdb(conn);                                                               // create db if not exist
     }
     if (!(dbexist)) {
       dirp=opendir(configmoviepath);
@@ -1310,145 +1433,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 // normal oversigt
 //
 // ****************************************************************************************
-/*
-
-void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
-  int lfilmoversigt_antal=8*4;
-  int film_nr=0;
-  bool cover3d=false;
-  char *lastslash;
-  float xvgaz=0.0f;
-  unsigned int sofset=0;
-  int bonline=8;
-  float boffset;
-  int ofs;
-  static bool movie_oversigt_loaded=false;
-  static int movie_oversigt_loaded_done=0;
-  char tmpfilename[200];
-  int loader_xpos,loader_ypos;
-  int winsizx,winsizy;
-  int xpos,ypos;
-  char *base,*right_margin;
-  int length,width;
-  int pline=0;
-  bool stop=false;
-  int buttonsize=config_menu.config_movie_main_window_icon_sizex;
-  int buttonsizey=config_menu.config_movie_main_window_icon_sizey;
-  int xof=5;
-  int yof=orgwinsizey-(buttonsizey);
-  
-  int xx=(float) (config_menu.config_movie_main_window_sizex/config_menu.config_movie_main_window_icon_sizex)-1;
-  int yy=(float) (config_menu.config_movie_main_window_sizey/config_menu.config_movie_main_window_icon_sizey)-2;
-  lfilmoversigt_antal = xx*yy;        // 
-
-  // load dvd covers dynamic one pr frame
-  if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
-    movie_oversigt_gfx_loading=true;
-    strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
-    if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
-      this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
-    }
-    if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
-      movie_oversigt_loaded=true;
-      movie_oversigt_loaded_done=1;
-      movie_oversigt_gfx_loading=false;
-    } else movie_oversigt_loaded_nr++;
-  }
-  glTranslatef(0.0f, 0.0f ,0.0f);
-
-  // mask
-  winsizx=200;
-  winsizy=200;
-  // xpos=20;
-  xpos=config_menu.config_movie_main_windowx;
-  // ypos=700;
-  ypos=config_menu.config_movie_main_window_sizey-(config_menu.config_movie_main_window_icon_sizey*2);
-  ypos=orgwinsizey-(config_menu.config_movie_main_window_icon_sizey*2); // orgwinsizey-(buttonsizey)+400;
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  while((film_nr<lfilmoversigt_antal) && (film_nr+sofset<filmoversigtsize)) {
-    sofset=(_mangley/40)*8;
-    if ((film_nr+sofset)<filmoversigt_antal) {
-      if (((film_nr % bonline)==0) && (film_nr>0)) {
-        xpos=config_menu.config_movie_main_windowx;
-        ypos=ypos-(config_menu.config_movie_main_window_icon_sizey+80);
-      }
-      if (film_nr+1==(int) film_key_selected) boffset+=10; else boffset=0;
-      if (filmoversigt[film_nr+sofset].gettextureid()) {
-        // print cover dvd
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);                           //
-        glLoadName(120+film_nr+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
-        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
-        glEnd();
-        // print movie cover over
-        glBindTexture(GL_TEXTURE_2D,filmoversigt[film_nr+sofset].gettextureid());
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glLoadName(120+film_nr+sofset);
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
-        glTexCoord2f(0, 0); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
-        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
-        glEnd(); //End quadrilateral coordinates
-      } else {
-        // do default cover dvd
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
-        glLoadName(120+film_nr+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
-        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
-        glEnd();
-      }
-      // show movie name
-      drawLinesOfText(filmoversigt[film_nr+sofset].getfilmtitle(),14.00f+xpos,114.0f+ypos,0.38f,22,2,1,true);
-    }
-    // next button
-    xpos+=buttonsize;                                                // 205
-    film_nr++;
-    //glPopMatrix();
-  }
-  if ((film_nr==0) || (this->filmoversigt_antal==0)) {
-    // show window
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBindTexture(GL_TEXTURE_2D,_textureId9_askbox);                            // _texturemovieinfobox
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glTranslatef(550, 350, 0.0f);                                               // pos
-    glBegin(GL_QUADS);    glPushMatrix();
-    glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);                         // draw bos
-    glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 400.0, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 400.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
-    glEnd();
-    drawText("No movie info from backend.", 10.00f+xpos, 40.0f+ypos, 0.4f,1);
-    glPopMatrix();
-  }
-}
-*/
-
-
-// ****************************************************************************************
-//
-// new version
-// normal oversigt
-//
-// ****************************************************************************************
-
-
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   std::string tmpfilename;
@@ -1484,20 +1468,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   if (filmoversigt.size()==0) {
     // show window
     glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBindTexture(GL_TEXTURE_2D,_textureId9_askbox);                            // _texturemovieinfobox
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glTranslatef(550, 350, 0.0f);                                               // pos
-    glBegin(GL_QUADS);    glPushMatrix();
-    glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);                         // draw bos
-    glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 400.0, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 400.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
-    glEnd();
-    drawText("No movie info from backend.", 10.00f+xpos, 40.0f+ypos, 0.4f,1);
+    drawText("No movie info from backend.", 550+10.00f+xpos, 40.0f+ypos, 0.4f,1);
     glPopMatrix();
   } else {
     while ((film_nr<lfilmoversigt_antal) && (film_nr+sofset<filmoversigt.size())) {
@@ -1549,7 +1520,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         drawLinesOfText(filmoversigt[film_nr+sofset].getfilmtitle(),14.00f+xpos,114.0f+ypos,0.38f,22,2,1,true);
       }
       // next button
-      xpos+=buttonsize;                                                // 205
+      xpos+=buttonsize;
       film_nr++;      
     }
   }

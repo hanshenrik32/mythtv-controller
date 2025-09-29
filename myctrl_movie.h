@@ -117,6 +117,7 @@ class film_oversigt_typem : vlc_controller {
       float getmovieposition();
       bool show_search_view;
   public:
+      int editmode;
       bool get_search_view() { return (show_search_view); }
       void set_search_view(bool val) { show_search_view=val; }
       bool film_is_playing;                                                     // playing ?
@@ -145,6 +146,11 @@ class film_oversigt_typem : vlc_controller {
       int opdatere_film_oversigt(void);
       int opdatere_film_oversigt(char *movietitle);
       bool tidal_createdb(MYSQL *conn);
+
+      std::string select_file_name(std::string startpath);
+      std::string select_movie_type();
+      bool update_movierec_in_db(int recnr);
+      bool update_movierec_in_db_all(int recnr);
 };
 
 
