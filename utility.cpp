@@ -24,6 +24,28 @@ unsigned int hourtounixtime(int hour) {
   return(mktime(tid));
 }
 
+
+
+// ****************************************************************************************
+//
+// hent antal elementer i directory dirname
+//
+// ****************************************************************************************
+
+unsigned int countEntriesInDir(const char* dirname) {
+    unsigned int n=0;
+    dirent* d;
+    DIR* dir = opendir(dirname);
+    if (dir == NULL) return 0;
+    while((d = readdir(dir))!=NULL) {
+      if ((strcmp(d->d_name,".")!=0) && (strcmp(d->d_name,"..")!=0)) n++;
+    }
+    closedir(dir);
+    return n;
+}
+
+
+
 // ***********************************************************
 //
 // write to log file in user home dir

@@ -79,7 +79,8 @@ all:
 
 
 compile: $(PROG)
-	@if ! test -f build-number.txt; then touch build-number.txt; fi
+	@if [ -f build-number.txt ]; then touch build-number.txt; fi
+	# @if test -e build-number.txt; then touch build-number.txt; fi
 	#tar -zxvf json-parser.tar.gz
 	cd json-parser \
 	./configure \

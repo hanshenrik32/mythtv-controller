@@ -100,8 +100,6 @@ Do command to install packets.
 
 sudo sh apt-get.sh
 
-
-
 You can install them by 'sudo sh apt-get.sh' when you have downloaded and
 untar the install file.
 

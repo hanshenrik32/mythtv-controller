@@ -13,5 +13,6 @@ int write_logfile(FILE *fhandler,char *logentry);
 bool directory_empty(char *path);
 char *b64_encode(const unsigned char *in, size_t len);
 
+unsigned int countEntriesInDir(const char* dirname);
 
 #endif

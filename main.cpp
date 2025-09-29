@@ -957,6 +957,8 @@ void datainfoloader_xmltv_v2();
 bool spotify_update_loaded_begin=false;
 bool tidal_update_loaded_begin=false;
 
+int do_show_film_edit_select_linie=0;
+
 // hent mythtv version and return it
 
 int hentmythtvver() {
@@ -6890,7 +6892,10 @@ void display() {
   }
   // ******************************************************************************************************************
   //
-  // *********************** show new movie info **********************************************************************
+  // ** show movie info **
+  //
+  // ******************************************************************************************************************
+   
   if (((vis_film_oversigt) || (vis_nyefilm_oversigt)) && (do_zoom_film_cover) && (fknapnr>0) && (!(visur))) {
     do_zoom_film_aktiv_nr=fknapnr-1;
     // draw window
@@ -6960,6 +6965,7 @@ void display() {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
+    if (film_oversigt.editmode==2) glLoadName(31);                                             // icon nr for edit cover
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( 0, 100 , 0.0);
     glTexCoord2f(0, 1); glVertex3f( 0, 0+320, 0.0);
@@ -6967,6 +6973,29 @@ void display() {
     glTexCoord2f(1, 0); glVertex3f( 0+220, 100 , 0.0);
     glEnd();
     glPopMatrix();
+
+
+    // update button
+    if (film_oversigt.editmode==2) {
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D,_textureupdatetidalview);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glTranslatef(440,400,0);
+      glDisable(GL_DEPTH_TEST);
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      glLoadName(32);                                             // icon nr for edit cover
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( 0, 100 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0, 0+181, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+188, 0+181 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0+188, 100 , 0.0);
+      glEnd();
+      glPopMatrix();
+    }
+
     //
     // show movie info
     // show movie icon over dvd cover
@@ -6975,7 +7004,6 @@ void display() {
     if (textureId==0) textureId=film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].gettextureid();
     if (textureId) {
       glPushMatrix();
-      if (textureId==0) textureId =_defaultdvdcover;                               // hvis ingen dvdcover findes
       glBindTexture(GL_TEXTURE_2D, textureId);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -6997,16 +7025,29 @@ void display() {
    
     // show genre
     drawText(movie_genre[configland], 670, 890, 0.4f,1);
-    drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 0.4f,1);
-    
+    if (film_oversigt.editmode==2) {
+      drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 0.35f,1);
+      if (do_show_film_edit_select_linie==0) showcoursornow(378,740,strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre));
+    } else {
+      drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 0.4f,1);
+    }
+    // show edit mode
+    if (film_oversigt.editmode==2) {
+      drawText("Load Cover", 470, 680, 0.4f,1);
+    }    
+
     // show movie title
     strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle());
     if (strlen(temptxt)>41) {
       temptxt[42]=0;
     }
     drawText(movie_title[configland], 670, 870, 0.4f,1);
-    drawText(temptxt, 750, 870, 0.4f,1);
-    
+    if (film_oversigt.editmode==2) {
+      drawText(temptxt, 750, 870, 0.35f,1);
+      if (do_show_film_edit_select_linie==1) showcoursornow(378,720,strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle()));
+    } else {
+      drawText(temptxt, 750, 870, 0.4f,1);
+    }
     // show movie length
     temptxt2 = fmt::format("{} min.",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength());
     drawText(movie_length[configland], 670, 870-20, 0.4f,1);
@@ -7015,14 +7056,23 @@ void display() {
     // show movie year
     temptxt2 = fmt::format("{} ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
     drawText(movie_year[configland], 670, 870-40, 0.4f,1);
-    drawText(temptxt2.c_str(), 750, 870-40, 0.4f,1);
-    
-    // show movie rating on imdb
+    if (film_oversigt.editmode==2) {
+      drawText(temptxt2.c_str(), 750, 870-40, 0.35f,1);
+      if (do_show_film_edit_select_linie==2) showcoursornow(378,680,temptxt2.length());
+    } else {
+      drawText(temptxt2.c_str(), 750, 870-40, 0.4f,1);
+    }
+    // show movie rating
     if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
       else strcpy(temptxt,"None");
     temptxt[23]=0;
     drawText(movie_rating[configland], 670, 870-60, 0.4f,1);
-    drawText(temptxt, 750, 870-60, 0.4f,1);
+    if (film_oversigt.editmode==2) {
+      drawText(temptxt, 750, 870-60, 0.35f,1);
+      if (do_show_film_edit_select_linie==3) showcoursornow(374,660,strlen(temptxt));
+    } else {
+      drawText(temptxt, 750, 870-60, 0.4f,1);
+    }
     
     // show movie format avi/mp4 osv
     drawText("Format ", 670, 870-80, 0.4f,1);
@@ -7046,8 +7096,12 @@ void display() {
     if (strcmp(temptxt,"")!=0) sprintf(temptxt,"%s ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); else strcpy(temptxt,"None");
     temptxt[23]=0;
     drawText("Imdb", 670, 870-140, 0.4f,1);
-    drawText(temptxt, 750, 870-140, 0.4f,1);
-
+    if (film_oversigt.editmode==2) {
+      drawText(temptxt, 750, 870-140, 0.35f,1);
+      if (do_show_film_edit_select_linie==4) showcoursornow(378,580,strlen(temptxt));
+    } else {
+      drawText(temptxt, 750, 870-140, 0.4f,1);
+    }
     // show movie cast
     drawText(movie_cast[configland], 670, 870-160, 0.4f,1);
     int ll=0;
@@ -7062,8 +7116,7 @@ void display() {
         yof-=20;
       }
       drawText(temptxt, 750, 870-160-yof, 0.4f,1);
-    }
-    
+    }   
     // show movie descrition
     drawText(movie_description[configland], 670, 870-200, 0.4f,1);
     int sted=0;
@@ -7076,7 +7129,10 @@ void display() {
       while (stream >> word) {
         if (line.length() + word.length() + 1 > maxWidth) {
           // outFile << line << '\n';
-          drawText(line.c_str(), 670, 870-220+linof, 0.4f,1);
+          if ((film_oversigt.editmode==2) && (do_show_film_edit_select_linie>=5)) {
+            drawText(line.c_str(), 670, 870-220+linof, 0.35f,1); 
+            showcoursornow(310,500,strlen(temptxt));
+          } else drawText(line.c_str(), 670, 870-220+linof, 0.4f,1);
           linof-=20.f;
           line = word;
         } else {
@@ -7084,18 +7140,20 @@ void display() {
           line += word;
         }
       }
+      // last line
       if (!line.empty()) {
-        drawText(line.c_str(), 670, 870-220+linof, 0.4f,1);
+        if ((film_oversigt.editmode==2) && (do_show_film_edit_select_linie>=5)) {
+          drawText(line.c_str(), 670, 870-220+linof, 0.35f,1); 
+          showcoursornow(318,500,strlen(temptxt));
+        } else drawText(line.c_str(), 670, 870-220+linof, 0.4f,1);
         linof-=20.f;
-          // outFile << line << '\n';
       }
     }
   }
-
+  // reset tidal (reload playlists)
   if (tidal_oversigt.do_setup_tidal_start_entry) {
     tidal_oversigt.setup_tidal_start_entry();
   }
-
 
   static bool retning=false;
   static int color=0;
@@ -7968,6 +8026,28 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             film_oversigt.opdatere_film_oversigt((char *) "%");
             //  remove search flag again and show all movies
             film_oversigt.set_search_view(false);
+          }
+          // edit mode load new cover from file
+          if ((film_oversigt.editmode==2) && ((GLubyte) names[i*4+3]==31)) {
+            printf("Load new cover from file for rec %d \n",do_zoom_film_aktiv_nr);
+            std::string cover_filename=film_oversigt.select_file_name("/data2/Movie/");
+            cover_filename.erase(std::remove(cover_filename.begin(), cover_filename.end(), '\n'), cover_filename.cend());
+            if (cover_filename.length()>0) {
+              film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmcoverfile((char *) cover_filename.c_str());
+              film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].settextureidfile((char *) cover_filename.c_str());
+              film_oversigt.update_movierec_in_db(do_zoom_film_aktiv_nr);
+              write_logfile(logfile,(char *) "Load new cover file." );
+            }
+            fundet = true;
+            //select_movie_type() function
+          }
+          // edit mode (update movie to db)
+          if ((film_oversigt.editmode==2) && ((GLubyte) names[i*4+3]==32)) {
+            // update edit movie to db
+            film_oversigt.update_movierec_in_db_all(do_zoom_film_aktiv_nr);
+            film_oversigt.editmode=0;
+            write_logfile(logfile,(char *) "Update movie info to db." );
+            fundet = true;
           }
         }
       }
@@ -9485,25 +9565,24 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             break;
         case GLUT_RIGHT_BUTTON:
             // close ask film again
-            if ((vis_film_oversigt) && (state==GLUT_UP)) {
+            if ((vis_film_oversigt) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {
               if (do_zoom_film_cover) do_zoom_film_cover=false; else if (!(do_zoom_film_cover)) do_zoom_film_cover=true;
             }
             // close ask tv again
-            if ((vis_tv_oversigt) && (state==GLUT_UP)) {
+            if ((vis_tv_oversigt) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {
               ask_tv_record=true;
               do_zoom_tvprg_aktiv_nr=0;
             }
             // close vis stream play
-            if ((vis_stream_oversigt) && (state==GLUT_UP)) {
+            if ((vis_stream_oversigt) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {
               if (debugmode & 4) fprintf(stderr,"sknapnr %d stream_playnr %d \n",sknapnr,stream_playnr);                                      // show last selected no stream is playing (stream_playnr=0)
               if ((sknapnr>0) && (stream_playnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
             }
             // close info (do not show new movies)
-            if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
+            if ((vis_nyefilm_oversigt) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {
               vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
             }
-
-            if (state==GLUT_UP) {
+            if ((state==GLUT_UP) && ((film_oversigt.editmode==0))) {
               fprintf(stderr,"Right mouse button pressed\n");
               if (tidal_oversigt.get_tidal_playing_flag()) {
                 if (ask_open_dir_or_play_tidal) {
@@ -10759,7 +10838,7 @@ void handlespeckeypress(int key,int x,int y) {
                   #endif
                   // movie
                   // key down
-                  if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.filmoversigt.size()-1)  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                  if ((vis_film_oversigt) && (film_oversigt.editmode==false) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.filmoversigt.size()-1)  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
                     if (film_key_selected>=18) {
                       _fangley+=MOVIE_CS;
                       film_select_iconnr+=fnumbersoficonline;
@@ -10849,6 +10928,9 @@ void handlespeckeypress(int key,int x,int y) {
                       }
                       if ((do_show_setup_select_linie==13) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++; else if ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL) do_show_setup_select_linie++;
                     }
+                  }
+                  if (film_oversigt.editmode) {
+                    do_show_film_edit_select_linie++;               // editor add new lines if needed
                   }
                 }
                 // editor add new lines if needed
@@ -11069,7 +11151,7 @@ void handlespeckeypress(int key,int x,int y) {
                   //
                   // movie stuf
                   //
-                  if ((vis_film_oversigt) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                  if ((vis_film_oversigt) && (film_oversigt.editmode==false) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
                     if ((vis_film_oversigt) && (film_select_iconnr>(fnumbersoficonline-1))) {
                       if ((film_key_selected<=fnumbersoficonline) && (film_select_iconnr>(fnumbersoficonline-1))) {
                         _fangley -= MOVIE_CS;
@@ -11170,6 +11252,11 @@ void handlespeckeypress(int key,int x,int y) {
                       }
                     }
                   }
+
+                  if (film_oversigt.editmode) {
+                    if (do_show_film_edit_select_linie>0) do_show_film_edit_select_linie--;               // editor add new lines if needed
+                  }
+
                 }
                 //
                 // if indside a setup menu
@@ -11500,6 +11587,12 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
         case 114:
+                printf("CTRL key pressed \n");
+                if (vis_film_oversigt) {
+                  film_oversigt.editmode=1;
+
+                }
+                break;
         case 115:
                 printf("CTRL key pressed \n");
                 break;
@@ -11725,6 +11818,44 @@ void handleKeypress(unsigned char key, int x, int y) {
           keybufferindex=strlen(keybuffer);
         }
       }
+      if (vis_film_oversigt) {
+        if (key==5) film_oversigt.editmode=2;          // ctrl e pressed
+        if (film_oversigt.editmode==2) {
+          // in edit mode       
+          switch (do_show_film_edit_select_linie) {
+            case 0: strcpy(keybuffer,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmgenre());
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            case 1: strcpy(keybuffer,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle());
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            case 2: // strcpy(keybuffer,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar()); //aar
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            case 3: sprintf(keybuffer,"%d",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
+                    // strcpy(keybuffer,std::to_string(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()); // imdb
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            case 4: strcpy(keybuffer,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); // imdb
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            case 5: // strcpy(keybuffer,film_oversigt.film_get_director((film_key_selected-1)+film_selected_startofset)); // descriptor
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            case 6: // strcpy(keybuffer,film_oversigt.film_get_cast((film_key_selected-1)+film_selected_startofset));
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            case 7: // strcpy(keybuffer,film_oversigt.film_get_runtime((film_key_selected-1)+film_selected_startofset));
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            case 8: // strcpy(keybuffer,film_oversigt.film_get_plot((film_key_selected-1)+film_selected_startofset));
+                    keybufferindex=strlen(keybuffer);
+                    break;
+            default:strcpy(keybuffer,"");
+                    keybufferindex=strlen(keybuffer);
+          }
+        }
+      }
 
 
       if (do_show_setup_screen) {
@@ -11749,11 +11880,33 @@ void handleKeypress(unsigned char key, int x, int y) {
           if (vis_tidal_oversigt) {
             if (keybufferindex>=0) playlistfilename[keybufferindex]=0;
           }
-
           if (tidal_oversigt.do_setup_tidal_start_entry) {
             if (do_show_editor_select_linie<tidal_oversigt.tidal_start_playlist_array.size()) tidal_oversigt.tidal_start_playlist_array[do_show_editor_select_linie]=keybuffer;
           }
-
+          if (vis_film_oversigt) {
+            if (film_oversigt.editmode==2) {
+              switch (do_show_film_edit_select_linie) {
+                case 0: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmgenre(keybuffer);
+                        break;
+                case 1: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmtitle(keybuffer);
+                        break;
+                case 2: // film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmaar(atoi(keybuffer));
+                        break;
+                case 3: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmrating(atoi(keybuffer));
+                        break;
+                case 4: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmimdbnummer(keybuffer);
+                        break;
+                case 5: // film_oversigt.film_set_director((film_key_selected-1)+film_selected_startofset,keybuffer);
+                        break;
+                case 6: // film_oversigt.film_set_cast((film_key_selected-1)+film_selected_startofset,keybuffer);
+                        break;
+                case 7: // film_oversigt.film_set_runtime((film_key_selected-1)+film_selected_startofset,keybuffer);
+                        break;
+                case 8: // film_oversigt.film_set_plot((film_key_selected-1)+film_selected_startofset,keybuffer);
+                        break;
+              }
+            }            
+          }
         } else {
           // delete key
           if ((vis_tidal_oversigt) && (key==127)) {
@@ -11763,6 +11916,12 @@ void handleKeypress(unsigned char key, int x, int y) {
               tidalknapnr--;
             }
           }
+
+          if ((vis_film_oversigt) && (key==127)) {
+            // del key
+
+          }
+
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
             if (key==32) {
               dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
@@ -11903,7 +12062,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
               }
-              // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              fprintf(stderr,"Keybuffer=%s\n",keybuffer);
             }
           }
 
@@ -11938,6 +12097,34 @@ void handleKeypress(unsigned char key, int x, int y) {
               channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
             }
           }
+          
+          if (vis_film_oversigt) {
+            if (film_oversigt.editmode==2) {
+              printf("keybuffer %s \n",keybuffer);
+              switch (do_show_film_edit_select_linie) {
+                case 0: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmgenre(keybuffer);
+                        break;
+                case 1: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmtitle(keybuffer);
+                        break;
+                case 2: // film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmaar(keybuffer);
+                        break;
+                case 3: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmrating(atoi(keybuffer));
+                        break;
+                case 4: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmimdbnummer(keybuffer);
+                        break;
+                case 5: // film_oversigt.film_set_director((film_key_selected-1)+film_selected_startofset,keybuffer);
+                        break;
+                case 6: // film_oversigt.film_set_cast((film_key_selected-1)+film_selected_startofset,keybuffer);
+                        break;
+                case 7: // film_oversigt.film_set_runtime((film_key_selected-1)+film_selected_startofset,keybuffer);
+                        break;
+                case 8: // film_oversigt.film_set_plot((film_key_selected-1)+film_selected_startofset,keybuffer);
+                        break;
+              }
+            }
+          }
+
+
           // setup window
           if (do_show_setup) {
             if (do_show_setup_sound) {
@@ -12900,8 +13087,21 @@ void handleKeypress(unsigned char key, int x, int y) {
                   _rangley=0.0f;
                 }
                 if (vis_film_oversigt) {
-                  hent_film_search = true;			  	// start movie title search
-                  fknapnr=0;
+                  if (film_oversigt.editmode==2) {
+                   std::string filmtype=film_oversigt.select_movie_type(); 
+                    if (filmtype.length()>0) {
+                      if (debugmode & 2) fprintf(stderr,"Set movie type to %s\n",filmtype.c_str());
+                      filmtype.erase(std::remove(filmtype.begin(), filmtype.end(), '\n'), filmtype.cend());
+                      film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmgenre((char *) filmtype.c_str());
+                      strcpy(keybuffer,filmtype.c_str());
+                      keybufferindex=strlen(keybuffer);
+
+                    }
+                  } else {
+                    hent_film_search = true;			  	// start movie title search
+                    strcpy(keybuffer,"");
+                    fknapnr=0;
+                  }
                 }
                 // search podcast
                 if (vis_stream_oversigt) {
