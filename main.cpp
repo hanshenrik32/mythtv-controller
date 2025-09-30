@@ -11818,6 +11818,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           keybufferindex=strlen(keybuffer);
         }
       }
+      std::string tmptxt;
       if (vis_film_oversigt) {
         if (key==5) film_oversigt.editmode=2;          // ctrl e pressed
         if (film_oversigt.editmode==2) {
@@ -11829,11 +11830,11 @@ void handleKeypress(unsigned char key, int x, int y) {
             case 1: strcpy(keybuffer,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle());
                     keybufferindex=strlen(keybuffer);
                     break;
-            case 2: // strcpy(keybuffer,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar()); //aar
+            case 2: tmptxt=std::to_string(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());    // year
+                    strcpy(keybuffer,tmptxt.c_str());
                     keybufferindex=strlen(keybuffer);
                     break;
             case 3: sprintf(keybuffer,"%d",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
-                    // strcpy(keybuffer,std::to_string(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()); // imdb
                     keybufferindex=strlen(keybuffer);
                     break;
             case 4: strcpy(keybuffer,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); // imdb
@@ -11890,7 +11891,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         break;
                 case 1: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmtitle(keybuffer);
                         break;
-                case 2: // film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmaar(atoi(keybuffer));
+                case 2: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmaar(atoi(keybuffer));
                         break;
                 case 3: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmrating(atoi(keybuffer));
                         break;
@@ -12106,7 +12107,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         break;
                 case 1: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmtitle(keybuffer);
                         break;
-                case 2: // film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmaar(keybuffer);
+                case 2: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmaar(atoi(keybuffer));
                         break;
                 case 3: film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmrating(atoi(keybuffer));
                         break;
