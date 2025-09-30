@@ -756,7 +756,7 @@ bool film_oversigt_typem::tidal_createdb(MYSQL *conn) {
   std::string sql_update;
   MYSQL_RES *res;
   if (!conn) return(false);
-  sql_update = "create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int, bitrate int , width int , high int, fsize int, fformat varchar(150))";
+  sql_update = "create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int, bitrate int , width int , high int, fsize bigint, fformat varchar(150))";
   mysql_query(conn,sql_update.c_str());
   res = mysql_store_result(conn);
   sql_update = "create table IF NOT EXISTS videocategory(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, category varchar(128))";
@@ -844,6 +844,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
   bool nostat=false;
   bool fundet;
   bool film_ok;
+  bool firsttime=false;
   long delrecid;
   std::string sqlselect;
   unsigned int del_rec_nr;
@@ -879,8 +880,9 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     } else dbexist=false;
     if (!(dbexist)) {
       dbexist=tidal_createdb(conn);                                                               // create db if not exist
+      firsttime=true;
     }
-    if (!(dbexist)) {
+    if (firsttime) {
       dirp=opendir(configmoviepath);
       if (dirp==NULL) {
         printf("No %s dir found \nOpen dir error \n",configmoviepath);
@@ -1351,6 +1353,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int loader_xpos,loader_ypos;
   int winsizx,winsizy;
   int xpos,ypos;
+  
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<6)) {
     /*
@@ -1425,6 +1428,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
     xpos+=205;
     i++;
   }
+  movie_oversigt_loaded_nr=0;
 }
 
 
@@ -1452,7 +1456,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   xpos=config_menu.config_movie_main_windowx;
   ypos=orgwinsizey-(config_menu.config_movie_main_window_icon_sizey*2); // orgwinsizey-(buttonsizey)+400;
   winsizx=200;
-  winsizy=200;  
+  winsizy=200;
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) filmoversigt.size())) {
     movie_oversigt_gfx_loading=true;
     tmpfilename=filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile();
