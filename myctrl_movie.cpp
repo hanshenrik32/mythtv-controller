@@ -549,8 +549,7 @@ void hentgenre(struct film_oversigt_type *film,unsigned int refnr) {
     std::string sqlselect;
     unsigned int i;
     // mysql stuf
-    // sprintf(sqlselect,"select idvideo,videogenre.genre from videometadatagenre left join videogenre on videometadatagenre.idgenre=videogenre.intid where idvideo=%d",refnr);
-    sqlselect = fmt::format("select idvideo,videogenre.genre from videometadatagenre left join videogenre on videometadatagenre.idgenre=videogenre.intid where idvideo={}",refnr);
+    sqlselect = fmt::format("select category,videogenre.genre from videometadata LEFT JOIN videogenre on videometadata.category=videogenre.intid where videometadata.intid={}",refnr);
     char *database = (char *) "mythconverg";
     conn=mysql_init(NULL);
     // Connect to database
@@ -628,16 +627,6 @@ std::string film_oversigt_typem::select_file_name(std::string startpath) {
   fclose(f);
   if (strlen(filenamepath)>0) {
     filename = filenamepath;
-    // filename.erase(std::remove(filename.begin(), filename.end(), '\n'), filename.cend());
-    /* 
-    filename = fs::path(filenamepath).filename();
-    filename.erase(std::remove(filename.begin(), filename.end(), '\n'), filename.cend());
-    tmp = "/home/hans/datadisk/mythtv-controller-0.38/";
-    tmp = tmp + filename;
-    dest_file = tmp;
-    filenamepath1 = filenamepath;
-    filenamepath1.erase(std::remove(filenamepath1.begin(), filenamepath1.end(), '\n'), filenamepath1.cend());
-    */
   }
   return(filename);
 }
@@ -654,7 +643,27 @@ std::string film_oversigt_typem::select_movie_type() {
   char filenamepath[1024];
   strcpy(filenamepath,"");
   std::string filename="";
-  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg en værdi\" --radiolist --column=\"Vælg\" --column=\"Type\" TRUE Action   FALSE Romance   FALSE Gyser";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg en værdi\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"Horror\" \
+  TRUE \"Action\" \
+  FALSE \"Science fiction\" \
+  FALSE \"Thriller\" \
+  FALSE \"Western\" \
+  FALSE \"Comedy\" \
+  FALSE \"Drama\" \
+  FALSE \"Romance\" \
+  FALSE \"Fantasy\" \
+  FALSE \"Crime film\" \
+  FALSE \"Animation\" \
+  FALSE \"Documentary\" \
+  FALSE \"Comedy\" \
+  FALSE \"Adventure\" \
+  FALSE \"Musical\" \
+  FALSE \"Fantasy\" \
+  FALSE \"Disaster\" \
+  FALSE \"Crime\" \
+  FALSE \"War\" \
+  FALSE \"Horror\"";
   FILE *f = popen(popenstring.c_str(), "r");
   fgets(filenamepath, 1024, f);
   if (!(f)) {
@@ -718,14 +727,32 @@ bool film_oversigt_typem::update_movierec_in_db_all(int recnr) {
     sql_update = sql_update + std::to_string(filmoversigt[recnr].getfilmaar());
     sql_update = sql_update + ", length=";
     sql_update = sql_update + std::to_string(filmoversigt[recnr].getfilmlength());
+
     sql_update = sql_update + ", userrating='";
     sql_update = sql_update + std::to_string(filmoversigt[recnr].getfilmrating());
     sql_update = sql_update + "', category=";
-    if ((filmoversigt[recnr].getfilmgenre(),"Action")==0) sql_update = sql_update + "1"; else 
-    if ((filmoversigt[recnr].getfilmgenre(),"Romance")==0) sql_update = sql_update + "2"; else
-    if ((filmoversigt[recnr].getfilmgenre(),"Gyser")==0) sql_update = sql_update + "3"; 
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Horror")==0) sql_update = sql_update + "1"; else 
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Action")==0) sql_update = sql_update + "2"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Science fiction")==0) sql_update = sql_update + "3"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Thriller")==0) sql_update = sql_update + "4"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Western")==0) sql_update = sql_update + "5"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Comedy")==0) sql_update = sql_update + "6"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Drama")==0) sql_update = sql_update + "7"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Romance")==0) sql_update = sql_update + "8"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Fantasy")==0) sql_update = sql_update + "9"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Crime film")==0) sql_update = sql_update + "10"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Animation")==0) sql_update = sql_update + "11"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Documentary")==0) sql_update = sql_update + "12"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Drama")==0) sql_update = sql_update + "13"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Comedy")==0) sql_update = sql_update + "14"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Adventure")==0) sql_update = sql_update + "15"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Musical")==0) sql_update = sql_update + "16"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Fantasy")==0) sql_update = sql_update + "17"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Disaster")==0) sql_update = sql_update + "18"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"Crime")==0) sql_update = sql_update + "19"; else
+    if (strcmp(filmoversigt[recnr].getfilmgenre(),"War")==0) sql_update = sql_update + "20";
     else sql_update = sql_update + "0";
-     sql_update = sql_update + " where filename='"; 
+    sql_update = sql_update + " where filename='"; 
     sql_update = sql_update + filmoversigt[recnr].getfilmfilename();
     sql_update = sql_update + "'";
     mysql_query(conn,sql_update.c_str());
@@ -749,10 +776,15 @@ int sql_movie_sqldb_callback(void *data, int argc, char **argv, char **azColName
 }
 
 
+// ****************************************************************************************
+//
+// create db tables
+//
+// ****************************************************************************************
 
 
 
-bool film_oversigt_typem::tidal_createdb(MYSQL *conn) {
+bool film_oversigt_typem::createdb(MYSQL *conn) {
   std::string sql_update;
   MYSQL_RES *res;
   if (!conn) return(false);
@@ -805,10 +837,73 @@ bool film_oversigt_typem::tidal_createdb(MYSQL *conn) {
   mysql_query(conn,sql_update.c_str());
   res = mysql_store_result(conn);
   sql_update = "insert into videotypes values (0,'mkv','',0,1)";
+  res = mysql_store_result(conn);
+  // video category
+  sql_update = "insert into videocategory values (1,'Horror')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (2,'Action')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (3,'Science fiction')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (4,'Thriller')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (5,'Western')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (6,'Comedy')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (7,'Drama')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (8,'Romance')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (9,'Fantasy')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (10,'Crime film')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (11,'Animation')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (12,'Documentary')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (13,'Drama')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (14,'Comedy')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (15,'Adventure')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (16,'Musical')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (17,'Fantasy')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (18,'Disaster')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (19,'Crime')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (20,'War')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
+  sql_update = "insert into videocategory values (21,'Horror')";
+  mysql_query(conn,sql_update.c_str());
+  res = mysql_store_result(conn);
   return(true);
 }
-
-
 
 
 
@@ -866,7 +961,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
   // mysql stuf
   int checkdirexist=0;
   write_logfile(logfile,(char *) "Opdatere Film oversigt fra db :");
-  mainsqlselect = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title");
+  mainsqlselect = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid order by title");
   conn=mysql_init(NULL);
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
@@ -879,7 +974,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       }
     } else dbexist=false;
     if (!(dbexist)) {
-      dbexist=tidal_createdb(conn);                                                               // create db if not exist
+      dbexist=createdb(conn);                                                               // create db if not exist
       firsttime=true;
     }
     if (firsttime) {
@@ -1010,7 +1105,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       dato=dato + to_string(now->tm_min);
                       dato=dato + ":";
                       dato=dato + to_string(now->tm_sec);
-                      // sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepathcheck.c_str(),coverfile.c_str(),dato.c_str());
                       ssqlselect = fmt::format("insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'{}','{}','','director','','{}','','{}',0,'',{},'2016-12-31',{:2.5f},{},0,0,0,0,'{}','hash','{}',0,0,0,0,'playcommand',0,'','','','','','{}',0)",movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepathcheck.c_str(),coverfile.c_str(),dato.c_str());
                       recnr++;
                       mysql_query(conn,"set NAMES 'utf8'");
@@ -1020,7 +1114,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       if (mysql_error(conn)) {
                         write_logfile(logfile,(char *) "Mysql error 'insert into videometadata'");
                       }
-                      // sprintf(sqlselect,"insert into videopathinfo(intid, path, contenttype, collectionref , recurse) values (0,'%s',0,0,0)",thismoviepathdir.c_str());
                       ssqlselect = fmt::format("insert into videopathinfo(intid, path, contenttype, collectionref , recurse) values (0,'{}',0,0,0)",thismoviepathdir.c_str());
                       mysql_query(conn,ssqlselect.c_str());
                       res = mysql_store_result(conn);
@@ -1167,6 +1260,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
         if (row[7]) new_movie.setfilmrating(atoi(row[7]));          		 // user rating
         if (row[8]) new_movie.setfilmsubtitle(row[8]);                   // hent film beskrivelse
         if (row[9]) new_movie.setfilmimdbnummer(row[9]);
+        if (row[10]) new_movie.setfilmgenre(row[10]); else new_movie.setfilmgenre("None");
         if (row[11]) {
           if (strlen(row[11])>0) new_movie.setBitrate(atoi(row[11]));
           if (strlen(row[12])>0) new_movie.setWidth(atoi(row[12]));
@@ -1234,6 +1328,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     if (filmoversigt.size()>0) this->filmoversigt_antal=filmoversigt.size()-1; else this->filmoversigt_antal=0;
     if (conn) mysql_close(conn);
   }
+  movie_oversigt_loaded_nr=0;
   return(1);
 }
 
@@ -1283,7 +1378,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
         }
       } else dbexist=false;
       if (dbexist==false) {
-        dbexist=tidal_createdb(conn);
+        dbexist=createdb(conn);
       }
       if (dbexist) {
         mysql_query(conn,"set NAMES 'utf8'");
@@ -1298,7 +1393,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
             new_movie.setfilmid(atoi(row[0]));
             new_movie.setfilmtitle(row[1]);
             // hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
-            // hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
+            hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
             if (row[8]) {							                                 // hent film beskrivelse
               new_movie.setfilmsubtitle(row[8]);
             } else new_movie.setfilmsubtitle((char *) "");
@@ -1319,6 +1414,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       }
       mysql_close(conn);
     }
+    movie_oversigt_loaded_nr=0;
     if (filmantal>0) this->filmoversigt_antal=filmantal; else this->filmoversigt_antal=0;
     return(filmantal);
 }

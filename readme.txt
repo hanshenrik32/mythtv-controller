@@ -14,10 +14,16 @@ you need to install fmodstudioapi20307linux.tar.gz
 # Updated 27/08/2017
 # Updated 26/11/2024
 # Updated 21/05/2025
+# Updated 30/09/2025
+
 
 # Soon support for vdr recording
 
 Versions.
+
+movie edit by CTRL-e
+mythtv-controller ver 0.44.4
+
 
 new uvmeter and some tidal stuf is changed.
 setup menu for tidal

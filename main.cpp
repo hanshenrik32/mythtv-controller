@@ -6897,6 +6897,7 @@ void display() {
   // ******************************************************************************************************************
    
   if (((vis_film_oversigt) || (vis_nyefilm_oversigt)) && (do_zoom_film_cover) && (fknapnr>0) && (!(visur))) {
+    int configland=0;
     do_zoom_film_aktiv_nr=fknapnr-1;
     // draw window
     glPushMatrix();
@@ -7993,7 +7994,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             write_logfile(logfile,(char *) "Close stream info.");
             fundet = true;
           }
-        }
+        } 
       }
       //
       // film
