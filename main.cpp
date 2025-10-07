@@ -3710,9 +3710,10 @@ void display() {
     } else if (vis_film_oversigt) {
       glPushMatrix();
       //aktivfont.selectfont("DejaVu Sans");
-      film_oversigt.show_film_oversigt(_fangley,fknapnr);
+      // old ver show_movie_oversigt
+      film_oversigt.show_film_oversigt(_fangley,film_select_iconnr);
 
-      // printf("film_oversigt1.antal = %d \n",film_oversigt.filmoversigt1.size());
+       printf("film_key_selected = %d film_select_iconnr = %d fknapnr = %d \n",film_key_selected,film_select_iconnr,fknapnr);
 
       glPopMatrix();
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
