@@ -1536,8 +1536,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int film_nr=0;
   std::string tmpfilename;
   std::string moviename;
-  float buttonsizex=220; // config_menu.config_movie_main_window_icon_sizex;
-  float buttonsizey=240; // config_menu.config_movie_main_window_icon_sizey;
+  float buttonsizex=config_menu.config_movie_main_window_icon_sizex;
+  float buttonsizey=config_menu.config_movie_main_window_icon_sizey;
   float yof=config_menu.config_movie_main_window_sizey-(buttonsizey);                                        // start ypos
   float xof=0.0f;
   float boffset=0.0f;
@@ -1564,7 +1564,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   while((i<lfilmoversigt_antal) && (i+sofset<filmoversigt.size())) {
     sofset=(_mangley/40)*8;
     if (((i % bonline)==0) && (i>0)) {
-      yof=yof-(config_menu.config_movie_main_window_icon_sizey+92);
+      yof=yof-(config_menu.config_movie_main_window_icon_sizey+22);         // 92
       xof=config_menu.config_movie_main_windowx;
     }
     glPushMatrix();
@@ -1608,7 +1608,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     }
     // show movie name
     moviename = fmt::format("{}",filmoversigt[film_nr+sofset].getfilmtitle());    
-    temprgtxt1.resize(60);
+    // moviename.resize(60);
     drawLinesOfText(moviename,14.00f+xof,yof-10,0.38f,22,2,1,true); // 10
     glPopMatrix();
     // next button

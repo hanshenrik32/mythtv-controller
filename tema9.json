@@ -198,8 +198,8 @@
                 "window_y": 0,
                 "window_sizex": 1920,
                 "window_sizey": 1080,
-                "window_icon_sizex": 200,
-                "window_icon_sizey": 180
+                "window_icon_sizex": 220,
+                "window_icon_sizey": 240
             },
             "spotify_main_window": {
                 "window_x": 0,

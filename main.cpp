@@ -9002,6 +9002,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // we have a select mouse/touch
           if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
             fknapnr=(GLuint) names[i*4+3]-119;			                                // get movie id
+            film_key_selected=fknapnr;
             // fprintf(stderr,"Film selected=%d names[i*4+3] = %d \n",fknapnr,names[i*4+3]);                                 //
             // write debug log
             sprintf(debuglogdata,"Film selected=%d",fknapnr);                                 //
@@ -11161,8 +11162,12 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((film_key_selected<=fnumbersoficonline) && (film_select_iconnr>(fnumbersoficonline-1))) {
                         _fangley -= MOVIE_CS;
                         film_select_iconnr-=fnumbersoficonline;
-                      } else film_select_iconnr-=fnumbersoficonline;
-                      if (film_key_selected>fnumbersoficonline) film_key_selected-=fnumbersoficonline;
+                      } else {
+                        film_select_iconnr-=fnumbersoficonline;
+                      }
+                      if (film_key_selected>fnumbersoficonline) {
+                        film_key_selected-=fnumbersoficonline;
+                      }
                     }
                   }
                   //
