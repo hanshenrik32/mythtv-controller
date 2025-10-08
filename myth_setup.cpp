@@ -238,7 +238,6 @@ void showcoursornow(int cxpos,int cypos,int txtlength) {
     glEnd();
   }
   glPopMatrix();
-
 }
 
 

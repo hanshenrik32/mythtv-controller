@@ -769,6 +769,7 @@ int radiooversigt_antal=0;                // antal aktive sange
 GLint cur_avail_mem_kb = 0;               // free nvidia memory (hvis 0 så ændres gfx zoom lidt så det passer på ati/intel)
 GLuint _textureutvbgmask;                 // background in tv guide programs
 GLuint _defaultdvdcover;                	// The id of the texture
+GLuint _defaultdvdcover_mask;                	// The id of the texture
 GLuint _texturemovieinfobox;	            //  movie image
 GLuint _textureId_dir; 	                  // folder image
 GLuint _textureId_song; 	                // folder image
@@ -3713,7 +3714,7 @@ void display() {
       // old ver show_movie_oversigt
       film_oversigt.show_film_oversigt(_fangley,film_select_iconnr);
 
-       printf("film_key_selected = %d film_select_iconnr = %d fknapnr = %d \n",film_key_selected,film_select_iconnr,fknapnr);
+       // printf("film_key_selected = %d film_select_iconnr = %d fknapnr = %d \n",film_key_selected,film_select_iconnr,fknapnr);
 
       glPopMatrix();
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
@@ -7014,6 +7015,7 @@ void display() {
       glDisable(GL_DEPTH_TEST);
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      glLoadName(31);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( 0+30, 100 +5, 0.0);
       glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320-5, 0.0);
@@ -11600,7 +11602,6 @@ void handlespeckeypress(int key,int x,int y) {
                 printf("CTRL key pressed \n");
                 if (vis_film_oversigt) {
                   film_oversigt.editmode=1;
-
                 }
                 break;
         case 115:
@@ -15398,8 +15399,8 @@ void datainfoloader_webserver_v2() {
 
     if (tidal_oversigt.do_update_tidal_start_entry) {
       tidal_oversigt.do_update_tidal_start_entry = false;
-      // do_setup_tidal_start_entry=false;      
-      tidal_oversigt.get_artist_from_file("",false);      
+      // do_setup_tidal_start_entry=false;
+      tidal_oversigt.get_artist_from_file((char *) "",false);
     }
   }
 }
@@ -16055,6 +16056,7 @@ void loadgfx() {
     }
     _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
     _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
+    _defaultdvdcover_mask = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask");
     if (screen_size<3)
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
     else
@@ -16292,6 +16294,7 @@ void freegfx() {
     int i;
     glDeleteTextures( 1, &_textureutvbgmask);
     glDeleteTextures( 1, &_defaultdvdcover);		    // default dvd cover hvis der ikke er nogle at loade
+    glDeleteTextures( 1, &_defaultdvdcover_mask);		    // default dvd cover hvis der ikke er nogle at loade
     glDeleteTextures( 1, &_texturemovieinfobox);		// movie info box
     glDeleteTextures( 1, &_textureId_dir);				      // cd/dir icon in music oversigt (hvis ingen cd cover findes)
     glDeleteTextures( 1, &_textureId_song);				      // cd/dir icon in music oversigt (hvis ingen cd cover findes)

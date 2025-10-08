@@ -1441,21 +1441,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 // ****************************************************************************************
 //
-// thread web loader (loading all icons)
-//
-// ****************************************************************************************
-
-
-void *loadweb(void *data) {
-  write_logfile(logfile,(char *) "Start web icon loader thread.");
-  streamoversigt.loadweb_stream_iconoversigt();
-  write_logfile(logfile,(char *) "End/Stop web icon loader thread.");
-}
-
-
-
-// ****************************************************************************************
-// in use
 // downloading all rss podcast icon gfx
 //
 // ****************************************************************************************
