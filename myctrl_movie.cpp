@@ -1590,24 +1590,23 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       glDisable(GL_BLEND);
       glBlendFunc(GL_ONE, GL_ONE);
       glLoadName(120+film_nr+sofset);
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
+      glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( xof+25,yof+10-boffset, 0.0);
       glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10+boffset, 0.0);
       glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-16, yof+buttonsizey-10+boffset , 0.0);
       glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-16, yof+10-boffset , 0.0);
-      glEnd(); //End quadrilateral coordinates
+      glEnd();
       // show mask over
       glBindTexture(GL_TEXTURE_2D,_defaultdvdcover_mask);
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(120+film_nr+sofset);
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
+      glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( xof+25,yof+10-boffset, 0.0);
       glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10+boffset, 0.0);
       glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-16, yof+buttonsizey-10+boffset , 0.0);
       glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-16, yof+10-boffset , 0.0);
-      glEnd(); //End quadrilateral coordinates
-
+      glEnd();
     } else {
       // show default cover dvd
       glEnable(GL_TEXTURE_2D);

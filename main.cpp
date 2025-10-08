@@ -830,6 +830,7 @@ GLuint spotify_search;                    // button in spotify search
 GLuint spotify_search_back;               // back button in spotify search
 GLuint spotify_ecover;                    //
 GLuint tidal_ecover;
+GLuint tidal_covermask;
 GLuint spotify_pil;                       // pil bruges i spotify search nederst på skærmen midt for
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
@@ -5771,34 +5772,32 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+150+100,100+320 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+150+100,320, 0.0);
         glEnd();
-        // if (!(do_zoom_radio)) {
-          // ff button
-          glEnable(GL_TEXTURE_2D);
-          glEnable(GL_BLEND);
-          glBindTexture(GL_TEXTURE_2D,_texturemlast);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(10);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+250 ,  320 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+250,100+320, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+250+100,100+320 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+250+100,320, 0.0);
-          glEnd();
-          // back button
-          glEnable(GL_TEXTURE_2D);
-          glEnable(GL_BLEND);
-          glBindTexture(GL_TEXTURE_2D,_texturemnext);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(11);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+350 ,  320 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+350,100+320, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+350+100,100+320 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+350+100,320, 0.0);
-          glEnd();
-        // }
+        // ff button
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,_texturemlast);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(10);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+250 ,  320 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+250,100+320, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+250+100,100+320 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+250+100,320, 0.0);
+        glEnd();
+        // back button
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,_texturemnext);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(11);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+350 ,  320 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+350,100+320, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+350+100,100+320 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+350+100,320, 0.0);
+        glEnd();
 
         // play position
         unsigned int ms = 0;
@@ -6088,6 +6087,17 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+395+200,200+390 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+395+200,390, 0.0);
         glEnd();
+
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,tidal_covermask);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);        
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+395 ,   390 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+395,200+390, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+395+200,200+390 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+395+200,390, 0.0);
+        glEnd();
+
 
         do_we_play_check=0;
         if (do_we_play_check==0) {
@@ -8057,6 +8067,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               std::string cover_filename=film_oversigt.select_file_name("/data2/Movie/");
               cover_filename.erase(std::remove(cover_filename.begin(), cover_filename.end(), '\n'), cover_filename.cend());
               if (cover_filename.length()>0) {
+                if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].gettextureid()!=0) {
+                  if (debugmode) fprintf(stderr,"Remove old cover file '%s' \n",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmcoverfile());
+                  // delete old cover (not done)
+
+                }
                 film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmcoverfile((char *) cover_filename.c_str());
                 film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].settextureidfile((char *) cover_filename.c_str());
                 film_oversigt.update_movierec_in_db(do_zoom_film_aktiv_nr);
@@ -9020,12 +9035,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             stopmovie = true;
           }
           // we have a select mouse/touch
-          if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
+          if ((film_oversigt.editmode==0) &&  (!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
             fknapnr=(GLuint) names[i*4+3]-119;			                                // get movie id
             film_key_selected=fknapnr;
             // fprintf(stderr,"Film selected=%d names[i*4+3] = %d \n",fknapnr,names[i*4+3]);                                 //
             // write debug log
-            sprintf(debuglogdata,"Film selected=%d",fknapnr);                                 //
+            sprintf(debuglogdata,"Movie selected=%d",fknapnr);
             write_logfile(logfile,(char *) debuglogdata);
             fundet = true;
           }
@@ -16245,6 +16260,7 @@ void loadgfx() {
 
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
     tidal_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_ecover");
+    tidal_covermask        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_covermask");
     spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
     big_search_bar_playlist= loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_playlist");
     big_search_bar_track   = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_song");
@@ -16447,6 +16463,7 @@ void freegfx() {
     glDeleteTextures( 1, &tidalbutton);          //
     glDeleteTextures( 1, &tidalbutton1);          //
     glDeleteTextures( 1, &tidal_ecover);            //
+    glDeleteTextures( 1, &tidal_covermask);            //
     glDeleteTextures( 1, &spotify_pil);             //
     glDeleteTextures( 1, &big_search_bar_playlist); // Spotify stuf
     glDeleteTextures( 1, &big_search_bar_track);    //
