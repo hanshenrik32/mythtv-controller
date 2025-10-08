@@ -6977,7 +6977,6 @@ void display() {
     glEnd();
     glPopMatrix();
 
-
     // update button
     if (film_oversigt.editmode==2) {
       glPushMatrix();
@@ -7017,13 +7016,32 @@ void display() {
       glBlendFunc(GL_DST_COLOR, GL_ZERO);
       glLoadName(31);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 0+30, 100 +5, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320-5, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+220-3, 0+320-5 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+220-3, 100+5 , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( 0+30, 100 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+220-1, 0+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0+220-1, 100 , 0.0);
+      glEnd();
+      glPopMatrix();
+
+      glPushMatrix();
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glTranslatef(420,600,0);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,_defaultdvdcover_mask);
+      glEnable(GL_BLEND);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(31);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( 0+30, 100 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+220-1, 0+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0+220-1, 100 , 0.0);
       glEnd();
       glPopMatrix();
     }
+
     // text genre
     glDisable(GL_TEXTURE_2D);
    
