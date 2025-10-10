@@ -1259,7 +1259,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
         if (row[7]) new_movie.setfilmrating(atoi(row[7]));          		 // user rating
         if (row[8]) new_movie.setfilmsubtitle(row[8]);                   // hent film beskrivelse
         if (row[9]) new_movie.setfilmimdbnummer(row[9]);
-        if (row[10]) new_movie.setfilmgenre(row[10]); else new_movie.setfilmgenre("None");
+        if (row[10]) new_movie.setfilmgenre(row[10]); else new_movie.setfilmgenre((char *) "None");
         if (row[11]) {
           if (strlen(row[11])>0) new_movie.setBitrate(atoi(row[11]));
           if (strlen(row[12])>0) new_movie.setWidth(atoi(row[12]));

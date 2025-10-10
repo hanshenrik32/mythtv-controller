@@ -7549,7 +7549,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if (names[i*4+3]!=0) {
         if ((fundet==false) && (do_show_setup)) {
           // test for setup menu sound
-          if (((GLubyte) names[i*4+3]==30) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          if ((names[i*4+3]==30) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
             do_show_setup_sound = true;
             do_show_setup_sql = false;
             do_show_setup_network = false;
@@ -7566,7 +7566,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test screen setup
-          if (((GLubyte) names[i*4+3]==31)  && (do_show_setup_sql==false) && (do_show_setup_sound==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
+          if ((names[i*4+3]==31)  && (do_show_setup_sql==false) && (do_show_setup_sound==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7581,7 +7581,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for gfx opløsning
-          if (((GLubyte) names[i*4+3]==32) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
+          if ((names[i*4+3]==32) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7596,7 +7596,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for screen setup
-          if (((GLubyte) names[i*4+3]==33)  && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
+          if ((names[i*4+3]==33)  && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
             do_show_setup_sound = false;
             do_show_setup_screen = true;
             do_show_setup_sql = false;
@@ -7611,7 +7611,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for torrent setup/info
-          if (((GLubyte) names[i*4+3]==34) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+          if ((names[i*4+3]==34) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             // do_show_setup_sql = true;
@@ -7626,7 +7626,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for ttffont setup/info
-          if (((GLubyte) names[i*4+3]==35) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+          if ((names[i*4+3]==35) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7641,7 +7641,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for F keys setup/info
-          if (((GLubyte) names[i*4+3]==36) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+          if ((names[i*4+3]==36) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7656,7 +7656,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for setupclose
-          if (((GLubyte) names[i*4+3]==37) && (do_show_setup_rss==false) && (do_show_setup_spotify==false) && (do_show_setup_tidal==false) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
+          if ((names[i*4+3]==37) && (do_show_setup_rss==false) && (do_show_setup_spotify==false) && (do_show_setup_tidal==false) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7672,7 +7672,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
             do_save_config = true;             // save setup now
           }
-          if (((GLubyte) names[i*4+3]==38) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          if ((names[i*4+3]==38) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
             do_show_videoplayer = true;
             do_show_setup_sound = false;
             do_show_setup_sql = false;
@@ -7687,7 +7687,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // do_show_tvgraber
-          if (((GLubyte) names[i*4+3]==39) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          if ((names[i*4+3]==39) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
             do_show_setup_sound = false;
             do_show_setup_sql = false;
             do_show_setup_network = false;
@@ -7703,7 +7703,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // test for close windows again icon for all other windows in setup glLoadName(40)
           //
-          if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_torrent) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
+          if ((names[i*4+3]==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_torrent) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7730,14 +7730,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for tema setup/info
-          if (((GLubyte) names[i*4+3]==41) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema))  {
+          if ((names[i*4+3]==41) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema))  {
             // next tema
             tema++;
             if (tema>TEMA_ANTAL) tema = 1;
             fundet = true;
           }
           // test for rss setup
-          if (((GLubyte) names[i*4+3]==42) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          if ((names[i*4+3]==42) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
             // close  all show setup windows
             do_show_setup_sound = false;
             do_show_setup_sql = false;
@@ -7757,7 +7757,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
 
           // test for spotify setup
-          if (((GLubyte) names[i*4+3]==43) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false)) {
+          if ((names[i*4+3]==43) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false)) {
             // close  all show setup windows
             do_show_setup_sound = false;
             do_show_setup_sql = false;
@@ -7776,7 +7776,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for tidal setup
-          if (((GLubyte) names[i*4+3]==44) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false && (do_show_setup_spotify==false))) {
+          if ((names[i*4+3]==44) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false && (do_show_setup_spotify==false))) {
             // close  all show setup windows
             do_show_setup_sound = false;
             do_show_setup_sql = false;
@@ -7795,7 +7795,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           //
-          if ((GLubyte) names[i*4+3]==45) {
+          if (names[i*4+3]==45) {
             fundet = true;
             fprintf(stderr,"45 Button pressed \n");
           }
@@ -7805,7 +7805,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         //
         if ((fundet==false) && (do_show_setup==false)) {
           // test for menu select tv
-          if ((GLubyte) names[i*4+3]==1) {
+          if (names[i*4+3]==1) {
             vis_music_oversigt = false;
             vis_film_oversigt = false;
             vis_tv_oversigt =! vis_tv_oversigt;
@@ -7820,7 +7820,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for menu select music
-          if ((GLubyte) names[i*4+3]==2) {
+          if (names[i*4+3]==2) {
             vis_radio_or_music_oversigt=!vis_radio_or_music_oversigt;
             //vis_radio_oversigt=!vis_radio_oversigt;
             //vis_music_oversigt=!vis_music_oversigt;
@@ -7838,7 +7838,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for menu select film/streams
-          if ((GLubyte) names[i*4+3]==3) {
+          if (names[i*4+3]==3) {
             vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
             // close all other setup windows
             vis_radio_oversigt = false;
@@ -7855,7 +7855,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for menu select recorded
-          if ((GLubyte) names[i*4+3]==4) {
+          if (names[i*4+3]==4) {
             // close all other setup windows
             vis_music_oversigt = false;
             vis_film_oversigt = false;
@@ -7874,7 +7874,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // setup menu i main
         if ((!(vis_radio_oversigt)) && (!(vis_film_oversigt)) && (!(vis_music_oversigt)) && (!(vis_recorded_oversigt)) && (!(vis_spotify_oversigt))&& (!(vis_tidal_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt))) {
           // test for menu select setup
-          if ((GLubyte) names[i*4+3]==5) {
+          if (names[i*4+3]==5) {
             // close all other setup windows
             do_show_setup =! do_show_setup;
             vis_music_oversigt = false;
@@ -7893,7 +7893,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for exit selected                                               // exit program
-          if (((GLubyte) names[i*4+3]==96) && (do_show_torrent==false)) {        // exit program
+          if ((names[i*4+3]==96) && (do_show_torrent==false)) {        // exit program
             // close all other setup windows
             vis_music_oversigt = false;
             vis_film_oversigt = false;
@@ -7918,13 +7918,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
 
         if (vis_radio_or_music_oversigt) {
-          if ((GLubyte) names[i*4+3]==29) {
+          if (names[i*4+3]==29) {
             vis_radio_or_music_oversigt = ! vis_radio_or_music_oversigt;
           }
         }
 
         if (vis_stream_or_movie_oversigt) {
-          if ((GLubyte) names[i*4+3]==29) {
+          if (names[i*4+3]==29) {
             vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
             fundet = true;
           }
@@ -7934,7 +7934,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // start/stop spotify online search view
         #ifdef ENABLE_SPOTIFY
         if (vis_spotify_oversigt) {
-          if ((GLubyte) names[i*4+3]==5) {                                        //
+          if (names[i*4+3]==5) {                                        //
             strcpy(keybuffer,"");                                                 // reset text buffer
             keybufferindex=0;                                                     //
             spotify_selected_startofset=0;
@@ -7957,7 +7957,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // enable tidal search
         #ifdef ENABLE_TIDAL
         if (vis_tidal_oversigt) {
-          if ((GLubyte) names[i*4+3]==5) {
+          if (names[i*4+3]==5) {
             strcpy(keybuffer,"");                                                 // reset text buffer
             keybufferindex=0;                                                     //
             tidal_selected_startofset=0;
@@ -7979,7 +7979,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
         // enable music search
         if (vis_music_oversigt) {
-          if ((GLubyte) names[i*4+3]==5) {
+          if (names[i*4+3]==5) {
             strcpy(keybuffer,"");                                                 // reset text buffer
             keybufferindex=0;                                                     //
             music_selected_startofset=0;
@@ -8006,17 +8006,17 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (vis_stream_oversigt) {
           if (!(fundet)) {
             // we have a select mouse/touch element dirid
-            if ((GLubyte) names[i*4+3]==23) {
+            if (names[i*4+3]==23) {
               if (debugmode & 4) fprintf(stderr,"scroll down\n");
               returnfunc = 1;
               fundet = true;
             }
-            if ((GLubyte) names[i*4+3]==24) {
+            if (names[i*4+3]==24) {
               if (debugmode & 4) fprintf(stderr,"scroll up\n");
               returnfunc = 2;
               fundet = true;
             }
-            if ((GLubyte) names[i*4+3]==27) {
+            if (names[i*4+3]==27) {
               //fprintf(stderr,"Close stream info\n");
               returnfunc = 2;
               do_zoom_stream_cover = false;
@@ -8029,10 +8029,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           } 
         }
         //
-        // film
+        // Movie
         //
         if (vis_film_oversigt) {
-          printf("name =  %d glubyte %d \n",names[i*4+3],(GLubyte) names[i*4+3]);
+          printf("name =  %d glubyte %d \n",names[i*4+3],names[i*4+3]);
           if (!(fundet)) {
             // we have a select mouse/touch element dirid
             // scroll down
@@ -8062,7 +8062,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               film_oversigt.set_search_view(false);
             }
             // edit mode load new cover from file
-            if ((film_oversigt.editmode==2) && ((GLubyte) names[i*4+3]==31)) {
+            if ((film_oversigt.editmode==2) && (names[i*4+3]==31)) {
               printf("Load new cover from file for rec %d \n",do_zoom_film_aktiv_nr);
               std::string cover_filename=film_oversigt.select_file_name("/data2/Movie/");
               cover_filename.erase(std::remove(cover_filename.begin(), cover_filename.end(), '\n'), cover_filename.cend());
@@ -8070,7 +8070,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].gettextureid()!=0) {
                   if (debugmode) fprintf(stderr,"Remove old cover file '%s' \n",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmcoverfile());
                   // delete old cover (not done)
-
+                  
                 }
                 film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].setfilmcoverfile((char *) cover_filename.c_str());
                 film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].settextureidfile((char *) cover_filename.c_str());
@@ -8081,7 +8081,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               //select_movie_type() function
             }
             // edit mode (update movie to db)
-            if ((film_oversigt.editmode==2) && ((GLubyte) names[i*4+3]==32)) {
+            if ((film_oversigt.editmode==2) && (names[i*4+3]==32)) {
               // update edit movie to db
               film_oversigt.update_movierec_in_db_all(do_zoom_film_aktiv_nr);
               film_oversigt.editmode=0;
@@ -8097,19 +8097,19 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           if (!(fundet)) {
             // we have a select mouse/touch element dirid
             // scroll down
-            if ((GLubyte) names[i*4+3]==23) {
+            if (names[i*4+3]==23) {
               if (debugmode & 2) fprintf(stderr,"scroll down\n");
               returnfunc = 1;
               fundet = true;
             }
             // scroll up
-            if ((GLubyte) names[i*4+3]==24) {
+            if (names[i*4+3]==24) {
               if (debugmode & 2) fprintf(stderr,"scroll up\n");
               returnfunc = 2;
               fundet = true;
             }
             // zoom music cover
-            if ((GLubyte) names[i*4+3]==27) {
+            if (names[i*4+3]==27) {
               do_zoom_music_cover =! do_zoom_music_cover;
               ask_open_dir_or_play = false;
               if (do_zoom_music_cover) {
@@ -8120,7 +8120,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
             // stop zoom music cover
-            if ((GLubyte) names[i*4+3]==29) {
+            if (names[i*4+3]==29) {
               vis_music_oversigt =! vis_music_oversigt;
               ask_open_dir_or_play = false;
               fundet = true;
@@ -8131,7 +8131,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           if ((!(fundet)) && (!(ask_open_dir_or_play))) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid          
 
             // we have a select mouse/touch element dirid
-            if ((GLuint) names[i*4+3]>=100) {                                         // i*4+3
+            if (names[i*4+3]>=100) {                                         // i*4+3
               mknapnr=(GLuint) names[i*4+3]-99;				                                // hent music knap nr
               if (debugmode & 2) fprintf(stderr,"music selected=%u  \n",mknapnr);
               fundet = true;
@@ -8147,7 +8147,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           //
           if ((!(fundet)) && (ask_open_dir_or_play) && (!(do_zoom_music_cover))) {
             // play button
-            if ((GLubyte) names[i*4+3]==20) {
+            if (names[i*4+3]==20) {
               ask_open_dir_or_play = false;                                         // flag luk vindue igen
               do_play_music_cover = 1;                                              // der er trykket på play button (play det nu)
               do_zoom_music_cover = false;                                          // ja den skal spilles lav zoom cover info window
@@ -8155,7 +8155,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
             // open music dir or close window
-            if ((GLubyte) names[i*4+3]==21) {
+            if (names[i*4+3]==21) {
               // pressed close
               if (debugmode & 2) fprintf(stderr,"Close window again\n");
               ask_open_dir_or_play = false;				// flag luk vindue igen
@@ -8164,7 +8164,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
             // swap selected
-            if ((GLubyte) names[i*4+3]==22) {
+            if (names[i*4+3]==22) {
               // pressed Swap
               if (debugmode & 2) fprintf(stderr,"Swap button pressed\n");
               for(int x=0;x<dirmusic.numbersinlist();x++) {
@@ -8177,14 +8177,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // hvis show player
           // use as controller
           if ((!(fundet)) && (do_zoom_music_cover)) {
-            if ((GLubyte) names[i*4+3]==5) {
+            if (names[i*4+3]==5) {
               // if touch mouse click on window then close windows again
               do_zoom_music_cover = false;
               ask_open_dir_or_play = false;				// flag luk vindue igen
               fundet = true;
             }
             // last song
-            if ((GLubyte) names[i*4+3]==10) {
+            if (names[i*4+3]==10) {
               if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
                 do_play_music_aktiv_table_nr--;                                   // skift aktiv sang
                 do_shift_song = true;                                             // sæt flag til skift
@@ -8193,7 +8193,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
 
             // next song
-            if ((GLubyte) names[i*4+3]==11) {
+            if (names[i*4+3]==11) {
               if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
                 do_play_music_aktiv_table_nr++;
                 do_shift_song = true;
@@ -8201,13 +8201,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
             // stop song
-            if ((GLubyte) names[i*4+3]==9) {
+            if (names[i*4+3]==9) {
               do_stop_music = 1;                                                  // stop play
               ask_open_dir_or_play = false;				// flag luk vindue igen
               fundet = true;
             }
             // play song
-            if ((GLubyte) names[i*4+3]==8) {
+            if (names[i*4+3]==8) {
               do_stop_music = 0;
               do_shift_song = true;
               if (do_play_music_aktiv_table_nr>=aktiv_playlist.numbers_in_playlist()) {
@@ -8233,7 +8233,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((vis_spotify_oversigt) || ((do_zoom_spotify_cover) && (vis_spotify_oversigt==false))) {
           if (do_show_spotify_search_oversigt==false) {
             if ((!(do_show_setup_spotify))  && (!(fundet))) {
-              if ((GLuint) names[i*4+3]>=100) {
+              if (names[i*4+3]>=100) {
                 spotifyknapnr = (GLuint) names[i*4+3]-99;				                  // hent spotify knap nr
                 spotify_select_iconnr=spotifyknapnr;
                 fundet = true;                                                    //
@@ -8259,7 +8259,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 }
               }
               // play playlist icon select (20) type 0
-              if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
+              if ((names[i*4+3]==20) && (spotify_oversigt.type==0)) {
                 // write to debug log
                 sprintf(debuglogdata,"play spotify playlist.");
                 write_logfile(logfile,(char *) debuglogdata);
@@ -8268,38 +8268,38 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 fundet = true;
               }
               // play song icon select (20) type 1
-              if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
+              if ((names[i*4+3]==20) && (spotify_oversigt.type==1)) {
                 write_logfile(logfile,(char *) "play spotify song.");
                 do_select_device_to_play=true;
                 returnfunc = 5;
                 fundet = true;
               }
               // open
-              if ((GLubyte) names[i*4+3]==21) {
+              if (names[i*4+3]==21) {
                 write_logfile(logfile,(char *) "open spotify playlist");
                 returnfunc = 3;
                 fundet = true;
               }
               // Stop play
-              if ((GLubyte) names[i*4+3]==9) {
+              if (names[i*4+3]==9) {
                 write_logfile(logfile,(char *) "(Spotify) Stop play");
                 returnfunc = 5;                                                       //
                 fundet = true;
               }
               // Next
-              if ((GLubyte) names[i*4+3]==11) {
+              if (names[i*4+3]==11) {
                 write_logfile(logfile,(char *) "(Spotify) Next song");
                 returnfunc = 6;                                                       //
                 fundet = true;
               }
               // last
-              if ((GLubyte) names[i*4+3]==10) {
+              if (names[i*4+3]==10) {
                 write_logfile(logfile,(char *) "(Spotify) last song");
                 returnfunc = 7;                                                       //
                 fundet = true;
               }
               // scroll up
-              if ((GLubyte) names[i*4+3]==23) {
+              if (names[i*4+3]==23) {
                 // write debug log
                 sprintf(debuglogdata,"scroll down spotify_selected_startofset = %d ",spotify_selected_startofset);
                 write_logfile(logfile,(char *) debuglogdata);
@@ -8311,7 +8311,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 }
               }
               // scroll down
-              if ((GLubyte) names[i*4+3]==24) {
+              if (names[i*4+3]==24) {
                 // write debug log
                 sprintf(debuglogdata,"scroll up spotify_selected_startofset = %d",spotify_selected_startofset);
                 write_logfile(logfile,(char *) debuglogdata);
@@ -8321,14 +8321,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 fundet = true;
               }
               // show close spotify info (27 need to move) 27 now is global exit
-              if ((GLubyte) names[i*4+3]==27) {
+              if (names[i*4+3]==27) {
                 // write debug log
                 write_logfile(logfile,(char *) "Show/close spotify info\n");
                 if (ask_open_dir_or_play_spotify==false) do_zoom_spotify_cover =! do_zoom_spotify_cover;
                 if (ask_open_dir_or_play_spotify) ask_open_dir_or_play_spotify=false;
                 fundet = true;
               }
-              if ((GLubyte) names[i*4+3]==29) {
+              if (names[i*4+3]==29) {
                 vis_spotify_oversigt =! vis_spotify_oversigt;
                 ask_open_dir_or_play_spotify=false;
                 fundet = true;
@@ -8422,7 +8422,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             */
             // play playlist icon select (20) type 0
-            if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
+            if ((names[i*4+3]==20) && (spotify_oversigt.type==0)) {
               fprintf(stderr,"play spotify playlist. type 0\n");
               write_logfile(logfile,(char *) "play spotify playlist.");
               do_select_device_to_play=true;
@@ -8430,7 +8430,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
             // play song icon select (20) type 1
-            if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
+            if ((names[i*4+3]==20) && (spotify_oversigt.type==1)) {
               fprintf(stderr,"play spotify song. type 1\n");
               write_logfile(logfile,(char *) "play spotify song.");
               do_select_device_to_play=true;
@@ -8438,7 +8438,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
             // play song icon select (20) type 2
-            if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==2)) {
+            if ((names[i*4+3]==20) && (spotify_oversigt.type==2)) {
               fprintf(stderr,"play spotify artist. type 2\n");
               write_logfile(logfile,(char *) "play spotify artist.");
               do_select_device_to_play=true;
@@ -8446,27 +8446,27 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
             // open 6
-            if ((GLubyte) names[i*4+3]==21) {
+            if (names[i*4+3]==21) {
               fprintf(stderr,"open spotify artist type 2\n");
               returnfunc = 6;
               fundet = true;
             }
             // Stop play
-            if ((GLubyte) names[i*4+3]==9) {
+            if (names[i*4+3]==9) {
               fprintf(stderr,"(Spotify) Stop play\n");
               write_logfile(logfile,(char *) "Stop Spotify play.");
               returnfunc = 5;                                                       //
               fundet = true;
             }
             // next song
-            if ((GLubyte) names[i*4+3]==11) {
+            if (names[i*4+3]==11) {
               fprintf(stderr,"(Spotify) Next song\n");
               write_logfile(logfile,(char *) "Next Spotify song.");
               returnfunc = 7;
               fundet = true;
             }
             // last song
-            if ((GLubyte) names[i*4+3]==12) {
+            if (names[i*4+3]==12) {
               fprintf(stderr,"(Spotify) last song\n");
               write_logfile(logfile,(char *) "Last Spotify song.");
               returnfunc = 7;                                                       //
@@ -8508,7 +8508,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 }
               }
               // play playlist icon select (20) type 0
-              if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==0)) {
+              if ((names[i*4+3]==20) && (tidal_oversigt.type==0)) {
                 // write to debug log
                 sprintf(debuglogdata,"play tidal playlist.");
                 write_logfile(logfile,(char *) debuglogdata);
@@ -8517,39 +8517,39 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 fundet = true;
               }
               // play song icon select (20) type 1
-              if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==1)) {
+              if ((names[i*4+3]==20) && (tidal_oversigt.type==1)) {
                 write_logfile(logfile,(char *) "play tidal song.");
                 do_select_device_to_play=true;
                 returnfunc = 5;
                 fundet = true;
               }
               // open
-              if ((GLubyte) names[i*4+3]==21) {
+              if (names[i*4+3]==21) {
                 write_logfile(logfile,(char *) "(tidal) open playlist");
                 returnfunc = 3;
                 fundet = true;
               }
               // Stop play
-              if ((GLubyte) names[i*4+3]==9) {
+              if (names[i*4+3]==9) {
                 write_logfile(logfile,(char *) "tidal Stop play");
                 do_stop_tidal=true;
                 returnfunc = 5;                                                       //
                 fundet = true;
               }
               // Next
-              if ((GLubyte) names[i*4+3]==11) {                                                // old 11
+              if (names[i*4+3]==11) {                                                // old 11
                 write_logfile(logfile,(char *) "(tidal) Next song");
                 returnfunc = 106;                                                       //
                 fundet = true;
               }
               // last
-              if ((GLubyte) names[i*4+3]==10) {                                                // old 10
+              if (names[i*4+3]==10) {                                                // old 10
                 write_logfile(logfile,(char *) "(tidal) last song");
                 returnfunc = 107;                                                       //
                 fundet = true;
               }
               // scroll up
-              if ((GLubyte) names[i*4+3]==23) {
+              if (names[i*4+3]==23) {
                 // write debug log
                 sprintf(debuglogdata,"scroll down tidal_selected_startofset = %d ",tidal_selected_startofset);
                 write_logfile(logfile,(char *) debuglogdata);
@@ -8561,7 +8561,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 }
               }
               // scroll down
-              if ((GLubyte) names[i*4+3]==24) {
+              if (names[i*4+3]==24) {
                 // write debug log
                 sprintf(debuglogdata,"scroll up tidal_selected_startofset = %d",tidal_selected_startofset);
                 write_logfile(logfile,(char *) debuglogdata);
@@ -8571,7 +8571,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 fundet = true;
               }
               // show close tidal info 27 now is global exit
-              if ((GLubyte) names[i*4+3]==27) {
+              if (names[i*4+3]==27) {
                 // write debug log
                 write_logfile(logfile,(char *) "Show/close tidal info");
                 if (ask_open_dir_or_play_tidal==false) {
@@ -8694,56 +8694,56 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         #ifdef ENABLE_SPOTIFY
         if ((do_show_setup_spotify)  && (!(fundet))) {
           // select default play device
-          if ((GLubyte) names[i*4+3]==10) {
+          if (names[i*4+3]==10) {
             fprintf(stderr,"selected first device\n");
             spotify_oversigt.set_default_device_to_play(0);
             write_logfile(logfile,(char *) "selected 1 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==11) {
+          if (names[i*4+3]==11) {
             fprintf(stderr,"selected 2 device\n");
             spotify_oversigt.set_default_device_to_play(1);
             write_logfile(logfile,(char *) "selected 2 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==12) {
+          if (names[i*4+3]==12) {
             fprintf(stderr,"selected 3 device\n");
             spotify_oversigt.set_default_device_to_play(2);
             write_logfile(logfile,(char *) "selected 3 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==13) {
+          if (names[i*4+3]==13) {
             fprintf(stderr,"selected 4 device\n");
             spotify_oversigt.set_default_device_to_play(3);
             write_logfile(logfile,(char *) "selected 4 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==14) {
+          if (names[i*4+3]==14) {
             fprintf(stderr,"selected 5 device\n");
             spotify_oversigt.set_default_device_to_play(4);
             write_logfile(logfile,(char *) "selected 5 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==15) {
+          if (names[i*4+3]==15) {
             fprintf(stderr,"selected 6 device\n");
             spotify_oversigt.set_default_device_to_play(5);
             write_logfile(logfile,(char *) "selected 6 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==16) {
+          if (names[i*4+3]==16) {
             fprintf(stderr,"selected 7 device\n");
             spotify_oversigt.set_default_device_to_play(6);
             write_logfile(logfile,(char *) "selected 7 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==17) {
+          if (names[i*4+3]==17) {
             fprintf(stderr,"selected 8 device\n");
             spotify_oversigt.set_default_device_to_play(7);
             write_logfile(logfile,(char *) "selected 8 device.");
@@ -8755,56 +8755,56 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         #ifdef ENABLE_TIDAL
         if ((do_show_setup_tidal)  && (!(fundet))) {
           // select default play device
-          if ((GLubyte) names[i*4+3]==10) {
+          if (names[i*4+3]==10) {
             fprintf(stderr,"selected first device\n");
             // spotify_oversigt.set_default_device_to_play(0);
             write_logfile(logfile,(char *) "selected 1 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==11) {
+          if (names[i*4+3]==11) {
             fprintf(stderr,"selected 2 device\n");
             // spotify_oversigt.set_default_device_to_play(1);
             write_logfile(logfile,(char *) "selected 2 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==12) {
+          if (names[i*4+3]==12) {
             fprintf(stderr,"selected 3 device\n");
             // spotify_oversigt.set_default_device_to_play(2);
             write_logfile(logfile,(char *) "selected 3 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==13) {
+          if (names[i*4+3]==13) {
             fprintf(stderr,"selected 4 device\n");
             // spotify_oversigt.set_default_device_to_play(3);
             write_logfile(logfile,(char *) "selected 4 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==14) {
+          if (names[i*4+3]==14) {
             fprintf(stderr,"selected 5 device\n");
             // spotify_oversigt.set_default_device_to_play(4);
             write_logfile(logfile,(char *) "selected 5 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==15) {
+          if (names[i*4+3]==15) {
             fprintf(stderr,"selected 6 device\n");
             // spotify_oversigt.set_default_device_to_play(5);
             write_logfile(logfile,(char *) "selected 6 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==16) {
+          if (names[i*4+3]==16) {
             fprintf(stderr,"selected 7 device\n");
             // spotify_oversigt.set_default_device_to_play(6);
             write_logfile(logfile,(char *) "selected 7 device.");
             returnfunc = 0;
             fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==17) {
+          if (names[i*4+3]==17) {
             fprintf(stderr,"selected 8 device\n");
             // spotify_oversigt.set_default_device_to_play(7);
             write_logfile(logfile,(char *) "selected 8 device.");
@@ -8816,7 +8816,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // select what to play music/tidal/spotify or radio from icon nr
         if ((vis_radio_or_music_oversigt) && (!(fundet))) {
           // Radio
-          if ((GLubyte) names[i*4+3]==80) {
+          if (names[i*4+3]==80) {
             fundet = true;
             vis_radio_oversigt = true;
             vis_music_oversigt = false;
@@ -8825,7 +8825,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             printf("Enable radio view\n ");
           }
           // Music
-          if ((GLubyte) names[i*4+3]==81) {
+          if (names[i*4+3]==81) {
             fundet = true;
             vis_music_oversigt = true;
             vis_radio_oversigt = false;
@@ -8835,7 +8835,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           } 
           // spotify
           #if defined(ENABLE_SPOTIFY)
-          if ((GLubyte) names[i*4+3]==82) {
+          if (names[i*4+3]==82) {
             fundet = true;
             vis_music_oversigt = false;
             vis_radio_oversigt = false;
@@ -8846,7 +8846,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           #endif
           #if defined(ENABLE_TIDAL)
           // tidal
-          if ((GLubyte) names[i*4+3]==83) {
+          if (names[i*4+3]==83) {
             fundet = true;
             vis_music_oversigt = false;
             vis_radio_oversigt = false;
@@ -8862,19 +8862,19 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         #if defined(ENABLE_TIDAL)
         // kun til mus/touch skærm (tidal oversigt)
         if ((vis_tidal_oversigt)  && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==23) {
+          if (names[i*4+3]==23) {
             if (debugmode & 8) fprintf(stderr,"scroll down\n");
             returnfunc = 1;
             fundet = true;
           }
           // scroll up
-          if ((GLubyte) names[i*4+3]==24) {
+          if (names[i*4+3]==24) {
             if (debugmode & 8) fprintf(stderr,"scroll up\n");
             returnfunc = 2;
             fundet = true;
           }
           // show close tidal
-          if ((GLubyte) names[i*4+3]==27) {
+          if (names[i*4+3]==27) {
             if (debugmode & 8) fprintf(stderr,"Show/close tidal info\n");
             do_zoom_tidal =! do_zoom_tidal;
             fundet = true;
@@ -8885,19 +8885,19 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // luk show play radio
         // scroll down
         if ((vis_radio_oversigt)  && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==23) {
+          if (names[i*4+3]==23) {
             if (debugmode & 8) fprintf(stderr,"scroll down\n");
             returnfunc = 1;
             fundet = true;
           }
           // scroll up
-          if ((GLubyte) names[i*4+3]==24) {
+          if (names[i*4+3]==24) {
             if (debugmode & 8) fprintf(stderr,"scroll up\n");
             returnfunc = 2;
             fundet = true;
           }
           // show close radio info (27 need to move) 27 now is global exit
-          if ((GLubyte) names[i*4+3]==27) {
+          if (names[i*4+3]==27) {
             if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
             do_zoom_radio =! do_zoom_radio;
             fundet = true;
@@ -8907,7 +8907,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // Bruges vist kun til mus/touch skærm (radio stationer)
           if (!(fundet)) {		// hvis ingen valgt
             // we have a select mouse/touch element dirid
-            if ((GLuint) names[i*4+3]>=100) {
+            if (names[i*4+3]>=100) {
               rknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
               // write debug log
               sprintf(debuglogdata,"radio station selected=%d glID=%u ",rknapnr,names[i*4+3]-99);
@@ -8921,7 +8921,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // stop radio player if vis_radio_oversigt
           if (!(fundet)) {
             // tryk stop radio
-            if ((GLubyte) names[i*4+3]==9) {
+            if (names[i*4+3]==9) {
               // write debug log
               write_logfile(logfile,(char *) "stop radio");
               do_stop_radio = 1;
@@ -8931,7 +8931,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
           if (!(fundet)) {
-            if ((GLubyte) names[i*4+3]==29) {
+            if (names[i*4+3]==29) {
               vis_radio_oversigt =! vis_radio_oversigt;
               fundet = true;
             }
@@ -8940,13 +8940,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // vælg skal der spilles film eller stream
         if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
           // stream
-          if ((GLubyte) names[i*4+3]==80) {
+          if (names[i*4+3]==80) {
             fundet = true;
             vis_stream_oversigt=true;
             vis_stream_or_movie_oversigt=false;
           }
           // stream
-          if ((GLubyte) names[i*4+3]==81) {
+          if (names[i*4+3]==81) {
             fundet = true;
             vis_film_oversigt = true;
             vis_stream_or_movie_oversigt = false;
@@ -8954,7 +8954,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         //
         if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==3) {
+          if (names[i*4+3]==3) {
             fundet = true;
             vis_stream_oversigt = false;
             vis_stream_or_movie_oversigt = false;
@@ -8962,7 +8962,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // stream oversigt
         if ((vis_stream_oversigt) && (!(fundet))) {
-          if ((GLuint) names[i*4+3]>=100) {
+          if (names[i*4+3]>=100) {
             sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
             // write debug log
             sprintf(debuglogdata,"stream selected=%u",sknapnr);
@@ -8970,13 +8970,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // close open stream or movie
-          if ((GLubyte) names[i*4+3]==3) {
+          if (names[i*4+3]==3) {
             fundet = true;
             vis_stream_or_movie_oversigt = false;
             vis_stream_oversigt = false;
           }
           // play button pressed
-          if (((GLubyte) names[i*4+3]==8) && (do_zoom_stream_cover) && (fundet==false)) {
+          if ((names[i*4+3]==8) && (do_zoom_stream_cover) && (fundet==false)) {
             // start play
             //do_zoom_stream_cover=!do_zoom_stream_cover;
             fundet = true;
@@ -8986,7 +8986,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
           // stop button
-          if (((GLubyte) names[i*4+3]==9) && (do_zoom_stream_cover) && (fundet==false)) {
+          if ((names[i*4+3]==9) && (do_zoom_stream_cover) && (fundet==false)) {
             fundet = true;
             if (streamoversigt.stream_is_playing) {
               do_zoom_stream_cover = false;
@@ -8999,20 +8999,20 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // pause play button pressed
           // pause play
-          if (((GLubyte) names[i*4+3]==12) && (do_zoom_stream_cover) && (fundet==false)) {
+          if ((names[i*4+3]==12) && (do_zoom_stream_cover) && (fundet==false)) {
             fundet = true;
             if (do_pause_stream) do_pause_stream=false; else do_pause_stream=true;
             // write debug log
             write_logfile(logfile,(char *) "Set/reset player pause.");
           }
           // jump forward button stream 
-          if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover) && (fundet==false)) {
+          if ((names[i*4+3]==11) && (do_zoom_stream_cover) && (fundet==false)) {
             fundet = true;
             stream_jump=true;
             if (streamoversigt.stream_is_playing) streamoversigt.jump_position(10.0f);
           }
           // jump backward button stream
-          if (((GLubyte) names[i*4+3]==10) && (do_zoom_stream_cover) && (fundet==false)) {
+          if ((names[i*4+3]==10) && (do_zoom_stream_cover) && (fundet==false)) {
             fundet = true;
             stream_jump = true;
             if (streamoversigt.stream_is_playing) streamoversigt.jump_position(-10.0f);
@@ -9020,14 +9020,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // film oversigt
         if ((vis_film_oversigt) && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==25) {
+          if (names[i*4+3]==25) {
             // write debug log
             write_logfile(logfile,(char *) "Start movie player.");
             fundet = true;
             startmovie = true;
           }
           // stop play movie
-          if ((GLubyte) names[i*4+3]==26) {
+          if (names[i*4+3]==26) {
             // write debug log
             write_logfile(logfile,(char *) "Stop movie.");
             fundet = true;
@@ -9036,7 +9036,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // we have a select mouse/touch
           if ((film_oversigt.editmode==0) &&  (!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-            fknapnr=(GLuint) names[i*4+3]-119;			                                // get movie id
+            fknapnr=names[i*4+3]-119;			                                // get movie id
             film_key_selected=fknapnr;
             // fprintf(stderr,"Film selected=%d names[i*4+3] = %d \n",fknapnr,names[i*4+3]);                                 //
             // write debug log
@@ -9047,20 +9047,20 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // vis ny film oversigt
         if ((vis_nyefilm_oversigt) && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==25) {
+          if (names[i*4+3]==25) {
             // write debug log
             write_logfile(logfile,(char *) "Start movie player.");
             fundet = true;
             startmovie = true;
           }
-          if ((GLubyte) names[i*4+3]==26) {
+          if (names[i*4+3]==26) {
             // write debug log
             write_logfile(logfile,(char *) "Stop movie player.");
             fundet = true;
             stopmovie = true;
           }
-          if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-            fknapnr=(GLuint) names[i*4+3]-119;                       // hent filmknap nr
+          if ((!(fundet)) && (names[i*4+3]>=100)) {
+            fknapnr=names[i*4+3]-119;                       // hent filmknap nr
             // fprintf(stderr,"Film new selected=%d names[i*4+3] = %d \n",fknapnr,names[i*4+3]);
             fundet = true;
           }
@@ -9069,20 +9069,20 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (vis_tv_oversigt) {
           if ((do_show_tvgraber==false) && (!(fundet))) {
             // close view
-            if ((GLubyte) names[i*4+3]==27) {
+            if (names[i*4+3]==27) {
               // write debug log
               write_logfile(logfile,(char *) "Close tv overview.");
               vis_tv_oversigt = false;
               fundet = true;
             }
             // show recorded programs
-            if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
+            if ((names[i*4+3]==28) && (!(fundet))) {
               write_logfile(logfile,(char *) "Close recorded overview.");
               vis_tv_oversigt = false;
               fundet = true;
             }
             // close record
-            if (((GLubyte) names[i*4+3]==29) && (!(fundet))) {
+            if ((names[i*4+3]==29) && (!(fundet))) {
               if (debugmode & 64) fprintf(stderr,"close start record tv program.\n");
               ask_tv_record = true;
               do_zoom_tvprg_aktiv_nr = 0;
@@ -9094,27 +9094,27 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             //
             if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
               // er der trykket på et tv program
-              if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
-                tvknapnr=(GLuint) names[i*4+3]-100;        					                // hent tv knap nr
+              if ((!(fundet)) && (names[i*4+3]>=100) && (names[i*4+3]<=1000)) {
+                tvknapnr=names[i*4+3]-100;        					                // hent tv knap nr
                 if (debugmode & 256) fprintf(stderr,"tvknapnr %d.\n",tvknapnr);
                 fundet = true;
               }
             }
             // show old recordings
-            if ((!(fundet)) && (!(vis_tvrec_list)) && ((GLubyte) names[i*4+3]==44)) {
+            if ((!(fundet)) && (!(vis_tvrec_list)) && (names[i*4+3]==44)) {
               fprintf(stderr,"Show old recordings \n");
               vis_old_recorded =! vis_old_recorded;							// SKAL fixes
               fundet = true;
             }
             // show new recordings
-            if ((!(fundet)) && (!(vis_old_recorded)) && ((GLubyte) names[i*4+3]==45)) {
+            if ((!(fundet)) && (!(vis_old_recorded)) && (names[i*4+3]==45)) {
               fprintf(stderr,"Show new recordings \n");
               vis_tvrec_list =! vis_tvrec_list;
               fundet = true;
             }
             // er vi igang med at spørge om vi skal optage programmet
             if (ask_tv_record) {
-              if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
+              if ((names[i*4+3]==40) && (!(fundet))) {
                 // write debug log
                 write_logfile(logfile,(char *) "Close ask do we record tv program window again.");
                 ask_tv_record = false;
@@ -9122,7 +9122,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 returnfunc = 3;
                 do_zoom_tvprg_aktiv_nr = 0;
               }
-              if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
+              if ((names[i*4+3]==41) && (!(fundet))) {
                 // write debug log
                 write_logfile(logfile,(char *) "Set program to record.");
                 ask_tv_record = false;
@@ -9137,7 +9137,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               }
             }
           } else if ((show_setup_tv_graber) && (!(fundet))) {
-            if ((GLubyte) names[i*4+3]==40) {
+            if (names[i*4+3]==40) {
               write_logfile(logfile,(char *) "Close tv graber config overview.");
               do_show_tvgraber = false;
 
@@ -9163,28 +9163,28 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
         if (do_show_torrent) {
-          if ((!(fundet)) && ((GLubyte) names[i*4+3]==40)) {
+          if ((!(fundet)) && (names[i*4+3]==40)) {
             do_show_torrent =! do_show_torrent;
             fundet = true;
           }
-          if ((!(fundet)) && ((GLubyte) names[i*4+3]==41)) {
+          if ((!(fundet)) && (names[i*4+3]==41)) {
             do_show_load__torrent_file =! do_show_load__torrent_file;
             fundet = true;
           }
         }
         // exist tidal startup entry
         if (tidal_oversigt.do_setup_tidal_start_entry) {
-          if ((!(fundet)) && ((GLubyte) names[i*4+3]==40)) {
+          if ((!(fundet)) && (names[i*4+3]==40)) {
             tidal_oversigt.do_setup_tidal_start_entry =! tidal_oversigt.do_setup_tidal_start_entry;
             if (tidal_oversigt.do_setup_tidal_start_entry == false) {
               // save
-              tidal_oversigt.save_tidal_artistlist("tidal_start_artistlists.txt");
+              tidal_oversigt.save_tidal_artistlist((char *) "tidal_start_artistlists.txt");
               tidal_oversigt.tidal_start_playlist_array;
             }
             fundet = true;
           }
           // set update flag to update tidal view from changes.
-          if ((!(fundet)) && ((GLubyte) names[i*4+3]==42)) {
+          if ((!(fundet)) && (names[i*4+3]==42)) {
             tidal_oversigt.do_update_tidal_start_entry = true;
             if ((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) {
               vis_tidal_oversigt = false;
@@ -9196,7 +9196,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (!(ask_tv_record)) {
           // show old recorded and close
           if ((!(fundet)) && (vis_old_recorded)) {
-            if ((GLubyte) names[i*4+3]==40) {
+            if (names[i*4+3]==40) {
               vis_old_recorded =! vis_old_recorded;
               fundet = 1;
               returnfunc = 3;
@@ -9204,7 +9204,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // show active tv rec list and close
           if ((!(fundet)) && (vis_tvrec_list)) {
-            if ((GLubyte) names[i*4+3]==40) {
+            if (names[i*4+3]==40) {
               vis_tvrec_list =! vis_tvrec_list;
               fundet = 1;
             }
@@ -9574,6 +9574,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 do_zoom_film_cover = true;
                 do_zoom_film_aktiv_nr = fknapnr;
                 do_swing_movie_cover = 1;
+                do_zoom_tidal_cover=false;
+                do_zoom_music_cover=false;
+                do_zoom_radio=false;
               }
               // ved vis tv oversigt
               if ((vis_tv_oversigt) && (retfunc==0)) {
@@ -9606,8 +9609,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             break;
         case GLUT_RIGHT_BUTTON:
             // close ask film again
-            if ((vis_film_oversigt) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {
-              if (do_zoom_film_cover) do_zoom_film_cover=false; else if (!(do_zoom_film_cover)) do_zoom_film_cover=true;
+            if ((vis_film_oversigt) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {              
+              do_zoom_film_cover=!do_zoom_film_cover;
+              do_zoom_tidal_cover=false;
+              do_zoom_music_cover=false;
+              do_zoom_radio=false;
             }
             // close ask tv again
             if ((vis_tv_oversigt) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {
@@ -9623,7 +9629,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if ((vis_nyefilm_oversigt) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {
               vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
             }
-            if ((state==GLUT_UP) && ((film_oversigt.editmode==0))) {
+            if ((vis_film_oversigt==false) && (state==GLUT_UP) && (film_oversigt.editmode==0)) {
               fprintf(stderr,"Right mouse button pressed\n");
               if (tidal_oversigt.get_tidal_playing_flag()) {
                 if (ask_open_dir_or_play_tidal) {
@@ -9643,15 +9649,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 ask_open_dir_or_play=false;				// flag luk vindue igen
                 if (do_zoom_music_cover) do_zoom_music_cover=false;
               }
-              if (radiooversigt.playing) {
-                do_zoom_radio=!do_zoom_radio;
-              }
-              if (spotify_oversigt.do_we_play()) {
-                do_zoom_spotify_cover=!do_zoom_spotify_cover;              
-              }
             }
-            
-
+            if ((vis_film_oversigt==false) && (radiooversigt.playing) && (state==GLUT_UP)) {
+              do_zoom_radio=!do_zoom_radio;
+            }
+            if ((vis_film_oversigt==false) && (spotify_oversigt.do_we_play()) && (state==GLUT_UP)) {
+              do_zoom_spotify_cover=!do_zoom_spotify_cover;              
+            }
             /*
             if (vis_music_oversigt) {
               if ((ask_open_dir_or_play) && (state==GLUT_UP)) {
