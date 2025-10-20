@@ -7203,7 +7203,9 @@ void display() {
 
   bool show_status=true;
   // show status line
-  strcpy(textstring,"");  
+  char showtextstring[4096];
+  strcpy(showtextstring,"");
+  strcpy(textstring,"");
   if (strcmp(music_db_update_loader,"")>0) strcat(textstring,"MUSIC,");
   if (do_update_moviedb) strcat(textstring,"MOVIE,");      
   if (spotify_oversigt.get_spotify_update_flag()) strcat(textstring,"SPOTIFY,");
@@ -7211,15 +7213,20 @@ void display() {
   if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
   if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
   if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
-  
   if (tidal_oversigt.show_update_process_string.size()>0) strcat(textstring,"Tidal playlist");
-  
   if (strcmp(textstring,"")==0) {
-    strcat(textstring,"STATUS: None."); 
+    strcpy(showtextstring,"Version: ");  
+    strcat(showtextstring,SHOWVER);
+    strcat(showtextstring," - STATUS: None");
     show_status=false;
-  } else strcat(textstring," running updates ..");
-  drawText(textstring, 1, 1, 0.4f,1);
- 
+  } else {
+    strcpy(showtextstring,"Version: ");  
+    strcat(showtextstring,SHOWVER);
+    strcat(showtextstring," - STATUS: ");
+    strcat(showtextstring," running updates ..");
+    strcat(showtextstring,textstring);
+  }
+  drawText(showtextstring, 1, 1, 0.4f,1); 
   // show pfs
   // debug mode 1
   if ((showfps) && (debugmode & 1) && (show_status=false)) {  
