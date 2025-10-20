@@ -44,6 +44,7 @@ extern const char *dbname;
 extern char configmysqluser[256];                              // /mythtv/mysql access info
 extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
+extern char configdefaultplayer[];                           // default movie player
 extern int configmythtvver;
 extern int configxbmcver;
 extern int screen_size;
@@ -323,22 +324,21 @@ void film_oversigt_typem::resetallefilm() {
 // ****************************************************************************************
 
 void film_oversigt_typem::stopmovie() {
+  std::string systemplayer;
   if ((vlc_in_playing()) && (film_is_playing)) vlc_controller::stopmedia();
+  if (film_is_playing) {
+    //write to debug log
+    if (strcmp("internal",configdefaultplayer)!=0) {
+      systemplayer=configdefaultplayer;
+      if (systemplayer=="/usr/bin/mpv") system("killall -9 mpv");
+      else if (systemplayer=="/snap/bin/vlc") system("killall -9 vlc");
+      else if (systemplayer=="/usr/bin/mplayer") system("killall -9 mplayer");
+    }
+    write_logfile(logfile,(char *) "Stop playing movie.");
+  }
   film_is_playing=false;
 }
 
-
-// ****************************************************************************************
-//
-// vlc stop player
-//
-// ****************************************************************************************
-
-
-void film_oversigt_typem::softstopmovie() {
-  if ((vlc_in_playing()) && (film_is_playing)) vlc_controller::stopmedia();
-  film_is_playing=false;
-}
 
 
 
@@ -350,12 +350,16 @@ void film_oversigt_typem::softstopmovie() {
 // ****************************************************************************************
 
 int film_oversigt_typem::playmovie(int nr) {
+  int err=0;
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   std::string updatedbplayed;
+  std::string systemcmd;
+  std::string useconfigdefaultplayer;
   char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
+  useconfigdefaultplayer=configdefaultplayer;
   if (conn) {
     if (!(mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, database, 0, NULL, 0))) {
       fprintf(stderr, "MySQL connection failed: %s\n", mysql_error(conn));
@@ -371,8 +375,28 @@ int film_oversigt_typem::playmovie(int nr) {
     res = mysql_store_result(conn);
     mysql_close(conn);
   }
+  sprintf(debuglogdata,"Start play use player %s",configdefaultplayer);
+  write_logfile(logfile,(char *) debuglogdata);  
+  if (film_is_playing) {
+    write_logfile(logfile,(char *) "Stop playing last movie before start new");
+    // stop playing (active movie) before start new
+    if (vlc_in_playing()) vlc_controller::stopmedia();
+  }
   film_is_playing=true;                                       // set play flag
-  vlc_controller::playmedia(this->filmoversigt[nr].getfilmfilename());
+  if (strncmp(configdefaultplayer,"Internal",8)==0) {
+    vlc_controller::playmedia(this->filmoversigt[nr].getfilmfilename());
+  } else {
+    if (useconfigdefaultplayer=="/usr/bin/mpv") useconfigdefaultplayer=useconfigdefaultplayer + " --fs";
+    else if (useconfigdefaultplayer=="/snap/bin/vlc") useconfigdefaultplayer=useconfigdefaultplayer + " --fullscreen";
+    else if (useconfigdefaultplayer=="/usr/bin/mplayer") useconfigdefaultplayer=useconfigdefaultplayer + " -fs";
+    systemcmd = fmt::format("{} '{}' &",useconfigdefaultplayer,this->filmoversigt[nr].getfilmfilename());
+    err=system(systemcmd.c_str());
+  }
+  if ((err==-1) || (err==127)) {
+    sprintf(debuglogdata,"Error start default player cmd: %s ",systemcmd.c_str());
+    write_logfile(logfile,(char *) debuglogdata);
+    return(0);
+  }
   return(1);
 }
 

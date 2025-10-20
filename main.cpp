@@ -1327,8 +1327,9 @@ int parse_config(char *filename) {
             }
             // set videt player program name (if default use vlc)
             else if (command_nr==setvideoplayer) {
-              if (strcmp(value,"")==0) strcpy(value,"default");                               // set default player (internal vlc)
+              if (strcmp(value,"")==0) strcpy(value,"internal");                               // set default player (internal vlc)
               strcpy(configvideoplayer,value);
+              strcpy(configdefaultplayer,value);
             }
             // sound port
             else if (command_nr==setsoundoutport) {
@@ -1496,7 +1497,7 @@ int save_config(char * filename) {
       fputs(temp,file);
       snprintf(temp,sizeof(temp),"debug=%d\n",debugmode);
       fputs(temp,file);
-      snprintf(temp,sizeof(temp),"videoplayer=default\n");
+      snprintf(temp,sizeof(temp),"videoplayer=%s\n",configdefaultplayer);
       fputs(temp,file);
       snprintf(temp,sizeof(temp),"configdefaultmusicpath=%s\n",configdefaultmusicpath);
       fputs(temp,file);
@@ -1590,7 +1591,7 @@ void load_config(char * filename) {
       strcpy(configstoragerecord[i].path,"");
       strcpy(configstoragerecord[i].name,"");
     }
-    strcpy(configdefaultplayer,"mplayer");	                 	// default sound player (fmod) (default) movie player
+    strcpy(configdefaultplayer,"internal");	                 	// default sound player (fmod) (default) movie player
     strcpy(configclosemythtvfrontend,"no");		                // close mythtv frontend
     strcpy(configscreensavertimeout,"30");	                 	// default screensaver timeout
     strcpy(configsoundoutport,"SPDIF");			                  // default sound interface
@@ -6714,7 +6715,10 @@ void display() {
     Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
     sdlmusicplayer=NULL;
     #endif
-    if (strcmp("default",configdefaultplayer)!=0)  {
+    film_oversigt.playmovie(fknapnr-1);               // start movie
+    
+    /*
+    if (strcmp("Internal",configdefaultplayer)!=0)  {
       // write debug log
       sprintf(debuglogdata,"Start movie nr %d Player is vlc path :%s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
       write_logfile(logfile,(char *) debuglogdata);
@@ -6758,22 +6762,15 @@ void display() {
         write_logfile(logfile,(char *) debuglogdata);
       }
     }
+    */
     startmovie = false;                   // start kun 1 instans
   }
   if (stopmovie) {
-    // write debug log
-    write_logfile(logfile,(char *) "Stop movie");
-    //sleep(10); // play
-    if (strcmp("default",configdefaultplayer)!=0) {
-      // close non default player
-      system("killall -9 startmovie.sh");
-    } else {
-      // close default player (vlc plugin)
-      film_oversigt.stopmovie();
-    }
-    //stop do it again next loop
-    stopmovie = false;
+    // stop movie playing
+    film_oversigt.stopmovie();
+    stopmovie = false;    
   }
+  
   // start play stream
   // still use the old system call bach file
   if (startstream) {
@@ -6784,7 +6781,7 @@ void display() {
       strcpy(stream_playing_desc,streamoversigt.get_stream_desc(stream_playnr-1));
       stream_playing_icon=streamoversigt.get_texture(stream_playnr-1);
     }
-    if (strcmp("default",configdefaultplayer)!=0)  {
+    if (strcmp("internal",configdefaultplayer)!=0)  {
       fprintf(stderr,"Start stream nr %d Player is firefox \n",sknapnr);
       strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
       strcat(systemcommand,"'");
@@ -6877,7 +6874,7 @@ void display() {
     sprintf(debuglogdata,"Start playing recorded program");
     write_logfile(logfile,(char *) debuglogdata);
 
-    if (strcmp("default",configdefaultplayer)!=0) {
+    if (strcmp("internal",configdefaultplayer)!=0) {
       strcpy(systemcommand,"./startrecorded.sh ");
       recordoversigt.get_recorded_filepath(temptxt,valgtrecordnr,subvalgtrecordnr);               // hent filepath
       //strcat(systemcommand,configrecordpath);
@@ -11660,6 +11657,31 @@ void handlespeckeypress(int key,int x,int y) {
 }
 
 
+// ****************************************************************************************
+//
+// Movie play device selector (used in handlekeypress).
+//
+// ****************************************************************************************
+
+
+std::string select_play_device() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg en værdi\" --radiolist --column=\"Vælg\" --column=\"Type\" TRUE \"Internal\" FALSE \"/usr/bin/mplayer\" FALSE \"/snap/bin/vlc\" FALSE \"/usr/bin/mpv\" FALSE \"/snap/bin/smplayer\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
 
 // ****************************************************************************************
 //
@@ -13137,7 +13159,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
                 if (vis_film_oversigt) {
                   if (film_oversigt.editmode==2) {
-                   std::string filmtype=film_oversigt.select_movie_type(); 
+                    std::string filmtype=film_oversigt.select_movie_type(); 
                     if (filmtype.length()>0) {
                       if (debugmode & 2) fprintf(stderr,"Set movie type to %s\n",filmtype.c_str());
                       filmtype.erase(std::remove(filmtype.begin(), filmtype.end(), '\n'), filmtype.cend());
@@ -13423,7 +13445,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                 }
                 if (do_show_setup) {
-                // ved (return) set wlan network and close show wlan select window
+                  // ved (return) set wlan network and close show wlan select window
                   if (show_wlan_select) {
                     show_wlan_select=false;
                     // set default wlan network to selected
@@ -13439,6 +13461,17 @@ void handleKeypress(unsigned char key, int x, int y) {
                   if (do_show_setup_network) {
                     if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     fprintf(stderr,"next line %d \n",do_show_setup_select_linie);
+                  }
+                  if (do_show_videoplayer) {
+                    std::string pdevice=select_play_device();
+                    if (pdevice.length()>0) {
+                      fprintf(stderr,"Set play device to %s\n",pdevice.c_str());
+                      pdevice.erase(std::remove(pdevice.begin(), pdevice.end(), '\n'), pdevice.cend());
+                      strcpy(configvideoplayer,pdevice.c_str());
+                      strcpy(configdefaultplayer,pdevice.c_str());
+                      sprintf(debuglogdata,"Set video output to %s ",configvideoplayer);
+                      write_logfile(logfile,(char *) debuglogdata);
+                    }
                   }
                 }
               }

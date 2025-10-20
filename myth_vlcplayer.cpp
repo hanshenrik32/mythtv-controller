@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include "myth_vlcplayer.h"
 
+
 // vlc player class stuf
 // constructor
 
@@ -80,9 +81,6 @@ int vlc_controller::playmedia(char *path) {
       //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
       if (!(vlc_mp)) error=1;
       libvlc_media_release(vlc_m);
-
-      
-
       #if 0
           /* This is a non working code that show how to hooks into a window,
             * if we have a window around */
@@ -92,6 +90,10 @@ int vlc_controller::playmedia(char *path) {
           /* or on mac os */
             libvlc_media_player_set_nsobject (mp, view);
       #endif
+
+      // unsigned long xid = GDK_WINDOW_XID(gtk_widget_get_window(b_window));
+      // libvlc_media_player_set_xwindow(vlc_mp, xid);
+
       // start play
       libvlc_media_player_play(vlc_mp);
       // set playing flag in class
