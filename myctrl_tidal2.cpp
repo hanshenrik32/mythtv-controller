@@ -1354,7 +1354,7 @@ int tidal_class::get_artist_from_file(char *filename, bool update_start_playlist
   show_update_process_string="";
   show_update_process_artist="";
   do_setup_tidal_start_entry=false;
-  opdatere_tidal_oversigt("");
+  opdatere_tidal_oversigt((char *) "");
   if (readok) return(1); else return(0);
 }
 
@@ -2124,7 +2124,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
         }
       }
     } else {
-      write_logfile(logfile,"Tidal return http code 404/401.");
+      write_logfile(logfile,(char *) "Tidal return http code 404/401.");
     }
   }
   // sample
@@ -4142,7 +4142,7 @@ int tidal_class::load_tidal_iconoversigt() {
           }
         } else {
           // else load normal from disk
-          if ((stack[nr].textureId==NULL) && (stack[nr].feed_gfx_url)) {
+          if ((!(stack[nr].textureId)) && (stack[nr].feed_gfx_url)) {
             if (strlen( stack[nr].feed_gfx_url)>0) stack[nr].textureId=loadTexture (stack[nr].feed_gfx_url);          // load texture
           }
         }

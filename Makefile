@@ -64,7 +64,7 @@ SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl -lfreetype -ljsoncpp -lfmt
+	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl -lfreetype -ljsoncpp -lfmt 
 endif
 
 all:
