@@ -638,7 +638,7 @@ std::string film_oversigt_typem::select_file_name(std::string startpath) {
   strcpy(filenamepath,"");
   std::string filenamepath1;
   std::string filename="";
-  std::string popenstring="/usr/bin/zenity --file-selection --file-filter=*.* --filename='";
+  std::string popenstring="/usr/bin/zenity --file-selection --file-filter=*.*  --filename='";
   popenstring=popenstring + startpath + "' --modal --title=\"Select cover file.\" 2> /dev/null"; 
   FILE *f = popen(popenstring.c_str(), "r");
   fgets(filenamepath, 1024, f);
@@ -957,8 +957,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
   struct stat statbuffer;
   char *ext;
   char movietitle[200];
+  std::string statfilename;
   char filename[256];
-  char statfilename[2000];
   bool nostat=false;
   bool fundet;
   bool film_ok;
@@ -1007,7 +1007,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       }
       if ((conn) && (dirp)) {
         while (moviefil = readdir(dirp)) {
-          t = std::time(0);   // get time now
+          t = std::time(0);                                                 // get time now
           now = std::localtime(&t);
           if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {
             // save path for later use in db insert
@@ -1020,11 +1020,10 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
             }
             // get title from dir/file name
             strcpy(movietitle,filename);
-            strcpy(statfilename,configmoviepath);
-            strcat(statfilename,"/");
-            strcat(statfilename,moviefil->d_name);
-            // need fix
-            if (stat(statfilename,&statbuffer)==-1) {
+            statfilename=configmoviepath;
+            statfilename=statfilename + "/";
+            statfilename=statfilename + moviefil->d_name;
+            if (stat(statfilename.c_str(),&statbuffer)==-1) {
               // perror("stat");
               // exit(EXIT_FAILURE);
               nostat=true;
@@ -1032,7 +1031,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
             // if dir
             if ((nostat==false) && ((statbuffer.st_mode & S_IFMT)==S_IFDIR)) {
               // it a dir opendir and find files
-              subdirp=opendir(statfilename);
+              subdirp=opendir(statfilename.c_str());
               film_ok=false;
               while (submoviefil = readdir(subdirp)) {
                 ext = strrchr(submoviefil->d_name, '.');
@@ -1085,8 +1084,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       coverfile=coverfile + "/";
                       coverfile=coverfile + "cover.jpg";
                       if (!(file_exists(coverfile.c_str()))) {
-                        // sprintf(sqlselect,"No cover file for %s ",coverfile.c_str());
-                        // printf("%s\n",sqlselect);
                         coverfile="";
                       }
                     }
@@ -1172,7 +1169,26 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   string tmpcovername = coverfile.substr(0, lastindex); 
                   coverfile=tmpcovername;                                           // get name - ext
                   coverfile=coverfile + ".jpg";
-                  if (!(file_exists(coverfile.c_str()))) coverfile="";
+                  if (!(file_exists(coverfile.c_str()))) {
+                    coverfile=configmoviepath;
+                    if (coverfile.back()!='/') coverfile=coverfile + "/";
+                    coverfile=coverfile + moviefil->d_name;
+                    size_t lastindex = coverfile.find_last_of("."); 
+                    string tmpcovername = coverfile.substr(0, lastindex); 
+                    coverfile=tmpcovername;                                           // get name - ext
+                    coverfile=coverfile + ".png";
+                  }
+                  if (!(file_exists(coverfile.c_str()))) {
+                    coverfile=configmoviepath;
+                    if (coverfile.back()!='/') coverfile=coverfile + "/";
+                    coverfile=coverfile + "cover.jpg";
+                    if (!(file_exists(coverfile.c_str()))) {
+                      coverfile=configmoviepath;
+                      if (coverfile.back()!='/') coverfile=coverfile + "/";
+                      coverfile=coverfile + "cover.png";
+                      if (!(file_exists(coverfile.c_str()))) coverfile="";
+                    }
+                  }
                   // strcpy(moviepath1,moviefil->d_name);                         // get full filename
                   moviepath=moviefil->d_name;
                   fundet=false;
