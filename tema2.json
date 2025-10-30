@@ -145,7 +145,7 @@
                 "y": 200
             },
             "spotifyplayer_info": {
-                "icon_path": "musicplayer-infconfig_movie_main_window_icon_sizeyo",
+                "icon_path": "musicplayer-info",
                 "x": 480,
                 "y": 300
             },

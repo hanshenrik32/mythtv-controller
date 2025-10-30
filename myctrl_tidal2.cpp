@@ -2438,7 +2438,7 @@ void tidal_class::clean_tidal_oversigt() {
 // Download image
 //
 // sample call
-// download_image("https://i.scdn.co/image/ab67616d0000b2737bded29598acbe1e2f4b4437","/home/user/image_filename.jpg");
+// tidal_download_image("https://i.scdn.co/image/ab67616d0000b2737bded29598acbe1e2f4b4437","/home/user/image_filename.jpg");
 //
 // ********************************************************************************************
 
@@ -3275,7 +3275,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     else searchbuffer=searchbuffer+"%20";
     n++;
   }
-  url="curl  -X 'GET'   'https://openapi.tidal.com/v2/searchResults/";
+  url="curl -X 'GET' 'https://openapi.tidal.com/v2/searchResults/";
   url = url + searchbuffer;
   switch (type) {
             // albums
@@ -4968,7 +4968,7 @@ void tidal_class::setup_tidal_start_entry() {
   glPushMatrix();
   glTranslatef(800, 620, 0.0f);
   glRasterPos2f(0.0f, 0.0f);
-  myglprint18_1((char *) "The number after /atrist/ (here 1566) is the album ID");
+  myglprint18_1((char *) "The number after /artist/ (here 1566) is the album ID");
   glPopMatrix();
 
   glPushMatrix();

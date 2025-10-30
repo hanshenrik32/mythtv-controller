@@ -16834,6 +16834,167 @@ int team_settings_load() {
 
     
   } catch (const std::exception &e) {
+    config_menu.config_tema_path="/opt/mythtv-controller/tema2/";
+
+    config_menu.config_tvguidex=1720;
+    config_menu.config_tvguidey=888;
+    config_menu.config_tvguide_icon="tv";
+
+    config_menu.config_musicx=1720;
+    config_menu.config_musicy=696;
+    config_menu.config_music_icon="music_button1";
+
+    config_menu.config_music_activex=1720;
+    config_menu.config_music_activey=696;
+    config_menu.config_music_active_icon="music_button1";
+
+    config_menu.config_mediax=1720;
+    config_menu.config_mediay=696;
+    config_menu.config_media_icon="stream_button";
+
+    config_menu.config_media1x=1720;
+    config_menu.config_media1y=696;
+    config_menu.config_media1_icon="stream_button1";
+
+    config_menu.config_spotifyx=1720;
+    config_menu.config_spotifyy=888;
+    config_menu.config_spotify_icon="spotify_button";
+
+    config_menu.config_spotify1x=1720;
+    config_menu.config_spotify1y=696;
+    config_menu.config_spotify1_icon="spotify_button1";
+
+    config_menu.config_tidalx=1720;
+    config_menu.config_tidaly=696;
+    config_menu.config_tidal_icon="tidal_button";
+
+    config_menu.config_tidal1x=1720;
+    config_menu.config_tidal1y=696;
+    config_menu.config_tidal1_icon="tidal_button1";
+
+    config_menu.config_radiox=1720;
+    config_menu.config_radioy=504;
+    config_menu.config_radio_icon="radio_button";
+
+    config_menu.config_radio1x=1720;
+    config_menu.config_radio1y=696;
+    config_menu.config_radio1_icon="radio_button1";
+
+    config_menu.config_moviex=1720;
+    config_menu.config_moviey=504;
+    config_menu.config_movie_icon="movie_button";
+
+    config_menu.config_movie1x=1720;
+    config_menu.config_movie1y=696;
+    config_menu.config_movie1_icon="movie_button1";
+
+    config_menu.config_recordedx=1720;
+    config_menu.config_recordedy=312;
+    config_menu.config_recorded_icon="recorded";
+
+    config_menu.config_recorded1x=1720;
+    config_menu.config_recorded1y=312;
+    config_menu.config_recorded1_icon="recorded_selected";
+
+    config_menu.config_closex=1720;
+    config_menu.config_closey=126;
+    config_menu.config_close_icon="close";
+
+    config_menu.config_setupx=1720;
+    config_menu.config_setupy=30;
+    config_menu.config_setup_icon="setupmenu";
+
+    config_menu.config_loadingx=1920;
+    config_menu.config_loadingy=200;
+    config_menu.config_loading_icon="loading";
+
+    config_menu.config_playinfox=1720;
+    config_menu.config_playinfoy=888;
+    config_menu.config_playinfo_icon="playinfo";
+
+    config_menu.config_downx=1720;
+    config_menu.config_downy=312;
+    config_menu.config_down_icon="pdown";
+
+    config_menu.config_upx=1720;
+    config_menu.config_upy=504;
+    config_menu.config_up_icon="pup";
+
+    config_menu.config_musicplayer_infox=480;
+    config_menu.config_musicplayer_infoy=200;
+    config_menu.config_musicplayer_info_icon="musicplayer-info";
+
+    config_menu.config_spotifyplayer_infox=480;
+    config_menu.config_spotifyplayer_infoy=300;
+    config_menu.config_spotifyplayer_info_icon="musicplayer-info";
+
+    config_menu.config_tidalplayer_infox=480;
+    config_menu.config_tidalplayer_infoy=300;
+    config_menu.config_tidalplayer_info_icon="musicplayer-info";
+
+    config_menu.config_radioplayer_infox=480;
+    config_menu.config_radioplayer_infoy=320;
+    config_menu.config_radioplayer_info_icon="musicplayer-info";
+
+    config_menu.config_mediaplayer_infox=480;
+    config_menu.config_mediaplayer_infoy=320;
+    config_menu.config_mediaplayer_info_icon="musicplayer-info";
+
+    config_menu.config_exitx=0;
+    config_menu.config_exity=1008;
+    config_menu.config_exit_icon="exit";
+
+    // config_menu.config_radio_or_music_oversigtx=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asInt());
+    // config_menu.config_radio_or_music_oversigty=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asInt());
+    // config_menu.config_radio_or_music_oversigt_icon=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asString());
+
+    config_menu.config_music_main_windowx=0;
+    config_menu.config_music_main_windowy=0;
+    config_menu.config_music_main_window_sizex=1920;
+    config_menu.config_music_main_window_sizey=1080;
+    config_menu.config_music_main_window_icon_sizex=180;
+    config_menu.config_music_main_window_icon_sizey=180;
+    
+    config_menu.config_radio_main_windowx=0;
+    config_menu.config_radio_main_windowy=0;
+    config_menu.config_radio_main_window_sizex=1920;
+    config_menu.config_radio_main_window_sizey=1080;
+    config_menu.config_radio_main_window_icon_sizex=200;
+    config_menu.config_radio_main_window_icon_sizey=180;
+    
+    config_menu.config_stream_main_windowx=0;
+    config_menu.config_stream_main_windowy=0;
+    config_menu.config_stream_main_window_sizex=1920;
+    config_menu.config_stream_main_window_sizey=1080;
+    config_menu.config_stream_main_window_icon_sizex=200;
+    config_menu.config_stream_main_window_icon_sizey=180;
+
+    config_menu.config_movie_main_windowx=0;
+    config_menu.config_movie_main_windowy=0;
+    config_menu.config_movie_main_window_sizex=1920;
+    config_menu.config_movie_main_window_sizey=1080;
+    config_menu.config_movie_main_window_icon_sizex=220;
+    config_menu.config_movie_main_window_icon_sizey=240;
+
+    config_menu.config_spotify_main_windowx=0;
+    config_menu.config_spotify_main_windowy=0;
+    config_menu.config_spotify_main_window_sizex=1920;
+    config_menu.config_spotify_main_window_sizey=1080;
+    config_menu.config_spotify_main_window_icon_sizex=200;
+    config_menu.config_spotify_main_window_icon_sizey=220;
+
+    config_menu.config_tidal_main_windowx=0;
+    config_menu.config_tidal_main_windowy=0;
+    config_menu.config_tidal_main_window_sizex=1920;
+    config_menu.config_tidal_main_window_sizey=1080;
+    config_menu.config_tidal_main_window_icon_sizex=180;
+    config_menu.config_tidal_main_window_icon_sizey=180;
+
+    config_menu.config_tv_main_windowx=0;
+    config_menu.config_tv_main_windowy=0;
+    config_menu.config_tv_main_window_sizex=1920;
+    config_menu.config_tv_main_window_sizey=1080;
+
     cout << "Error parsing JSON: " << e.what() << endl;
     return 0;
   }
