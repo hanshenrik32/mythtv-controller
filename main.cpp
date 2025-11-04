@@ -831,6 +831,7 @@ GLuint spotify_search_back;               // back button in spotify search
 GLuint spotify_ecover;                    //
 GLuint tidal_ecover;
 GLuint tidal_covermask;
+GLuint tidal_playing_icon;                // icon for active playlist/songs
 GLuint spotify_pil;                       // pil bruges i spotify search nederst på skærmen midt for
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
@@ -16305,6 +16306,7 @@ void loadgfx() {
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
     tidal_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_ecover");
     tidal_covermask        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_covermask");
+    tidal_playing_icon    = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_playing_icon");
     spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
     big_search_bar_playlist= loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_playlist");
     big_search_bar_track   = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_song");
@@ -16508,6 +16510,7 @@ void freegfx() {
     glDeleteTextures( 1, &tidalbutton1);          //
     glDeleteTextures( 1, &tidal_ecover);            //
     glDeleteTextures( 1, &tidal_covermask);            //
+    glDeleteTextures( 1, &tidal_playing_icon);        //
     glDeleteTextures( 1, &spotify_pil);             //
     glDeleteTextures( 1, &big_search_bar_playlist); // Spotify stuf
     glDeleteTextures( 1, &big_search_bar_track);    //

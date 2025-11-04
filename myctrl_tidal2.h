@@ -91,6 +91,7 @@ class tidal_class {
     
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
+    int tidal_playingnr;
     bool tidal_update_loaded_begin;
     //
     char tidaltoken[512];                                                 // access_token

@@ -769,7 +769,6 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
   std::string sqlinsert1;
   std::string sqlselect1;
   std::string debuglogdata1;
-  
 
   char *database = (char *) "mythtvcontroller";
   bool recordexist=false;
