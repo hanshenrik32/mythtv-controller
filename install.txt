@@ -10,6 +10,7 @@
 # Updated 07-07-2024
 # Updated 30-12-2024
 # Updated 01-07-2025
+# Updated 07-11-2025
 
 
 This packets need to be installed on Ubuntu.
@@ -21,7 +22,10 @@ you have to extract this file to the source directory to be able to compile and 
 
 Version.
 
-mythtv-controller ver 0.43.2
+mythtv-controller ver 0.45.1
+
+New tidal loader. (tidal-dl-ng) tidal-dl do not work any more.
+New icon the playlist is played in view.
 
 New font system to write text faster. called drawText 
 
@@ -33,7 +37,7 @@ void drawText(const char *text, float x, float y, float scale,int color)
 mariadb settings.
 
 create database mythtvcontroller;
-GRANT ALL PRIVILEGES ON *.* TO 'mythtv'@localhost IDENTIFIED BY 'PASSWORD HERE';
+GRANT ALL PRIVILEGES ON *.* TO 'mythtv'@localhost IDENTIFIED BY 'bimmer';
 FLUSH PRIVILEGES;
 
 Now the db is ready.

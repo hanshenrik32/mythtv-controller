@@ -94,7 +94,7 @@ class tidal_class {
     int tidal_playingnr;
     bool tidal_update_loaded_begin;
     //
-    char tidaltoken[512];                                                 // access_token
+    // char tidaltoken[512];                                                 // access_token
     char countryCode[512];                                                //
     char tidaltoken_refresh[512];                                         // refresh_token
     int antal;					                       	                            // Antal songs in playlist
@@ -120,6 +120,7 @@ class tidal_class {
     int tidal_get_artists_all_albums(char *artistid,bool force);
     int update_playcount(const char *playpath);
   public:
+    char tidaltoken[512];                                                 // access_token
     bool do_setup_tidal_start_entry;                                            // show tidal start id entrys
     bool do_update_tidal_start_entry;                                           // do the udpate and save / load settings
 

@@ -13,7 +13,8 @@
 #include <cmath>
 #include <iostream>
 #include <fmt/format.h>
-
+#include <jsoncpp/json/json.h>
+#include <fstream>
 #include "myctrl_stream.h"
 #include "utility.h"
 #include "myth_ttffont.h"
@@ -666,6 +667,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
             if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
               // parse downloaded xmlfile now (create db records)
               parsexmlrssfile(parsefilename,baseicon);
+              // parsexmlrssfile_new(parsefilename,baseicon);
             }
           } else if ((!(file_exists(parsefilename))) || (updaterssfile)) {
             // download rss file
@@ -681,6 +683,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
               // parse downloaded xmlfile now (create db records)
               // and get base image from func call (baseicon (url to image))
               parsexmlrssfile(parsefilename,baseicon);
+              // parsexmlrssfile_new(parsefilename,baseicon);
               //printf("... Parse %s rss file \n",parsefilename);
             } else {
               printf("XML FILE is missing/not working on %s file.\n",row[3]);
@@ -1028,6 +1031,32 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
   return(1);
 }
 
+
+// ****************************************************************************************
+//
+// new version using json format for rss feed list
+//
+// ****************************************************************************************
+
+  Json::Value iRoot1;
+  Json::Reader reader1;
+
+int stream_class::parsexmlrssfile_new(char *filename,char *baseiconfile) {
+  // function implementation
+  // load json file
+  std::string fname=fmt::format("{}", filename);
+  std::ifstream temasettingsfile(fname);
+  reader1.parse(temasettingsfile, iRoot1);
+  try {
+    // const Json::Value rssfeeds = iRoot["rss"];
+    std::string val=iRoot1["channel"].get("title","0").asString();
+    std::cout << "Channel title: " << val << std::endl;
+    // std::cout << iRoot1["rss"] << std::endl;
+  } catch (const std::exception &e) {
+    std::cerr << "Error parsing JSON: " << e.what() << std::endl;
+  } 
+  return 1; // placeholder return value
+}
 
 
 

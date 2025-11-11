@@ -177,5 +177,6 @@ install:
 	#    mysql -uroot -p${rootpasswd} -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
 	#    mysql -uroot -p${rootpasswd} -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
 	#    mysql -uroot -p${rootpasswd} -e "FLUSH PRIVILEGES;"
+	#    "GRANT ALL PRIVILEGES ON mythtvcontroller.* to 'mythtv'@'%' WITH GRANT OPTION;"
 	#fi
 

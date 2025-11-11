@@ -57,6 +57,7 @@ class stream_class : vlc_controller {
         int stream_oversigt_nowloading;				                                  // denne tæller op når der loades gfx
         int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
         int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
+        int parsexmlrssfile_new(char *filename,char *baseiconfile);
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
         bool stream_is_playing;
