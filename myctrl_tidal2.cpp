@@ -724,7 +724,7 @@ void tidal_class::process_value(json_value* value, int depth) {
       if (tidal_process_id) {
         tidal_process_id=false;
         if (depth==5) {
-          printf("Playlist id found: %s\n", value->u.string.ptr);
+          // printf("Playlist id found: %s\n", value->u.string.ptr);
           tidal_playlist_id=value->u.string.ptr;
         }
       }
@@ -749,31 +749,31 @@ void tidal_class::process_value(json_value* value, int depth) {
         // create new record from data collected from json file
         // printf("popularity found : %s\n", value->u.string.ptr);
         if  (depth==7) {
-          printf("Save record \n\n ");
-          strcpy(cnew_tidal_record.feed_artist,tidal_playlist_artist.c_str());
-          strcpy(cnew_tidal_record.playlistid,tidal_playlist_id.c_str());
-          strcpy(cnew_tidal_record.feed_showtxt,tidal_playlist_title.c_str());
-          strcpy(cnew_tidal_record.feed_name,tidal_playlist_title.c_str());
-          strcpy(cnew_tidal_record.feed_release_date,tidal_playlist_releasedate.c_str());
-          cnew_tidal_record.numberOfTracks=tidal_playlist_numberOfItems;
-          strcpy(cnew_tidal_record.type_of_media,"ALBUM");
-          // get url for artist cover image
-          gfxurl=get_artist_cover_image((char *) tidal_playlist_id.c_str());
-          strcpy(cnew_tidal_record.feed_gfx_url, gfxurl.c_str());
-          downloadfilenamelong = localuserhomedir;
-          downloadfilenamelong = downloadfilenamelong + "/tidal_gfx/";
-          downloadfilenamelong = downloadfilenamelong + tidal_playlist_id;
-          downloadfilenamelong = downloadfilenamelong + ".jpg";
-          strcpy(cnew_tidal_record.feed_gfx_url,downloadfilenamelong.c_str());
-          if (!(file_exists(downloadfilenamelong.c_str()))) {
-            // download image
-            tidal_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong.c_str());
-          }
-          if (tidal_playlist_numberOfItems>2) {
+          if (playlist_type=="albums") {
+            // printf("playlist_type=%s Save record \n\n ",playlist_type.c_str());
+            strcpy(cnew_tidal_record.feed_artist,tidal_playlist_artist.c_str());
+            strcpy(cnew_tidal_record.playlistid,tidal_playlist_id.c_str());
+            strcpy(cnew_tidal_record.feed_showtxt,tidal_playlist_title.c_str());
+            strcpy(cnew_tidal_record.feed_name,tidal_playlist_title.c_str());
+            strcpy(cnew_tidal_record.feed_release_date,tidal_playlist_releasedate.c_str());
+            cnew_tidal_record.numberOfTracks=tidal_playlist_numberOfItems;
+            strcpy(cnew_tidal_record.type_of_media,"ALBUM");
+            // get url for artist cover image
+            gfxurl=get_artist_cover_image((char *) tidal_playlist_id.c_str());
+            strcpy(cnew_tidal_record.feed_gfx_url, gfxurl.c_str());
+            downloadfilenamelong = localuserhomedir;
+            downloadfilenamelong = downloadfilenamelong + "/tidal_gfx/";
+            downloadfilenamelong = downloadfilenamelong + tidal_playlist_id;
+            downloadfilenamelong = downloadfilenamelong + ".jpg";
+            strcpy(cnew_tidal_record.feed_gfx_url,downloadfilenamelong.c_str());
+            if (!(file_exists(downloadfilenamelong.c_str()))) {
+              // download image
+              tidal_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong.c_str());
+            }
             stack.push_back(cnew_tidal_record);
             antalplaylists++;
             antal++;
-            printf("add album named : %s  \n",cnew_tidal_record.feed_showtxt);
+            printf("add album named : %s\n",cnew_tidal_record.feed_showtxt);
           }
         }
         tidal_process_popularity=false;
@@ -809,10 +809,11 @@ void tidal_class::process_value(json_value* value, int depth) {
       }
       if (tidal_process_type) {
         if (depth==5) {
-          printf("playlist type found: %s\n", value->u.string.ptr);
+          // printf("playlist type found: %s\n", value->u.string.ptr);
+          playlist_type=value->u.string.ptr;
         }
         if (depth==7) {
-          printf("type found: %s\n", value->u.string.ptr);
+          // printf("type found: %s\n", value->u.string.ptr);
         // printf("antal = %d depth = %d  name %s \n ",antal,depth, tidal_playlist_title.c_str());
         }
         tidal_process_type=false;

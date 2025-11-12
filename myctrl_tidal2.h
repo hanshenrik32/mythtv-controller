@@ -169,6 +169,9 @@ class tidal_class {
     struct mg_mgr mgr;                                                      // web server
     struct mg_mgr client_mgr;                                               // web server client
     struct mg_connection *c;                                                // connection struct
+
+    std::string playlist_type;            // playlist type from json file (used to only create playlist then save to db)
+
     // end webserver
     tidal_class();
     ~tidal_class();
