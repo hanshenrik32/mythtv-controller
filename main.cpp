@@ -831,6 +831,7 @@ GLuint spotify_search_back;               // back button in spotify search
 GLuint spotify_ecover;                    //
 GLuint tidal_ecover;
 GLuint tidal_covermask;
+GLuint tidal_playing_icon;                // icon for active playlist/songs
 GLuint spotify_pil;                       // pil bruges i spotify search nederst på skærmen midt for
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
@@ -8516,14 +8517,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 // write to debug log
                 sprintf(debuglogdata,"play tidal playlist.");
                 write_logfile(logfile,(char *) debuglogdata);
-                do_select_device_to_play=true;
+                // do_select_device_to_play=true;
                 returnfunc = 4;
                 fundet = true;
               }
               // play song icon select (20) type 1
               if ((names[i*4+3]==20) && (tidal_oversigt.type==1)) {
                 write_logfile(logfile,(char *) "play tidal song.");
-                do_select_device_to_play=true;
+                // do_select_device_to_play=true;
                 returnfunc = 5;
                 fundet = true;
               }
@@ -9389,6 +9390,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if ((vis_stream_oversigt) && (retfunc==0) && (stopstream==false) && (do_zoom_stream_cover==false)) {
                 if (sknapnr>0) {
                   do_play_stream = 1;						// select button do open or play
+                  radio_key_selected=0;
                   if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
                 }
               }
@@ -9445,6 +9447,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     if (spotifyknapnr>0) {
                       do_play_spotify=1;
                       do_open_spotifyplaylist=0;
+                      radio_key_selected=0;
                       fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
                     }
                   }
@@ -9496,6 +9499,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     if (tidalknapnr>0) {
                       do_play_tidal=1;
                       do_open_tidalplaylist=0;
+                      radio_key_selected=0;
                       fprintf(stderr,"Set do_play_tidal flag tidalknapnr=%d \n",tidalknapnr);
                       write_logfile(logfile,(char *) "Set last play tidal flag");
                     }
@@ -15366,8 +15370,6 @@ void datainfoloader_webserver_v2() {
       do_hent_tidal_search_online=false;
       tidal_oversigt_loaded_begin=true;
       // clear old
-      tidal_oversigt.clean_tidal_oversigt();
-
       tidal_oversigt.search_tidal_online_done=false;
       fprintf(stderr,"Update tidal search result thread.\n");
       write_logfile(logfile,(char *) "Tidal start search result thread");
@@ -15632,8 +15634,9 @@ void webupdate_loader_tidal_v2() {
   if (loadedtidal) {
     write_logfile(logfile,(char *) "Loader thread done update tidal from web.");
   } else {
-    if (strcmp(tidal_oversigt.tidal_get_token(),"")==0) write_logfile(logfile,(char *) "Error on tidal token.");
-    else {
+    if (strlen(tidal_oversigt.tidaltoken)==0) {
+      write_logfile(logfile,(char *) "Error on tidal token.");
+    } else {
       tidal_user_id_check=tidal_oversigt.tidal_get_user_id();
       sprintf(debuglogdata,"Tidal Error loading user data. Error code %d",tidal_user_id_check);
       write_logfile(logfile,(char *) debuglogdata);
@@ -16286,36 +16289,26 @@ void loadgfx() {
 
 // ************************** spotify buttons ****************************
     spotify_askplay       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
-    spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
-    
-    // spotify_search        = loadgfxfile(temapath,(char *) "buttons/",(char *) "search");
+    spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");    
     spotify_search        = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_search_icon.c_str());     // "search");
-
-    // spotify_search_back   = loadgfxfile(temapath,(char *) "buttons/",(char *) "search_back");
     spotify_search_back   =loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_search_back_icon.c_str());     // "search_back");
-    
-    // spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     spotifybutton         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_spotify_icon.c_str());     // "spotify_button");				// setup menu
     spotifybutton1         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_spotify1_icon.c_str());     // "spotify_button");				// setup menu
 
-    // tidalbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "tidal_button");
     tidalbutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tidal_icon.c_str());     // "tidal_button");				// setup menu
     tidalbutton1          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tidal1_icon.c_str());     // "tidal_button1");				// setup menu
-
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
     tidal_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_ecover");
     tidal_covermask        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_covermask");
+    tidal_playing_icon    = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_playing_icon");
     spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
     big_search_bar_playlist= loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_playlist");
     big_search_bar_track   = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_song");
     big_search_bar_albumm  = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_album");
     big_search_bar_artist  = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_artist");
-
     tidal_big_search_bar_artist = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_artist");
     tidal_big_search_bar_album = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_album");
     tidal_big_search_bar_track = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_track");
-
-
     // radio options (O) key in radio oversigt
     radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
@@ -16508,6 +16501,7 @@ void freegfx() {
     glDeleteTextures( 1, &tidalbutton1);          //
     glDeleteTextures( 1, &tidal_ecover);            //
     glDeleteTextures( 1, &tidal_covermask);            //
+    glDeleteTextures( 1, &tidal_playing_icon);        //
     glDeleteTextures( 1, &spotify_pil);             //
     glDeleteTextures( 1, &big_search_bar_playlist); // Spotify stuf
     glDeleteTextures( 1, &big_search_bar_track);    //
@@ -16834,6 +16828,167 @@ int team_settings_load() {
 
     
   } catch (const std::exception &e) {
+    config_menu.config_tema_path="/opt/mythtv-controller/tema2/";
+
+    config_menu.config_tvguidex=1720;
+    config_menu.config_tvguidey=888;
+    config_menu.config_tvguide_icon="tv";
+
+    config_menu.config_musicx=1720;
+    config_menu.config_musicy=696;
+    config_menu.config_music_icon="music_button1";
+
+    config_menu.config_music_activex=1720;
+    config_menu.config_music_activey=696;
+    config_menu.config_music_active_icon="music_button1";
+
+    config_menu.config_mediax=1720;
+    config_menu.config_mediay=696;
+    config_menu.config_media_icon="stream_button";
+
+    config_menu.config_media1x=1720;
+    config_menu.config_media1y=696;
+    config_menu.config_media1_icon="stream_button1";
+
+    config_menu.config_spotifyx=1720;
+    config_menu.config_spotifyy=888;
+    config_menu.config_spotify_icon="spotify_button";
+
+    config_menu.config_spotify1x=1720;
+    config_menu.config_spotify1y=696;
+    config_menu.config_spotify1_icon="spotify_button1";
+
+    config_menu.config_tidalx=1720;
+    config_menu.config_tidaly=696;
+    config_menu.config_tidal_icon="tidal_button";
+
+    config_menu.config_tidal1x=1720;
+    config_menu.config_tidal1y=696;
+    config_menu.config_tidal1_icon="tidal_button1";
+
+    config_menu.config_radiox=1720;
+    config_menu.config_radioy=504;
+    config_menu.config_radio_icon="radio_button";
+
+    config_menu.config_radio1x=1720;
+    config_menu.config_radio1y=696;
+    config_menu.config_radio1_icon="radio_button1";
+
+    config_menu.config_moviex=1720;
+    config_menu.config_moviey=504;
+    config_menu.config_movie_icon="movie_button";
+
+    config_menu.config_movie1x=1720;
+    config_menu.config_movie1y=696;
+    config_menu.config_movie1_icon="movie_button1";
+
+    config_menu.config_recordedx=1720;
+    config_menu.config_recordedy=312;
+    config_menu.config_recorded_icon="recorded";
+
+    config_menu.config_recorded1x=1720;
+    config_menu.config_recorded1y=312;
+    config_menu.config_recorded1_icon="recorded_selected";
+
+    config_menu.config_closex=1720;
+    config_menu.config_closey=126;
+    config_menu.config_close_icon="close";
+
+    config_menu.config_setupx=1720;
+    config_menu.config_setupy=30;
+    config_menu.config_setup_icon="setupmenu";
+
+    config_menu.config_loadingx=1920;
+    config_menu.config_loadingy=200;
+    config_menu.config_loading_icon="loading";
+
+    config_menu.config_playinfox=1720;
+    config_menu.config_playinfoy=888;
+    config_menu.config_playinfo_icon="playinfo";
+
+    config_menu.config_downx=1720;
+    config_menu.config_downy=312;
+    config_menu.config_down_icon="pdown";
+
+    config_menu.config_upx=1720;
+    config_menu.config_upy=504;
+    config_menu.config_up_icon="pup";
+
+    config_menu.config_musicplayer_infox=480;
+    config_menu.config_musicplayer_infoy=200;
+    config_menu.config_musicplayer_info_icon="musicplayer-info";
+
+    config_menu.config_spotifyplayer_infox=480;
+    config_menu.config_spotifyplayer_infoy=300;
+    config_menu.config_spotifyplayer_info_icon="musicplayer-info";
+
+    config_menu.config_tidalplayer_infox=480;
+    config_menu.config_tidalplayer_infoy=300;
+    config_menu.config_tidalplayer_info_icon="musicplayer-info";
+
+    config_menu.config_radioplayer_infox=480;
+    config_menu.config_radioplayer_infoy=320;
+    config_menu.config_radioplayer_info_icon="musicplayer-info";
+
+    config_menu.config_mediaplayer_infox=480;
+    config_menu.config_mediaplayer_infoy=320;
+    config_menu.config_mediaplayer_info_icon="musicplayer-info";
+
+    config_menu.config_exitx=0;
+    config_menu.config_exity=1008;
+    config_menu.config_exit_icon="exit";
+
+    // config_menu.config_radio_or_music_oversigtx=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asInt());
+    // config_menu.config_radio_or_music_oversigty=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asInt());
+    // config_menu.config_radio_or_music_oversigt_icon=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asString());
+
+    config_menu.config_music_main_windowx=0;
+    config_menu.config_music_main_windowy=0;
+    config_menu.config_music_main_window_sizex=1920;
+    config_menu.config_music_main_window_sizey=1080;
+    config_menu.config_music_main_window_icon_sizex=180;
+    config_menu.config_music_main_window_icon_sizey=180;
+    
+    config_menu.config_radio_main_windowx=0;
+    config_menu.config_radio_main_windowy=0;
+    config_menu.config_radio_main_window_sizex=1920;
+    config_menu.config_radio_main_window_sizey=1080;
+    config_menu.config_radio_main_window_icon_sizex=200;
+    config_menu.config_radio_main_window_icon_sizey=180;
+    
+    config_menu.config_stream_main_windowx=0;
+    config_menu.config_stream_main_windowy=0;
+    config_menu.config_stream_main_window_sizex=1920;
+    config_menu.config_stream_main_window_sizey=1080;
+    config_menu.config_stream_main_window_icon_sizex=200;
+    config_menu.config_stream_main_window_icon_sizey=180;
+
+    config_menu.config_movie_main_windowx=0;
+    config_menu.config_movie_main_windowy=0;
+    config_menu.config_movie_main_window_sizex=1920;
+    config_menu.config_movie_main_window_sizey=1080;
+    config_menu.config_movie_main_window_icon_sizex=220;
+    config_menu.config_movie_main_window_icon_sizey=240;
+
+    config_menu.config_spotify_main_windowx=0;
+    config_menu.config_spotify_main_windowy=0;
+    config_menu.config_spotify_main_window_sizex=1920;
+    config_menu.config_spotify_main_window_sizey=1080;
+    config_menu.config_spotify_main_window_icon_sizex=200;
+    config_menu.config_spotify_main_window_icon_sizey=220;
+
+    config_menu.config_tidal_main_windowx=0;
+    config_menu.config_tidal_main_windowy=0;
+    config_menu.config_tidal_main_window_sizex=1920;
+    config_menu.config_tidal_main_window_sizey=1080;
+    config_menu.config_tidal_main_window_icon_sizex=180;
+    config_menu.config_tidal_main_window_icon_sizey=180;
+
+    config_menu.config_tv_main_windowx=0;
+    config_menu.config_tv_main_windowy=0;
+    config_menu.config_tv_main_window_sizex=1920;
+    config_menu.config_tv_main_window_sizey=1080;
+
     cout << "Error parsing JSON: " << e.what() << endl;
     return 0;
   }
@@ -17013,6 +17168,10 @@ int main(int argc, char** argv) {
     bool tidalok;
     // login tidal
     tidalok=tidal_oversigt.get_access_token((char *) "your access token");
+
+
+
+
     if (tidalok) {   
       
       // tidal_oversigt.opdatere_tidal_userCollections("131776836");
@@ -17046,11 +17205,10 @@ int main(int argc, char** argv) {
       // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // load default file
       if (checkartistdbexist()==false) {
-        // File tidal_artistlists.txt
+        // File tidal_start_artistlists.txt
         tidal_oversigt.get_artist_from_file((char *) "",true);
       }      
       tidal_oversigt.get_artist_from_file_and_update_for_editor((char *) "");
-
       tidal_oversigt.opdatere_tidal_oversigt(0);
       tidal_oversigt.opdatere_tidal_userCollections2((char *) "");
     } else {

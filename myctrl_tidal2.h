@@ -91,9 +91,10 @@ class tidal_class {
     
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
+    int tidal_playingnr;
     bool tidal_update_loaded_begin;
     //
-    char tidaltoken[512];                                                 // access_token
+    // char tidaltoken[512];                                                 // access_token
     char countryCode[512];                                                //
     char tidaltoken_refresh[512];                                         // refresh_token
     int antal;					                       	                            // Antal songs in playlist
@@ -119,6 +120,7 @@ class tidal_class {
     int tidal_get_artists_all_albums(char *artistid,bool force);
     int update_playcount(const char *playpath);
   public:
+    char tidaltoken[512];                                                 // access_token
     bool do_setup_tidal_start_entry;                                            // show tidal start id entrys
     bool do_update_tidal_start_entry;                                           // do the udpate and save / load settings
 
@@ -167,6 +169,9 @@ class tidal_class {
     struct mg_mgr mgr;                                                      // web server
     struct mg_mgr client_mgr;                                               // web server client
     struct mg_connection *c;                                                // connection struct
+
+    std::string playlist_type;            // playlist type from json file (used to only create playlist then save to db)
+
     // end webserver
     tidal_class();
     ~tidal_class();
