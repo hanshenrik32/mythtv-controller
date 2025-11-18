@@ -3194,9 +3194,7 @@ void display() {
   }
   // show menu **********************************************************************
   // main menu
-
   torrent_downloader.opdate_progress();
-
   if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer == 0)) {
       //
       glPushMatrix();
@@ -3377,7 +3375,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( config_menu.config_moviex+iconsizex, config_menu.config_moviey , 0.0);
         glEnd();
       } else {
-        //film icon or pil up
+        //icon pil up
         if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
           glLoadName(23); 			// Overwrite the first name in the buffer
@@ -3765,7 +3763,7 @@ void display() {
       if (do_show_tidal_search_oversigt==false) {
         // show Tidal overview
         tidal_oversigt.set_textureloaded(false);
-        tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );       
+        tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
       } else {
         // show Tidal search
         tidal_oversigt.show_tidal_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr , keybuffer );
@@ -4174,27 +4172,40 @@ void display() {
   if (vis_tidal_oversigt) {
     if (ask_save_playlist) {
       xof = 500;
-      yof = 600;
+      yof = 660;
+
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glColor3f(1.0f, 1.0f, 1.0f);
+      glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-      glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
+      glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS); // draw ask box
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
-      glEnd(); //End quadrilateral coordinates
-      glPopMatrix();     
-      strcpy(temptxt,"Playlist name :");
+      glColor4f(0.7f, 0.41f, 1.0f, 0.6f);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(config_menu.config_spotifyplayer_infox+0 ,        455-20 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(config_menu.config_spotifyplayer_infox+0 ,    300+455-20 , 0.0);
+      glTexCoord2f(1, 1); glVertex3f(config_menu.config_spotifyplayer_infox+0+400, 300+455-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f(config_menu.config_spotifyplayer_infox+0+400,     455-20 , 0.0);
+      glEnd();
+      glPopMatrix();
+      strcpy(temptxt,"Record name :");
       strcat(temptxt,keybuffer);
       drawText(temptxt, xof+20.0f,yof+10.0f+5.0f, 0.4f,1);
-      showcoursornow(266,460+5,strlen(keybuffer));
+      showcoursornow(275,520+5,strlen(keybuffer));
+
+      strcpy(temptxt,"Artist name   :");
+      strcat(temptxt,tidal_oversigt.tidal_aktiv_artist_name());
+      drawText(temptxt, xof+20.0f,yof-10.0f+5.0f, 0.4f,1);
+
+      strcpy(temptxt,"Date                :");
+      strcat(temptxt,tidal_oversigt.tidal_aktiv_song_release_date());
+      drawText(temptxt, xof+20.0f,yof-30.0f+5.0f, 0.4f,1);
+
+      sprintf(temptxt,"# of songs     : %d",tidal_oversigt.total_aktiv_songs());
+      drawText(temptxt, xof+20.0f,yof-60.0f+5.0f, 0.4f,1);
+
+      drawText("Enter to save", xof+120.0f,yof-180.0f+5.0f, 0.4f,1);
     }
     // show loading status of tidal online search
     if (tidal_oversigt_loaded_begin) {
@@ -4235,7 +4246,7 @@ void display() {
   #ifdef ENABLE_TIDAL
   // Tidal save playlist to db
   if ((vis_tidal_oversigt) && (save_ask_save_playlist)) {
-    tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid,playlistfileartistname);
+    tidal_oversigt.save_tidal_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid,playlistfileartistname);
     save_ask_save_playlist=false;
     ask_save_playlist=false;
     // reset keyboard buffer
@@ -6113,9 +6124,8 @@ void display() {
           drawText("         ",520.0f, 640.0f, 0.4f,1);
         } else {
           // show value
-          drawText("Playlist ",520.0f, 640.0f, 0.4f,1);
-          if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
-            else drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
+          drawText("Artist ",520.0f, 640.0f, 0.4f,1);
+          drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
         }
         // show tidal songname
         drawText("Songname ", 520.0f, 620.0f, 0.4f,1);
@@ -8497,6 +8507,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 } else if (tidal_oversigt.type==1) {
                   ask_open_dir_or_play_tidal=true;
                 }
+                if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
+                  do_zoom_tidal_cover = false;
+                  do_zoom_spotify_cover=false;
+                  do_zoom_music_cover=false;
+                  do_zoom_radio=false;
+                }
               }
               // works ok
               // back icon to main playlist overview
@@ -8579,11 +8595,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               if (names[i*4+3]==27) {
                 // write debug log
                 write_logfile(logfile,(char *) "Show/close tidal info");
-                if (ask_open_dir_or_play_tidal==false) {
+                if (ask_save_playlist) {
+                  ask_save_playlist=false;
+                } else if (ask_open_dir_or_play_tidal==false) {
                   do_zoom_tidal_cover = false;
                   // do_zoom_tidal_cover =! do_zoom_tidal_cover;
                 }
                 if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
+                
                 fundet = true;
               }
             }
@@ -9643,7 +9662,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if (ask_open_dir_or_play_tidal) {
                   ask_open_dir_or_play_tidal=false;				// flag luk vindue igen
                 } else {
-                  do_zoom_tidal_cover=!do_zoom_tidal_cover;
+                  if (ask_save_playlist) ask_save_playlist=false;
+                  else do_zoom_tidal_cover=!do_zoom_tidal_cover;
                 }
               }
               if ((musicoversigt.get_music_is_playing())) {
@@ -12845,7 +12865,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_tidal_oversigt=false;
                 keybufferopenwin=false;
                 key=0;
-              } else if ((!(do_show_setup)) && (do_show_torrent==false) && (key==27) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {                       // exit program
+              } else if ((!(do_show_setup)) && (do_show_torrent==false) && (key==27) && (tidal_oversigt.do_setup_tidal_start_entry==false) && (ask_save_playlist==false)) {      // exit program
                 remove("mythtv-controller.lock");
                 runwebserver=false;
                 order_channel_list();
