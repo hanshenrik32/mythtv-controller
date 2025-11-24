@@ -240,7 +240,7 @@ class tidal_class {
     int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
     int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
     void set_textureloaded(bool set);                                               // set flag for textures loaded
-    int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid,char *artistname);
+    int save_tidal_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid,char *artistname);
     bool delete_record_in_view(long tidalknapnr);
     int get_users_playlist_plus_favorite(bool cleandb);
     void set_tidal_playing_flag(bool flag);    

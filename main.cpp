@@ -3194,9 +3194,7 @@ void display() {
   }
   // show menu **********************************************************************
   // main menu
-
   torrent_downloader.opdate_progress();
-
   if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer == 0)) {
       //
       glPushMatrix();
@@ -3377,7 +3375,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( config_menu.config_moviex+iconsizex, config_menu.config_moviey , 0.0);
         glEnd();
       } else {
-        //film icon or pil up
+        //icon pil up
         if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
           glLoadName(23); 			// Overwrite the first name in the buffer
@@ -3765,7 +3763,10 @@ void display() {
       if (do_show_tidal_search_oversigt==false) {
         // show Tidal overview
         tidal_oversigt.set_textureloaded(false);
-        tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );       
+        tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
+        
+        printf("tidal_selected_startofset = %d \n",tidal_selected_startofset);
+        
       } else {
         // show Tidal search
         tidal_oversigt.show_tidal_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr , keybuffer );
@@ -4174,27 +4175,40 @@ void display() {
   if (vis_tidal_oversigt) {
     if (ask_save_playlist) {
       xof = 500;
-      yof = 600;
+      yof = 660;
+
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glColor3f(1.0f, 1.0f, 1.0f);
+      glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-      glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
+      glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS); // draw ask box
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
-      glEnd(); //End quadrilateral coordinates
-      glPopMatrix();     
-      strcpy(temptxt,"Playlist name :");
+      glColor4f(0.7f, 0.41f, 1.0f, 0.6f);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(config_menu.config_spotifyplayer_infox+0 ,        455-20 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(config_menu.config_spotifyplayer_infox+0 ,    300+455-20 , 0.0);
+      glTexCoord2f(1, 1); glVertex3f(config_menu.config_spotifyplayer_infox+0+400, 300+455-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f(config_menu.config_spotifyplayer_infox+0+400,     455-20 , 0.0);
+      glEnd();
+      glPopMatrix();
+      strcpy(temptxt,"Record name :");
       strcat(temptxt,keybuffer);
       drawText(temptxt, xof+20.0f,yof+10.0f+5.0f, 0.4f,1);
-      showcoursornow(266,460+5,strlen(keybuffer));
+      showcoursornow(275,520+5,strlen(keybuffer));
+
+      strcpy(temptxt,"Artist name   :");
+      strcat(temptxt,tidal_oversigt.tidal_aktiv_artist_name());
+      drawText(temptxt, xof+20.0f,yof-10.0f+5.0f, 0.4f,1);
+
+      strcpy(temptxt,"Date                :");
+      strcat(temptxt,tidal_oversigt.tidal_aktiv_song_release_date());
+      drawText(temptxt, xof+20.0f,yof-30.0f+5.0f, 0.4f,1);
+
+      sprintf(temptxt,"# of songs     : %d",tidal_oversigt.total_aktiv_songs());
+      drawText(temptxt, xof+20.0f,yof-60.0f+5.0f, 0.4f,1);
+
+      drawText("Enter to save", xof+120.0f,yof-180.0f+5.0f, 0.4f,1);
     }
     // show loading status of tidal online search
     if (tidal_oversigt_loaded_begin) {
@@ -4235,7 +4249,7 @@ void display() {
   #ifdef ENABLE_TIDAL
   // Tidal save playlist to db
   if ((vis_tidal_oversigt) && (save_ask_save_playlist)) {
-    tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid,playlistfileartistname);
+    tidal_oversigt.save_tidal_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid,playlistfileartistname);
     save_ask_save_playlist=false;
     ask_save_playlist=false;
     // reset keyboard buffer
@@ -4877,302 +4891,6 @@ void display() {
       }
     }
   }
-  // ******************************************************************************************************************
-  // ******************************************************************************************************************
-  // ******************************************************************************************************************
-  // show player music status view
-  if ((vis_music_oversigt) && (!(visur))) {
-    // spiller vi en sang vis status info i 3d   (do_play_music_aktiv=1 hvis der er status vindow
-    /*
-    if (do_zoom_music_cover) {
-      //  printf("numbers of songs = %d aktiv song =%d in array  play position %d sec   \n",aktiv_playlist.numbers_in_playlist(),do_play_music_aktiv_nr,(snd->getPlayPosition())/1000);
-      // show background mask
-      int buttonsize = 800;
-      int buttonsizey = 500;
-      yof = 200;        
-      if (!(snd) && (do_stop_music==false)) {
-        // background
-        glPushMatrix();
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glColor4f(1.0f,1.0f,1.0f,1.0f);
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        if (do_stop_music_all) {						                                  // SKAL checkes om gfx er ok
-            glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
-        } else {
-            glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);			          //  _textureId1
-        }
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glColor4f(1.0f, 1.0f, 1.0f,1.00f);					                         // lav alpha blending. 80%
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( (config_menu.config_musicplayer_infox), config_menu.config_musicplayer_infoy , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( (config_menu.config_musicplayer_infox),config_menu.config_musicplayer_infoy+buttonsizey, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( (config_menu.config_musicplayer_infox)+buttonsize, config_menu.config_musicplayer_infoy+buttonsizey , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( (config_menu.config_musicplayer_infox)+buttonsize,config_menu.config_musicplayer_infoy , 0.0);
-        glEnd();
-        // show no play
-        drawText("No song is playing.", 740.0f, 650.0f, 0.4f,1);
-      } else {        
-        // background
-        glPushMatrix();
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glColor4f(1.0f,1.0f,1.0f,1.0f);
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        if (do_stop_music_all) {						// SKAL checkes om gfx er ok
-            glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
-        } else {
-            glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
-        }
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glColor4f(1.0f, 1.0f, 1.0f,1.00f);					// lav alpha blending. 80%
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( (config_menu.config_musicplayer_infox), config_menu.config_musicplayer_infoy , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( (config_menu.config_musicplayer_infox),config_menu.config_musicplayer_infoy+buttonsizey, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( (config_menu.config_musicplayer_infox)+buttonsize, config_menu.config_musicplayer_infoy+buttonsizey , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( (config_menu.config_musicplayer_infox)+buttonsize,config_menu.config_musicplayer_infoy , 0.0);
-        glEnd();
-        glPopMatrix();
-        // ************************************************************ play
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D, _texturemplay);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(8);                        // play button
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(20+config_menu.config_musicplayer_infox, 20+yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(20+config_menu.config_musicplayer_infox,20+yof+100, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(20+config_menu.config_musicplayer_infox+100, 20+yof+100 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(20+config_menu.config_musicplayer_infox+100,20+yof , 0.0);
-        glEnd();
-        glPopMatrix();
-        // ************************************************************ last
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D, _texturemlast2);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(6);                                              // last button
-        glBegin(GL_QUADS);
-        // last
-        glTexCoord2f(0, 0); glVertex3f(120+ config_menu.config_musicplayer_infox,20+yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(120+ config_menu.config_musicplayer_infox,20+yof+100, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(120+ config_menu.config_musicplayer_infox+100, 20+yof+100 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(120+ config_menu.config_musicplayer_infox+100,20+yof , 0.0);
-        glEnd();
-        glPopMatrix();
-        // ************************************************************ next
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D, _texturemnext);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(7);                     						   // next button
-        glBegin(GL_QUADS);
-        // last
-        glTexCoord2f(0, 0); glVertex3f(220+ config_menu.config_musicplayer_infox,20+yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(220+ config_menu.config_musicplayer_infox,20+yof+100, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(220+ config_menu.config_musicplayer_infox+100, 20+yof+100 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(220+ config_menu.config_musicplayer_infox+100,20+yof , 0.0);
-        glEnd();
-        glPopMatrix();
-        // ************************************************************stop
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D, _texturemstop);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(9);                                                          // Stop button
-        glBegin(GL_QUADS);
-        // last
-        glTexCoord2f(0, 0); glVertex3f(320+ config_menu.config_musicplayer_infox,20+yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(320+ config_menu.config_musicplayer_infox,20+yof+100, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(320+ config_menu.config_musicplayer_infox+100, 20+yof+100 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(320+ config_menu.config_musicplayer_infox+100,20+yof , 0.0);
-        glEnd();
-        glPopMatrix();
-        // ************************************************************* draw cover
-        // Draw music cover
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        // textureId=aktiv_playlist.get_textureid(do_play_music_aktiv_table_nr-1);		// get cd texture opengl id
-        textureId=dirmusic.textureId;
-        if (textureId==0) textureId=_texture_nocdcover;		                       				// hvis ingen texture (music cover) set default (box2.bmp) / use default if no cover
-        glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(9);                                                            // Set button id
-        glBegin(GL_QUADS);
-        // last
-        glTexCoord2f(0, 0); glVertex3f(560+ config_menu.config_musicplayer_infox,40+yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(560+ config_menu.config_musicplayer_infox,40+yof+200, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(560+ config_menu.config_musicplayer_infox+200, 40+yof+200 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(560+ config_menu.config_musicplayer_infox+200,40+yof , 0.0);
-        glEnd();
-        drawText(music_artist[configland], 520.0f, 650.0f, 0.4f,1);
-
-        // show artist name
-        aktiv_playlist.get_artistname(temptxt,do_play_music_aktiv_table_nr-1);
-        temptxt[40]=0;
-        drawText(temptxt, 700.0f, 650.0f, 0.4f,1);
-
-        // show cd album name
-        strcpy(temptxt,music_album[configland]);                // music album text
-        temptxt[50]=0;        
-        drawText(temptxt, 520.0f, 630.0f, 0.4f,1);
-
-        // show album name
-        drawText(temptxt, 700.0f, 630.0f, 0.4f,1);
-        aktiv_playlist.get_albumname(temptxt,do_play_music_aktiv_table_nr-1);
-        temptxt[40]=0;
-
-        // show song name
-        strcpy(temptxt,music_songname[configland]);
-        drawText(temptxt, 520.0f, 610.0f, 0.4f,1);
-
-
-        char *pos;
-        // show artist name
-        aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr-1);
-        pos=strrchr(temptxt,'/');
-        if (strrchr(temptxt,'/')) {
-          strcpy(temptxt1,pos+1);
-          strcpy(temptxt,temptxt1);
-        }
-        pos=strrchr(temptxt,'.');
-        if (strrchr(temptxt,'.')) {
-          temptxt[pos-temptxt]='\0';
-        }
-        temptxt[40]=0;
-        drawText(temptxt, 700.0f, 610.0f, 0.4f,1);
-
-
-        if (!(do_stop_music_all)) {
-          // play position
-          unsigned int ms = 0;
-          float frequency;
-          vis_error=false;
-          if (vis_error==false)  {
-            #if defined USE_FMOD_MIXER
-            result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
-            if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-              ERRCHECK(result,do_play_music_aktiv_table_nr);
-            }
-            // get play length new version
-            result=sound->getLength(&playtime_songlength,FMOD_TIMEUNIT_MS);
-            if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-              ERRCHECK(result,do_play_music_aktiv_table_nr);
-            }
-            result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
-            if (result!=FMOD_OK) {
-              ERRCHECK(result,do_play_music_aktiv_table_nr);
-            }
-            #endif
-            #if defined USE_SDL_MIXER
-            ms = 0;
-            playtime_songlength = 20000;
-            lenbytes = 200;
-            frequency = audio_rate;		// show rate
-            //Mix_QuerySpec(int *frequency, Uint16 *format, int *channels);
-            #endif
-            // do the calc
-            #if defined USE_FMOD_MIXER
-            if ((playtime_songlength>0) && (result==FMOD_OK)) {
-              kbps = (lenbytes/(playtime_songlength/1000)*8)/1000;			// calc bit rate
-            } else {
-              kbps=0;
-            }
-            if (result==FMOD_OK) {
-              playtime_songlength = playtime_songlength/1000;
-              playtime = ms/1000;
-            } else {
-              playtime_songlength = 0;
-              playtime = ms/1000;
-            }
-            #endif
-          } else if (vis_error) {
-            kbps = 0;
-            ms = 0;
-            playtime_songlength=0;
-            playtime = ms/1000;
-          }
-          playtime_hour = (playtime/60)/60;
-          playtime_min = (playtime/60);
-          playtime_sec = playtime-(playtime_min*60);
-          playtime_min = playtime_min-(playtime_hour*60);
-          // old metode.
-          playtime_length_min = playtime_songlength/60;
-          playtime_length_sec = playtime_songlength-(playtime_length_min*60);
-          // configland = lande kode
-          strcpy(temptxt,music_play_time[configland]);
-          temptxt[40] = 0;
-          drawText(temptxt, 520.0f, 580.0f, 0.4f,1);
-
-          sprintf(temptxt,"%02d:%02d/%02d:%02d ",playtime_min,playtime_sec,playtime_length_min,playtime_length_sec);
-          temptxt[40]=0;
-          drawText(temptxt, 700.0f, 580.0f, 0.4f,1);
-
-
-          #if defined USE_FMOD_MIXER
-          channel->getFrequency(&frequency);
-          #endif
-          drawText(music_samplerate[configland], 520.0f, 560.0f, 0.4f,1);
-          sprintf(temptxt,"%5.0f/%d Kbits.",frequency,kbps);
-          temptxt[40]=0;
-          drawText(temptxt, 700.0f, 560.0f, 0.4f,1);
-
-        }
-        // play list status
-        drawText(music_playsong[configland], 520.0f, 540.0f, 0.4f,1);
-
-        // show artist name
-        // format as %d/%d in playlist
-        sprintf(temptxt,music_numberinplaylist[configland],do_play_music_aktiv_table_nr,aktiv_playlist.numbers_in_playlist());
-        temptxt[40]=0;
-        drawText(temptxt, 700.0f, 540.0f, 0.4f,1);
-
-        // show next song in status window
-        glColor3f(0.6f, 0.6f, 0.6f);
-        if ((do_play_music_aktiv_table_nr)<aktiv_playlist.numbers_in_playlist()) {
-          strcpy(temptxt,music_nextsong[configland]);
-          temptxt[52]=0;
-          drawText(temptxt, 520.0f, 520.0f, 0.4f,1);
-          aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr);
-          pos=strrchr(temptxt,'/');
-          if (strrchr(temptxt,'/')) {
-            strcpy(temptxt1,pos+1);
-            strcpy(temptxt,temptxt1);
-          }
-          pos=strrchr(temptxt,'.');
-          if (strrchr(temptxt,'.')) temptxt[pos-temptxt]='\0';
-          temptxt[40]=0;
-          drawText(temptxt, 700.0f, 520.0f, 0.4f,1);
-        }
-      }
-    }
-    */
-  }
-
   
   // ******************************************************************************************************************
   // ******************************************************************************************************************
@@ -5710,7 +5428,7 @@ void display() {
     if ((snd) && (!(visur))) {
       int textofset=140;
       if (radiooversigt.playing) {
-
+  
       }
       if (do_zoom_radio) {
 
@@ -5921,7 +5639,6 @@ void display() {
         temptxt[40]=0;
         drawText(temptxt, 700.0f, 580.0f, 0.4f,1);
 
-
         #if defined USE_FMOD_MIXER
         channel->getFrequency(&frequency);
         #endif
@@ -5930,8 +5647,6 @@ void display() {
         temptxt[40]=0;
         drawText(temptxt, 700.0f, 560.0f, 0.4f,1);
         // end NEW CODE
-
-
 
         drawText("Song Name ",520.0f, 650.0f, 0.4f ,1);
         // show artist name
@@ -6113,9 +5828,8 @@ void display() {
           drawText("         ",520.0f, 640.0f, 0.4f,1);
         } else {
           // show value
-          drawText("Playlist ",520.0f, 640.0f, 0.4f,1);
-          if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
-            else drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
+          drawText("Artist ",520.0f, 640.0f, 0.4f,1);
+          drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
         }
         // show tidal songname
         drawText("Songname ", 520.0f, 620.0f, 0.4f,1);
@@ -6716,54 +6430,7 @@ void display() {
     Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
     sdlmusicplayer=NULL;
     #endif
-    film_oversigt.playmovie(fknapnr-1);               // start movie
-    
-    /*
-    if (strcmp("Internal",configdefaultplayer)!=0)  {
-      // write debug log
-      sprintf(debuglogdata,"Start movie nr %d Player is vlc path :%s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-      write_logfile(logfile,(char *) debuglogdata);
-      strcpy(systemcommand,"/bin/sh startmovie.sh ");
-      strcat(systemcommand,"'");
-      strcat(systemcommand,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());      // old strcat(systemcommand,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfilename());
-      strcat(systemcommand,"'");    
-      cmd_error=system(systemcommand);
-      if (cmd_error) {
-        sprintf(debuglogdata,"Error file not found %s.",film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-        write_logfile(logfile,(char *) debuglogdata);
-      } else write_logfile(logfile,(char *) "VLC OK. Start movie from startmovie.sh");
-    } else {
-      // default
-      // start internal player (vlc)
-      sprintf(debuglogdata,"Start play use default player film nr: %d name: %s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-      // write to log file
-      write_logfile(logfile,(char *) debuglogdata);
-      // if we play music/stream (radio) stop that before play movie stream (vlc)
-      // stop music if play before start movie
-      // write to log
-      write_logfile(logfile,(char *) "Stop playing music/radio.");
-      // clean music playlist
-      aktiv_playlist.clean_playlist();                // clean play list (reset) play list
-      do_play_music_aktiv_table_nr=1;			            // reset play start nr
-      // write to log
-      write_logfile(logfile,(char *) "Stop playing media if any");
-      if (film_oversigt.film_is_playing) {
-        //write to debug log
-        write_logfile(logfile,(char *) "Stop playing last movie before start new");
-        // stop playing (active movie)
-        //film_oversigt.softstopmovie();
-      }
-      // start movie
-      if (film_oversigt.playmovie(fknapnr-1)==0) {
-        vis_error = true;
-        vis_error_timeout = 60;
-        //playmedia
-      } else {
-        sprintf(debuglogdata,"Start movie %s ",film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-        write_logfile(logfile,(char *) debuglogdata);
-      }
-    }
-    */
+    film_oversigt.playmovie(fknapnr-1);               // start movie   
     startmovie = false;                   // start kun 1 instans
   }
   if (stopmovie) {
@@ -8497,6 +8164,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 } else if (tidal_oversigt.type==1) {
                   ask_open_dir_or_play_tidal=true;
                 }
+                if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
+                  do_zoom_tidal_cover = false;
+                  do_zoom_spotify_cover=false;
+                  do_zoom_music_cover=false;
+                  do_zoom_radio=false;
+                }
               }
               // works ok
               // back icon to main playlist overview
@@ -8579,11 +8252,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               if (names[i*4+3]==27) {
                 // write debug log
                 write_logfile(logfile,(char *) "Show/close tidal info");
-                if (ask_open_dir_or_play_tidal==false) {
+                if (ask_save_playlist) {
+                  ask_save_playlist=false;
+                } else if (ask_open_dir_or_play_tidal==false) {
                   do_zoom_tidal_cover = false;
                   // do_zoom_tidal_cover =! do_zoom_tidal_cover;
                 }
                 if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
+                
                 fundet = true;
               }
             }
@@ -9643,7 +9319,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if (ask_open_dir_or_play_tidal) {
                   ask_open_dir_or_play_tidal=false;				// flag luk vindue igen
                 } else {
-                  do_zoom_tidal_cover=!do_zoom_tidal_cover;
+                  if (ask_save_playlist) ask_save_playlist=false;
+                  else do_zoom_tidal_cover=!do_zoom_tidal_cover;
                 }
               }
               if ((musicoversigt.get_music_is_playing())) {
@@ -10015,7 +9692,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         }
         if (do_zoom_tidal_cover) {
           // pause/stop tidal music
-          if (( retfunc == 5 ) || (button==3)) {
+          if (( retfunc == 5 ) && (button==3)) {                                                                // OR || before
             if (do_play_tidal_cover==false) tidal_oversigt.tidal_resume_play();
             tidal_oversigt.tidal_pause_play();                              // spotify stop play
             do_zoom_tidal_cover=false;
@@ -12845,7 +12522,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_tidal_oversigt=false;
                 keybufferopenwin=false;
                 key=0;
-              } else if ((!(do_show_setup)) && (do_show_torrent==false) && (key==27) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {                       // exit program
+              } else if ((!(do_show_setup)) && (do_show_torrent==false) && (key==27) && (tidal_oversigt.do_setup_tidal_start_entry==false) && (ask_save_playlist==false)) {      // exit program
                 remove("mythtv-controller.lock");
                 runwebserver=false;
                 order_channel_list();
@@ -17044,7 +16721,7 @@ int main(int argc, char** argv) {
       fputs("|  Y Y  \\___  | |  | |   Y  \\  |  \\   /  /_____/ \\  \\__(  <_> )   |  \\  |  |  | \\(  <_> )  |_|  |_\\  ___/|  | \\/   \n",logfile);
       fputs("|__|_|  / ____| |__| |___|  /__|   \\_/            \\___  >____/|___|  /__|  |__|   \\____/|____/____/\\___  >__|           \n",logfile);
       fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
-      fputs("Ver 0.42.6 \n",logfile);
+      fputs("Ver 0.45.1 \n",logfile);
     }
     printf("Build date %s\n",build_str);
     printf("\n\nMythtv-controller Version %s \n",SHOWVER);
@@ -17069,6 +16746,7 @@ int main(int argc, char** argv) {
         printf("-r For radio mode\n");
         printf("-f For film mode\n");
         printf("-s For podcast mode\n");
+        printf("-t For Tidal mode\n");
         printf("-v Show version\n");
         printf("-h This help screen\n\n");
         exit(0);
@@ -17210,14 +16888,16 @@ int main(int argc, char** argv) {
       }      
       tidal_oversigt.get_artist_from_file_and_update_for_editor((char *) "");
       tidal_oversigt.opdatere_tidal_oversigt(0);
-      tidal_oversigt.opdatere_tidal_userCollections2((char *) "");
+      // get user collections
+      // this call do not work
+      // tidal_oversigt.opdatere_tidal_userCollections2((char *) "");
     } else {
       printf("Token is missing i code.\n");
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
       exit(0);
     }
     // works
-    
+    // old code
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {
       //tidal_oversigt->start_webserver();
@@ -17410,12 +17090,12 @@ int main(int argc, char** argv) {
     #endif
     // select start func if argc is this
     if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt = true;
-    if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt = true;
-    if ((argc>1) && (strcmp(argv[1],"-m")==0)) vis_music_oversigt = true;
-    if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt = true;
-    if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-m")==0)) vis_music_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt = true;
     #ifdef ENABLE_SPOTIFY
-    if ((argc>1) && (strcmp(argv[1],"-y")==0)) vis_spotify_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-y")==0)) vis_spotify_oversigt = true;
     #endif
     #ifdef ENABLE_TIDAL
     if ((argc>1) && (strcmp(argv[1],"-t")==0)) vis_tidal_oversigt = true;
