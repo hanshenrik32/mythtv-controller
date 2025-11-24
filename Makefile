@@ -90,8 +90,12 @@ compile: $(PROG)
 		cp lirc/* ~/.config/lirc/; \
 		mkdir -p ~/.xmltv/; \
 	fi
+	cd ..
 	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
+	if ! test -d bin; then \
+		mkdir bin; \
+	fi
 	cp mythtv-controller debian/mythtv-controller/opt/mythtv-controller/bin/
 
 
@@ -139,9 +143,9 @@ installtidal-dl:
 
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
-	@mkdir -p /opt/mythtv-controller/images/radiostations	
+	@mkdir -p /opt/mythtv-controller/images/radiostations
 	@mkdir -p /opt/mythtv-controller/convert/hires
-	@mkdir -p /opt/mythtv-controller/images/mythnetvision	
+	@mkdir -p /opt/mythtv-controller/images/mythnetvision
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@cp -r -p images tema1 tema1.json tema2 tema2.json tema3 tema3.json tema4 tema4.json tema5 tema5.json tema6 tema6.json tema7 tema7.json tema8 tema8.json tema9 tema9.json tema10 tema10.json $(DESTDIR)
