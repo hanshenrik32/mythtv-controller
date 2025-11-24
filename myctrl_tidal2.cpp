@@ -1759,7 +1759,7 @@ int tidal_class::opdatere_tidal_userCollections2(char *uid) {
   url = url + localuserhomedir;
   url = url + "/";
   url = url + "tidal_usercollection_result.json";
-  printf("url %s \n",url.c_str());
+  // printf("url %s \n",url.c_str());
   error=system(url.c_str());
   if (error!=0) {
     fprintf(stderr,"Curl error get user collections\n");

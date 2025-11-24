@@ -6726,54 +6726,7 @@ void display() {
     Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
     sdlmusicplayer=NULL;
     #endif
-    film_oversigt.playmovie(fknapnr-1);               // start movie
-    
-    /*
-    if (strcmp("Internal",configdefaultplayer)!=0)  {
-      // write debug log
-      sprintf(debuglogdata,"Start movie nr %d Player is vlc path :%s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-      write_logfile(logfile,(char *) debuglogdata);
-      strcpy(systemcommand,"/bin/sh startmovie.sh ");
-      strcat(systemcommand,"'");
-      strcat(systemcommand,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());      // old strcat(systemcommand,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfilename());
-      strcat(systemcommand,"'");    
-      cmd_error=system(systemcommand);
-      if (cmd_error) {
-        sprintf(debuglogdata,"Error file not found %s.",film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-        write_logfile(logfile,(char *) debuglogdata);
-      } else write_logfile(logfile,(char *) "VLC OK. Start movie from startmovie.sh");
-    } else {
-      // default
-      // start internal player (vlc)
-      sprintf(debuglogdata,"Start play use default player film nr: %d name: %s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-      // write to log file
-      write_logfile(logfile,(char *) debuglogdata);
-      // if we play music/stream (radio) stop that before play movie stream (vlc)
-      // stop music if play before start movie
-      // write to log
-      write_logfile(logfile,(char *) "Stop playing music/radio.");
-      // clean music playlist
-      aktiv_playlist.clean_playlist();                // clean play list (reset) play list
-      do_play_music_aktiv_table_nr=1;			            // reset play start nr
-      // write to log
-      write_logfile(logfile,(char *) "Stop playing media if any");
-      if (film_oversigt.film_is_playing) {
-        //write to debug log
-        write_logfile(logfile,(char *) "Stop playing last movie before start new");
-        // stop playing (active movie)
-        //film_oversigt.softstopmovie();
-      }
-      // start movie
-      if (film_oversigt.playmovie(fknapnr-1)==0) {
-        vis_error = true;
-        vis_error_timeout = 60;
-        //playmedia
-      } else {
-        sprintf(debuglogdata,"Start movie %s ",film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-        write_logfile(logfile,(char *) debuglogdata);
-      }
-    }
-    */
+    film_oversigt.playmovie(fknapnr-1);               // start movie   
     startmovie = false;                   // start kun 1 instans
   }
   if (stopmovie) {
@@ -17064,7 +17017,7 @@ int main(int argc, char** argv) {
       fputs("|  Y Y  \\___  | |  | |   Y  \\  |  \\   /  /_____/ \\  \\__(  <_> )   |  \\  |  |  | \\(  <_> )  |_|  |_\\  ___/|  | \\/   \n",logfile);
       fputs("|__|_|  / ____| |__| |___|  /__|   \\_/            \\___  >____/|___|  /__|  |__|   \\____/|____/____/\\___  >__|           \n",logfile);
       fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
-      fputs("Ver 0.42.6 \n",logfile);
+      fputs("Ver 0.45.1 \n",logfile);
     }
     printf("Build date %s\n",build_str);
     printf("\n\nMythtv-controller Version %s \n",SHOWVER);
@@ -17089,6 +17042,7 @@ int main(int argc, char** argv) {
         printf("-r For radio mode\n");
         printf("-f For film mode\n");
         printf("-s For podcast mode\n");
+        printf("-t For Tidal mode\n");
         printf("-v Show version\n");
         printf("-h This help screen\n\n");
         exit(0);
@@ -17230,14 +17184,16 @@ int main(int argc, char** argv) {
       }      
       tidal_oversigt.get_artist_from_file_and_update_for_editor((char *) "");
       tidal_oversigt.opdatere_tidal_oversigt(0);
-      tidal_oversigt.opdatere_tidal_userCollections2((char *) "");
+      // get user collections
+      // this call do not work
+      // tidal_oversigt.opdatere_tidal_userCollections2((char *) "");
     } else {
       printf("Token is missing i code.\n");
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
       exit(0);
     }
     // works
-    
+    // old code
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {
       //tidal_oversigt->start_webserver();
@@ -17430,12 +17386,12 @@ int main(int argc, char** argv) {
     #endif
     // select start func if argc is this
     if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt = true;
-    if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt = true;
-    if ((argc>1) && (strcmp(argv[1],"-m")==0)) vis_music_oversigt = true;
-    if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt = true;
-    if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-m")==0)) vis_music_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt = true;
     #ifdef ENABLE_SPOTIFY
-    if ((argc>1) && (strcmp(argv[1],"-y")==0)) vis_spotify_oversigt = true;
+    else if ((argc>1) && (strcmp(argv[1],"-y")==0)) vis_spotify_oversigt = true;
     #endif
     #ifdef ENABLE_TIDAL
     if ((argc>1) && (strcmp(argv[1],"-t")==0)) vis_tidal_oversigt = true;
