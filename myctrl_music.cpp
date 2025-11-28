@@ -1217,6 +1217,8 @@ int musicoversigt_class::save_music_oversigt_playlists(char *playlistname) {
     } // end while
     snprintf(temptxt,sizeof(temptxt),"','%s',%d,%d,'%s')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
     sqlselect2 = fmt::format("','{}',{},{},'{}')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
+    sqlselect1 = sqlselect1 + sqlselect2; 
+    // printf("SQL SAVE PLAYLIST = %s \n",sqlselect1.c_str());
     strcat(sqlselect,temptxt);
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
@@ -1478,7 +1480,16 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         } else {
-          glBindTexture(GL_TEXTURE_2D,normal_icon);
+          // new code load cover file if exist
+          if (musicoversigt[i+sofset].textureId==0) {
+            if (strcmp(musicoversigt[i+sofset].album_coverfile,"")!=0) {
+              if (file_exists(musicoversigt[i+sofset].album_coverfile)) {
+                musicoversigt[i+sofset].textureId = loadTexture((char *) musicoversigt[i+sofset].album_coverfile);
+              }
+            }
+          }
+          if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
+          else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }

@@ -8225,8 +8225,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 write_logfile(logfile,(char *) "(tidal) last song");
                 returnfunc = 107;                                                       //
                 fundet = true;
-              }
-              // scroll up
+              }              
+              // scroll up button
               if (names[i*4+3]==23) {
                 // write debug log
                 sprintf(debuglogdata,"scroll down tidal_selected_startofset = %d ",tidal_selected_startofset);
@@ -8238,7 +8238,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                   fundet = true;
                 }
               }
-              // scroll down
+              // scroll down button
               if (names[i*4+3]==24) {
                 // write debug log
                 sprintf(debuglogdata,"scroll up tidal_selected_startofset = %d",tidal_selected_startofset);
@@ -11769,6 +11769,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
               ask_save_playlist=false;
             } else {
+              /*
               if (vis_music_oversigt) {
                 // save playlist
                 fprintf(stderr,"Ask save playlist\n");
@@ -11786,6 +11787,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   ask_save_playlist = true;                                         // set save playlist flag
                 }
               }
+              */
             }
           }
 
@@ -12654,7 +12656,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // save playlist
             case 'S':
               // do save playlist
-              /*
+              
               if (vis_music_oversigt) {
                 // save playlist
                 fprintf(stderr,"Ask save playlist\n");
@@ -12665,7 +12667,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 fprintf(stderr,"Ask save playlist\n");
                 ask_save_playlist = true;                                         // set save playlist flag
               }
-              */
+              
               break;
             case 't':
               if (vis_movie_options) {
@@ -12988,6 +12990,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                   */
                 }
                 // enter key pressed og ask open dir or play er åben så start play
+
+
+                // save playlist
+                if ((vis_music_oversigt) && (ask_save_playlist)) {
+                  fprintf(stderr,"Enter key pressed start play music \n");
+                  musicoversigt.save_music_oversigt_playlists(keybuffer);   // save playlist
+                  ask_save_playlist=false;                                   // luk vindue igen
+                }
+
                 if ((vis_music_oversigt) && (ask_open_dir_or_play) && (ask_save_playlist==false)) {
                   ask_open_dir_or_play=false;                 // flag luk vindue igen
                   do_play_music_cover=1;                      // der er trykket på cover play det
