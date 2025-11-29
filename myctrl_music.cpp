@@ -1185,16 +1185,18 @@ int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int s
 
 int musicoversigt_class::save_music_oversigt_playlists(char *playlistname) {
   bool fault;
-  char sqlselect[8192];
-  char temptxt[2048];
   std::string sqlselect1;
   std::string sqlselect2;
+  std::string dato;
   unsigned int i;
   // mysql vars
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   char database[256];
+  time_t now = time(0);
+  tm *ltm = localtime(&now);
+  dato=fmt::format("{}-{}-{} {}:{}:{}",ltm->tm_year+1900,ltm->tm_mon+1,ltm->tm_mday,ltm->tm_hour,ltm->tm_min,ltm->tm_sec);
   strcpy(database,dbname);
   //clean_music_oversigt(musicoversigt);
   write_logfile(logfile,(char *) "Save music playlist.");
@@ -1205,22 +1207,15 @@ int musicoversigt_class::save_music_oversigt_playlists(char *playlistname) {
   mysql_query(conn,"set NAMES 'utf8'");
   res = mysql_store_result(conn);
   if (conn) {
-    snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO music_playlist (playlist_id,playlist_name,playlist_songs,last_accessed,length,songcount,hostname) values(0,'%s','",playlistname);
     sqlselect1 = fmt::format("REPLACE INTO music_playlist (playlist_id,playlist_name,playlist_songs,last_accessed,length,songcount,hostname) values(0,'{}','",playlistname);
     while (i<aktiv_playlist.numbers_in_playlist()) {
-      sprintf(temptxt,"%d",aktiv_playlist.get_songid(i));
       sqlselect1 = sqlselect1 + std::to_string(aktiv_playlist.get_songid(i));
       sqlselect1 = sqlselect1 + " ";
-      strcat(sqlselect,temptxt);
-      strcat(sqlselect," ");
       i++;
-    } // end while
-    snprintf(temptxt,sizeof(temptxt),"','%s',%d,%d,'%s')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
-    sqlselect2 = fmt::format("','{}',{},{},'{}')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
+    }
+    sqlselect2 = fmt::format("','{}',{},{},'{}')",dato,0,aktiv_playlist.numbers_in_playlist(),"");
     sqlselect1 = sqlselect1 + sqlselect2; 
-    // printf("SQL SAVE PLAYLIST = %s \n",sqlselect1.c_str());
-    strcat(sqlselect,temptxt);
-    mysql_query(conn,sqlselect);
+    mysql_query(conn,sqlselect1.c_str());
     res = mysql_store_result(conn);
     if (res) fault=false;
   }
