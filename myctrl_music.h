@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <vector>
 
 //#include <irrKlang.h>
 //used in music oversigt
@@ -33,10 +34,10 @@ class musicoversigt_class {
   private:
     // const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
     unsigned int antal_music_oversigt;
-    music_oversigt_type musicoversigt[MAX_MUSIC_OVERSIGT_SIZE+1];
+    // music_oversigt_type musicoversigt[MAX_MUSIC_OVERSIGT_SIZE+1];
+    std::vector <music_oversigt_type> musicoversigt;
     bool do_play;
-    bool music_is_playing;                                                // do we play ?
-    
+    bool music_is_playing;                                                // do we play ?    
   public:
     char overview_show_band_name[256];                                  // show band name in overview
     bool search_loaded;

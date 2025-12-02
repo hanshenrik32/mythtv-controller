@@ -574,7 +574,8 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       if (stack[i+sofset].online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
       // indside draw radio station icon
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
+      glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glBlendEquation(GL_FUNC_ADD);
       //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D,stack[i+sofset].textureId);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -590,7 +591,6 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     } else {
       // default icon
       glPushMatrix();
-
       if (stack[i+sofset].online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
