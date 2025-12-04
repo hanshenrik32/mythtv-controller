@@ -970,7 +970,6 @@ int hentmythtvver() {
     MYSQL_ROW row;
     char sqlselect[200];
     char txtversion[200];
-//    int i;
     // mysql stuf
     strcpy(txtversion,"");
     strcpy(sqlselect,"select data from settings where value like 'DBSchemaVer'");    
@@ -5259,195 +5258,30 @@ void display() {
   */
   // ******************************************************************************************************************
   //
-  // *********************** RADIO stuf *******************************************************************************
+  // *********************** Show play stuf ***************************************************************************
+  //
   // show radio player
   if (!(visur)) {
-    if (vis_radio_oversigt) {
-      /*
-      if ((snd) && (do_zoom_radio)) {
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        // window texture
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glDisable(GL_DEPTH_TEST);
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D, _textureradioplayer);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox ,  config_menu.config_radioplayer_infoy , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox,400+config_menu.config_radioplayer_infoy, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+640,400+config_menu.config_radioplayer_infoy , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+640,config_menu.config_radioplayer_infoy, 0.0);
-        glEnd();
-        // play button
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D,_texturemplay);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(8);                        // 8 = play
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+50 ,  320 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+50,100+320, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+50+100,100+320 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+50+100,320, 0.0);
-        glEnd();
-        // stop button
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D,_texturemstop);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(9);                        // 9 = stop
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+150 ,  320 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+150,100+320, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+150+100,100+320 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+150+100,320, 0.0);
-        glEnd();
-        // ff button
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D,_texturemlast);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(8);                        // 8 = play
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+250 ,  320 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+250,100+320, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+250+100,100+320 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+250+100,320, 0.0);
-        glEnd();
-        // back button
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D,_texturemnext);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(8);                        // 8 = play
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+350 ,  320 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+350,100+320, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+350+100,100+320 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+350+100,320, 0.0);
-        glEnd();
-        // get radio station texture
-        textureId=radiooversigt.get_texture(aktiv_radio_station);                           // get radio texture opengl id
-        if (textureId) {
-          // radio icon big size
-          glEnable(GL_TEXTURE_2D);
-          glEnable(GL_BLEND);
-          // if (textureId==0) textureId=onlineradio;                                            // hvis ingen texture (music cover) set default
-          glBindTexture(GL_TEXTURE_2D,textureId);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+400 ,  480 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+400 ,  200+480, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 200+480 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 480, 0.0);
-          glEnd();
-        }
-        if (snd) {
-          // play position
-          unsigned int ms = 0;
-          float frequency;
-          #if defined USE_FMOD_MIXER
-          result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
-          if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-            ERRCHECK(result,0);
-          }
-          // get play length new version
-          result=sound->getLength(&radio_playtime_songlength,FMOD_TIMEUNIT_MS);
-          if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-            ERRCHECK(result,do_play_music_aktiv_table_nr);
-          }
-          result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
-          if (result!=FMOD_OK) {
-            ERRCHECK(result,0);
-          }
-          // do the calc
-          if (result==FMOD_OK) {
-            //playtime_songlength=playtime_songlength/1000;
-            radio_playtime=ms/1000;
-          } else {
-            radio_playtime_songlength=0;
-            radio_playtime=0;
-          }
-          #endif
-          #if defined USE_SDL_MIXER
-          #endif
-          drawText("Song Name ",(orgwinsizex/4)+20, (orgwinsizey/2)+120, 0.4f ,1);
-          std::string temptxt1;
-          temptxt1 = fmt::format("{:38}",aktivsongname);
-          temptxt1.resize(38);
-          drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+120, 0.4f,1);
-          drawText("Station ",(orgwinsizex/4)+20, (orgwinsizey/2)+80, 0.4f,1);            
-          temptxt1 = fmt::format(" {:38}",radiooversigt.get_station_name(aktiv_radio_station));
-          temptxt1.resize(38);
-          drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+80, 0.4f,1);
-          radio_playtime_hour=(radio_playtime/60)/60;
-          radio_playtime_min=(radio_playtime/60);
-          radio_playtime_sec=radio_playtime-(radio_playtime_min*60);
-          radio_playtime_min=radio_playtime_min-(radio_playtime_hour*60);
-          if (radio_playtime_min>60) radio_playtime_min=0;
-          sprintf(temptxt,"%s",music_timename[1]);       // 1 = danish
-          temptxt[40]=0;
-          drawText(temptxt,(orgwinsizex/4)+20, (orgwinsizey/2)+60, 0.4f,1);
-          temptxt1 = fmt::format(" {:02}:{:02}:{:02}",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
-          drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+60, 0.4f,1);
-          drawText("Bitrate ",(orgwinsizex/4)+20, (orgwinsizey/2)+40, 0.4f,1);
-          frequency=192;
-          temptxt1 = fmt::format(" {:3.0f} Kbits",frequency);
-          drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+40, 0.4f,1);
-          drawText("Status ",(orgwinsizex/4)+20, (orgwinsizey/2)+20, 0.4f,1);
-          sprintf(temptxt," %-20s",aktivsongstatus);
-          drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+20, 0.4f,1);
-        }
-      }
-      */
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // show tidal player status NEW version
-    
+    // show tidal player status NEW version    
     if ((snd) && (!(visur))) {
       int textofset=140;
       if (radiooversigt.playing) {
-  
       }
       if (do_zoom_radio) {
-
       }
       if (do_zoom_stream_cover) {
-
+        do_zoom_radio=false;
       }
       if (do_zoom_tidal_cover) {
-
+        do_zoom_radio=false;
       }
       if (do_zoom_spotify_cover) {
-
+        do_zoom_radio=false;
       }
       if (do_zoom_music_cover) {
-
+        do_zoom_radio=false;
       }
-
       // printf("zoom_tidal=%s zoom_spotify=%s zoom_music=%s zoom_radio=%s  zoom_stream=%s \n",do_zoom_tidal_cover ? "true" : "false",do_zoom_spotify_cover ? "true" : "false",do_zoom_music_cover ? "true" : "false",do_zoom_radio ? "true" : "false",do_zoom_stream_cover ? "true" : "false ");
-      
       if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
         // show tidal player
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -5492,33 +5326,34 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+150+100,100+320 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+150+100,320, 0.0);
         glEnd();
-        // ff button
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D,_texturemlast);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(10);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+250 ,  320 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+250,100+320, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+250+100,100+320 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+250+100,320, 0.0);
-        glEnd();
-        // back button
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D,_texturemnext);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(11);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+350 ,  320 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+350,100+320, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+350+100,100+320 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+350+100,320, 0.0);
-        glEnd();
-
+        if (!(do_zoom_radio)) {
+          // ff button
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBindTexture(GL_TEXTURE_2D,_texturemlast);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(10);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+250 ,  320 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+250,100+320, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+250+100,100+320 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+250+100,320, 0.0);
+          glEnd();
+          // back button
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBindTexture(GL_TEXTURE_2D,_texturemnext);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(11);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+350 ,  320 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+350,100+320, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+350+100,100+320 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+350+100,320, 0.0);
+          glEnd();
+        }
         // play position
         unsigned int ms = 0;
         float frequency;
@@ -5536,7 +5371,6 @@ void display() {
         if (result!=FMOD_OK) {
           ERRCHECK(result,0);
         }
-
         unsigned int splaytime;
         unsigned int splaytime_songlength;
         // do the calc
@@ -5698,6 +5532,36 @@ void display() {
           glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 480, 0.0);
           glEnd();
         }
+        // play position
+        unsigned int ms = 0;
+        float frequency;
+        vis_error=false;
+        if (vis_error==false)  {
+          #if defined USE_FMOD_MIXER
+          result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
+          if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
+            ERRCHECK(result,do_play_music_aktiv_table_nr);
+          }
+          // get play length new version
+          result=sound->getLength(&playtime_songlength,FMOD_TIMEUNIT_MS);
+          if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
+            ERRCHECK(result,do_play_music_aktiv_table_nr);
+          }
+          result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
+          if (result!=FMOD_OK) {
+            ERRCHECK(result,do_play_music_aktiv_table_nr);
+          }
+          #endif
+        }
+        // do the calc
+        if (result==FMOD_OK) {
+          //playtime_songlength=playtime_songlength/1000;
+          radio_playtime=ms/1000;
+        } else {
+          radio_playtime_songlength=0;
+          radio_playtime=0;
+        }
+
         drawText("Song Name ",(orgwinsizex/4)+20, (orgwinsizey/2)+120, 0.4f ,1);
         std::string temptxt1;
         temptxt1 = fmt::format("{:38}",aktivsongname);
@@ -5814,8 +5678,6 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+395+200,200+390 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+395+200,390, 0.0);
         glEnd();
-
-
         do_we_play_check=0;
         if (do_we_play_check==0) {
           tidal_oversigt.tidal_do_we_play();
@@ -7584,7 +7446,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             order_channel_list();                                               // order tv channel list
             save_channel_list();                                                //
             txmltvgraber_createconfig();                                        // create tv grabber config
-            write_logfile(logfile,(char *) "Exit program.");
+            write_logfile(logfile,(char *) "Exit program.");            
+            save_config((char *) "/etc/mythtv-controller.conf");
             exit(0);                                                            // exit
           }
         }
@@ -8225,8 +8088,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 write_logfile(logfile,(char *) "(tidal) last song");
                 returnfunc = 107;                                                       //
                 fundet = true;
-              }
-              // scroll up
+              }              
+              // scroll up button
               if (names[i*4+3]==23) {
                 // write debug log
                 sprintf(debuglogdata,"scroll down tidal_selected_startofset = %d ",tidal_selected_startofset);
@@ -8238,7 +8101,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                   fundet = true;
                 }
               }
-              // scroll down
+              // scroll down button
               if (names[i*4+3]==24) {
                 // write debug log
                 sprintf(debuglogdata,"scroll up tidal_selected_startofset = %d",tidal_selected_startofset);
@@ -11769,6 +11632,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
               ask_save_playlist=false;
             } else {
+              /*
               if (vis_music_oversigt) {
                 // save playlist
                 fprintf(stderr,"Ask save playlist\n");
@@ -11786,6 +11650,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   ask_save_playlist = true;                                         // set save playlist flag
                 }
               }
+              */
             }
           }
 
@@ -12654,7 +12519,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // save playlist
             case 'S':
               // do save playlist
-              /*
+              
               if (vis_music_oversigt) {
                 // save playlist
                 fprintf(stderr,"Ask save playlist\n");
@@ -12665,7 +12530,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 fprintf(stderr,"Ask save playlist\n");
                 ask_save_playlist = true;                                         // set save playlist flag
               }
-              */
+              
               break;
             case 't':
               if (vis_movie_options) {
@@ -12988,6 +12853,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                   */
                 }
                 // enter key pressed og ask open dir or play er åben så start play
+
+
+                // save playlist
+                if ((vis_music_oversigt) && (ask_save_playlist)) {
+                  fprintf(stderr,"Enter key pressed start play music \n");
+                  musicoversigt.save_music_oversigt_playlists(keybuffer);   // save playlist
+                  ask_save_playlist=false;                                   // luk vindue igen
+                }
+
                 if ((vis_music_oversigt) && (ask_open_dir_or_play) && (ask_save_playlist==false)) {
                   ask_open_dir_or_play=false;                 // flag luk vindue igen
                   do_play_music_cover=1;                      // der er trykket på cover play det
@@ -15758,24 +15632,22 @@ void *xbmcdatainfoloader_movie(void *data) {
 
 GLuint loadgfxfile(char *temapath,char *dir,char *file) {
     GLuint gl_img=0;
-    char fileload[2000];
-    strcpy(fileload,"");
-    strcat(fileload,temapath);
-    strcat(fileload,dir);
-    strcat(fileload,file);							// filename - type
-    strcat(fileload,".png");            // add png to file name
-    if (file_exists(fileload)) gl_img = loadTexture ((char *) fileload);
+    std::string fileload="";
+    fileload=fileload + temapath;
+    fileload=fileload + dir;
+    fileload=fileload + file;              // filename - type
+    fileload=fileload + ".png";            // add png
+    if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
     else {
-      // check if file exist af .jpg file
-      strcpy(fileload,"");
-      strcat(fileload,temapath);
-      strcat(fileload,dir);
-      strcat(fileload,file);
-      strcat(fileload,".jpg");
-      if (file_exists(fileload)) gl_img = loadTexture ((char *) fileload);
+      // check if file exist af .jpg file      
+      fileload=fileload + temapath;
+      fileload=fileload + dir;
+      fileload=fileload + file;              // filename - type
+      fileload=fileload + ".jpg";            // add jpg
+      if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
       else gl_img = 0;
     }
-    if (gl_img == 0) fprintf(stderr,"GFXFILE %s in dir %s NOT FOUND \n",fileload,dir);
+    if (gl_img == 0) fprintf(stderr,"GFXFILE %s in dir %s NOT FOUND \n",fileload.c_str(),dir);
     return(gl_img);
 }
 
@@ -15790,36 +15662,32 @@ GLuint loadgfxfile(char *temapath,char *dir,char *file) {
 
 void loadgfx() {
     unsigned int i;
-    char tmpfilename[256];
-    char fileload[256];
-    char temapath[256];
-    char temapath1[256];
-    printf ("Loading init graphic.\n");
-    strcpy(temapath,"");
-    strcpy(temapath1,"");
-    if (tema == 1) strcpy(temapath,"/opt/mythtv-controller/tema1/"); else
-    if (tema == 2) strcpy(temapath,"/opt/mythtv-controller/tema2/"); else
-    if (tema == 3) strcpy(temapath,"/opt/mythtv-controller/tema3/"); else
-    if (tema == 4) strcpy(temapath,"/opt/mythtv-controller/tema4/"); else
-    if (tema == 5) strcpy(temapath,"/opt/mythtv-controller/tema5/"); else
-    if (tema == 6) strcpy(temapath,"/opt/mythtv-controller/tema6/"); else
-    if (tema == 7) strcpy(temapath,"/opt/mythtv-controller/tema7/"); else
-    if (tema == 8) strcpy(temapath,"/opt/mythtv-controller/tema8/"); else
-    if (tema == 9) strcpy(temapath,"/opt/mythtv-controller/tema9/"); else
-    if (tema == 10) strcpy(temapath,"/opt/mythtv-controller/tema10/"); else {
+    std::string temapath="";
+    printf ("Loading init graphic.\n");    
+    if (tema == 1) temapath="/opt/mythtv-controller/tema1/"; else
+    if (tema == 2) temapath="/opt/mythtv-controller/tema2/"; else
+    if (tema == 3) temapath="/opt/mythtv-controller/tema3/"; else
+    if (tema == 4) temapath="/opt/mythtv-controller/tema4/"; else
+    if (tema == 5) temapath="/opt/mythtv-controller/tema5/"; else
+    if (tema == 6) temapath="/opt/mythtv-controller/tema6/"; else
+    if (tema == 7) temapath="/opt/mythtv-controller/tema7/"; else
+    if (tema == 8) temapath="/opt/mythtv-controller/tema8/"; else
+    if (tema == 9) temapath="/opt/mythtv-controller/tema9/"; else
+    if (tema == 10) temapath="/opt/mythtv-controller/tema10/"; else {
       // default tema
-      strcpy(temapath,"tema1/");
+      // strcpy(temapath,"tema1/");
+      temapath="tema1/";
       tema=1;
     }
-    _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
-    _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
-    _defaultdvdcover_mask = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask");
+    _textureutvbgmask     = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tv_carbon");
+    _defaultdvdcover      = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dvdcover");
+    _defaultdvdcover_mask = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dvdcover_mask");
     if (screen_size<3)
-    _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
+    _texturemovieinfobox  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
     else
-    _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox3-4");		// big screen  16/9
-    _textureId_dir       = loadgfxfile(temapath,(char *) "images/",(char *) "dir1");
-    _textureId_song      = loadgfxfile(temapath,(char *) "images/",(char *) "song1");
+    _texturemovieinfobox  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "movie-infobox3-4");		// big screen  16/9
+    _textureId_dir       = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dir1");
+    _textureId_song      = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "song1");
     
     // _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info");
     _texturemusicplayer 	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_musicplayer_info_icon.c_str());  //
@@ -15827,110 +15695,110 @@ void loadgfx() {
     _texturetidalplayer   = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_tidalplayer_info_icon.c_str());  //
     _textureradioplayer   = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_radioplayer_info_icon.c_str());  //
 
-    _texturetidalloading	= loadgfxfile(temapath,(char *) "images/",(char *) "tidalplayer-loading");
+    _texturetidalloading	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidalplayer-loading");
 
-    _textureId9_askbox   	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
-    _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
-    _textureIdplayicon   	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
-    _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
-    _textureclose        	= loadgfxfile(temapath,(char *) "images/",(char *) "close");
+    _textureId9_askbox   	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "askbox");
+    _textureId9_2        	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "askbox_cd_cover");
+    _textureIdplayicon   	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "play");
+    _textureopen         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "open");
+    _textureclose        	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "close");
 
-    _textureupdatetidalview= loadgfxfile(temapath,(char *) "images/",(char *) "updatetidalview");
+    _textureupdatetidalview= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "updatetidalview");
 
-    _textureloadfile      = loadgfxfile(temapath,(char *) "images/",(char *) "load_file");
+    _textureloadfile      = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "load_file");
     
     _textureclosemain    	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_closemain_icon.c_str()); // "closemain");
 
-    _textureclose_small  	= loadgfxfile(temapath,(char *) "images/",(char *) "close_small");
-    _textureswap         	= loadgfxfile(temapath,(char *) "images/",(char *) "swap");
-    _textureId11         	= loadgfxfile(temapath,(char *) "images/",(char *) "tvprogram_oversigt");
+    _textureclose_small  	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "close_small");
+    _textureswap         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "swap");
+    _textureId11         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvprogram_oversigt");
     // main background
-    _textureIdback_main   = loadgfxfile(temapath,(char *) "images/",(char *) "background_main");
+    _textureIdback_main   = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "background_main");
     // music oversigt background
-    _textureIdback_music  = loadgfxfile(temapath,(char *) "images/",(char *) "background_music");
+    _textureIdback_music  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "background_music");
     // setup background
-    _textureIdback_setup  = loadgfxfile(temapath,(char *) "images/",(char *) "tuxsetup");
+    _textureIdback_setup  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tuxsetup");
     // other back
-    _textureIdback_other  = loadgfxfile(temapath,(char *) "images/",(char *) "background_other");
+    _textureIdback_other  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "background_other");
     // mask for knap
-    _textureId14         	= loadgfxfile(temapath,(char *) "images/",(char *) "stor_knap3_2_pause");
-    _texture_nocdcover   	= loadgfxfile(temapath,(char *) "images/",(char *) "nocdcover");
-    _textureId22         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox1");
-    _textureId23         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox2");
-    _textureId24         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox3");
-    _textureId26         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar");
-    _textureId27         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar_back");
-    _textureId28         	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist");
-    _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
-    setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
-    setupupdatebutton     = loadgfxfile(temapath,(char *) "images/",(char *) "updatebutton");
-    setuptvgraberback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptvgraberback");
+    _textureId14         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "stor_knap3_2_pause");
+    _texture_nocdcover   	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "nocdcover");
+    _textureId22         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox1");
+    _textureId23         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox2");
+    _textureId24         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox3");
+    _textureId26         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "volbar");
+    _textureId27         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "volbar_back");
+    _textureId28         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dirplaylist");
+    _textureIdback       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "back-icon");
+    setuptexture         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setup");
+    setupupdatebutton     = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "updatebutton");
+    setuptvgraberback    	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptvgraberback");
     _textureIdtv         	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tvguide_icon.c_str());  // "tv"
     _textureIdmusic     	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());  // "music");
-    _textureIplaylistsave	= loadgfxfile(temapath,(char *) "images/",(char *) "playlist_save");
+    _textureIplaylistsave	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "playlist_save");
     _textureIdfilm       	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_movie_icon.c_str());  // "movie");
     _textureIdrecorded  	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_recorded_icon.c_str()); // "recorded");
-    _texturemlast       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaylast");
-    _texturemlast2      	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaylast");
-    _texturemnext       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaynext");
-    _texturemplay       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplay");
-    _texturempause        = loadgfxfile(temapath,(char *) "images/",(char *) "mpause");
+    _texturemlast       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "mplaylast");
+    _texturemlast2      	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "mplaylast");
+    _texturemnext       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "mplaynext");
+    _texturemplay       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "mplay");
+    _texturempause        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "mpause");
     _textureIdpup       	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_up_icon.c_str()); // "pup");
     _textureIdpdown     	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_down_icon.c_str()); // "pdown");
-    _texturemstop       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaystop");
-    _textureIdrecorded_aktiv=loadgfxfile(temapath,(char *) "buttons/",(char *) "recorded_selected");
+    _texturemstop       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "mplaystop");
+    _textureIdrecorded_aktiv=loadgfxfile((char *) temapath.c_str(),(char *) "buttons/",(char *) "recorded_selected");
     _textureIdfilm_aktiv  = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_movie1_icon.c_str()); // "movie1");
-    _textureIdmusicsearch = loadgfxfile(temapath,(char *) "images/",(char *) "music_search");
-    _textureIdradiosearch = loadgfxfile(temapath,(char *) "images/",(char *) "radio_search");
-    _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "playlist_search");
-    _textureIdmoviesearch = loadgfxfile(temapath,(char *) "images/",(char *) "movie_search");
+    _textureIdmusicsearch = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "music_search");
+    _textureIdradiosearch = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "radio_search");
+    _textureIdmusicsearch1= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "playlist_search");
+    _textureIdmoviesearch = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "movie_search");
     _textureIdloading   	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_loading_icon.c_str()); // "loading");			// window
     _textureIdplayinfo  	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_playinfo_icon.c_str()); // "playinfo");
-    _textureIdclose     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close");
-    _textureIdclose1    	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close1");
-    _texturelock        	= loadgfxfile(temapath,(char *) "images/",(char *) "lock");
+    _textureIdclose     	= loadgfxfile((char *) temapath.c_str(),(char *) "buttons/",(char *) "close");
+    _textureIdclose1    	= loadgfxfile((char *) temapath.c_str(),(char *) "buttons/",(char *) "close1");
+    _texturelock        	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "lock");
     // ************************ icons ******************************************
     _texturesetupmenu   	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_setup_icon.c_str());     // "setupmenu");				// setup menu
     _texturesetupmenu_select	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_setup_selected_icon.c_str()); // "setupmenu1");		// setup menu selected
-    _texturesoundsetup		= loadgfxfile(temapath,(char *) "images/",(char *) "setupsound");
-    _texturesourcesetup		= loadgfxfile(temapath,(char *) "images/",(char *) "setupsource");
-    _textureimagesetup		= loadgfxfile(temapath,(char *) "images/",(char *) "setupimg");
-    _texturetemasetup 		= loadgfxfile(temapath,(char *) "images/",(char *) "setuptema");
-    _texturemythtvsql 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupsql");
-    _texturesetupfont 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupfont");
-    _texturekeyssetup 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeys");
-    _texturekeysrss		    = loadgfxfile(temapath,(char *) "images/",(char *) "setuprss");
-    _texturespotify       = loadgfxfile(temapath,(char *) "images/",(char *) "setupspotify");
-    _texturetidal         = loadgfxfile(temapath,(char *) "images/",(char *) "setuptidal");
-    _texturevideoplayersetup	= loadgfxfile(temapath,(char *) "images/",(char *) "setupplayer");
-    _texturetvgrabersetup = loadgfxfile(temapath,(char *) "images/",(char *) "setupxmltv");
-    _texturesetupclose		= loadgfxfile(temapath,(char *) "images/",(char *) "setupclose");
-    setupkeysbar1     		= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeybar1");
-    setupkeysbar2     		= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeybar2");
-    tvprginfobig      		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprginfo");
-    _tvprgrecorded    		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecorded");
-    _tvprgrecordedr   		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecordedr");
-    _tvrecordbutton   		= loadgfxfile(temapath,(char *) "images/",(char *) "tvrecord");
-    _tvrecordcancelbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "tvrecord_cancel");
-    _tvoldprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "oldrecordedbutton");
-    _tvnewprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "newrecordedbutton");
+    _texturesoundsetup		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupsound");
+    _texturesourcesetup		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupsource");
+    _textureimagesetup		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupimg");
+    _texturetemasetup 		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptema");
+    _texturemythtvsql 		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupsql");
+    _texturesetupfont 		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupfont");
+    _texturekeyssetup 		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupkeys");
+    _texturekeysrss		    = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuprss");
+    _texturespotify       = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupspotify");
+    _texturetidal         = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptidal");
+    _texturevideoplayersetup	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupplayer");
+    _texturetvgrabersetup = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupxmltv");
+    _texturesetupclose		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupclose");
+    setupkeysbar1     		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupkeybar1");
+    setupkeysbar2     		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupkeybar2");
+    tvprginfobig      		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvprginfo");
+    _tvprgrecorded    		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvprgrecorded");
+    _tvprgrecordedr   		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvprgrecordedr");
+    _tvrecordbutton   		= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvrecord");
+    _tvrecordcancelbutton	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvrecord_cancel");
+    _tvoldprgrecordedbutton	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "oldrecordedbutton");
+    _tvnewprgrecordedbutton	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "newrecordedbutton");
     // ****************** backgrounds **************************************
-    setupsoundback      	= loadgfxfile(temapath,(char *) "images/",(char *) "setup-soundback");
-    setupsqlback        	= loadgfxfile(temapath,(char *) "images/",(char *) "setupsqlback");
-    setuptorrent_background = loadgfxfile(temapath,(char *) "images/",(char *) "setuptorrent_background");
-    setuptemaback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptemaback");
-    setupnetworkback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setupnetworkback");
-    setupnetworkwlanback  = loadgfxfile(temapath,(char *) "images/",(char *) "setupnetworkwlanback");
-    setupscreenback     	= loadgfxfile(temapath,(char *) "images/",(char *) "setupscreenback");
-    setupfontback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupfontback");
-    setupkeysback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeysback");
-    setuprssback         	= loadgfxfile(temapath,(char *) "images/",(char *) "setuprssback");
-    torrent_background   	= loadgfxfile(temapath,(char *) "images/",(char *) "torrent_background");
-    setuptidalback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptidalscreen");
-    _texturesaveplaylist  = loadgfxfile(temapath,(char *) "images/",(char *) "filename");
-    mobileplayer_icon     = loadgfxfile(temapath,(char *) "images/",(char *) "mobileplayer");
-    pcplayer_icon         = loadgfxfile(temapath,(char *) "images/",(char *) "pcplayer");
-    unknownplayer_icon    = loadgfxfile(temapath,(char *) "images/",(char *) "unknownplayer");
+    setupsoundback      	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setup-soundback");
+    setupsqlback        	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupsqlback");
+    setuptorrent_background = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptorrent_background");
+    setuptemaback       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptemaback");
+    setupnetworkback    	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupnetworkback");
+    setupnetworkwlanback  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupnetworkwlanback");
+    setupscreenback     	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupscreenback");
+    setupfontback       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupfontback");
+    setupkeysback       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupkeysback");
+    setuprssback         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuprssback");
+    torrent_background   	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "torrent_background");
+    setuptidalback       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptidalscreen");
+    _texturesaveplaylist  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "filename");
+    mobileplayer_icon     = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "mobileplayer");
+    pcplayer_icon         = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "pcplayer");
+    unknownplayer_icon    = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "unknownplayer");
 
 // ************************* screen shot *******************************
     screenshot1           = loadTexture ((char *) "images/screenshot1.png");
@@ -15944,18 +15812,18 @@ void loadgfx() {
     screenshot9           = loadTexture ((char *) "images/screenshot9.png");
     screenshot10          = loadTexture ((char *) "images/screenshot10.png");
 // ************************* Tv guide ***********************************
-    _tvbar1               = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
-    _tvoverskrift         = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
-    _tvbar1_1             = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
-    _tvbar3               = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
+    _tvbar1               = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvbar1");
+    _tvoverskrift         = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvbar_top");
+    _tvbar1_1             = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvbar1_1");
+    _tvbar3               = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvbar3");
 // ************************ radio buttons *******************************
-    spotify_icon_border   = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_icon_border.png");
+    spotify_icon_border   = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "spotify_icon_border.png");
 
-    onlineradio_empty     = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
-    onlineradio_selected  = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_selected");
-    onlineradio           = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
-    onlineradio192        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
-    onlineradio320        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
+    onlineradio_empty     = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlineradio_empty");
+    onlineradio_selected  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlineradio_selected");
+    onlineradio           = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlineradio");
+    onlineradio192        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlineradio192");
+    onlineradio320        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlineradio320");
     
     // radiobutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "radio_button");
     radiobutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_radio_icon.c_str());     // "radio_button");				// setup menu
@@ -15965,8 +15833,8 @@ void loadgfx() {
     musicbutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());     // "radio_button");				// setup menu
 
 // ************************** spotify buttons ****************************
-    spotify_askplay       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
-    spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");    
+    spotify_askplay       = loadgfxfile((char *) temapath.c_str(),(char *) "buttons/",(char *) "spotify_askplay");
+    spotify_askopen       = loadgfxfile((char *) temapath.c_str(),(char *) "buttons/",(char *) "spotify_askopen");    
     spotify_search        = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_search_icon.c_str());     // "search");
     spotify_search_back   =loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_search_back_icon.c_str());     // "search_back");
     spotifybutton         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_spotify_icon.c_str());     // "spotify_button");				// setup menu
@@ -15974,24 +15842,24 @@ void loadgfx() {
 
     tidalbutton           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tidal_icon.c_str());     // "tidal_button");				// setup menu
     tidalbutton1          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_tidal1_icon.c_str());     // "tidal_button1");				// setup menu
-    spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
-    tidal_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_ecover");
-    tidal_covermask        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_covermask");
-    tidal_playing_icon    = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_playing_icon");
-    spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
-    big_search_bar_playlist= loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_playlist");
-    big_search_bar_track   = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_song");
-    big_search_bar_albumm  = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_album");
-    big_search_bar_artist  = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_artist");
-    tidal_big_search_bar_artist = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_artist");
-    tidal_big_search_bar_album = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_album");
-    tidal_big_search_bar_track = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_track");
+    spotify_ecover        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "spotify_ecover");
+    tidal_ecover        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_ecover");
+    tidal_covermask        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_covermask");
+    tidal_playing_icon    = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_playing_icon");
+    spotify_pil           = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "spotify_pil");
+    big_search_bar_playlist= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "big_search_bar_playlist");
+    big_search_bar_track   = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "big_search_bar_song");
+    big_search_bar_albumm  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "big_search_bar_album");
+    big_search_bar_artist  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "big_search_bar_artist");
+    tidal_big_search_bar_artist = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_artist");
+    tidal_big_search_bar_album = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_album");
+    tidal_big_search_bar_track = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_track");
     // radio options (O) key in radio oversigt
-    radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
+    radiooptions          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
-    onlinestream          = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream");
-    onlinestream_empty    = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
-    onlinestream_empty1   = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
+    onlinestream          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlinestream");
+    onlinestream_empty    = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlinestream_empty");
+    onlinestream_empty1   = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlinestream_empty1");
     // podcast button
     //streambutton          = loadgfxfile(temapath,(char *) "buttons/",(char *) "stream_button");
 
@@ -16002,33 +15870,24 @@ void loadgfx() {
     moviebutton          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_movie_icon.c_str()); // "movie_button");
 
     // main logo
-    _mainlogo             = loadgfxfile(temapath,(char *) "images/",(char *) "logo");
-    // mask for flags
-    strcpy(fileload,(char *) "/opt/mythtv-controller/images/landemask.jpg");
-    gfxlandemask          = loadTexture (fileload);
+    _mainlogo             = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "logo");
+    // mask for flags    
+    gfxlandemask          = loadTexture ((char *) "/opt/mythtv-controller/images/landemask.jpg");
 // ************************** screen saver boxes **************************************
-    screensaverbox        = loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
-    screensaverbox1       = loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix1");
-    texturedot            = loadgfxfile(temapath,(char *) "images/",(char *) "dot");
-    texturedot1           = loadgfxfile(temapath,(char *) "images/",(char *) "dot1");
-    _errorbox             = loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
+    screensaverbox        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "3d_brix");
+    screensaverbox1       = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "3d_brix1");
+    texturedot            = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dot");
+    texturedot1           = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dot1");
+    _errorbox             = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "errorbox");
     // new stuf mini icon
-    newstuf_icon          = loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
+    newstuf_icon          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "new_stuf");
     // exit
-    _textureexit          = loadgfxfile(temapath,(char *) "images/",(char *) "exit");
-    _textureIdreset_search = loadgfxfile(temapath,(char *) "buttons/",(char *) "reset_search");
+    _textureexit          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "exit");
+    _textureIdreset_search = loadgfxfile((char *) temapath.c_str(),(char *) "buttons/",(char *) "reset_search");
     // analog clock background
-    analog_clock_background = loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
-    volume_window = loadgfxfile(temapath,(char *) "images/",(char *) "volume_win");
-    /*
-    strcpy(tmpfilename,temapath);
-    strcat(tmpfilename,(char *) "buttons/music1.png");
-    if (file_exists(tmpfilename)) {
-      _textureIdmusic_aktiv=loadTexture ((char *) tmpfilename);
-    } else _textureIdmusic_aktiv=0;
-    */
+    analog_clock_background = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "clock_background");
+    volume_window = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "volume_win");
     _textureIdmusic_aktiv=loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_active_icon.c_str()); // "music1");
-
     printf ("Done loading init graphic.\n");
 }
 
@@ -16949,6 +16808,7 @@ int main(int argc, char** argv) {
       // music loader
       if (configmythtvver>=0) {
         datainfoloader_music_v2();      // load music info
+        // musicoversigt.load_music_covergfx();
         /*
         int rc = pthread_create(&loaderthread,NULL,datainfoloader_music,NULL);
         if (rc) {
