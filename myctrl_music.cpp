@@ -821,7 +821,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                           ext = strrchr(de2->d_name, '.');
                           if (ext) strcpy(filetype,ext+1); else strcpy(filetype,"");
                           if ((strcmp(filetype,"mp3")==0) || (strcmp(filetype,"flac")==0) || (strcmp(filetype,"wav")==0) || (strcmp(filetype,"ogg")==0)) {
-                            // add found path
+                            // add found path to db
                             strcpy(songname,checkdir2s.c_str());
                             strcat(songname,"/");
                             strcat(songname,de2->d_name);
@@ -1496,7 +1496,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   int length;
   std::string temptxt1;
   sofset=(_mangley/40)*8;
-  while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
+  while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) musicoversigt.size())) {
     // do new line (if not first line)
     if (((i % bonline)==0) && (i>0)) {
       xof=config_menu.config_music_main_windowx;
@@ -1551,8 +1551,13 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
       }
     }
     // if selected icon
-    if (i+1==music_key_selected) buttonsize=190.0f;
-    else buttonsize=180.0f;
+    if (i+1==music_key_selected) {
+      buttonsize=190.0f;
+      buttonsizey=190.0f;
+    } else {
+      buttonsize=180.0f;
+      buttonsizey=180.0f;
+    }
     glEnable(GL_TEXTURE_2D);
     //glBlendFunc(GL_ONE, GL_ONE);
     //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -1658,7 +1663,7 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
   }
   if (cursor) glcRenderString("_"); else glcRenderString(" ");
   glPopMatrix();
-  while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
+  while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) musicoversigt.size())) {
     // do new line (if not first line)
     if (((i % bonline)==0) && (i>0)) {
       xof=0;
@@ -1670,18 +1675,57 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // show back or opem playlist list
       // else normal icon loader if exist else load default icon (normal_icon) or playlist icon (dirplaylist_icon)
-    if (musicoversigt[i+sofset].textureId!=0) {
-      glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    if (i==0) {
+      // view is playlist ?
+      if (musicoversigt[i+sofset].oversigttype!=-1) {
+        if (i+sofset==0) {
+          glBindTexture(GL_TEXTURE_2D,back_icon);
+        } else {
+          if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
+          else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      } else {
+        glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      }
     } else {
-      glBindTexture(GL_TEXTURE_2D,normal_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      // else normal icon loader if exist else load default icon (normal_icon) or playlist icon (dirplaylist_icon)
+      if (musicoversigt[i+sofset].textureId!=0) {
+        glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      } else {
+        if (musicoversigt[i+sofset].oversigttype==-1) {
+          glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        } else {
+          // new code load cover file if exist
+          if (musicoversigt[i+sofset].textureId==0) {
+            if (strcmp(musicoversigt[i+sofset].album_coverfile,"")!=0) {
+              if (file_exists(musicoversigt[i+sofset].album_coverfile)) {
+                musicoversigt[i+sofset].textureId = loadTexture((char *) musicoversigt[i+sofset].album_coverfile);
+              }
+            }
+          }
+          if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
+          else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+      }
     }
     // if selected icon
-    if (i+1==music_key_selected) buttonsize=190.0f;
-    else buttonsize=180.0f;
+    if (i+1==music_key_selected) {
+      buttonsize=190.0f;
+      buttonsizey=190.0f;
+    } else {
+      buttonsize=180.0f;
+      buttonsizey=180.0f;
+    }
     glEnable(GL_TEXTURE_2D);
     //glBlendFunc(GL_ONE, GL_ONE);
     //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);

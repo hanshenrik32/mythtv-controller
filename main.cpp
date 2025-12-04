@@ -5266,26 +5266,22 @@ void display() {
     if ((snd) && (!(visur))) {
       int textofset=140;
       if (radiooversigt.playing) {
-  
       }
       if (do_zoom_radio) {
-
       }
       if (do_zoom_stream_cover) {
-
+        do_zoom_radio=false;
       }
       if (do_zoom_tidal_cover) {
-
+        do_zoom_radio=false;
       }
       if (do_zoom_spotify_cover) {
-
+        do_zoom_radio=false;
       }
       if (do_zoom_music_cover) {
-
+        do_zoom_radio=false;
       }
-
       // printf("zoom_tidal=%s zoom_spotify=%s zoom_music=%s zoom_radio=%s  zoom_stream=%s \n",do_zoom_tidal_cover ? "true" : "false",do_zoom_spotify_cover ? "true" : "false",do_zoom_music_cover ? "true" : "false",do_zoom_radio ? "true" : "false",do_zoom_stream_cover ? "true" : "false ");
-      
       if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
         // show tidal player
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -16812,6 +16808,7 @@ int main(int argc, char** argv) {
       // music loader
       if (configmythtvver>=0) {
         datainfoloader_music_v2();      // load music info
+        // musicoversigt.load_music_covergfx();
         /*
         int rc = pthread_create(&loaderthread,NULL,datainfoloader_music,NULL);
         if (rc) {
