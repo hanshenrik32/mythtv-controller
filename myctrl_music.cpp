@@ -927,6 +927,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     char database[256];
     char icon_file[512];
     char tmptxt[512];
+    std::string tmptxt2;
     char tmptxt1[512];
     const char *sqllite_sql = "select directory_id,path,parent_id from music_directories where parent_id=0 order by path";
     char *zErrMsg = 0;
@@ -943,18 +944,6 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     if (directory_id==0) {			// hent fra starten top music directory
       // strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
       sqlselect = "select directory_id,path,parent_id from music_directories where parent_id=0 order by path";
-      /*
-      strcpy(musicoversigt[i].album_name,"PLAYLIST");
-      strcpy(musicoversigt[i].album_path,"");
-      strcpy(musicoversigt[i].album_coverfile,"");
-      musicoversigt[i].textureId=0;
-      musicoversigt[i].directory_id=0;			// husk directory id
-      musicoversigt[i].parent_id=0;
-      musicoversigt[i].album_id=0;
-      musicoversigt[i].artist_id=0;
-      musicoversigt[i].oversigttype=-1;			// type -1 = playlist
-      */
-
       strcpy(newmusicoversigt_record.album_name,"PLAYLIST");
       strcpy(newmusicoversigt_record.album_path,"");
       strcpy(newmusicoversigt_record.album_coverfile,"");
@@ -965,11 +954,9 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
       newmusicoversigt_record.artist_id=0;
       newmusicoversigt_record.oversigttype=-1;			// type -1 = playlist
       musicoversigt.push_back(newmusicoversigt_record);                      // cxreate first record playlist
-
       i++;
     } else {
-      // sprintf(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=%d",directory_id);		 // dir id in mythtv mysql
-      sqlselect = fmt::format("select directory_id,path,parent_id from music_directories where parent_id={}",directory_id);     
+      sqlselect = fmt::format("select music_directories.directory_id, path, parent_id, music_artists.artist_name from music_directories left join music_artists on music_artists.artist_id=music_directories.parent_id where music_directories.parent_id={}",directory_id);
       strcpy(newmusicoversigt_record.album_name,"   BACK");
       strcpy(newmusicoversigt_record.album_path,"");
       strcpy(newmusicoversigt_record.album_coverfile,"");
@@ -1002,86 +989,31 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
       res = mysql_store_result(conn);
       if (res) {
         while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
-          strcpy(dirname,row[1]);
-          strcpy(tmptxt,configmusicpath);			// config dir fra mythtv setup table
-          strcat(tmptxt,row[1]);
-          //strcat(tmptxt,"/Front.jpg");
-          strcpy(tmptxt1,configmusicpath);			// config dir fra mythtv setup table
-          strcat(tmptxt1,row[1]);
-          strcat(tmptxt1,"/front.jpg");
           // check for some file types to convert to cover
-          findcoverfile(tmptxt,fundetpath);			// return fundetpath = picture found        
-          if (file_exists(fundetpath)) {
-            /*
-            strcpy(convert_command,"/usr/bin/convert -scale 128 ");
-            strcat(convert_command,"\"");
-            strcat(convert_command,fundetpath);
-            strcat(convert_command,"\"");
-            strcat(convert_command," \"");
-            strcat(convert_command,configmusicpath);
-            strcat(convert_command,row[1]);
-            strcat(convert_command,"/");
-            strcat(convert_command,"mythcFront.jpg\"");
-            strcpy(tmptxt,configmusicpath);
-            strcat(tmptxt,row[1]);
-            strcat(tmptxt,"/mythcFront.jpg");
-            if (!(file_exists(tmptxt))) {
-              system(convert_command);
-              if (debugmode) printf("Do Convert scale image %s to 128*128 \n",row[1]);
-            }
-            */
-            strcpy(tmptxt,configmusicpath);
-            strcat(tmptxt,row[1]);
-            strcat(tmptxt,"/");
-            strcat(tmptxt,"cover.jpg");
-            if (!(file_exists(tmptxt))) {
-              strcpy(tmptxt,configmusicpath);
-              strcat(tmptxt,row[1]);
-              strcat(tmptxt,"/");
-              strcat(tmptxt,"Front.jpg");
-            }
-            strcpy(icon_file,fundetpath);		// gem icon file name
+          // findcoverfile(tmptxt,fundetpath);			// return fundetpath = picture found // NOT IN USE ANY MORE NOT NEEDED
+          tmptxt2=configmusicpath;
+          tmptxt2=tmptxt2 + row[3] + "/" + row[1] + "/cover.jpg";
+          if (file_exists(tmptxt2.c_str())) {
+            strcpy(fundetpath,tmptxt2.c_str());
+            strcpy(icon_file,fundetpath);
           } else {
-            strcpy(icon_file,"");			// no icon
+            tmptxt2=configmusicpath;
+            tmptxt2=tmptxt2 + row[3] + "/" + row[1] + "/Front.jpg";
+            if (file_exists(tmptxt2.c_str())) {
+              strcpy(fundetpath,tmptxt2.c_str());
+              strcpy(icon_file,fundetpath);
+            } else strcpy(icon_file,"");
           }
-          /*
-          strcpy(musicoversigt[i].album_name,dirname);
-          strcpy(musicoversigt[i].album_path,"");
-          strcpy(musicoversigt[i].album_coverfile,icon_file);
-          */
-
           strcpy(newmusicoversigt_record.album_name,dirname);
           strcpy(newmusicoversigt_record.album_path,"");
-          strcpy(newmusicoversigt_record.album_coverfile,icon_file);
-
-          
-          // måske crash
-          std::string tmp123;
+          strcpy(newmusicoversigt_record.album_coverfile,icon_file);         
           if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
-          tmp123 = tmpfilename;
-          tmp123 = tmp123 + row[1];
-          tmp123 = tmp123 + "/";
-          tmp123 = tmp123 + "cover.jpg";
-          if (strlen(tmp123.c_str())>0) {
-            if (file_exists(tmp123.c_str())) {
-              // musicoversigt[i].textureId = loadTexture((char *) tmp123.c_str());
-            }
-          }
-          /*
-          musicoversigt[i].directory_id=atoi(row[0]);			// husk directory id
-          musicoversigt[i].parent_id=atoi(row[2]);
-          musicoversigt[i].album_id=0;
-          musicoversigt[i].artist_id=0;
-          musicoversigt[i].oversigttype=0;
-          */
-
           newmusicoversigt_record.directory_id=atoi(row[0]);			// husk directory id
           newmusicoversigt_record.parent_id=atoi(row[2]);
           newmusicoversigt_record.album_id=0;
           newmusicoversigt_record.artist_id=0;
           newmusicoversigt_record.oversigttype=0;
           musicoversigt.push_back(newmusicoversigt_record);                      // cxreate first record playlist
-
           i++;
           antal_music_oversigt=i;
         }        	// end while
@@ -1109,7 +1041,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
 
 
 int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int search_art) {
-    char convert_command[512];
+    std::string convert_command;
     // char sqlselect[1000];
     std::string sqlselect;
     char dirname[256];
@@ -1120,7 +1052,7 @@ int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int s
     MYSQL_ROW row;
     char database[256];
     char icon_file[512];
-    char tmptxt[512];
+    std::string tmptxt;
     music_oversigt_type newmusicoversigt_record;
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt();
@@ -1159,42 +1091,31 @@ int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int s
       while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
         // cout << "Opdatere music oversigt fra database: " << row[1] << std::endl;
         strcpy(dirname,row[1]);
-        strcpy(tmptxt,configmusicpath);
-        strcat(tmptxt,row[1]);
-        strcat(tmptxt,"/Front.jpg");
-        if (file_exists(tmptxt)) {
-          strcpy(convert_command,"/usr/bin/convert -scale 128 ");
-          strcat(convert_command,"\"");
-          strcat(convert_command,configmusicpath);
-          strcat(convert_command,row[1]);
-          strcat(convert_command,"/Front.jpg\"");
-          strcat(convert_command," \"");
-          strcat(convert_command,configmusicpath);
-          strcat(convert_command,row[1]);
-          strcat(convert_command,"/");
-          strcat(convert_command,"mythcFront.jpg\"");
-          strcpy(tmptxt,configmusicpath);
-          strcat(tmptxt,row[1]);
-          strcat(tmptxt,"/mythcFront.jpg");
-          if (!(file_exists(tmptxt))) {
-            system(convert_command);
+        tmptxt = configmusicpath;
+        tmptxt = tmptxt + row[1];
+        tmptxt = tmptxt + "/front.jpg";
+        if (file_exists(tmptxt.c_str())) {
+          convert_command="/usr/bin/convert -scale 128 ";
+          convert_command=convert_command + "\"";
+          convert_command=convert_command + configmusicpath;
+          convert_command=convert_command + row[1];
+          convert_command=convert_command + "/Front.jpg\"";
+          convert_command=convert_command + " \"";
+          convert_command=convert_command + configmusicpath;
+          convert_command=convert_command + row[1];
+          convert_command=convert_command + "/";
+          convert_command=convert_command + "/mythcFront.jpg\"";
+          tmptxt=configmusicpath;
+          tmptxt=tmptxt + row[1];
+          tmptxt=tmptxt + "/mythcFront.jpg";
+          if (!(file_exists(tmptxt.c_str()))) {
+            system(convert_command.c_str());
             printf("Do Convert scale image %s to 128*128 \n",row[1]);
           }
-          strcpy(icon_file,tmptxt);		// gem icon file name
+          strcpy(icon_file,tmptxt.c_str());		// gem icon file name
         } else {
           strcpy(icon_file,"");			// no icon
         }
-        /*
-        strcpy(musicoversigt[i].album_name,dirname);
-        strcpy(musicoversigt[i].album_path,"");
-        strcpy(musicoversigt[i].album_coverfile,icon_file);
-        musicoversigt[i].directory_id=atoi(row[0]);			// husk directory id
-        musicoversigt[i].parent_id=atoi(row[2]);
-        musicoversigt[i].album_id=0;
-        musicoversigt[i].artist_id=0;
-        musicoversigt[i].oversigttype=0;  // not playlist
-        */
-
         strcpy(newmusicoversigt_record.album_name,dirname);
         strcpy(newmusicoversigt_record.album_path,"");
         strcpy(newmusicoversigt_record.album_coverfile,icon_file);
@@ -1204,26 +1125,15 @@ int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int s
         newmusicoversigt_record.artist_id=0;
         newmusicoversigt_record.oversigttype=0;  // not playlist
         musicoversigt.push_back(newmusicoversigt_record);                      // cxreate first record
-
         i++;
       }        	// end while
     } else {
       printf("SQL DATBASE ERROR\n");
       i=0;
     }
-    /*
-    if (i>0) {
-      antal_music_oversigt=i-1;
-      musicoversigt_antal=i-1;
-    } else {
-      antal_music_oversigt=0;
-      musicoversigt_antal=0;
-    }
-    */
     musicoversigt_antal=musicoversigt.size();						// antal i oversigt
     antal_music_oversigt=musicoversigt_antal;
-
-    if (debugmode & 2) printf("Fundet antal %d \n",i);    
+    if (debugmode & 2) printf("Fundet antal %d \n",antal_music_oversigt);
     mysql_close(conn);
     return(i);
 }
@@ -1553,10 +1463,10 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     // if selected icon
     if (i+1==music_key_selected) {
       buttonsize=190.0f;
-      buttonsizey=190.0f;
+      buttonsizey=170.0f;
     } else {
       buttonsize=180.0f;
-      buttonsizey=180.0f;
+      buttonsizey=160.0f;
     }
     glEnable(GL_TEXTURE_2D);
     //glBlendFunc(GL_ONE, GL_ONE);
@@ -1584,9 +1494,9 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
+    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3)    , 200 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3)    , 200+150, 0.0);
+    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150, 0.0);
     glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
     glEnd();
     sprintf(temptxt,"Error no music loaded in db");
@@ -1721,10 +1631,10 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
     // if selected icon
     if (i+1==music_key_selected) {
       buttonsize=190.0f;
-      buttonsizey=190.0f;
+      buttonsizey=170.0f;
     } else {
       buttonsize=180.0f;
-      buttonsizey=180.0f;
+      buttonsizey=160.0f;
     }
     glEnable(GL_TEXTURE_2D);
     //glBlendFunc(GL_ONE, GL_ONE);

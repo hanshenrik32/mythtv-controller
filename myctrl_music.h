@@ -28,13 +28,9 @@ class music_oversigt_type {
 };
 
 
-const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
-
 class musicoversigt_class {
   private:
-    // const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
     unsigned int antal_music_oversigt;
-    // music_oversigt_type musicoversigt[MAX_MUSIC_OVERSIGT_SIZE+1];
     std::vector <music_oversigt_type> musicoversigt;
     bool do_play;
     bool music_is_playing;                                                // do we play ?    

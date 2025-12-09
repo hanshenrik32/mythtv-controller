@@ -9278,7 +9278,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // hent fra db
           if (do_show_music_search_oversigt==false) {
             if (musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1))>0) {
-              musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
+              // musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
             } else {
               // opdatere music oversigt fra intern path
               fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt.get_album_path(mknapnr-1));
