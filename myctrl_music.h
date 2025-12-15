@@ -5,16 +5,15 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <vector>
+#include <string>
 
 //#include <irrKlang.h>
 //used in music oversigt
-
 
 // class for music oversigt
 
 class music_oversigt_type {
   public:
-    music_oversigt_type *insert();
     unsigned int album_id;
     unsigned int artist_id;
     char album_name[256];			      // music name
@@ -27,13 +26,13 @@ class music_oversigt_type {
     char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
 };
 
-
 class musicoversigt_class {
   private:
     unsigned int antal_music_oversigt;
     std::vector <music_oversigt_type> musicoversigt;
     bool do_play;
-    bool music_is_playing;                                                // do we play ?    
+    bool music_is_playing;                                                // do we play ?
+    
   public:
     char overview_show_band_name[256];                                  // show band name in overview
     bool search_loaded;
