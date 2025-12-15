@@ -3613,7 +3613,7 @@ void display() {
         } else {
           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 1);
         }
-        musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
+        // musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
         // old ver
         //opdatere_music_oversigt_icons(); 					                            // load gfx icons
         keybuffer[0] = 0;
@@ -14723,9 +14723,7 @@ void *datainfoloader_music(void *data) {
       musicoversigt.opdatere_music_oversigt_nodb();
       
       // new test
-      musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
-      
-      
+      // musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
       
       do_update_music_now = false;                                              // do not call update any more
       do_update_music = false;                                                  // stop show music update

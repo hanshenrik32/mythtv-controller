@@ -949,7 +949,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     musicoversigt.push_back(newmusicoversigt_record);
   } else {
     // sprintf(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=%d",directory_id);		 // dir id in mythtv mysql
-    sqlselect = fmt::format("select directory_id,path,parent_id from music_directories where parent_id={}",directory_id);     
+    sqlselect = fmt::format("select music_directories.directory_id, path, parent_id, music_artists.artist_name from music_directories left join music_artists on music_artists.artist_id=music_directories.parent_id where music_directories.parent_id={}",directory_id);
     strcpy(newmusicoversigt_record.album_name,"   BACK");
     strcpy(newmusicoversigt_record.album_path,"");
     strcpy(newmusicoversigt_record.album_coverfile,"");
@@ -1015,13 +1015,26 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
           strcat(tmptxt,"cover.jpg");
           if (!(file_exists(tmptxt))) {
             strcpy(tmptxt,configmusicpath);
+            if (directory_id>0) {
+              strcat(tmptxt,row[3]);
+              strcat(tmptxt,"/");
+            }
             strcat(tmptxt,row[1]);
             strcat(tmptxt,"/");
             strcat(tmptxt,"front.jpg");
           }
           strcpy(icon_file,fundetpath);		// gem icon file name
         } else {
-          strcpy(icon_file,"");			// no icon
+          strcpy(tmptxt1,configmusicpath);			// config dir fra mythtv setup table
+          if (directory_id>0) {
+            strcat(tmptxt1,row[3]);
+            strcat(tmptxt1,"/");
+          }
+          strcat(tmptxt1,row[1]);
+          strcat(tmptxt1,"/front.jpg");
+          if (file_exists(tmptxt1)) {
+            strcpy(icon_file,tmptxt1);		// gem icon file name
+          } else strcpy(icon_file,"");			// no icon
         }
         strcpy(newmusicoversigt_record.album_name,dirname);
         strcpy(newmusicoversigt_record.album_path,"");
@@ -1094,18 +1107,6 @@ int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int s
     } else {
       sqlselect = fmt::format("select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id) where music_songs.name like '%{}%' group by directory_id",searchtxt);
     }
-    /*
-    strcpy(musicoversigt[i].album_name,(char *) "   BACK");
-    strcpy(musicoversigt[i].album_path,(char *) "");
-    strcpy(musicoversigt[i].album_coverfile,(char *) "");
-    musicoversigt[i].textureId=0;
-    musicoversigt[i].directory_id=0;			// husk directory id
-    musicoversigt[i].parent_id=0;
-    musicoversigt[i].album_id=0;
-    musicoversigt[i].artist_id=0;
-    musicoversigt[i].oversigttype=0;
-    i++;
-    */
   }
   //printf("SQL SELECT = %s \n",sqlselect.c_str());
   conn=mysql_init(NULL);
@@ -1439,7 +1440,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   int length;
   std::string temptxt1;
   sofset=(_mangley/40)*8;
-  while(i<(int) musicoversigt.size() && (strcmp(musicoversigt[i+sofset].album_name,"")!=0)) {
+  while(i<(int) musicoversigt.size() && (i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0)) {
     // do new line (if not first line)
     if (((i % bonline)==0) && (i>0)) {
       xof=config_menu.config_music_main_windowx;
@@ -1447,7 +1448,6 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     }
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
-    //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // show back or opem playlist list
     if (i==0) {
@@ -1483,6 +1483,9 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
             if (strcmp(musicoversigt[i+sofset].album_coverfile,"")!=0) {
               if (file_exists(musicoversigt[i+sofset].album_coverfile)) {
                 musicoversigt[i+sofset].textureId = loadTexture((char *) musicoversigt[i+sofset].album_coverfile);
+
+                printf("Load cover file %s \n",musicoversigt[i+sofset].album_coverfile);
+
               }
             }
           }
@@ -1502,10 +1505,17 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glLoadName(100+i);
     glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsizey , 0.0);
-    glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+    if (musicoversigt[i+sofset].textureId) {
+      glTexCoord2f(0, 0); glVertex3f( xof,yof+20 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey-8, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsizey-8 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof+20 , 0.0);
+    } else {
+      glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsizey , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+    }
     glEnd();
     glPopMatrix();
     drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 0.4f,18,5,1,true);
@@ -1631,10 +1641,17 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glLoadName(100+i);
     glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsizey , 0.0);
-    glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+    if (musicoversigt[i+sofset].textureId) {
+      glTexCoord2f(0, 0); glVertex3f( xof,yof+20 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey-8, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsizey-8 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof+20 , 0.0);
+    } else {
+      glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsizey , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+    }
     glEnd();
     glPopMatrix();
     drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 0.4f,18,5,1,true);
