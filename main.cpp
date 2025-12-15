@@ -348,9 +348,11 @@ bool hent_tidal_search = false;                          // skal vi søge efter 
 bool do_show_spotify_search_oversigt=false;
 bool do_show_tidal_search_oversigt=false;
 bool do_show_music_search_oversigt=false;                 // show music search oversigt
+bool do_show_movie_search_oversigt=false;                 // show music search oversigt
 bool hent_spotify_search_online=false;                    // skal vi starte search online
 bool do_hent_spotify_search_online=false;                 // skal vi starte search online (do it)
 bool search_spotify_string_changed=false;
+bool search_movie_string_changed=false;
 
 bool do_hent_tidal_search_online=false;                   // skal vi starte search online (do it)
 // bool search_tidal_string_changed=false;
@@ -1973,7 +1975,7 @@ int hent_mythtv_playlist(int playlistnr) {
               strcat(tmptxt,tmptxt1);				                               // add path
               strcat(tmptxt,"/");
               strcpy(tmptxt3,tmptxt);			                                 // er = path
-              strcat(tmptxt3,"mythcFront.jpg");		                         // add filename til cover
+              strcat(tmptxt3,"mythcfront.jpg");		                         // add filename til cover
               strcat(tmptxt,row1[1]);				                               // add filename til sang
               strcpy(tmptxt,row1[1]);				                               // add filename til sang
               if (file_exists(tmptxt3)) {
@@ -2163,7 +2165,7 @@ unsigned int hent_antal_dir_songs(int dirid) {
             dirmusic.textureId=loadTexture((char *) imgpath.c_str());
           } else {
             // check if Front.jpg exist from old config
-            huskpath = huskpath + "Front.jpg";
+            huskpath = huskpath + "front.jpg";
             if (file_exists(huskpath.c_str())) {
                dirmusic.textureId=loadTexture((char *) huskpath.c_str());
             } else {
@@ -2207,7 +2209,7 @@ unsigned int hent_antal_dir_songs(int dirid) {
               checkpath = checkpath + "/";
               checkpath = checkpath + pathlist[iii-1];
               checkpath = checkpath + "/";
-              checkpath = checkpath + "Front.jpg";
+              checkpath = checkpath + "front.jpg";
               if (file_exists(checkpath.c_str())) {
                 textureId = 0;
                 // textureId = loadTexture((char *) checkpath.c_str());		// load texture to opengl
@@ -3555,6 +3557,7 @@ void display() {
     if (fknapnr == 0) show_newmovietimeout--;
     film_oversigt.show_minifilm_oversigt(0,0);
   }
+  
   // search movies
   if (vis_film_oversigt) {
     if (keybufferindex>0) {
@@ -3575,6 +3578,7 @@ void display() {
       }
     }
   }
+  
   // search radio station buffer search
   if ((vis_radio_oversigt) && (!(visur)))  {
     if (keybufferindex>0) {						  // er der kommet noget i keyboard buffer
@@ -3609,7 +3613,7 @@ void display() {
         } else {
           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 1);
         }
-        musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
+        // musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
         // old ver
         //opdatere_music_oversigt_icons(); 					                            // load gfx icons
         keybuffer[0] = 0;
@@ -11492,7 +11496,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       }
       // gem key pressed in buffer
       if (keybufferindex<80) {
-        // backspace
+        // backspace key
         if (key==8) {
           if (keybufferindex>0) {
             keybufferindex--;
@@ -11544,11 +11548,14 @@ void handleKeypress(unsigned char key, int x, int y) {
 
           }
 
-          if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-            if (key==32) {
-              dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
+          if (vis_music_oversigt) {
+            if (ask_open_dir_or_play) {
+              if (key==32) {
+                dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
+              }
             }
           }
+          
           // hvis vi ikke gør andre ting
           if ((ask_save_playlist==false) || (save_ask_save_playlist==false)) {
             // gem søg sang/artist navn 
@@ -11557,6 +11564,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
+              }
+              if (strlen(keybuffer)>0) {
+                do_show_music_search_oversigt=true;
               }
             }
             //
@@ -11626,7 +11636,18 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (do_show_editor_select_linie>tidal_oversigt.tidal_start_playlist_array.size()) do_show_editor_select_linie--;
             }
           }
-          
+          // movie search fill buffer from keyboard
+          if (vis_film_oversigt) {
+            if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY) &&  (keybufferindex<search_string_max_length)) {
+              if (keybufferindex==0) do_show_movie_search_oversigt=true;
+              keybuffer[keybufferindex]=key;
+              keybufferindex++;
+              keybuffer[keybufferindex]='\0';       // else input key text in buffer
+              search_movie_string_changed=true;
+              // show_search_music_oversigt=true;
+              // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+            }
+          }
           if (key=='S') {
             // (disable save as askbox) if 'S' is pressed again.
             if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
@@ -12771,7 +12792,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   music_icon_anim_icon_ofsety=0;
                 }
                 // start music 
-                if ((vis_music_oversigt) && (!(do_zoom_music_cover)) && ((ask_save_playlist==false))) {
+                if ((vis_music_oversigt) && (!(do_zoom_music_cover)) && ((ask_save_playlist==false)) && (hent_music_search==false)) {
                   mknapnr=music_key_selected;	                     	// hent valget
                   // normal dir
                   if (musicoversigt.get_album_type(mknapnr-1)==0) {
@@ -14702,9 +14723,7 @@ void *datainfoloader_music(void *data) {
       musicoversigt.opdatere_music_oversigt_nodb();
       
       // new test
-      musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
-      
-      
+      // musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
       
       do_update_music_now = false;                                              // do not call update any more
       do_update_music = false;                                                  // stop show music update
