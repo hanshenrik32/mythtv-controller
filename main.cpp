@@ -120,6 +120,8 @@ bool music_oversigt_loaded_begin = false;                                      /
 bool global_use_spotify_local_player;
 
 
+bool do_update_music_icons_now_in_thread=false;                    // do update music icons now in thread 
+
 
 #ifdef USE_FMOD_MIXER
 FMOD::DSP* dsp = 0;                   // fmod Sound device
@@ -7037,7 +7039,7 @@ void display() {
     fprintf(stderr,"call/Start phread music.\n");
     // update_music_phread_loader();   
     musicoversigt.opdatere_music_oversigt_nodb();
-    musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
+    // musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
     do_update_music_now = false;                                              // do not call update any more
     do_update_music = false;
     write_logfile(logfile,(char *) "Update music db.");
@@ -7532,12 +7534,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               //spotify_oversigt.load_spotify_iconoversigt();                     // update icons
               music_oversigt_loaded_begin=false;                                //
             } else {
-              do_show_music_search_oversigt=true;
+              // do not enable search view. if we are in save playlist mode
+              if (ask_save_playlist==false) {
+                do_show_music_search_oversigt=true;
+                write_logfile(logfile,(char *) "Enable Music search.");
+              }
             }
-            write_logfile(logfile,(char *) "Music search.");
           }
         }
-
 
         //
         // stream control
@@ -9282,6 +9286,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // hent fra db
           if (do_show_music_search_oversigt==false) {
             if (musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1))>0) {
+              do_update_music_icons_now_in_thread=true;                                      // opdatere icons nu
               // musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
             } else {
               // opdatere music oversigt fra intern path
@@ -11566,7 +11571,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
               }
               if (strlen(keybuffer)>0) {
-                do_show_music_search_oversigt=true;
+                // do not enable search view. if we are in save playlist mode
+                if (ask_save_playlist==false) {
+                  do_show_music_search_oversigt=true;
+                  write_logfile(logfile,(char *) "Enable Music search.");
+                }
               }
             }
             //
@@ -14751,7 +14760,7 @@ void *datainfoloader_music(void *data) {
 // ****************************************************************************************
 //
 // in use
-// phread dataload Music from empty db/update
+// dataload Music from empty db/update
 //
 // ****************************************************************************************
 
@@ -16557,7 +16566,7 @@ int team_settings_load() {
 
 // ****************************************************************************************
 //
-// thread running the torrent update function
+//  in use thread running the torrent update function
 //
 // ****************************************************************************************
 
@@ -16565,8 +16574,12 @@ int team_settings_load() {
 void opdate_threadfunction() {
   while (true) {
     torrent_downloader.opdate_torrent(); // Update torrent function
+    if (do_update_music_icons_now_in_thread) {      
+      musicoversigt.opdatere_music_oversigt_icons();
+      printf("Now Opdate music icons \n");
+      do_update_music_icons_now_in_thread=false;  // disale again
+    }
   }
-  // printf("Opdate torrent \n");
 }
 
 // ****************************************************************************************
