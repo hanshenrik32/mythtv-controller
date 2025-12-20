@@ -1663,7 +1663,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     // show movie name
     moviename = fmt::format("{}",filmoversigt[film_nr+sofset].getfilmtitle());    
     // moviename.resize(60);
-    drawLinesOfText(moviename,14.00f+xof,yof-10,0.38f,22,2,1,true); // 10
+    drawLinesOfText(moviename,14.00f+xof,yof-10,0.38f,20,2,1,true); // 10
     glPopMatrix();
     // next button
     xof+=buttonsizex-10;
