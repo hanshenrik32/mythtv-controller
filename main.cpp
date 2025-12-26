@@ -5641,6 +5641,7 @@ void display() {
         int textofset=140;
         // tidal play info icon
         glEnable(GL_BLEND);
+        // if url
         if (tidal_oversigt.tidal_aktiv_cover_image_url()) {
           //do file exist and have we not loaded it before then load it.
           if ((tidal_oversigt.get_tidal_aktiv_cover_image()==0) && (tidal_oversigt.aktiv_song_tidal_icon==0)) {
@@ -5650,8 +5651,9 @@ void display() {
             if (img) tidal_oversigt.set_tidal_aktiv_cover_image(img);                                                         // assign to aktiv play list
           } else {
             if (tidal_oversigt.aktiv_song_tidal_icon) {
-              glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
+              // glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
               tidal_oversigt.aktiv_song_tidal_icon=tidal_oversigt.get_tidal_aktiv_cover_image();                            // update show icon
+              glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
             } else {
               if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
               else glBindTexture(GL_TEXTURE_2D,tidal_ecover);
@@ -5660,12 +5662,14 @@ void display() {
         } else {
           glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
         }
+        /*
         if (tidal_oversigt.aktiv_song_tidal_icon) {
           glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);          // set active icon
         } else {
           glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
           // printf("No Tidal icon\n");
         }
+        */
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);

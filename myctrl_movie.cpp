@@ -984,7 +984,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
   // mysql stuf
   int checkdirexist=0;
   write_logfile(logfile,(char *) "Opdatere Film oversigt fra db :");
-  mainsqlselect = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid order by title");
+  mainsqlselect = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid order by insertdate desc,title");
   conn=mysql_init(NULL);
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
