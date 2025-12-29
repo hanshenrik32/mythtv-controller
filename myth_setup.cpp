@@ -256,10 +256,10 @@ void showcoursornow(int cxpos,int cypos,int txtlength) {
 rss_stream_class::rss_stream_class() {
   antal=0;
   for(int n=0;n<maxantal;n++) {
-    rss_source_feed[n].stream_name=new char[namemaxlength];
-    rss_source_feed[n].stream_url=new char[urlmaxlength];
-    strcpy(rss_source_feed[n].stream_name,"");
-    strcpy(rss_source_feed[n].stream_url,"");
+    // rss_source_feed[n].stream_name=new char[namemaxlength];
+    // rss_source_feed[n].stream_url=new char[urlmaxlength];
+    // strcpy(rss_source_feed[n].stream_name,"");
+    // strcpy(rss_source_feed[n].stream_url,"");
   }
 }
 
@@ -271,10 +271,29 @@ rss_stream_class::rss_stream_class() {
 
 rss_stream_class::~rss_stream_class() {
   for(int n=0;n<maxantal;n++) {
-    delete[] rss_source_feed[n].stream_name;
-    delete[] rss_source_feed[n].stream_url;
+    // delete[] rss_source_feed[n].stream_name;
+    // delete[] rss_source_feed[n].stream_url;
   }
 }
+
+
+
+std::string rss_stream_class::get_stream_name_std(int nr) { 
+  if ((nr>=0) && (nr < rss_source_feed_vector.size())) {
+    return (rss_source_feed_vector[nr].stream_name);
+  }
+  return "";
+}
+
+
+std::string rss_stream_class::get_stream_url_std(int nr) { 
+  if ((nr>=0) && (nr < rss_source_feed_vector.size())) {
+    return (rss_source_feed_vector[nr].stream_url);
+  }
+  return "";
+}
+
+
 
 // ****************************************************************************************
 //
@@ -288,6 +307,8 @@ int rss_stream_class::load_rss_data() {
   MYSQL_RES *res;
   MYSQL_ROW row;
   antal=0;
+  rss_stream_struct new_rss_source_feed;
+  rss_source_feed_vector.clear();
   char *database = (char *) dbname;
   conn=mysql_init(NULL);
   // Connect to database
@@ -298,15 +319,20 @@ int rss_stream_class::load_rss_data() {
     mysql_query(conn,"select feedtitle,title,url from internetcontentarticles where mediaURL is NULL order by feedtitle asc");
     res = mysql_store_result(conn);
     if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (antal<100)) {
-        if (row[0]) strcpy(rss_source_feed[antal].stream_name,row[0]);
-        if (row[2]) strcpy(rss_source_feed[antal].stream_url,row[2]);
-        antal++;
+      while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
+        if (row[0]) {
+          new_rss_source_feed.stream_name=row[0];
+        }
+        if (row[2]) {
+          new_rss_source_feed.stream_url=row[2];          
+        }
+        rss_source_feed_vector.push_back(new_rss_source_feed);
       }
     }
     mysql_close(conn);
+    antal=rss_source_feed_vector.size();
   } else write_logfile(logfile,(char *) "Error connect to mysql.");
-  return(1);
+  return(rss_source_feed_vector.size());
 }
 
 // ****************************************************************************************
@@ -333,14 +359,14 @@ int rss_stream_class::save_rss_data() {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    for(n=0;n<maxantal;n++) {
+    for(n=0;n<rss_source_feed_vector.size();n++) {
       // find record
       doexist=false;
       strcpy(ftitle,"");
       strcpy(ftitle2,"");
       strcpy(furl,"");
-      if ((rss_source_feed[n].stream_name) && (strcmp(rss_source_feed[n].stream_name,"")!=0)) {
-        sprintf(sqlstring,"select feedtitle,url from internetcontentarticles where feedtitle like '%s' limit 1",rss_source_feed[n].stream_name);
+      if ((rss_source_feed_vector[n].stream_name.length()>0) && (rss_source_feed_vector[n].stream_name.length()>0)) {
+        sprintf(sqlstring,"select feedtitle,url from internetcontentarticles where feedtitle like '%s' limit 1",rss_source_feed_vector[n].stream_name.c_str());
         mysql_query(conn,sqlstring);
         res = mysql_store_result(conn);
         while ((row = mysql_fetch_row(res)) != NULL) {
@@ -351,29 +377,28 @@ int rss_stream_class::save_rss_data() {
         if (doexist) {
           // find record in db abd do the change and update record again
           if (ftitle) {
-            if (strcmp(ftitle,rss_source_feed[n].stream_name)==0) {
-              sprintf(sqlstring,"update internetcontentarticles set url='%s' where title like '%s' limit 1",rss_source_feed[n].stream_url,rss_source_feed[n].stream_name);
+            if (ftitle,rss_source_feed_vector[n].stream_name.length()==0) {
+              sprintf(sqlstring,"update internetcontentarticles set url='%s' where title like '%s' limit 1",rss_source_feed_vector[n].stream_url.c_str(),rss_source_feed_vector[n].stream_name.c_str());
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
-            } else if (strcmp(furl,rss_source_feed[n].stream_url)==0) {
               //
               // update name
               //
               // save old name
-              sprintf(sqlstring,"select title from internetcontentarticles where url like '%s' limit 1",rss_source_feed[n].stream_url);
+              sprintf(sqlstring,"select title from internetcontentarticles where url like '%s' limit 1",rss_source_feed_vector[n].stream_url.c_str());
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
               while (((row1 = mysql_fetch_row(res1)) != NULL) && (antal<100)) {
                 strcpy(ftitle2,row1[0]);
               }
               // update db record with new name
-              sprintf(sqlstring,"update internetcontentarticles set name='%s' where url like '%s' limit 1",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+              sprintf(sqlstring,"update internetcontentarticles set name='%s' where url like '%s' limit 1",rss_source_feed_vector[n].stream_name.c_str(),rss_source_feed_vector[n].stream_url.c_str());
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
               if (res1) {
                 // if okay update
                 // chnage/update name
-                sprintf(sqlstring,"update internetcontent set name='%s' where name like '%s'",rss_source_feed[n].stream_name,ftitle2);
+                sprintf(sqlstring,"update internetcontent set name='%s' where name like '%s'",rss_source_feed_vector[n].stream_name.c_str(),ftitle2);
                 mysql_query(conn,sqlstring);
                 res1 = mysql_store_result(conn);
               }
@@ -381,20 +406,20 @@ int rss_stream_class::save_rss_data() {
               //
               // no update of name of url create new
               //
-              sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+              sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed_vector[n].stream_name,rss_source_feed_vector[n].stream_name.c_str(),rss_source_feed_vector[n].stream_url.c_str());
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
-              sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name);
+              sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed_vector[n].stream_name.c_str());
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
             }
           }
-        } else {
+        } else { 
           // no update of name of url create new
-          sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+          sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed_vector[n].stream_name,rss_source_feed_vector[n].stream_name.c_str(),rss_source_feed_vector[n].stream_url.c_str());
           mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
-          sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name);
+          sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed_vector[n].stream_name.c_str());
           mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
         }
@@ -413,7 +438,13 @@ int rss_stream_class::save_rss_data() {
 // ****************************************************************************************
 
 int rss_stream_class::set_stream_url(int nr,char *url) {
-  strcpy(rss_source_feed[nr].stream_url,url);
+  if (nr>=rss_source_feed_vector.size()) {
+    rss_stream_struct new_rss_source_feed;
+    new_rss_source_feed.stream_name="";
+    new_rss_source_feed.stream_url="";
+    rss_source_feed_vector.push_back(new_rss_source_feed);
+  }
+  rss_source_feed_vector[nr].stream_url=url;
   return(1);
 }
 
@@ -425,7 +456,13 @@ int rss_stream_class::set_stream_url(int nr,char *url) {
 // ****************************************************************************************
 
 int rss_stream_class::set_stream_name(int nr,char *name) {
-  strcpy(rss_source_feed[nr].stream_name,name);
+  if (nr>=rss_source_feed_vector.size()) {
+    rss_stream_struct new_rss_source_feed;
+    new_rss_source_feed.stream_name="";
+    new_rss_source_feed.stream_url="";
+    rss_source_feed_vector.push_back(new_rss_source_feed);
+  }
+  rss_source_feed_vector[nr].stream_name=name;
   return(1);
 }
 
@@ -2725,7 +2762,7 @@ void show_setup_keys() {
 void showrss_list() {
   printf("\n");
   for(int t=0;t<99;t++) {
-    if (strcmp(rssstreamoversigt.get_stream_name(t),"")!=0) printf("nr %d feedname %s url %s \n",t,rssstreamoversigt.get_stream_name(t),rssstreamoversigt.get_stream_url(t));
+    if (strcmp(rssstreamoversigt.get_stream_name_std(t).c_str(),"")!=0) printf("nr %d feedname %s url %s \n",t,rssstreamoversigt.get_stream_name_std(t).c_str(),rssstreamoversigt.get_stream_url_std(t).c_str());
   }
   printf("\n");
 }
@@ -2788,9 +2825,9 @@ void show_setup_rss(unsigned int startofset) {
   // overskrift
   glDisable(GL_TEXTURE_2D);
   glColor3f(1.0f, 1.0f, 1.0f);
-  glTranslatef(300, 680, 0.0f);
+  glTranslatef(260, 680, 0.0f);
   glRasterPos2f(0.0f, 0.0f);
-  myglprint4((char *) "RSS Feed Name.");
+  myglprint4((char *) " NR RSS Feed Name.");
   glPopMatrix();
   glPushMatrix();
   glDisable(GL_TEXTURE_2D);
@@ -2799,26 +2836,40 @@ void show_setup_rss(unsigned int startofset) {
   glRasterPos2f(0.0f, 0.0f);
   myglprint4((char *) "Podcast URL");
   glPopMatrix();
-  for (int n=0;n<18;n++) {
+
+  printf("do_show_setup_select_linie=%d startofset=%d streamantal=%d select name %s \n",do_show_setup_select_linie,startofset,rssstreamoversigt.streamantal(),rssstreamoversigt.get_stream_name_std(do_show_setup_select_linie/2+startofset).c_str());
+
+  for (int n=0;n<19;n++) {
+    glPushMatrix();
+    glTranslatef(260 , 660-(n*20) , 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    showtxt=fmt::format("{:3} ",n+startofset);
+    if (n+startofset==do_show_setup_select_linie/2+startofset) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
+    myglprint4((char *) showtxt.c_str());
+    glPopMatrix();
+
     glPushMatrix();
     glTranslatef(300 , 660-(n*20) , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
-    if (n==do_show_setup_select_linie) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
+    
+    // if (n==do_show_setup_select_linie) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
+
     if ((startofset+n+1)<rssstreamoversigt.streamantal()) {
-      showtxt=rssstreamoversigt.get_stream_name(0+startofset+n);
-      // strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+startofset+n));
+      showtxt=rssstreamoversigt.get_stream_name_std(0+startofset+n);
     } else {
-      strcpy(keybuffer,"");
-      showtxt=keybuffer;
+      // strcpy(keybuffer,"");
+      // showtxt=keybuffer;
+      showtxt="";
     }
     myglprint4((char *) showtxt.c_str());
-    if (n==do_show_setup_select_linie) glColor3f(1.0f,1.0f,0.0f); glColor3f(.7f,0.7f,0.7f);
+    // if (n==do_show_setup_select_linie) glColor3f(1.0f,1.0f,0.0f); glColor3f(.7f,0.7f,0.7f);
     if ((startofset+n+1)<rssstreamoversigt.streamantal()) {
-      strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+startofset+n));
-      showtxt=rssstreamoversigt.get_stream_url(0+startofset+n);
+      // strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(0+startofset+n).c_str());
+      showtxt=rssstreamoversigt.get_stream_url_std(0+startofset+n);
     } else {
-      strcpy(keybuffer,"");
-      showtxt=keybuffer;
+      // strcpy(keybuffer,"");
+      // showtxt=keybuffer;
+      showtxt="";
     }
     glRasterPos2f(392.0f, 0.0f);
     myglprint4((char *) showtxt.c_str());
@@ -2826,148 +2877,148 @@ void show_setup_rss(unsigned int startofset) {
   }
   switch(do_show_setup_select_linie) {
       case 0: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(0*20),strlen(rssstreamoversigt.get_stream_name(0+startofset)));
+              if ((startofset)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(0*20),strlen(rssstreamoversigt.get_stream_name_std(0+startofset).c_str()));
               else showcoursornow(-70,510-(0*20),0);
               break;
       case 1: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(0*20),strlen(rssstreamoversigt.get_stream_url(0+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(0*20),strlen(rssstreamoversigt.get_stream_url_std(0+startofset).c_str()));
+              else showcoursornow(320,510-(0*20),0);
               break;
       case 2: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+1)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(1*20),strlen(rssstreamoversigt.get_stream_name(1+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+1)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(1*20),strlen(rssstreamoversigt.get_stream_name_std(1+startofset).c_str()));
+              else showcoursornow(-70,510-(1*20),0);
               break;
       case 3: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+1)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(1*20),strlen(rssstreamoversigt.get_stream_url(1+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+1)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(1*20),strlen(rssstreamoversigt.get_stream_url_std(1+startofset).c_str()));
+              else showcoursornow(320,510-(1*20),0);
               break;
       case 4: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+2)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(2*20),strlen(rssstreamoversigt.get_stream_name(2+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+2)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(2*20),strlen(rssstreamoversigt.get_stream_name_std(2+startofset).c_str()));
+              else showcoursornow(-70,510-(2*20),0);
               break;
       case 5: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+2)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(2*20),strlen(rssstreamoversigt.get_stream_url(2+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+2)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(2*20),strlen(rssstreamoversigt.get_stream_url_std(2+startofset).c_str()));
+              else showcoursornow(320,510-(2*20),0);
               break;
       case 6: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+3)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(3*20),strlen(rssstreamoversigt.get_stream_name(3+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+3)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(3*20),strlen(rssstreamoversigt.get_stream_name_std(3+startofset).c_str()));
+              else showcoursornow(-70,510-(3*20),0);
               break;
       case 7: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+3)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(3*20),strlen(rssstreamoversigt.get_stream_url(3+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+3)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(3*20),strlen(rssstreamoversigt.get_stream_url_std(3+startofset).c_str()));
+              else showcoursornow(320,510-(3*20),0);
               break;
       case 8: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+4)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(4*20),strlen(rssstreamoversigt.get_stream_name(4+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+4)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(4*20),strlen(rssstreamoversigt.get_stream_name_std(4+startofset).c_str()));
+              else showcoursornow(-70,510-(4*20),0);
               break;
       case 9: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+4)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(4*20),strlen(rssstreamoversigt.get_stream_url(4+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+4)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(4*20),strlen(rssstreamoversigt.get_stream_url_std(4+startofset).c_str()));
+              else showcoursornow(320,510-(4*20),0);
               break;
       case 10:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+5)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(5*20),strlen(rssstreamoversigt.get_stream_name(5+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+5)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(5*20),strlen(rssstreamoversigt.get_stream_name_std(5+startofset).c_str()));
+              else showcoursornow(-70,510-(5*20),0);
               break;
       case 11:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+5)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(5*20),strlen(rssstreamoversigt.get_stream_url(5+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+5)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(5*20),strlen(rssstreamoversigt.get_stream_url_std(5+startofset).c_str()));
+              else showcoursornow(320,510-(5*20),0);
               break;
       case 12:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+6)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(6*20),strlen(rssstreamoversigt.get_stream_name(6+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+6)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(6*20),strlen(rssstreamoversigt.get_stream_name_std(6+startofset).c_str()));
+              else showcoursornow(-70,510-(6*20),0);
               break;
       case 13:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+6)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(6*20),strlen(rssstreamoversigt.get_stream_url(6+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+6)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(6*20),strlen(rssstreamoversigt.get_stream_url_std(6+startofset).c_str()));
+              else showcoursornow(320,510-(6*20),0);
               break;
       case 14:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+7)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(7*20),strlen(rssstreamoversigt.get_stream_name(7+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+7)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(7*20),strlen(rssstreamoversigt.get_stream_name_std(7+startofset).c_str()));
+              else showcoursornow(-70,510-(7*20),0);
               break;
       case 15:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+7)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(7*20),strlen(rssstreamoversigt.get_stream_url(7+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+7)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(7*20),strlen(rssstreamoversigt.get_stream_url_std(7+startofset).c_str()));
+              else showcoursornow(320,510-(7*20),0);
               break;
       case 16:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+8)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(8*20),strlen(rssstreamoversigt.get_stream_name(8+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+8)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(8*20),strlen(rssstreamoversigt.get_stream_name_std(8+startofset).c_str()));
+              else showcoursornow(-70,510-(8*20),0);
               break;
       case 17:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+8)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(8*20),strlen(rssstreamoversigt.get_stream_url(8+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+8)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(8*20),strlen(rssstreamoversigt.get_stream_url_std(8+startofset).c_str()));
+              else showcoursornow(320,510-(8*20),0);
               break;
       case 18: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+9)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(9*20),strlen(rssstreamoversigt.get_stream_name(9+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+9)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(9*20),strlen(rssstreamoversigt.get_stream_name_std(9+startofset).c_str()));
+              else showcoursornow(-70,510-(9*20),0);
               break;
       case 19: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+9)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(9*20),strlen(rssstreamoversigt.get_stream_url(9+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+9)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(9*20),strlen(rssstreamoversigt.get_stream_url_std(9+startofset).c_str()));
+              else showcoursornow(320,510-(9*20),0);
               break;
       case 20: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+10)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(10*20),strlen(rssstreamoversigt.get_stream_name(10+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+10)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(10*20),strlen(rssstreamoversigt.get_stream_name_std(10+startofset).c_str()));
+              else showcoursornow(-70,510-(10*20),0);
               break;
       case 21: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+10)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(10*20),strlen(rssstreamoversigt.get_stream_url(10+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+10)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(10*20),strlen(rssstreamoversigt.get_stream_url_std(10+startofset).c_str()));
+              else showcoursornow(320,510-(10*20),0);
               break;
       case 22:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+11)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(11*20),strlen(rssstreamoversigt.get_stream_name(11+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+11)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(11*20),strlen(rssstreamoversigt.get_stream_name_std(11+startofset).c_str()));
+              else showcoursornow(-70,510-(11*20),0);
               break;
       case 23:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+11)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(11*20),strlen(rssstreamoversigt.get_stream_url(11+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+11)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(11*20),strlen(rssstreamoversigt.get_stream_url_std(11+startofset).c_str()));
+              else showcoursornow(320,510-(11*20),0);
               break;
       case 24:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+12)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(12*20),strlen(rssstreamoversigt.get_stream_name(12+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+12)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(12*20),strlen(rssstreamoversigt.get_stream_name_std(12+startofset).c_str()));
+              else showcoursornow(-70,510-(12*20),0);
               break;
       case 25:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+12)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(12*20),strlen(rssstreamoversigt.get_stream_url(12+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+12)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(12*20),strlen(rssstreamoversigt.get_stream_url_std(12+startofset).c_str()));
+              else showcoursornow(320,510-(12*20),0);
               break;
       case 26:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+13)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(13*20),strlen(rssstreamoversigt.get_stream_name(13+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+13)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(13*20),strlen(rssstreamoversigt.get_stream_name_std(13+startofset).c_str()));
+              else showcoursornow(-70,510-(13*20),0);
               break;
       case 27:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+13)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(13*20),strlen(rssstreamoversigt.get_stream_url(13+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+13)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(13*20),strlen(rssstreamoversigt.get_stream_url_std(13+startofset).c_str()));
+              else showcoursornow(320,510-(13*20),0);
               break;
       case 28:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+14)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(14*20),strlen(rssstreamoversigt.get_stream_name(14+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+14)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(14*20),strlen(rssstreamoversigt.get_stream_name_std(14+startofset).c_str()));
+              else showcoursornow(-70,510-(14*20),0);
               break;
       case 29:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+14)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(14*20),strlen(rssstreamoversigt.get_stream_url(14+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+14)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(14*20),strlen(rssstreamoversigt.get_stream_url_std(14+startofset).c_str()));
+              else showcoursornow(320,510-(14*20),0);
               break;
       case 30:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+14)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(15*20),strlen(rssstreamoversigt.get_stream_name(15+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+14)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(15*20),strlen(rssstreamoversigt.get_stream_name_std(15+startofset).c_str()));
+              else showcoursornow(-70,510-(15*20),0);
               break;
       case 31:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+15)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(15*20),strlen(rssstreamoversigt.get_stream_url(15+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+15)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(15*20),strlen(rssstreamoversigt.get_stream_url_std(15+startofset).c_str()));
+              else showcoursornow(320,510-(15*20),0);
               break;
       case 32:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+16)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(16*20),strlen(rssstreamoversigt.get_stream_name(16+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+16)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(16*20),strlen(rssstreamoversigt.get_stream_name_std(16+startofset).c_str()));
+              else showcoursornow(-70,510-(16*20),0);
               break;
       case 33:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+16)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(16*20),strlen(rssstreamoversigt.get_stream_url(16+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+16)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(16*20),strlen(rssstreamoversigt.get_stream_url_std(16+startofset).c_str()));
+              else showcoursornow(320,510-(16*20),0);
               break;
       case 34:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+17)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(17*20),strlen(rssstreamoversigt.get_stream_name(17+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+17)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(17*20),strlen(rssstreamoversigt.get_stream_name_std(17+startofset).c_str()));
+              else showcoursornow(-70,510-(17*20),0);
               break;
       case 35:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+17)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(17*20),strlen(rssstreamoversigt.get_stream_url(17+startofset)));
-              else showcoursornow(-70,510-(0*20),0);
+              if ((startofset+17)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(17*20),strlen(rssstreamoversigt.get_stream_url_std(17+startofset).c_str()));
+              else showcoursornow(320,510-(17*20),0);
               break;
   }
 }

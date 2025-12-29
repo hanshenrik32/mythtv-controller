@@ -988,12 +988,12 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
   conn=mysql_init(NULL);
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
-    sql_update = "select table_schema as database_name,count(*) as tables from information_schema.tables where table_type = 'BASE TABLE' and table_schema not in ('information_schema', 'sys', 'performance_schema', 'mysql') group by table_schema order by table_schema";
+    sql_update = "select table_schema as database_name,count(*) as tables from information_schema.tables where table_type = 'BASE TABLE' and table_schema in ('mythtvcontroller') group by table_schema order by table_schema";
     mysql_query(conn,sql_update.c_str());
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        if (atoi(row[1])==34) dbexist=true; else dbexist=false;
+        if (atoi(row[1])>=33) dbexist=true; else dbexist=false;
       }
     } else dbexist=false;
     if (!(dbexist)) {

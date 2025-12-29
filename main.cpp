@@ -203,8 +203,8 @@ const char *kodivermovie[8]={"MyVideos119.db","MyVideos109.db","MyVideos107.db",
 char keybuffer[512];                                    // keyboard buffer
 unsigned int keybufferindex=0;                          // keyboard buffer index
 int findtype=0;					                              	// bruges af search kunster/sange
-unsigned int do_show_setup_select_linie=0;              // bruges af setup
-unsigned int do_show_editor_select_linie=0;              // bruges af setup
+int do_show_setup_select_linie=0;                       // bruges af setup
+int do_show_editor_select_linie=0;                      // bruges af setup
 bool do_save_config = false;                              // flag to save config
 
 channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array used in setup graber (default max 400) if you wats to change it look in myth_setup.h
@@ -10587,7 +10587,13 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_rss) {
                     if (do_show_setup_select_linie<35) do_show_setup_select_linie++;
                     else {
-                      if (configrss_ofset<streamoversigt.antalstreams()) configrss_ofset++;
+                      if ((do_show_setup_select_linie+configrss_ofset)<=rssstreamoversigt.streamantal()) {
+                        configrss_ofset++;
+                        // rssstreamoversigt.rss_source_feed_vector.insert(streamoversigt.antalstreams());
+                      } else {
+                        realrssrecordnr++;
+                        configrss_ofset++;
+                      }
                     }
                     if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) {
                       if ((realrssrecordnr)<43) realrssrecordnr++;
@@ -11051,6 +11057,17 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
                 if (do_show_setup) {
+                  if (do_show_setup_rss) {
+                    if (configrss_ofset>0) {
+                      configrss_ofset-=12; 
+                      if (configrss_ofset<0) configrss_ofset=0;
+                    } else if (do_show_setup_select_linie>12) {
+                      do_show_setup_select_linie-=12;
+                      if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
+                    } else if (do_show_setup_select_linie>0) {
+                      do_show_setup_select_linie=0;
+                    }
+                  }
                   if (do_show_tvgraber) {
                     if (tvchannel_startofset>1) tvchannel_startofset-=12;
                     else if ((do_show_setup_select_linie)>0) do_show_setup_select_linie-=12;
@@ -11102,6 +11119,17 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // if indside a setup menu
                 if (do_show_setup) {
+                  if (do_show_setup_rss) {
+                    if (streamoversigt.antalstreams()>17) {
+                      do_show_setup_select_linie+=12; 
+                      if ((do_show_setup_select_linie+configrss_ofset)>streamoversigt.antalstreams()-1) {
+                        configrss_ofset=streamoversigt.antalstreams()-17;
+                        do_show_setup_select_linie=17;
+                      } else if ((do_show_setup_select_linie+configrss_ofset)>17) {
+                        realrssrecordnr+=12;
+                      }
+                    }
+                  }
                   if (do_show_tvgraber) {
                     if (tvchannel_startofset>0) tvchannel_startofset+=12;
                     else if ((do_show_setup_select_linie)>0) do_show_setup_select_linie+=12;
@@ -11185,14 +11213,10 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   if (show_setup_rss) {
                     // jump to button of text
-                    if (streamoversigt.antalstreams()>17) do_show_setup_select_linie=34; else do_show_setup_select_linie=0;
-                    configrss_ofset=0;
-                    for(int i=configrss_ofset;i<3000-1;i++) {
-                      if (streamoversigt.get_stream_name(configrss_ofset)) {
-                        configrss_ofset++;
-                      }
-                    }
-                    if (configrss_ofset>8) configrss_ofset-=8;
+                    if (streamoversigt.antalstreams()>17) {
+                      do_show_setup_select_linie=34;
+                      configrss_ofset=streamoversigt.antalstreams()-17;
+                    } else do_show_setup_select_linie=streamoversigt.antalstreams();
                   }
                 }
                 break;
@@ -11289,120 +11313,116 @@ void handleKeypress(unsigned char key, int x, int y) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
-          case 0: if (rssstreamoversigt.get_stream_name(0+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+configrss_ofset)); else strcpy(keybuffer,"");
+          case 0: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(0+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 1: if (rssstreamoversigt.get_stream_url(0+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+configrss_ofset)); else strcpy(keybuffer,"");
+          case 1: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(0+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 2: if (rssstreamoversigt.get_stream_name(1+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(1+configrss_ofset)); else strcpy(keybuffer,"");
+          case 2: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(1+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 3: if (rssstreamoversigt.get_stream_url(1+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(1+configrss_ofset)); else strcpy(keybuffer,"");
+          case 3: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(1+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 4: if (rssstreamoversigt.get_stream_name(2+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(2+configrss_ofset)); else strcpy(keybuffer,"");
+          case 4: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(2+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 5: if (rssstreamoversigt.get_stream_url(2+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(2+configrss_ofset)); else strcpy(keybuffer,"");
+          case 5: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(2+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 6: if (rssstreamoversigt.get_stream_name(3+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(3+configrss_ofset)); else strcpy(keybuffer,"");
+          case 6: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(3+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 7: if (rssstreamoversigt.get_stream_url(3+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(3+configrss_ofset)); else strcpy(keybuffer,"");
+          case 7: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(3+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 8: if (rssstreamoversigt.get_stream_name(4+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(4+configrss_ofset)); else strcpy(keybuffer,"");
+          case 8: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(4+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 9: if (rssstreamoversigt.get_stream_url(4+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(4+configrss_ofset)); else strcpy(keybuffer,"");
+          case 9: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(4+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 10:if (rssstreamoversigt.get_stream_name(5+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(5+configrss_ofset)); else strcpy(keybuffer,"");
+          case 10:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(5+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 11:if (rssstreamoversigt.get_stream_url(5+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(5+configrss_ofset)); else strcpy(keybuffer,"");
+          case 11:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(5+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 12:if (rssstreamoversigt.get_stream_name(6+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(6+configrss_ofset)); else strcpy(keybuffer,"");
+          case 12:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(6+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 13:if (rssstreamoversigt.get_stream_url(6+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(6+configrss_ofset)); else strcpy(keybuffer,"");
+          case 13:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(6+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 14:if (rssstreamoversigt.get_stream_name(7+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(7+configrss_ofset)); else strcpy(keybuffer,"");
+          case 14:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(7+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 15:if (rssstreamoversigt.get_stream_url(7+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(7+configrss_ofset)); else strcpy(keybuffer,"");
+          case 15:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(7+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 16:if (rssstreamoversigt.get_stream_name(8+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(8+configrss_ofset)); else strcpy(keybuffer,"");
+          case 16:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(8+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 17:if (rssstreamoversigt.get_stream_url(8+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(8+configrss_ofset)); else strcpy(keybuffer,"");
+          case 17:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(8+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 18:if (rssstreamoversigt.get_stream_name(9+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(9+configrss_ofset)); else strcpy(keybuffer,"");
+          case 18:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(9+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 19:if (rssstreamoversigt.get_stream_url(9+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(9+configrss_ofset)); else strcpy(keybuffer,"");
+          case 19:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(9+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 20:if (rssstreamoversigt.get_stream_name(10+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(10+configrss_ofset)); else strcpy(keybuffer,"");
+          case 20:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(10+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 21:if (rssstreamoversigt.get_stream_url(10+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(10+configrss_ofset)); else strcpy(keybuffer,"");
+          case 21:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(10+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 22:if (rssstreamoversigt.get_stream_name(11+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(11+configrss_ofset)); else strcpy(keybuffer,"");
+          case 22:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(11+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 23:if (rssstreamoversigt.get_stream_url(11+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(11+configrss_ofset)); else strcpy(keybuffer,"");
+          case 23:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(11+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 24:if (rssstreamoversigt.get_stream_name(12+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(12+configrss_ofset)); else strcpy(keybuffer,"");
+          case 24:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(12+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 25:if (rssstreamoversigt.get_stream_url(12+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(12+configrss_ofset)); else strcpy(keybuffer,"");
+          case 25:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(12+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 26:if (rssstreamoversigt.get_stream_name(13+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(13+configrss_ofset)); else strcpy(keybuffer,"");
+          case 26:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(13+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 27:if (rssstreamoversigt.get_stream_url(13+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(13+configrss_ofset)); else strcpy(keybuffer,"");
+          case 27:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(13+configrss_ofset).c_str());
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 28:if (rssstreamoversigt.get_stream_name(14+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(14+configrss_ofset)); else strcpy(keybuffer,"");
+          case 28:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(14+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 29:if (rssstreamoversigt.get_stream_url(14+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(14+configrss_ofset)); else strcpy(keybuffer,"");
+          case 29:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(14+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 30:if (rssstreamoversigt.get_stream_name(15+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(15+configrss_ofset)); else strcpy(keybuffer,"");
+          case 30:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(15+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 31:if (rssstreamoversigt.get_stream_url(15+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(15+configrss_ofset)); else strcpy(keybuffer,"");
+          case 31:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(15+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 32:if (rssstreamoversigt.get_stream_name(16+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(16+configrss_ofset)); else strcpy(keybuffer,"");
+          case 32:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(16+configrss_ofset).c_str());
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 33:if (rssstreamoversigt.get_stream_url(16+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(16+configrss_ofset)); else strcpy(keybuffer,"");
+          case 33:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(16+configrss_ofset).c_str()); 
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 34:if (rssstreamoversigt.get_stream_name(17+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(17+configrss_ofset)); else strcpy(keybuffer,"");
+          case 34:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(17+configrss_ofset).c_str());
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 35:if (rssstreamoversigt.get_stream_url(17+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(17+configrss_ofset)); else strcpy(keybuffer,"");
+          case 35:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(17+configrss_ofset).c_str());
                   keybufferindex=strlen(keybuffer);
                   break;
-          case 36:if (rssstreamoversigt.get_stream_name(18+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(18+configrss_ofset)); else strcpy(keybuffer,"");
-                  keybufferindex=strlen(keybuffer);
-                  break;
-          case 37:if (rssstreamoversigt.get_stream_url(18+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(18+configrss_ofset)); else strcpy(keybuffer,"");
-                  keybufferindex=strlen(keybuffer);
-                  break;
+          default: strcpy(keybuffer,"");
+                   keybufferindex=strlen(keybuffer);
         }
       }
       #ifdef ENABLE_SPOTIFY
@@ -12187,10 +12207,6 @@ void handleKeypress(unsigned char key, int x, int y) {
               case 34:rssstreamoversigt.set_stream_name(17+configrss_ofset,keybuffer);
                       break;
               case 35:rssstreamoversigt.set_stream_url(17+configrss_ofset,keybuffer);
-                      break;
-              case 36:rssstreamoversigt.set_stream_name(18+configrss_ofset,keybuffer);
-                      break;
-              case 37:rssstreamoversigt.set_stream_url(18+configrss_ofset,keybuffer);
                       break;
              }
          }
@@ -13071,6 +13087,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                 }
               }
+              
+              if (do_show_setup_rss) {
+                do_show_setup_select_linie++;
+                /*
+                if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) {
+                  if ((realrssrecordnr)<43) realrssrecordnr++;
+                } else configrss_ofset++;
+                */
+              }
+
               if (do_show_torrent) {
                 printf("enter pressed\n ");
                 if ((do_show_torrent_options) && (do_show_torrent_options_move==false)) {
