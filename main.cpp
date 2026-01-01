@@ -7247,7 +7247,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // test for close windows again icon for all other windows in setup glLoadName(40)
           //
-          if ((names[i*4+3]==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_torrent) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
+          if ((names[i*4+3]==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_torrent) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_setup_rss) || (do_show_tvgraber))) {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7255,10 +7255,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_setup_tema = false;
             do_show_setup_keys = false;
             do_show_videoplayer = false;
-            do_show_setup_rss = false;
             do_show_setup_spotify = false;
             do_show_setup_tidal = false;
             do_show_setup_torrent = false;
+            if (do_show_setup_rss) {
+              rssstreamoversigt.save_rss_data();   // save rss data to mysql db
+              do_show_setup_rss = false;
+            }
             if (do_show_setup_font) {
               if (debugmode) fprintf(stderr,"Set aktiv font to '%s' \n",aktivfont.typeinfo[setupfontselectofset].fontname);
               strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
@@ -7280,7 +7283,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if (tema>TEMA_ANTAL) tema = 1;
             fundet = true;
           }
-          // test for rss setup
+          // test for select rss setup
           if ((names[i*4+3]==42) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
             // close  all show setup windows
             do_show_setup_sound = false;
@@ -7300,7 +7303,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
 
-          // test for spotify setup
+          // test for select spotify setup
           if ((names[i*4+3]==43) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false)) {
             // close  all show setup windows
             do_show_setup_sound = false;
@@ -7319,7 +7322,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_setup_torrent = false;
             fundet = true;
           }
-          // test for tidal setup
+          // test for tidal select setup
           if ((names[i*4+3]==44) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false && (do_show_setup_spotify==false))) {
             // close  all show setup windows
             do_show_setup_sound = false;
@@ -10585,17 +10588,20 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   // setup rss source window
                   if (do_show_setup_rss) {
-                    if (do_show_setup_select_linie<35) do_show_setup_select_linie++;
-                    else {
-                      if ((do_show_setup_select_linie+configrss_ofset)<=rssstreamoversigt.streamantal()) {
+                    if ((rssstreamoversigt.setup_select_linie<35) && ((rssstreamoversigt.setup_select_linie/2)+configrss_ofset<rssstreamoversigt.streamantal())) {
+                      rssstreamoversigt.setup_select_linie++;
+                    } else {
+                      if ((((rssstreamoversigt.setup_select_linie/2)+1+configrss_ofset))<=rssstreamoversigt.streamantal()) {
                         configrss_ofset++;
                         // rssstreamoversigt.rss_source_feed_vector.insert(streamoversigt.antalstreams());
                       } else {
-                        realrssrecordnr++;
-                        configrss_ofset++;
+                        if ((((rssstreamoversigt.setup_select_linie/2)+1+configrss_ofset))<=rssstreamoversigt.streamantal()) {
+                          realrssrecordnr++;
+                          configrss_ofset++;
+                        }
                       }
                     }
-                    if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) {
+                    if (((rssstreamoversigt.setup_select_linie+configrss_ofset) % 2)==0) {
                       if ((realrssrecordnr)<43) realrssrecordnr++;
                     }
                   }
@@ -10918,9 +10924,9 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   // setup rss
                   if (do_show_setup_rss) {
-                    if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                    if (rssstreamoversigt.setup_select_linie>0) rssstreamoversigt.setup_select_linie--;
                     else if (configrss_ofset>0) configrss_ofset--;
-                    if ((((do_show_setup_select_linie+configrss_ofset) % 2)==0) && ((do_show_setup_select_linie+configrss_ofset)>0)) realrssrecordnr--;
+                    if ((((rssstreamoversigt.setup_select_linie+configrss_ofset) % 2)==0) && ((rssstreamoversigt.setup_select_linie+configrss_ofset)>0)) realrssrecordnr--;
                   }
                   if (do_show_setup_spotify) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
@@ -11061,11 +11067,11 @@ void handlespeckeypress(int key,int x,int y) {
                     if (configrss_ofset>0) {
                       configrss_ofset-=12; 
                       if (configrss_ofset<0) configrss_ofset=0;
-                    } else if (do_show_setup_select_linie>12) {
-                      do_show_setup_select_linie-=12;
-                      if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
-                    } else if (do_show_setup_select_linie>0) {
-                      do_show_setup_select_linie=0;
+                    } else if (rssstreamoversigt.setup_select_linie>12) {
+                      rssstreamoversigt.setup_select_linie-=12;
+                      if (rssstreamoversigt.setup_select_linie<0) rssstreamoversigt.setup_select_linie=0;
+                    } else if (rssstreamoversigt.setup_select_linie>0) {
+                      rssstreamoversigt.setup_select_linie=0;
                     }
                   }
                   if (do_show_tvgraber) {
@@ -11121,11 +11127,11 @@ void handlespeckeypress(int key,int x,int y) {
                 if (do_show_setup) {
                   if (do_show_setup_rss) {
                     if (streamoversigt.antalstreams()>17) {
-                      do_show_setup_select_linie+=12; 
-                      if ((do_show_setup_select_linie+configrss_ofset)>streamoversigt.antalstreams()-1) {
+                      rssstreamoversigt.setup_select_linie+=12; 
+                      if ((rssstreamoversigt.setup_select_linie+configrss_ofset)>streamoversigt.antalstreams()-1) {
                         configrss_ofset=streamoversigt.antalstreams()-17;
-                        do_show_setup_select_linie=17;
-                      } else if ((do_show_setup_select_linie+configrss_ofset)>17) {
+                        rssstreamoversigt.setup_select_linie=17;
+                      } else if ((rssstreamoversigt.setup_select_linie+configrss_ofset)>17) {
                         realrssrecordnr+=12;
                       }
                     }
@@ -11177,7 +11183,7 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   // rss setup
                   if (show_setup_rss) {
-                    do_show_setup_select_linie = 0;
+                    rssstreamoversigt.setup_select_linie = 0;
                     configrss_ofset = 0;
                   }
                 }
@@ -11214,9 +11220,9 @@ void handlespeckeypress(int key,int x,int y) {
                   if (show_setup_rss) {
                     // jump to button of text
                     if (streamoversigt.antalstreams()>17) {
-                      do_show_setup_select_linie=34;
+                      rssstreamoversigt.setup_select_linie=34;
                       configrss_ofset=streamoversigt.antalstreams()-17;
-                    } else do_show_setup_select_linie=streamoversigt.antalstreams();
+                    } else rssstreamoversigt.setup_select_linie=streamoversigt.antalstreams();
                   }
                 }
                 break;
@@ -11309,121 +11315,85 @@ void handleKeypress(unsigned char key, int x, int y) {
         vis_volume_timeout=120;
       }
     }
-    if ((key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!='S') && (key!='*') && (key!='U') && (key!=117) && (key!=optionmenukey) && (key!=13) && (key!=27) || ((vis_spotify_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_tidal_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_film_oversigt) && (key!=13) && (key!=27) && (key!=117)) || ((tidal_oversigt.do_setup_tidal_start_entry) && (key!=13) && (key!=27) && (key!=117)) || ((vis_radio_oversigt) && (key!='u') && (key!=optionmenukey) && (key!=27 && (key!=13))) || ((vis_tv_oversigt) && (key!='u') && (key!=27))) {
+    if ((key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!=127) && (key!='S') && (key!='*') && (key!='U') && (key!=117) && (key!=optionmenukey) && (key!=13) && (key!=27) || ((vis_spotify_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_tidal_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_film_oversigt) && (key!=13) && (key!=27) && (key!=117)) || ((tidal_oversigt.do_setup_tidal_start_entry) && (key!=13) && (key!=27) && (key!=117)) || ((vis_radio_oversigt) && (key!='u') && (key!=optionmenukey) && (key!=27 && (key!=13))) || ((vis_tv_oversigt) && (key!='u') && (key!=27))) {
       // rss setup windows is open
       if (do_show_setup_rss) {
-        switch(do_show_setup_select_linie) {
-          case 0: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(0+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
+        switch(rssstreamoversigt.setup_select_linie) {
+          case 0: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(0+configrss_ofset).c_str());
                   break;
           case 1: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(0+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 2: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(1+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 3: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(1+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 4: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(2+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 5: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(2+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 6: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(3+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 7: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(3+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 8: strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(4+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 9: strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(4+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 10:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(5+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 11:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(5+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 12:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(6+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 13:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(6+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 14:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(7+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 15:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(7+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 16:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(8+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 17:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(8+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 18:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(9+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 19:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(9+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 20:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(10+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 21:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(10+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 22:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(11+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 23:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(11+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 24:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(12+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 25:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(12+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 26:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(13+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 27:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(13+configrss_ofset).c_str());
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 28:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(14+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 29:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(14+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 30:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(15+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 31:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(15+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 32:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(16+configrss_ofset).c_str());
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 33:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(16+configrss_ofset).c_str()); 
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 34:strcpy(keybuffer,rssstreamoversigt.get_stream_name_std(17+configrss_ofset).c_str());
-                  keybufferindex=strlen(keybuffer);
                   break;
           case 35:strcpy(keybuffer,rssstreamoversigt.get_stream_url_std(17+configrss_ofset).c_str());
-                  keybufferindex=strlen(keybuffer);
                   break;
           default: strcpy(keybuffer,"");
-                   keybufferindex=strlen(keybuffer);
         }
+        keybufferindex=strlen(keybuffer);
       }
       #ifdef ENABLE_SPOTIFY
       if (do_show_setup_spotify) {
@@ -11563,19 +11533,20 @@ void handleKeypress(unsigned char key, int x, int y) {
             }            
           }
         } else {
-          // delete key
-          if ((vis_tidal_oversigt) && (key==127)) {
-            printf("delete record in overview %d      del nr %d         antal %d \n",(tidalknapnr)+tidal_selected_startofset,(tidalknapnr-1)+tidal_selected_startofset,tidal_oversigt.streamantal());
-            tidal_oversigt.delete_record_in_view((tidalknapnr-1)+tidal_selected_startofset);
-            if ((tidalknapnr)+tidal_selected_startofset>tidal_oversigt.streamantal()) {
-              tidalknapnr--;
+          // delete key 127
+          if (key==127) {
+            if (vis_tidal_oversigt) {
+              printf("delete record in overview %d      del nr %d         antal %d \n",(tidalknapnr)+tidal_selected_startofset,(tidalknapnr-1)+tidal_selected_startofset,tidal_oversigt.streamantal());
+              tidal_oversigt.delete_record_in_view((tidalknapnr-1)+tidal_selected_startofset);
+              if ((tidalknapnr)+tidal_selected_startofset>tidal_oversigt.streamantal()) {
+                tidalknapnr--;
+              }
+            }
+            if ((vis_film_oversigt) && (key==127)) {
+              // del key
             }
           }
 
-          if ((vis_film_oversigt) && (key==127)) {
-            // del key
-
-          }
 
           if (vis_music_oversigt) {
             if (ask_open_dir_or_play) {
@@ -12135,7 +12106,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
          } else if (do_show_setup_rss) {
             // update records
-            switch(do_show_setup_select_linie) {
+            switch(rssstreamoversigt.setup_select_linie) {
               case 0: rssstreamoversigt.set_stream_name(0+configrss_ofset,keybuffer);
                       break;
               case 1: rssstreamoversigt.set_stream_url(0+configrss_ofset,keybuffer);
@@ -13089,7 +13060,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               
               if (do_show_setup_rss) {
-                do_show_setup_select_linie++;
+                rssstreamoversigt.setup_select_linie++;
                 /*
                 if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) {
                   if ((realrssrecordnr)<43) realrssrecordnr++;
@@ -13129,6 +13100,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                 }
               }
+              break;
+            case 127:
               break;
         }
     }

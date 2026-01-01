@@ -92,6 +92,7 @@ class stream_class : vlc_controller {
         stream_class();
         ~stream_class();
         int streamantal() { return(antal); }
+        // int streamantal() { return(stack1.size()); }
         void clean_stream_oversigt();
         int opdatere_stream_oversigt(char *art,char *fpath);
         int loadrssfile(bool updaterssfile);                                    // download file from web

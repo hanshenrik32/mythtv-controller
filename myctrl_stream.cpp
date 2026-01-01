@@ -374,7 +374,7 @@ stream_class::~stream_class() {
 // ****************************************************************************************
 
 char *stream_class::get_stream_name(int nr) {
-  if (nr<antal) return (stack[nr]->feed_name); else return (NULL);
+  if (nr<antal) return (stack1[nr].feed_name); else return (NULL);
 }
 
 // ****************************************************************************************
@@ -384,7 +384,7 @@ char *stream_class::get_stream_name(int nr) {
 // ****************************************************************************************
 
 char *stream_class::get_stream_desc(int nr) {
-  if (nr<antal) return (stack[nr]->feed_desc); else return (NULL);
+  if (nr<antal) return (stack1[nr].feed_desc); else return (NULL);
 }
 
 // ****************************************************************************************
@@ -410,7 +410,7 @@ void stream_class::clean_stream_oversigt() {
 //
 // ****************************************************************************************
 void stream_class::set_texture(int nr,GLuint idtexture) {
-    stack[nr]->textureId=idtexture;
+    stack1[nr].textureId=idtexture;
 }
 
 //
@@ -683,8 +683,6 @@ int stream_class::loadrssfile(bool updaterssfile) {
               // parse downloaded xmlfile now (create db records)
               // and get base image from func call (baseicon (url to image))
               parsexmlrssfile(parsefilename,baseicon);
-              // parsexmlrssfile_new(parsefilename,baseicon);
-              //printf("... Parse %s rss file \n",parsefilename);
             } else {
               printf("XML FILE is missing/not working on %s file.\n",row[3]);
             }
@@ -993,7 +991,6 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 subnode2=subnode2->next;
               }
               recordexist=false;
-              // snprintf(sqlinsert,sizeof(sqlinsert),"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
               sqlinsert1 = fmt::format("SELECT feedtitle from internetcontentarticles where (feedtitle like '{}' mediaURL like '{}' and title like \"{}\")",rssprgtitle,rssvideolink,rssprgfeedtitle);
               mysql_query(conn,sqlinsert1.c_str());
               res = mysql_store_result(conn);
@@ -1048,10 +1045,8 @@ int stream_class::parsexmlrssfile_new(char *filename,char *baseiconfile) {
   std::ifstream temasettingsfile(fname);
   reader1.parse(temasettingsfile, iRoot1);
   try {
-    // const Json::Value rssfeeds = iRoot["rss"];
     std::string val=iRoot1["channel"].get("title","0").asString();
     std::cout << "Channel title: " << val << std::endl;
-    // std::cout << iRoot1["rss"] << std::endl;
   } catch (const std::exception &e) {
     std::cerr << "Error parsing JSON: " << e.what() << std::endl;
   } 
@@ -1073,7 +1068,6 @@ int stream_class::get_antal_rss_feeds_sources(MYSQL *conn) {
   MYSQL_RES *res;
   MYSQL_ROW row;
   int antal=0;
-  //printf("*************************************************************************************\n");
   if (conn) {
     snprintf(sqlselect,sizeof(sqlselect),"SELECT count(name) from mythtvcontroller.internetcontent where active=1");
     mysql_query(conn,sqlselect);
@@ -1182,6 +1176,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
   bool dbexist=false;
   antal=0;
   int i=0;
+  stream_oversigt_type new_stream_recrord;
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
@@ -1323,6 +1318,21 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
             stack[antal]->textureId=0;				//
             stack[antal]->intnr=0;					//
             stack[antal]->nyt=false;					// New podcast ?
+
+
+            strcpy(new_stream_recrord.feed_showtxt,"");          	        // show name
+            strcpy(new_stream_recrord.feed_name,"");		        // mythtv db feedtitle
+            strcpy(new_stream_recrord.feed_desc,"");                       // desc
+            strcpy(new_stream_recrord.feed_path,"");                       // mythtv db path
+            strcpy(new_stream_recrord.feed_gfx_url,"");			//
+            strcpy(new_stream_recrord.feed_gfx_mythtv,"");			//
+            strcpy(new_stream_recrord.feed_streamurl,"");			//
+            new_stream_recrord.feed_group_antal=0;				//
+            new_stream_recrord.feed_path_antal=0;				//
+            new_stream_recrord.textureId=0;				//
+            new_stream_recrord.intnr=0;					//
+            new_stream_recrord.nyt=false;					// New podcast ?
+
             // top level
             if (getart==0) {
               strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
@@ -1334,6 +1344,18 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
               if (row[7]) strncat(tmpfilename,row[7],20);                                     // get image path
               strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		      // icon file URL
               if (row[9]) strcpy(tmpfilename,row[9]);
+
+              // begin new ver
+              strncpy(new_stream_recrord.feed_showtxt,row[0],feed_pathlength);          	        // show name
+              strncpy(new_stream_recrord.feed_name,row[0],feed_namelength);
+              if (row[1]) strcpy(new_stream_recrord.feed_path,row[1]);
+              if (row[0]) new_stream_recrord.feed_group_antal=get_podcasttype_antal(row[0]);        // get antal
+              else new_stream_recrord.feed_group_antal=0;
+              if (row[3]) strncpy(new_stream_recrord.feed_desc,row[3],feed_desclength);
+              if (row[7]) strncat(tmpfilename,row[7],20);                                     // get image path
+              strcpy(new_stream_recrord.feed_gfx_mythtv,tmpfilename);            	       		      // icon file URL
+              // end new ver
+
               get_webfilenamelong(downloadfilename,tmpfilename);                              // get file name from url to gfx
               // check filename
               strcpy(downloadfilename1,downloadfilename);                 // back name before change
@@ -1356,6 +1378,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
               }
               // tmpfilename is now the bame of the icon
               strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
+
+
+              strncpy(new_stream_recrord.feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
+              stack1.push_back(new_stream_recrord);                     // save new record in vector
+
               antal++;
             } else {
               // if first creat back button
@@ -1369,6 +1396,20 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);            // feed (db link) url
                 stack[antal]->feed_group_antal=0;
                 stack[antal]->intnr=0;	                               					// intnr=0 = back button type
+
+
+
+                new_stream_recrord.textureId=_textureIdback;			                    // back icon
+                strcpy(new_stream_recrord.feed_showtxt,"BACK");
+                if (row[0]) strncpy(new_stream_recrord.feed_name,row[0],feed_namelength);
+                if (row[1]) strncpy(new_stream_recrord.feed_path,row[1],feed_pathlength);
+                //strcpy(new_stream_recrord.feed_streamurl,row[4]);
+                if (row[3]) strncpy(new_stream_recrord.feed_desc,row[3],feed_desclength);
+                if (row[5]) strncpy(new_stream_recrord.feed_gfx_url,row[5],feed_url);            // feed (db link) url
+                new_stream_recrord.feed_group_antal=0;
+                new_stream_recrord.intnr=0;	                               					// intnr=
+                stack1.push_back(new_stream_recrord);                     // save new record in vector
+
                 antal++;
               }
               // alloc new element in array
@@ -1379,15 +1420,30 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 if (getart==1) {
                   // old ver used path from mysql
                   //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
-                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                  if (row[2]) {
+                    strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                    strncpy(new_stream_recrord.feed_showtxt,row[2],feed_pathlength);
+                  }
                 } else {
-                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                  if (row[2]) {
+                    strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                    strncpy(new_stream_recrord.feed_showtxt,row[2],feed_pathlength);
+                  }
                 }
-                if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
-                if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
+                if (row[1]) {
+                  strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
+                  strncpy(new_stream_recrord.feed_path,row[1],feed_pathlength);		// path
+                }
+                if (row[2]) {
+                  strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
+                  strncpy(new_stream_recrord.feed_name,row[0],feed_namelength);		// feedtitle
+                }
                 // old ver
                 //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
-                if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
+                if (row[8]) {
+                  strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
+                  strncpy(new_stream_recrord.feed_streamurl,row[8],feed_url);		  // save play url
+                }
                 switch(getart) {
                   case 0: if (row[9]) strcpy(tmpfilename,row[9]);
                           break;
@@ -1398,7 +1454,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 }
                 // test antal afspillinger this 0 set som new rss
                 if (row[9]) {
-                  if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
+                  if (atoi(row[9])==0) {
+                    stack[antal]->nyt=true;
+                    new_stream_recrord.nyt=true;
+                  } else {
+                    stack[antal]->nyt=false;
+                    new_stream_recrord.nyt=false;
+                  }
                 }
                 if (strlen(tmpfilename)>7) {
                   if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
@@ -1440,12 +1502,26 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                   }
                 } else strcpy(tmpfilename,"");
                 strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
+
+                strncpy(new_stream_recrord.feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
+
                 // strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
-                if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                if (row[3]) {
+                  strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                  strncpy(new_stream_recrord.feed_desc,row[3],feed_desclength);
+                }
                 // no texture now
                 stack[antal]->textureId=0;
+                new_stream_recrord.textureId=0;
                 // opdatere group antal
-                if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
+                if (getart==1) {
+                  stack[antal]->feed_group_antal=atoi(row[6]);
+                  new_stream_recrord.feed_group_antal=atoi(row[6]);
+                } else {
+                  stack[antal]->feed_group_antal=0;
+                  new_stream_recrord.feed_group_antal=0;
+                }
+                stack1.push_back(new_stream_recrord);                     // save new record in vector
                 antal++;
               }
             }
@@ -1695,7 +1771,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       buttonsizex=config_menu.config_stream_main_window_icon_sizex;
       show_round_corner = false;
     }
-    if (stack[i+sofset]->textureId) {
+    if (stack1[i+sofset].textureId) {
       // stream icon exist draw it
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
@@ -1833,7 +1909,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         // indsite draw icon rss gfx - NOT SELECTED
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glBindTexture(GL_TEXTURE_2D,stack1[i+sofset].textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -1932,7 +2008,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
         glEnd();
         // show nyt icon note
-        if (stack[i+sofset]->nyt) {
+        if (stack1[i+sofset].nyt) {
           glBindTexture(GL_TEXTURE_2D,newstuf_icon);
           glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
           glBegin(GL_QUADS);
@@ -1946,13 +2022,13 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glPopMatrix();
     }
     // draw numbers in group
-    if (stack[i+sofset]->feed_group_antal>1) {
+    if (stack1[i+sofset].feed_group_antal>1) {
       // show numbers in group
-      temprgtxt1 = fmt::format("Feeds {}",stack[i+sofset]->feed_group_antal);
+      temprgtxt1 = fmt::format("Feeds {}",stack1[i+sofset].feed_group_antal);
       drawText(temprgtxt1.c_str(), xof+22,yof+14, 0.3f,1);
     }
     // show text 20 of elements in string
-    temprgtxt1 = fmt::format("{:^20}",stack[i+sofset]->feed_showtxt);
+    temprgtxt1 = fmt::format("{:^20}",stack1[i+sofset].feed_showtxt);
     temprgtxt1.resize(20);
     drawText(temprgtxt1.c_str(), xof+20,yof-10, 0.4f,1);
     // next button

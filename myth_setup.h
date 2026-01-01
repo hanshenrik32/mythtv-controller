@@ -40,7 +40,7 @@ struct channel_list_struct {
 
 class channel_configfile {
   private:
-    static const int maxconfigfilesize=400;                                                  // config for xmltv
+    static const int maxconfigfilesize=400;                                     // config for xmltv
     int configfilesize=0;                                                       // real size
     char configtext[400][80];                                                   // config settings
   public:
@@ -54,7 +54,6 @@ class channel_configfile {
 // used for rss db config of rss feeds
 //
 
-
 struct rss_stream_struct {
   std::string stream_name;
   std::string stream_url;
@@ -67,9 +66,8 @@ class rss_stream_class {
     std::vector <rss_stream_struct> rss_source_feed_vector;
     unsigned int antal;
     static const int maxantal=1000;                                                           // # of records do create
-    static const int namemaxlength=80;                                                       // max length
-    static const int urlmaxlength=2048;                                                       // max length
   public:
+    int setup_select_linie=0;
     int load_rss_data();                              // loaddb
     int save_rss_data();                              // update db
     int streamantal() { return(rss_source_feed_vector.size()); }

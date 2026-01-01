@@ -133,7 +133,7 @@ extern GLuint _textureclose;
 extern GLuint _texturetvgrabersetup;                //
 extern GLuint setupupdatebutton;
 extern GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,screenshot7,screenshot8,screenshot9,screenshot10;
-extern unsigned int do_show_setup_select_linie;
+extern int do_show_setup_select_linie;
 extern int tema;
 extern int screen_size;
 extern int configmythtvver;
@@ -347,6 +347,7 @@ int rss_stream_class::save_rss_data() {
   char ftitle[2048];
   char ftitle2[2048];
   char furl[2048];
+  bool db_state_status;
   // mysql vars
   MYSQL *conn;
   MYSQL_RES *res,*res1;
@@ -410,18 +411,24 @@ int rss_stream_class::save_rss_data() {
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
               sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed_vector[n].stream_name.c_str());
-              mysql_query(conn,sqlstring);
+              db_state_status=mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
             }
           }
         } else { 
           // no update of name of url create new
           sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed_vector[n].stream_name,rss_source_feed_vector[n].stream_name.c_str(),rss_source_feed_vector[n].stream_url.c_str());
-          mysql_query(conn,sqlstring);
+          db_state_status=mysql_query(conn,sqlstring);
+          if (db_state_status==false) {
+            write_logfile(logfile,(char *) "Error insert new rss feed to mysql db.");
+          }
           res1 = mysql_store_result(conn);
           sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed_vector[n].stream_name.c_str());
-          mysql_query(conn,sqlstring);
+          db_state_status=mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
+          if (db_state_status==false) {
+            write_logfile(logfile,(char *) "Error insert new rss feed to mysql db.");
+          }
         }
       }
     } //for next
@@ -2837,14 +2844,14 @@ void show_setup_rss(unsigned int startofset) {
   myglprint4((char *) "Podcast URL");
   glPopMatrix();
 
-  printf("do_show_setup_select_linie=%d startofset=%d streamantal=%d select name %s \n",do_show_setup_select_linie,startofset,rssstreamoversigt.streamantal(),rssstreamoversigt.get_stream_name_std(do_show_setup_select_linie/2+startofset).c_str());
+  printf("do_show_setup_select_linie=%d startofset=%d streamantal=%d select name %s \n",(rssstreamoversigt.setup_select_linie/2)+startofset,startofset,rssstreamoversigt.streamantal(),rssstreamoversigt.get_stream_name_std(rssstreamoversigt.setup_select_linie/2+startofset).c_str());
 
   for (int n=0;n<19;n++) {
     glPushMatrix();
     glTranslatef(260 , 660-(n*20) , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     showtxt=fmt::format("{:3} ",n+startofset);
-    if (n+startofset==do_show_setup_select_linie/2+startofset) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
+    if (n+startofset==rssstreamoversigt.setup_select_linie/2+startofset) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
     myglprint4((char *) showtxt.c_str());
     glPopMatrix();
 
@@ -2875,7 +2882,7 @@ void show_setup_rss(unsigned int startofset) {
     myglprint4((char *) showtxt.c_str());
     glPopMatrix();
   }
-  switch(do_show_setup_select_linie) {
+  switch(rssstreamoversigt.setup_select_linie) {
       case 0: glColor3f(1.0f,1.0f,1.0f);
               if ((startofset)<rssstreamoversigt.streamantal()) showcoursornow(-70,510-(0*20),strlen(rssstreamoversigt.get_stream_name_std(0+startofset).c_str()));
               else showcoursornow(-70,510-(0*20),0);
