@@ -9936,7 +9936,8 @@ void handlespeckeypress(int key,int x,int y) {
                   if (findtype==0) findtype=1;
                   else if (findtype==1) findtype=0;
                 } else if ((!(vis_radio_oversigt)) && (!(vis_radio_or_music_oversigt)) && (!(vis_tidal_oversigt))) {
-                  if (do_show_setup) do_save_config = true;		                   // set save config file flag
+                  // if (do_show_setup) do_save_config = true;		                   // set save config file flag
+                  do_save_config = true;		                   // set save config file flag
                   do_save_setup_rss = true;                                      // save rss setup
                   vis_radio_oversigt = false;
                   vis_tv_oversigt = false;
@@ -10313,20 +10314,24 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // Podcast
                 // key right
-                if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.streamantal()-1) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.antalstreams()) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
                   // er vi på første skærm ingen scroll
                   // så scroll
-                  if ((stream_key_selected % (snumbersoficonline*6)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
+                  if ((stream_key_selected % (snumbersoficonline*5)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
                     // ikke max
-                    if ((stream_select_iconnr+1)<streamoversigt.streamantal()) {
+                    if ((stream_select_iconnr+1)<streamoversigt.antal_rss_streams()) {
                       _sangley+=RADIO_CS;
                       stream_key_selected-=snumbersoficonline;	// den viste på skærm af 1 til 20
                       stream_select_iconnr++;			// den rigtige valgte af 1 til stream antal
                     }
                   } else {
-                    if (stream_select_iconnr<streamoversigt.streamantal()) stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                    int ant=streamoversigt.antal_rss_streams();
+                    int ant2=streamoversigt.antalstreams();
+                    if (stream_select_iconnr+1<ant2) {
+                      stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                      stream_key_selected++;
+                    }
                   }
-                  if ((stream_select_iconnr)<streamoversigt.streamantal()) stream_key_selected++;
                 }
                 // If indside tv overview
                 // key right
@@ -10473,14 +10478,16 @@ void handlespeckeypress(int key,int x,int y) {
                   // stream
                   // stream_select_iconnr = the real nr in the array
                   // stream_key_selected = the number on the screen
-                  if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
-                    if (stream_key_selected>=(snumbersoficonline*4)) {
-                      if ((stream_key_selected+((_sangley/RADIO_CS)*snumbersoficonline))<streamoversigt.streamantal()) _sangley+=RADIO_CS;
-                    } else {
-                      if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_key_selected+=snumbersoficonline;
-                    }
-                    if (stream_select_iconnr>=0) {
-                      if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_select_iconnr+=snumbersoficonline;
+                  if ((vis_stream_oversigt) && (show_stream_options==false)) {
+                    if ((stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                      if (stream_key_selected>=(snumbersoficonline*4)) {
+                        if ((stream_key_selected+((_sangley/RADIO_CS)*snumbersoficonline))<streamoversigt.streamantal()) _sangley+=RADIO_CS;
+                      } else {
+                        if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_key_selected+=snumbersoficonline;
+                      }
+                      if (stream_select_iconnr>=0) {
+                        if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_select_iconnr+=snumbersoficonline;
+                      }
                     }
                   }
                   // recorded tv
@@ -10804,7 +10811,9 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((_sangley>0) && (stream_key_selected<=snumbersoficonline) && (stream_select_iconnr>(snumbersoficonline-1))) {
                         _sangley-=MOVIE_CS;
                         stream_select_iconnr-=snumbersoficonline;
-                      } else stream_select_iconnr-=snumbersoficonline;
+                      } else {
+                        stream_select_iconnr-=snumbersoficonline;
+                      }
                     } else {
                       if (stream_key_selected>snumbersoficonline) stream_key_selected-=snumbersoficonline;
                       else if (_sangley>0) _sangley-=MOVIE_CS;
@@ -11236,6 +11245,7 @@ void handlespeckeypress(int key,int x,int y) {
                 printf("CTRL key pressed \n");
                 break;
     }
+    debugmode=true;
     if (debugmode) {
       if (vis_radio_oversigt) fprintf(stderr,"Radio_key_selected = %d  radio_select_iconnr = %d \n ",radio_key_selected,radio_select_iconnr);
       if (vis_music_oversigt) fprintf(stderr,"Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
@@ -11243,6 +11253,7 @@ void handlespeckeypress(int key,int x,int y) {
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
       if (show_setup_rss) fprintf(stderr,"Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
+      if (vis_stream_oversigt) fprintf(stderr,"stream_key_selected = %d  stream_select_iconnr = %d streamoversigt_antal= %d \n ",stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
       #ifdef ENABLE_SPOTIFY
       if (vis_spotify_oversigt) fprintf(stderr,"Spotify_key_selected = %d  spotify_select_iconnr = %d spotifycoversigt_antal= \n ",spotify_key_selected,spotify_select_iconnr);
       #endif
@@ -12679,7 +12690,11 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               if (vis_stream_oversigt) {
                 do_update_rss_show = true;                                     // set show update flag
-                do_update_rss = true;                                          // set update flag
+                do_update_rss = true; 
+                // streamoversigt.cleanup_rss_db();                                          // set update flag
+                streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
+                do_update_rss_show = true;                                     // set show update flag
+                do_update_rss = false;                                          // set update flag
               }
               break;
             case 13:
@@ -12710,9 +12725,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                   if ((tidalknapnr>0) && (do_show_tidal_search_oversigt==false)) {
                     // set play playlist flag
-
-                    printf("tidal_selected_startofset = %d  tidalknapnr = %d ",tidal_selected_startofset,tidalknapnr);
-
+                    // printf("tidal_selected_startofset = %d  tidalknapnr = %d ",tidal_selected_startofset,tidalknapnr);
                     do_play_tidal=tidalknapnr;
                     tidal_oversigt.startplay=true;
                   }
