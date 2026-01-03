@@ -590,6 +590,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   MYSQL_ROW row2;
   MYSQL_ROW row3;
   int a;
+  std::string icon_filename;
   music_oversigt_type newmusicoversigt_record;
   if (strcmp(configdefaultmusicpath,"")==0) {
     printf("No music patch in config file\nUSe default homedir/Music");
@@ -675,44 +676,60 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
           write_logfile(logfile,(char *) "update/Loading directory ");
           // create db over all dirs in start path
           while(de = readdir(dirp)) {
-            if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0) && (strcmp(de->d_name,"@eaDir")!=0)) {
-              // if dir
-              if (de->d_type==DT_DIR) {
-                printf("Checking directory %20s \n" , de->d_name);
-                dirfindes=false;
-                conn2=mysql_init(NULL);
-                if (conn2) {
-                  mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-                  sqlselect1=fmt::format("select directory_id from music_directories where path like '{}'",de->d_name);
-                  mysql_query(conn2,sqlselect1.c_str());
-                  res2 = mysql_store_result(conn2);
-                  if (res2) {
-                    while ((row2 = mysql_fetch_row(res2)) != NULL) {
-                      dirfindes=true;
-                      // printf("***** DIR Fundet %s \n",de->d_name);
-                    }
-                  }              
-                  mysql_close(conn2);
-                }
-                sqlselect = fmt::format("insert into music_directories(directory_id,path,parent_id) values({},'{}',{})",0,de->d_name,0);
-                mysql_query(conn,sqlselect.c_str());
-                res = mysql_store_result(conn);
-                strcpy(newmusicoversigt_record.album_name,de->d_name);
-                strcpy(newmusicoversigt_record.album_path,"");
-                strcat(newmusicoversigt_record.album_path,de->d_name);
-                newmusicoversigt_record.directory_id=i;
-                newmusicoversigt_record.parent_id=0;
-                newmusicoversigt_record.album_id=0;
-                newmusicoversigt_record.artist_id=0;
-                newmusicoversigt_record.oversigttype=0;
-                musicoversigt.push_back(newmusicoversigt_record);
-                parent_dir_id=0;
-                // update artist db
-                snprintf(sqlselect2,sizeof(sqlselect2),"insert into music_artists values (%d,'%s')",0,de->d_name);
-                mysql_query(conn,sqlselect2);
-                res = mysql_store_result(conn);
-                i++;
+            if (strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0 || strcmp(de->d_name, "@eaDir") == 0)
+              continue;
+            // if dir
+            if (de->d_type==DT_DIR) {
+              printf("Checking directory %20s \n" , de->d_name);
+              dirfindes=false;
+              conn2=mysql_init(NULL);
+              if (conn2) {
+                mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+                sqlselect1=fmt::format("select directory_id from music_directories where path like '{}'",de->d_name);
+                mysql_query(conn2,sqlselect1.c_str());
+                res2 = mysql_store_result(conn2);
+                if (res2) {
+                  while ((row2 = mysql_fetch_row(res2)) != NULL) {
+                    dirfindes=true;
+                    // printf("***** DIR Fundet %s \n",de->d_name);
+                  }
+                }              
+                mysql_close(conn2);
               }
+              sqlselect = fmt::format("insert into music_directories(directory_id,path,parent_id) values({},'{}',{})",0,de->d_name,0);
+              mysql_query(conn,sqlselect.c_str());
+              res = mysql_store_result(conn);
+              strcpy(newmusicoversigt_record.album_name,de->d_name);
+              strcpy(newmusicoversigt_record.album_path,"");
+              strcat(newmusicoversigt_record.album_path,de->d_name);
+              newmusicoversigt_record.directory_id=i;
+              newmusicoversigt_record.parent_id=0;
+              newmusicoversigt_record.album_id=0;
+              newmusicoversigt_record.artist_id=0;
+              newmusicoversigt_record.oversigttype=0;
+
+              icon_filename = fmt::format("{}{}/front.jpg",dirpath,de->d_name);
+              if (file_exists(icon_filename.c_str())) {
+                strcpy(newmusicoversigt_record.album_coverfile,icon_filename.c_str());
+              } else {
+                icon_filename = fmt::format("{}{}/mythcfront.jpg",dirpath,de->d_name);
+                if (file_exists(icon_filename.c_str())) {
+                  strcpy(newmusicoversigt_record.album_coverfile,icon_filename.c_str());
+                } else {
+                  icon_filename = fmt::format("{}{}/cover.jpg",dirpath,de->d_name);
+                  if (file_exists(icon_filename.c_str())) {
+                    strcpy(newmusicoversigt_record.album_coverfile,icon_filename.c_str());
+                  } else strcpy(newmusicoversigt_record.album_coverfile,"");
+                }
+              }
+
+              musicoversigt.push_back(newmusicoversigt_record);
+              parent_dir_id=0;
+              // update artist db
+              snprintf(sqlselect2,sizeof(sqlselect2),"insert into music_artists values (%d,'%s')",0,de->d_name);
+              mysql_query(conn,sqlselect2);
+              res = mysql_store_result(conn);
+              i++;
             }
           }
           // fill database music_albums from dir from music_directories
@@ -1034,23 +1051,22 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
           strcat(tmptxt1,"/front.jpg");
           if (file_exists(tmptxt1)) {
             strcpy(icon_file,tmptxt1);		// gem icon file name
-          } else strcpy(icon_file,"");			// no icon
+          } else {
+            strcpy(tmptxt1,configmusicpath);			// config dir fra mythtv setup table
+            if (directory_id>0) {
+              strcat(tmptxt1,row[3]);
+              strcat(tmptxt1,"/");
+            }
+            strcat(tmptxt1,row[1]);
+            strcat(tmptxt1,"/mythcfront.jpg");
+            if (file_exists(tmptxt1)) {
+              strcpy(icon_file,tmptxt1);		// gem icon file name
+            } else strcpy(icon_file,"");			// no icon
+          }
         }
         strcpy(newmusicoversigt_record.album_name,dirname);
         strcpy(newmusicoversigt_record.album_path,"");
-        strcpy(newmusicoversigt_record.album_coverfile,icon_file);         
-        // måske crash
-        std::string tmp123;
-        if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
-        tmp123 = tmpfilename;
-        tmp123 = tmp123 + row[1];
-        tmp123 = tmp123 + "/";
-        tmp123 = tmp123 + "cover.jpg";
-        if (strlen(tmp123.c_str())>0) {
-          if (file_exists(tmp123.c_str())) {
-            // musicoversigt[i].textureId = loadTexture((char *) tmp123.c_str());
-          }
-        }
+        strcpy(newmusicoversigt_record.album_coverfile,icon_file);
         newmusicoversigt_record.directory_id=atoi(row[0]);			// husk directory id
         newmusicoversigt_record.parent_id=atoi(row[2]);
         newmusicoversigt_record.album_id=0;
@@ -1304,6 +1320,7 @@ void musicoversigt_class::opdatere_music_oversigt_icons() {
       // load covers file into opengl as textures (png/jpg)
       // MAKE CRASH crash
       // musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
+      // musicoversigt[i].textureId = loadTexture((char *) musicoversigt[i].album_coverfile);
     } else {
       musicoversigt[i].textureId=0;
     }
@@ -1479,18 +1496,19 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         } else {
           // new code load cover file if exist
+          
           if (musicoversigt[i+sofset].textureId==0) {
             if (strcmp(musicoversigt[i+sofset].album_coverfile,"")!=0) {
               if (file_exists(musicoversigt[i+sofset].album_coverfile)) {
                 musicoversigt[i+sofset].textureId = loadTexture((char *) musicoversigt[i+sofset].album_coverfile);
-
                 printf("Load cover file %s \n",musicoversigt[i+sofset].album_coverfile);
 
               }
             }
           }
+          
           if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
-          else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+          else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);          
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }

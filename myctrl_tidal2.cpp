@@ -3887,6 +3887,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         tidal_aktiv_song_antal++;
       }
       if (tidal_aktiv_song_antal>0) tidal_aktiv_song_antal--;
+      aktiv_song_tidal_icon = stack[tidalknapnr].textureId;
       tidal_aktiv_song_nr=0;
       if (sound) sound->release();                                                                                      // stop last played
       if ( file_exists(tidal_aktiv_song[0].playurl) == true ) {
@@ -4116,6 +4117,8 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   if (conn) mysql_close(conn);
   if ((tidal_aktiv_song_antal) && (error==0)) return(tidal_aktiv_song_antal); else return(0);
 }
+
+
 
 
 // ****************************************************************************************

@@ -44,8 +44,7 @@ struct stream_oversigt_type {
 class stream_class : vlc_controller {
     private:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
-        stream_oversigt_type *stack[maxantal];			                            // radio stack array
-        std::vector<stream_oversigt_type> stack1;
+        std::vector<stream_oversigt_type> FeedCatalog;
         int antal;					                       	                            // Antal streams
         int antalrss_feeds;                                                     // antal feeds
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
@@ -66,17 +65,17 @@ class stream_class : vlc_controller {
         int type;
         bool gfx_loaded;					                                              //
         void update_rss_nr_of_view(char *url);                                  // save rss to db file (struct)
-        void set_rss_new(int nr,bool ny) { if (nr<antal) stack[nr]->nyt=ny; }                 // set new flag
+        void set_rss_new(int nr,bool ny) { if (nr<antal) FeedCatalog[nr].nyt=ny; }                 // set new flag
         char *get_stream_name(int nr);                                          // get name
         char *get_stream_desc(int nr);                                          // get desc
-        char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_mythtv); else return(0); }
-        char *get_stream_path(int nr) { if (nr<antal) return (stack[nr]->feed_path); else return(0); }
-        char *get_stream_url(int nr) { if (nr<antal) return (stack[nr]->feed_streamurl); else return(0);  }
-        char *get_stream_gfx_url(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_url); else return(0); }
-        unsigned int get_stream_groupantal(unsigned int nr) { if (nr<antal) return (stack[nr]->feed_group_antal); else return(0); }
-        unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (stack[nr]->feed_path_antal); else return(0); }
-        long get_stream_intnr(unsigned int nr) { if (nr<antal) return (stack[nr]->intnr); else return(0); }
-        GLuint get_texture(int nr) { if (nr<antal) return(stack[nr]->textureId); else return(0); }
+        char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_gfx_mythtv); else return(0); }
+        char *get_stream_path(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_path); else return(0); }
+        char *get_stream_url(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_streamurl); else return(0);  }
+        char *get_stream_gfx_url(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_gfx_url); else return(0); }
+        unsigned int get_stream_groupantal(unsigned int nr) { if (nr<antal) return (FeedCatalog[nr].feed_group_antal); else return(0); }
+        unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (FeedCatalog[nr].feed_path_antal); else return(0); }
+        long get_stream_intnr(unsigned int nr) { if (nr<antal) return (FeedCatalog[nr].intnr); else return(0); }
+        GLuint get_texture(int nr) { if (nr<antal) return(FeedCatalog[nr].textureId); else return(0); }
         //int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
         int antalstreams() { return antal; };
         int antal_rss_streams() { return antalrss_feeds; };
@@ -92,6 +91,7 @@ class stream_class : vlc_controller {
         stream_class();
         ~stream_class();
         int streamantal() { return(antal); }
+        // int streamantal() { return(FeedCatalog.size()); }
         void clean_stream_oversigt();
         int opdatere_stream_oversigt(char *art,char *fpath);
         int loadrssfile(bool updaterssfile);                                    // download file from web
@@ -99,6 +99,7 @@ class stream_class : vlc_controller {
         void playstream(char *url);
         float getstream_pos();
         void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
+        bool cleanup_rss_db();
 };
 
 void *loadweb(void *data);
