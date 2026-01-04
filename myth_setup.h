@@ -65,7 +65,7 @@ class rss_stream_class {
   private:
     std::vector <rss_stream_struct> rss_source_feed_vector;
     unsigned int antal;
-    static const int maxantal=1000;                                                           // # of records do create
+    static const int maxantal=4000;                                                           // # of records do create
   public:
     int setup_select_linie=0;
     int load_rss_data();                              // loaddb

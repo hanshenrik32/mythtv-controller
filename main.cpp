@@ -48,6 +48,7 @@
 #include <libtorrent/torrent_info.hpp>
 #include <iostream>
 #include <regex>
+#include <gtk/gtk.h>
 
 // type used
 using namespace std;

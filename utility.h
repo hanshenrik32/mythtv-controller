@@ -1,6 +1,6 @@
 #ifndef MYCTRL_UTILITY
 #define MYCTRL_UTILITY
-
+#include <string>
 bool file_exists(const char * filename);
 int gotoxy(int x, int y);
 int clearscreen();
@@ -14,5 +14,7 @@ bool directory_empty(char *path);
 char *b64_encode(const unsigned char *in, size_t len);
 
 unsigned int countEntriesInDir(const char* dirname);
+
+std::string getClipboardText();                                                     // get text from clipboard
 
 #endif

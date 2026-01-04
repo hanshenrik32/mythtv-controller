@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
-
+#include <string>
+#include <gtk/gtk.h>
 
 // used to get home dir
 // #include <unistd.h>
@@ -23,6 +24,20 @@ unsigned int hourtounixtime(int hour) {
   tid->tm_hour=hour;
   return(mktime(tid));
 }
+
+
+std::string getClipboardText() {
+  gtk_init(nullptr, nullptr);
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  gchar* text = gtk_clipboard_wait_for_text(clipboard);
+  std::string result;
+  if (text) {
+    result = text;
+    g_free(text);
+  }
+  return result;
+}
+
 
 
 
