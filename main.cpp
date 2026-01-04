@@ -506,8 +506,8 @@ int vis_error_flag=0;
 int vis_error_songnr;
 int do_stream_icon_anim_icon_ofset=0;                   //
 int stream_icon_anim_icon_ofset=0;                      //
-unsigned int configrss_ofset=0;
-unsigned int realrssrecordnr=0;                         //
+int configrss_ofset=0;
+int realrssrecordnr=0;                         //
 int do_radio_icon_anim_icon_ofset=0;                    //
 int radio_icon_anim_icon_ofset=0;                       //
 unsigned int radiomoversigt_antal=0;                            // antal radio stationer
@@ -11133,12 +11133,17 @@ void handlespeckeypress(int key,int x,int y) {
                     do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
                 }
                 // if indside a setup menu
+                
                 if (do_show_setup) {
                   if (do_show_setup_rss) {
-                    if (streamoversigt.antalstreams()>17) {
-                      rssstreamoversigt.setup_select_linie+=12; 
-                      if ((rssstreamoversigt.setup_select_linie+configrss_ofset)>streamoversigt.antalstreams()-1) {
-                        configrss_ofset=streamoversigt.antalstreams()-17;
+                    if (streamoversigt.antal_rss_streams()>17) {
+                      if (rssstreamoversigt.setup_select_linie>17) {
+                        configrss_ofset+=12;
+                      } else {
+                        rssstreamoversigt.setup_select_linie+=12; 
+                      }                      
+                      if ((rssstreamoversigt.setup_select_linie+configrss_ofset)>streamoversigt.antal_rss_streams()-1) {
+                        configrss_ofset=streamoversigt.antal_rss_streams()-17;
                         rssstreamoversigt.setup_select_linie=17;
                       } else if ((rssstreamoversigt.setup_select_linie+configrss_ofset)>17) {
                         realrssrecordnr+=12;
@@ -11228,10 +11233,10 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   if (show_setup_rss) {
                     // jump to button of text
-                    if (streamoversigt.antalstreams()>17) {
+                    if (streamoversigt.antal_rss_streams()>17) {
                       rssstreamoversigt.setup_select_linie=34;
-                      configrss_ofset=streamoversigt.antalstreams()-17;
-                    } else rssstreamoversigt.setup_select_linie=streamoversigt.antalstreams();
+                      configrss_ofset=streamoversigt.antal_rss_streams()-13;      // 17
+                    } else rssstreamoversigt.setup_select_linie=streamoversigt.antal_rss_streams();
                   }
                 }
                 break;

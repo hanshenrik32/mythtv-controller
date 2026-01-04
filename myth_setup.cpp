@@ -2839,10 +2839,10 @@ void show_setup_rss(unsigned int startofset) {
 
   for (int n=0;n<19;n++) {
     glPushMatrix();
+    if (n+startofset==rssstreamoversigt.setup_select_linie/2+startofset) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
     glTranslatef(260 , 660-(n*20) , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     showtxt=fmt::format("{:3} ",n+startofset);
-    if (n+startofset==rssstreamoversigt.setup_select_linie/2+startofset) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
     myglprint4((char *) showtxt.c_str());
     glPopMatrix();
 
