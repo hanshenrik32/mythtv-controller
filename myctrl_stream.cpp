@@ -15,6 +15,9 @@
 #include <fmt/format.h>
 #include <jsoncpp/json/json.h>
 #include <fstream>
+#include <regex>
+#include <string>
+#include <iostream>
 #include "myctrl_stream.h"
 #include "utility.h"
 #include "myth_ttffont.h"
@@ -33,6 +36,12 @@ extern config_icons config_menu;
 // text render is glcRenderString for freetype font support (slow)
 // new text render in use drawText()
 //
+
+// temp
+extern GLuint tidal_big_search_bar_artist;
+extern GLuint tidal_big_search_bar_album;
+extern GLuint tidal_big_search_bar_track;
+
 
 extern long configrssguidelastupdate;
 extern FILE *logfile;
@@ -355,6 +364,8 @@ stream_class::stream_class() : antal(0) {
     gfx_loaded=false;			      // gfx loaded
     stream_is_playing=false;    // is we playing any media
     stream_is_pause=false;      // is player on pause
+    rss_search_podcast_string="";
+    FeedCatalog_search_view.clear();
 }
 
 // ****************************************************************************************
@@ -375,7 +386,16 @@ stream_class::~stream_class() {
 // ****************************************************************************************
 
 char *stream_class::get_stream_name(int nr) {
-  if (nr<antal) return (FeedCatalog[nr].feed_name); else return (NULL);
+  if (FeedCatalog_search_view.size()==0) {
+    if (nr<antal) {
+      return (FeedCatalog[nr].feed_name);
+    }
+  } else {
+    if (nr<FeedCatalog_search_view.size()) {
+      return (FeedCatalog_search_view[nr].feed_name);
+    }
+  }
+  return NULL;
 }
 
 // ****************************************************************************************
@@ -385,7 +405,12 @@ char *stream_class::get_stream_name(int nr) {
 // ****************************************************************************************
 
 char *stream_class::get_stream_desc(int nr) {
-  if (nr<antal) return (FeedCatalog[nr].feed_desc); else return (NULL);
+  if (FeedCatalog_search_view.size()==0) {
+    if (nr<antal) return (FeedCatalog[nr].feed_desc); else return (NULL);
+  } else  {
+    if (nr<FeedCatalog_search_view.size()) return (FeedCatalog_search_view[nr].feed_desc); else return (NULL);
+  }
+  return (NULL);
 }
 
 // ****************************************************************************************
@@ -405,13 +430,32 @@ void stream_class::clean_stream_oversigt() {
     stream_oversigt_nowloading=0;
 }
 
+
+// ****************************************************************************************
+//
+// clean up number of created search view
+//
+// ****************************************************************************************
+void stream_class::clean_stream_search_oversigt() {
+    startup_loaded=false;				// set radio station loaded in
+    for(int i=1;i<antal;i++) {
+      if (FeedCatalog_search_view[i].textureId) glDeleteTextures(1, &FeedCatalog_search_view[i].textureId);	// delete stream texture
+    }
+    FeedCatalog_search_view.clear();
+    antal=0;
+    stream_oversigt_loaded=false;			// set load icon texture again
+    stream_oversigt_loaded_nr=0;
+    stream_oversigt_nowloading=0;
+}
+
+
 // ****************************************************************************************
 //
 // set en stream icon image
 //
 // ****************************************************************************************
 void stream_class::set_texture(int nr,GLuint idtexture) {
-    FeedCatalog[nr].textureId=idtexture;
+  if (FeedCatalog_search_view.size()==0) FeedCatalog[nr].textureId=idtexture; else FeedCatalog_search_view[nr].textureId=idtexture;
 }
 
 //
@@ -473,6 +517,26 @@ int stream_class::pausestream(int pause) {
     vlc_controller::pause(1);
     if (!(stream_is_pause)) stream_is_pause=true; else stream_is_pause=false;
     return(1);
+}
+
+
+// ****************************************************************************************
+//
+// get stream url
+//
+// ****************************************************************************************
+
+char *stream_class::get_stream_url(int nr) {
+  if (FeedCatalog_search_view.size()==0) {
+    if (nr<antal) {
+      return (FeedCatalog[nr].feed_streamurl);
+    }
+  } else {
+    if (nr<FeedCatalog_search_view.size()) {
+      return (FeedCatalog_search_view[nr].feed_streamurl);
+    }
+  }
+  return(0);
 }
 
 
@@ -1388,7 +1452,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
               new_stream_recrord.feed_group_antal=0;
               new_stream_recrord.intnr=0;	                               					// intnr=
               FeedCatalog.push_back(new_stream_recrord);                     // save new record in vector
-
               antal++;
             }
             if (row[5]) strncpy(new_stream_recrord.feed_gfx_url,row[5],feed_url);
@@ -1589,6 +1652,49 @@ void stream_class::playstream(char *url) {
 }
 
 
+
+bool regexContains(const std::string& text, const std::string& pattern) {
+    std::regex re(pattern, std::regex::icase);   // case-insensitive
+    return std::regex_search(text, re);
+}
+
+// ****************************************************************************************
+//
+// update search podcast stream view
+//
+// ****************************************************************************************
+
+
+void stream_class::update_search_podcast_stream_view() {
+  // FeedCatalog - source data
+  // FeedCatalog_search_view - destination data
+  // FeedCatalog_search_view.clear();
+  int i=0;
+  FeedCatalog_search_view.clear();
+  // printf("\n");
+  while(i<FeedCatalog.size()) {
+    if (regexContains(FeedCatalog[i].feed_showtxt,rss_search_podcast_string)) {
+      // printf("Fundet String %s  \n",FeedCatalog[i].feed_showtxt);
+      FeedCatalog_search_view.push_back(FeedCatalog[i]);
+    }
+    i++;
+  }
+}
+
+// ****************************************************************************************
+//
+// get # of records in search podcast stream view.
+//
+// ****************************************************************************************
+
+
+int stream_class::FeedCatalog_search_antalstreams() {
+  int antal;
+  antal=FeedCatalog_search_view.size();
+  return(antal);
+}
+
+
 // ****************************************************************************************
 //
 // show stream overview
@@ -1604,6 +1710,10 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   float buttonsizey=config_menu.config_stream_main_window_icon_sizey;
   float yof=orgwinsizey-(buttonsizey);                                        // start ypos
   float xof=0.0f;
+
+  float yof_top=orgwinsizey-(buttonsizey*1)+20;                               // start ypos
+  float xof_top=((orgwinsizex-buttonsizex)/2)-(1200/2);
+
   xof=config_menu.config_stream_main_windowx;                     // start xpos
   int xx=(float) config_menu.config_stream_main_window_sizex/(buttonsizex);
   int yy=(float) (config_menu.config_stream_main_window_sizey/buttonsizey);
@@ -1643,6 +1753,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   const int n=9;
   float da=1.5707963267948966192313216916398/float(n);
   int loop;
+  int searchtype=0;
   if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
   if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
     if (FeedCatalog[stream_oversigt_loaded_nr].feed_gfx_mythtv[0]) {
@@ -1709,262 +1820,717 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   }
   // calc start pos (ofset)
   sofset=(_sangley/40)*8;
-  // draw icons
-  while((i<lstreamoversigt_antal) && (i+sofset<antal) && (i<FeedCatalog.size())) {
-    if (((i % bonline)==0) && (i>0)) {
-      yof=yof-(config_menu.config_stream_main_window_icon_sizey+20);
-      xof=config_menu.config_stream_main_windowx;
+  // draw search bar
+  if (rss_search_podcast_string != "") {
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // type of search
+    switch (searchtype) {
+      case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_album);
+              break;
+      case 1: glBindTexture(GL_TEXTURE_2D,0);
+              break;
+      default:glBindTexture(GL_TEXTURE_2D,0);
     }
-    // selected biger
-    if (i+1==(int) stream_key_selected) {
-      buttonsizey=config_menu.config_stream_main_window_icon_sizey;
-      buttonsizex=config_menu.config_stream_main_window_icon_sizex;
-      show_round_corner = true;
-    } else {
-      buttonsizey=config_menu.config_stream_main_window_icon_sizey;
-      buttonsizex=config_menu.config_stream_main_window_icon_sizex;
-      show_round_corner = false;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(0);
+    glBegin(GL_QUADS); 
+    glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+buttonsizey-20 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+    glEnd();
+    glPopMatrix();
+    
+    // show tidal search string
+    glPushMatrix();
+    // glTranslatef(xof+210+(buttonsizex/2),yof+240,0);
+    glTranslatef(xof_top+30,yof_top+50,0);
+    glDisable(GL_TEXTURE_2D);
+    glScalef(120, 120, 1.0);
+    if (rss_search_podcast_string!="") {
+      glcRenderString(rss_search_podcast_string.c_str());
     }
-    if (FeedCatalog[i+sofset].textureId) {
-      // stream icon exist draw it
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glBindTexture(GL_TEXTURE_2D,empty_icon1);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      // round corner
-      if (show_round_corner) {
-        cx=100+xof;                 // pos x
-        cy=80+yof;                  // pos y
-        dx=buttonsizex-20;          // siz y
-        dy=buttonsizey-30;          // siz x
-        r=20;                       // radius
-        a=0.0;
-        da=1.5707963267948966192313216916398/float(n);
-        dx-=r+r;
-        dy-=r+r;
-        loop=0;
-        glBegin(GL_TRIANGLE_FAN);
-        glTexCoord2f(0.5f, 0.5f); 
-        glVertex2f(cx,cy);
-        x0=cx+(0.5*dx);
-        y0=cy+(0.5*dy);
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glTexCoord2f(0, 0); 
-            glVertex2f(x,y);
+    bool cursor=true;
+    // if (cursor) glcRenderString("_"); else glcRenderString(" ");
+    glPopMatrix();
+    yof=yof-200;
+  }
+
+  bool draw=false;
+  ii=0;
+  //
+  // show search view if any data in search string (rss_search_podcast_string)
+  //
+  if (FeedCatalog_search_view.size()>0) {
+    // draw from search view
+    int antal1=FeedCatalog_search_view.size();
+    while((ii<lstreamoversigt_antal) && (ii+sofset<antal1) && (i<FeedCatalog_search_view.size())) {
+      if ((rss_search_podcast_string!="")) {
+        if (regexContains(FeedCatalog_search_view[ii+sofset].feed_showtxt,rss_search_podcast_string)) {
+          draw=true;
+        } else draw=false;
+      } else draw=true;
+      if (draw) {
+        draw=false;
+        
+        if (((ii % bonline)==0) && (ii>0)) {
+          yof=yof-(config_menu.config_stream_main_window_icon_sizey+20);
+          xof=config_menu.config_stream_main_windowx;
         }
-        x0-=dx;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
+        // selected biger
+        if (i+1==(int) stream_key_selected) {
+          buttonsizey=config_menu.config_stream_main_window_icon_sizey;
+          buttonsizex=config_menu.config_stream_main_window_icon_sizex;
+          show_round_corner = true;
+        } else {
+          buttonsizey=config_menu.config_stream_main_window_icon_sizey;
+          buttonsizex=config_menu.config_stream_main_window_icon_sizex;
+          show_round_corner = false;
         }
-        y0-=dy;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
+        if (FeedCatalog_search_view[ii+sofset].textureId) {
+          // stream icon exist draw it
+          glEnable(GL_TEXTURE_2D);
+          glBlendFunc(GL_ONE, GL_ONE);
+          glBindTexture(GL_TEXTURE_2D,empty_icon1);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          // round corner
+          if (show_round_corner) {
+            cx=100+xof;                 // pos x
+            cy=80+yof;                  // pos y
+            dx=buttonsizex-20;          // siz y
+            dy=buttonsizey-30;          // siz x
+            r=20;                       // radius
+            a=0.0;
+            da=1.5707963267948966192313216916398/float(n);
+            dx-=r+r;
+            dy-=r+r;
+            loop=0;
+            glBegin(GL_TRIANGLE_FAN);
+            glTexCoord2f(0.5f, 0.5f); 
+            glVertex2f(cx,cy);
+            x0=cx+(0.5*dx);
+            y0=cy+(0.5*dy);
+            for (loop=0;loop<n;loop++,a+=da) {
+                x=x0+(r*cos(a));
+                y=y0+(r*sin(a));
+                glTexCoord2f(0, 0); 
+                glVertex2f(x,y);
+            }
+            x0-=dx;
+            for (loop=0;loop<n;loop++,a+=da) {
+                x=x0+(r*cos(a));
+                y=y0+(r*sin(a));
+                glVertex2f(x,y);
+            }
+            y0-=dy;
+            for (loop=0;loop<n;loop++,a+=da) {
+                x=x0+(r*cos(a));
+                y=y0+(r*sin(a));
+                glVertex2f(x,y);
+            }
+            x0+=dx;
+            for (loop=0;loop<n;loop++,a+=da) {
+                x=x0+(r*cos(a));
+                y=y0+(r*sin(a));
+                glVertex2f(x,y);
+            }          
+            glVertex2f(x,cy+(0.5*dy));
+            glEnd();
+          } else {
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+            glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20, 0.0);
+            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+            glEnd();
+          }
+
+          glPushMatrix();
+          // indsite draw icon rss gfx - SELECTED
+          if (show_round_corner) {  
+           
+            // indsite draw icon rss gfx
+            glEnable(GL_TEXTURE_2D);
+            glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+            glBindTexture(GL_TEXTURE_2D,FeedCatalog_search_view[ii+sofset].textureId);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glLoadName(100+ii+sofset);
+            glBegin(GL_QUADS);
+            if (tema==5) {
+              glTexCoord2f(0, 0); glVertex3f( xof+25, yof+10 , 0.0);
+              glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10, 0.0);
+              glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-25, yof+buttonsizey-10 , 0.0);
+              glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-25, yof+10 , 0.0);
+            } else {
+              glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20 , 0.0);
+              glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30 , 0.0);
+              glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30, 0.0);
+              glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+            }
+            glEnd();
+          } else {
+            // indsite draw icon rss gfx - NOT SELECTED
+            glEnable(GL_TEXTURE_2D);
+            glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+            glBindTexture(GL_TEXTURE_2D,FeedCatalog_search_view[ii+sofset].textureId);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glLoadName(100+ii+sofset);
+            glBegin(GL_QUADS);
+            if (tema==5) {
+              glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+              glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+              glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+              glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+            } else {
+              glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
+              glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
+              glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
+              glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+            }
+            glEnd();
+          }
+
+          // show nyt icon note
+          if (FeedCatalog_search_view[ii+sofset].nyt) {
+            glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+            //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+            glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+            glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+            glEnd();
+          }
+          glPopMatrix();
+        } else {
+          // no icon - draw default icon
+          glPushMatrix();
+          // indsite draw radio station icon
+          if (show_round_corner) {  
+            cx=100+xof;          // pos x
+            cy=80+yof;               // pos y
+            dx=buttonsizex-20;          // siz y
+            dy=buttonsizey-30;          // siz x
+            r=20;            // radius
+            a=0.0;
+            da=1.5707963267948966192313216916398/float(n);
+            dx-=r+r;
+            dy-=r+r;
+            loop=0;
+
+            glEnable(GL_TEXTURE_2D);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBindTexture(GL_TEXTURE_2D,empty_icon1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glLoadName(100+ii+sofset);
+            glBegin(GL_TRIANGLE_FAN);
+            glTexCoord2f(0.5f, 0.5f); 
+            glVertex2f(cx,cy);
+            x0=cx+(0.5*dx);
+            y0=cy+(0.5*dy);
+            for (loop=0;loop<n;loop++,a+=da) {
+                x=x0+(r*cos(a));
+                y=y0+(r*sin(a));
+                glTexCoord2f(0, 0); 
+                glVertex2f(x,y);
+            }
+            x0-=dx;
+            for (loop=0;loop<n;loop++,a+=da) {
+                x=x0+(r*cos(a));
+                y=y0+(r*sin(a));
+                glVertex2f(x,y);
+            }
+            y0-=dy;
+            for (loop=0;loop<n;loop++,a+=da) {
+                x=x0+(r*cos(a));
+                y=y0+(r*sin(a));
+                glVertex2f(x,y);
+            }
+            x0+=dx;
+            for (loop=0;loop<n;loop++,a+=da) {
+                x=x0+(r*cos(a));
+                y=y0+(r*sin(a));
+                glVertex2f(x,y);
+            }          
+            glVertex2f(x,cy+(0.5*dy));
+            glEnd();
+          } else {
+            glEnable(GL_TEXTURE_2D);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBindTexture(GL_TEXTURE_2D,empty_icon1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glLoadName(100+i+sofset);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+            glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+            glEnd();
+            // show nyt icon note
+            if (FeedCatalog_search_view[ii+sofset].nyt) {
+              glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+              glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+              glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+              glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+              glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+              glEnd();
+            }
+          }
+          glPopMatrix();
         }
-        x0+=dx;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
-        }          
-        glVertex2f(x,cy+(0.5*dy));
-        glEnd();
-      } else {
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-        glEnd();
+        // draw numbers in group
+        if (FeedCatalog_search_view[ii+sofset].feed_group_antal>1) {
+          // show numbers in group
+          temprgtxt1 = fmt::format("Feeds {}",FeedCatalog_search_view[ii+sofset].feed_group_antal);
+          drawText(temprgtxt1.c_str(), xof+22,yof+14, 0.3f,1);
+        }
+        // show text 20 of elements in string
+        temprgtxt1 = fmt::format("{:^20}",FeedCatalog_search_view[ii+sofset].feed_showtxt);
+        temprgtxt1.resize(20);
+        drawText(temprgtxt1.c_str(), xof+20,yof-10, 0.4f,1);
+        // next button
+        xof+=(buttonsizex+10);
+        ii++;
+      }
+      i++;
+    }
+
+  } else {
+    // draw from normal (all) view
+    while((ii<lstreamoversigt_antal) && (ii+sofset<antal) && (i<FeedCatalog.size())) {
+        draw=true;
+        if (draw) {
+          draw=false;
+          if (((ii % bonline)==0) && (ii>0)) {
+            yof=yof-(config_menu.config_stream_main_window_icon_sizey+20);
+            xof=config_menu.config_stream_main_windowx;
+          }
+          // selected biger
+          if (i+1==(int) stream_key_selected) {
+            buttonsizey=config_menu.config_stream_main_window_icon_sizey;
+            buttonsizex=config_menu.config_stream_main_window_icon_sizex;
+            show_round_corner = true;
+          } else {
+            buttonsizey=config_menu.config_stream_main_window_icon_sizey;
+            buttonsizex=config_menu.config_stream_main_window_icon_sizex;
+            show_round_corner = false;
+          }
+          if (FeedCatalog[ii+sofset].textureId) {
+            // stream icon exist draw it
+            glEnable(GL_TEXTURE_2D);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBindTexture(GL_TEXTURE_2D,empty_icon1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            // round corner
+            if (show_round_corner) {
+              cx=100+xof;                 // pos x
+              cy=80+yof;                  // pos y
+              dx=buttonsizex-20;          // siz y
+              dy=buttonsizey-30;          // siz x
+              r=20;                       // radius
+              a=0.0;
+              da=1.5707963267948966192313216916398/float(n);
+              dx-=r+r;
+              dy-=r+r;
+              loop=0;
+              glBegin(GL_TRIANGLE_FAN);
+              glTexCoord2f(0.5f, 0.5f); 
+              glVertex2f(cx,cy);
+              x0=cx+(0.5*dx);
+              y0=cy+(0.5*dy);
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glTexCoord2f(0, 0); 
+                  glVertex2f(x,y);
+              }
+              x0-=dx;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }
+              y0-=dy;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }
+              x0+=dx;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }          
+              glVertex2f(x,cy+(0.5*dy));
+              glEnd();
+            } else {
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+              glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+              glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20, 0.0);
+              glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+              glEnd();
+            }
+
+            glPushMatrix();
+            // indsite draw icon rss gfx - SELECTED
+            if (show_round_corner) {  
+
+              /*
+              cx=100+xof;          // pos x
+              cy=80+yof;               // pos y
+              dx=buttonsizex-20;          // siz y
+              dy=buttonsizey-30;          // siz x
+              r=20;            // radius
+              a=0.0;
+              da=1.5707963267948966192313216916398/float(n);
+              dx-=r+r;
+              dy-=r+r;
+              loop=0;
+
+              glEnable(GL_TEXTURE_2D);
+              glBlendFunc(GL_ONE, GL_ONE);
+              glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glLoadName(100+i+sofset);
+              glBegin(GL_TRIANGLE_FAN);
+              glTexCoord2f(0.5f, 0.5f); 
+              glVertex2f(cx,cy);
+              x0=cx+(0.5*dx);
+              y0=cy+(0.5*dy);
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glTexCoord2f(0, 0); 
+                  glVertex2f(x,y);
+              }
+              x0-=dx;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }
+              y0-=dy;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }
+              x0+=dx;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }          
+              glVertex2f(x,cy+(0.5*dy));
+              glEnd();
+              */
+              
+              // indsite draw icon rss gfx
+              glEnable(GL_TEXTURE_2D);
+              glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+              glBindTexture(GL_TEXTURE_2D,FeedCatalog[ii+sofset].textureId);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glLoadName(100+ii+sofset);
+              glBegin(GL_QUADS);
+              if (tema==5) {
+                glTexCoord2f(0, 0); glVertex3f( xof+25, yof+10 , 0.0);
+                glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10, 0.0);
+                glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-25, yof+buttonsizey-10 , 0.0);
+                glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-25, yof+10 , 0.0);
+              } else {
+                glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20 , 0.0);
+                glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30 , 0.0);
+                glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30, 0.0);
+                glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+              }
+              glEnd();
+            } else {
+              // indsite draw icon rss gfx - NOT SELECTED
+              glEnable(GL_TEXTURE_2D);
+              glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+              glBindTexture(GL_TEXTURE_2D,FeedCatalog[ii+sofset].textureId);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glLoadName(100+ii+sofset);
+              glBegin(GL_QUADS);
+              if (tema==5) {
+                glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+                glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+                glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+                glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+              } else {
+                glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
+                glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
+                glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
+                glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+              }
+              glEnd();
+            }
+
+            // show nyt icon note
+            if (FeedCatalog[i+sofset].nyt) {
+              glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+              //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+              glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+              glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+              glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+              glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+              glEnd();
+            }
+            glPopMatrix();
+          } else {
+            // no icon - draw default icon
+            glPushMatrix();
+            // indsite draw radio station icon
+            if (show_round_corner) {  
+              cx=100+xof;          // pos x
+              cy=80+yof;               // pos y
+              dx=buttonsizex-20;          // siz y
+              dy=buttonsizey-30;          // siz x
+              r=20;            // radius
+              a=0.0;
+              da=1.5707963267948966192313216916398/float(n);
+              dx-=r+r;
+              dy-=r+r;
+              loop=0;
+
+              glEnable(GL_TEXTURE_2D);
+              glBlendFunc(GL_ONE, GL_ONE);
+              glBindTexture(GL_TEXTURE_2D,empty_icon1);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glLoadName(100+ii+sofset);
+              glBegin(GL_TRIANGLE_FAN);
+              glTexCoord2f(0.5f, 0.5f); 
+              glVertex2f(cx,cy);
+              x0=cx+(0.5*dx);
+              y0=cy+(0.5*dy);
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glTexCoord2f(0, 0); 
+                  glVertex2f(x,y);
+              }
+              x0-=dx;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }
+              y0-=dy;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }
+              x0+=dx;
+              for (loop=0;loop<n;loop++,a+=da) {
+                  x=x0+(r*cos(a));
+                  y=y0+(r*sin(a));
+                  glVertex2f(x,y);
+              }          
+              glVertex2f(x,cy+(0.5*dy));
+              glEnd();
+            } else {
+              glEnable(GL_TEXTURE_2D);
+              glBlendFunc(GL_ONE, GL_ONE);
+              glBindTexture(GL_TEXTURE_2D,empty_icon1);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glLoadName(100+i+sofset);
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+              glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+              glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+              glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+              glEnd();
+              // show nyt icon note
+              if (FeedCatalog[ii+sofset].nyt) {
+                glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+                glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+                glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+                glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+                glEnd();
+              }
+            }
+            glPopMatrix();
+          }
+          // draw numbers in group
+          if (FeedCatalog[ii+sofset].feed_group_antal>1) {
+            // show numbers in group
+            temprgtxt1 = fmt::format("Feeds {}",FeedCatalog[ii+sofset].feed_group_antal);
+            drawText(temprgtxt1.c_str(), xof+22,yof+14, 0.3f,1);
+          }
+          // show text 20 of elements in string
+          temprgtxt1 = fmt::format("{:^20}",FeedCatalog[ii+sofset].feed_showtxt);
+          temprgtxt1.resize(20);
+          drawText(temprgtxt1.c_str(), xof+20,yof-10, 0.4f,1);
+          // next button
+          xof+=(buttonsizex+10);
+          ii++;
+        }
+        i++;
       }
 
-      glPushMatrix();
-      // indsite draw icon rss gfx - SELECTED
-      if (show_round_corner) {  
 
-        /*
-        cx=100+xof;          // pos x
-        cy=80+yof;               // pos y
-        dx=buttonsizex-20;          // siz y
-        dy=buttonsizey-30;          // siz x
-        r=20;            // radius
-        a=0.0;
-        da=1.5707963267948966192313216916398/float(n);
-        dx-=r+r;
-        dy-=r+r;
-        loop=0;
+  }
+  /*
+  while((ii<lstreamoversigt_antal) && (ii+sofset<antal) && (i<FeedCatalog.size())) {
+    if ((rss_search_podcast_string!="")) {
+      if (regexContains(FeedCatalog[i+sofset].feed_showtxt,rss_search_podcast_string)) {
+        draw=true;
+      } else draw=false;
+    } else draw=true;
 
+    if (draw) {
+      draw=false;
+      if (((ii % bonline)==0) && (ii>0)) {
+        yof=yof-(config_menu.config_stream_main_window_icon_sizey+20);
+        xof=config_menu.config_stream_main_windowx;
+      }
+      // selected biger
+      if (i+1==(int) stream_key_selected) {
+        buttonsizey=config_menu.config_stream_main_window_icon_sizey;
+        buttonsizex=config_menu.config_stream_main_window_icon_sizex;
+        show_round_corner = true;
+      } else {
+        buttonsizey=config_menu.config_stream_main_window_icon_sizey;
+        buttonsizex=config_menu.config_stream_main_window_icon_sizex;
+        show_round_corner = false;
+      }
+      if (FeedCatalog[ii+sofset].textureId) {
+        // stream icon exist draw it
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glBindTexture(GL_TEXTURE_2D,empty_icon1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_TRIANGLE_FAN);
-        glTexCoord2f(0.5f, 0.5f); 
-        glVertex2f(cx,cy);
-        x0=cx+(0.5*dx);
-        y0=cy+(0.5*dy);
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glTexCoord2f(0, 0); 
-            glVertex2f(x,y);
-        }
-        x0-=dx;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
-        }
-        y0-=dy;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
-        }
-        x0+=dx;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
-        }          
-        glVertex2f(x,cy+(0.5*dy));
-        glEnd();
-        */
-        
-        // indsite draw icon rss gfx
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,FeedCatalog[i+sofset].textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        if (tema==5) {
-          glTexCoord2f(0, 0); glVertex3f( xof+25, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-25, yof+buttonsizey-10 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-25, yof+10 , 0.0);
+        // round corner
+        if (show_round_corner) {
+          cx=100+xof;                 // pos x
+          cy=80+yof;                  // pos y
+          dx=buttonsizex-20;          // siz y
+          dy=buttonsizey-30;          // siz x
+          r=20;                       // radius
+          a=0.0;
+          da=1.5707963267948966192313216916398/float(n);
+          dx-=r+r;
+          dy-=r+r;
+          loop=0;
+          glBegin(GL_TRIANGLE_FAN);
+          glTexCoord2f(0.5f, 0.5f); 
+          glVertex2f(cx,cy);
+          x0=cx+(0.5*dx);
+          y0=cy+(0.5*dy);
+          for (loop=0;loop<n;loop++,a+=da) {
+              x=x0+(r*cos(a));
+              y=y0+(r*sin(a));
+              glTexCoord2f(0, 0); 
+              glVertex2f(x,y);
+          }
+          x0-=dx;
+          for (loop=0;loop<n;loop++,a+=da) {
+              x=x0+(r*cos(a));
+              y=y0+(r*sin(a));
+              glVertex2f(x,y);
+          }
+          y0-=dy;
+          for (loop=0;loop<n;loop++,a+=da) {
+              x=x0+(r*cos(a));
+              y=y0+(r*sin(a));
+              glVertex2f(x,y);
+          }
+          x0+=dx;
+          for (loop=0;loop<n;loop++,a+=da) {
+              x=x0+(r*cos(a));
+              y=y0+(r*sin(a));
+              glVertex2f(x,y);
+          }          
+          glVertex2f(x,cy+(0.5*dy));
+          glEnd();
         } else {
-          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
-        }
-        glEnd();
-      } else {
-        // indsite draw icon rss gfx - NOT SELECTED
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,FeedCatalog[i+sofset].textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        if (tema==5) {
+          glBegin(GL_QUADS);
           glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
           glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20, 0.0);
           glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+          glEnd();
+        }
+
+        glPushMatrix();
+        // indsite draw icon rss gfx - SELECTED
+        if (show_round_corner) {  
+
+          
+          // indsite draw icon rss gfx
+          glEnable(GL_TEXTURE_2D);
+          glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+          glBindTexture(GL_TEXTURE_2D,FeedCatalog[ii+sofset].textureId);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(100+ii+sofset);
+          glBegin(GL_QUADS);
+          if (tema==5) {
+            glTexCoord2f(0, 0); glVertex3f( xof+25, yof+10 , 0.0);
+            glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10, 0.0);
+            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-25, yof+buttonsizey-10 , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-25, yof+10 , 0.0);
+          } else {
+            glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20 , 0.0);
+            glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30 , 0.0);
+            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30, 0.0);
+            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+          }
+          glEnd();
         } else {
-          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+          // indsite draw icon rss gfx - NOT SELECTED
+          glEnable(GL_TEXTURE_2D);
+          glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+          glBindTexture(GL_TEXTURE_2D,FeedCatalog[ii+sofset].textureId);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(100+ii+sofset);
+          glBegin(GL_QUADS);
+          if (tema==5) {
+            glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+            glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+          } else {
+            glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
+            glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
+            glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+          }
+          glEnd();
         }
-        glEnd();
-      }
 
-      // show nyt icon note
-      if (FeedCatalog[i+sofset].nyt) {
-        glBindTexture(GL_TEXTURE_2D,newstuf_icon);
-        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
-        glEnd();
-      }
-      glPopMatrix();
-    } else {
-      // no icon - draw default icon
-      glPushMatrix();
-      // indsite draw radio station icon
-      if (show_round_corner) {  
-        cx=100+xof;          // pos x
-        cy=80+yof;               // pos y
-        dx=buttonsizex-20;          // siz y
-        dy=buttonsizey-30;          // siz x
-        r=20;            // radius
-        a=0.0;
-        da=1.5707963267948966192313216916398/float(n);
-        dx-=r+r;
-        dy-=r+r;
-        loop=0;
-
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,empty_icon1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_TRIANGLE_FAN);
-        glTexCoord2f(0.5f, 0.5f); 
-        glVertex2f(cx,cy);
-        x0=cx+(0.5*dx);
-        y0=cy+(0.5*dy);
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glTexCoord2f(0, 0); 
-            glVertex2f(x,y);
-        }
-        x0-=dx;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
-        }
-        y0-=dy;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
-        }
-        x0+=dx;
-        for (loop=0;loop<n;loop++,a+=da) {
-            x=x0+(r*cos(a));
-            y=y0+(r*sin(a));
-            glVertex2f(x,y);
-        }          
-        glVertex2f(x,cy+(0.5*dy));
-        glEnd();
-      } else {
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,empty_icon1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-        glEnd();
         // show nyt icon note
         if (FeedCatalog[i+sofset].nyt) {
           glBindTexture(GL_TEXTURE_2D,newstuf_icon);
-          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+          //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
           glBegin(GL_QUADS);
           glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
           glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
@@ -1972,23 +2538,107 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
           glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
           glEnd();
         }
+        glPopMatrix();
+      } else {
+        // no icon - draw default icon
+        glPushMatrix();
+        // indsite draw radio station icon
+        if (show_round_corner) {  
+          cx=100+xof;          // pos x
+          cy=80+yof;               // pos y
+          dx=buttonsizex-20;          // siz y
+          dy=buttonsizey-30;          // siz x
+          r=20;            // radius
+          a=0.0;
+          da=1.5707963267948966192313216916398/float(n);
+          dx-=r+r;
+          dy-=r+r;
+          loop=0;
+
+          glEnable(GL_TEXTURE_2D);
+          glBlendFunc(GL_ONE, GL_ONE);
+          glBindTexture(GL_TEXTURE_2D,empty_icon1);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(100+ii+sofset);
+          glBegin(GL_TRIANGLE_FAN);
+          glTexCoord2f(0.5f, 0.5f); 
+          glVertex2f(cx,cy);
+          x0=cx+(0.5*dx);
+          y0=cy+(0.5*dy);
+          for (loop=0;loop<n;loop++,a+=da) {
+              x=x0+(r*cos(a));
+              y=y0+(r*sin(a));
+              glTexCoord2f(0, 0); 
+              glVertex2f(x,y);
+          }
+          x0-=dx;
+          for (loop=0;loop<n;loop++,a+=da) {
+              x=x0+(r*cos(a));
+              y=y0+(r*sin(a));
+              glVertex2f(x,y);
+          }
+          y0-=dy;
+          for (loop=0;loop<n;loop++,a+=da) {
+              x=x0+(r*cos(a));
+              y=y0+(r*sin(a));
+              glVertex2f(x,y);
+          }
+          x0+=dx;
+          for (loop=0;loop<n;loop++,a+=da) {
+              x=x0+(r*cos(a));
+              y=y0+(r*sin(a));
+              glVertex2f(x,y);
+          }          
+          glVertex2f(x,cy+(0.5*dy));
+          glEnd();
+        } else {
+          glEnable(GL_TEXTURE_2D);
+          glBlendFunc(GL_ONE, GL_ONE);
+          glBindTexture(GL_TEXTURE_2D,empty_icon1);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(100+i+sofset);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+          glEnd();
+          // show nyt icon note
+          if (FeedCatalog[ii+sofset].nyt) {
+            glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+            glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+            glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+            glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+            glEnd();
+          }
+        }
+        glPopMatrix();
       }
-      glPopMatrix();
+      // draw numbers in group
+      if (FeedCatalog[ii+sofset].feed_group_antal>1) {
+        // show numbers in group
+        temprgtxt1 = fmt::format("Feeds {}",FeedCatalog[ii+sofset].feed_group_antal);
+        drawText(temprgtxt1.c_str(), xof+22,yof+14, 0.3f,1);
+      }
+      // show text 20 of elements in string
+      temprgtxt1 = fmt::format("{:^20}",FeedCatalog[ii+sofset].feed_showtxt);
+      temprgtxt1.resize(20);
+      drawText(temprgtxt1.c_str(), xof+20,yof-10, 0.4f,1);
+      // next button
+      xof+=(buttonsizex+10);
+      ii++;
     }
-    // draw numbers in group
-    if (FeedCatalog[i+sofset].feed_group_antal>1) {
-      // show numbers in group
-      temprgtxt1 = fmt::format("Feeds {}",FeedCatalog[i+sofset].feed_group_antal);
-      drawText(temprgtxt1.c_str(), xof+22,yof+14, 0.3f,1);
-    }
-    // show text 20 of elements in string
-    temprgtxt1 = fmt::format("{:^20}",FeedCatalog[i+sofset].feed_showtxt);
-    temprgtxt1.resize(20);
-    drawText(temprgtxt1.c_str(), xof+20,yof-10, 0.4f,1);
-    // next button
     i++;
-    xof+=(buttonsizex+10);
   }
+  */
+
+
+
   //
   // no records loaded error
   //

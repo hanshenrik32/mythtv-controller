@@ -48,10 +48,11 @@
 #include <libtorrent/torrent_info.hpp>
 #include <iostream>
 #include <regex>
-#include <gtk/gtk.h>
+
 
 // type used
 using namespace std;
+
 // if defined the support will be enabled
 #define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
@@ -395,6 +396,7 @@ bool do_move_torrent_file = false;                        // do the move
 bool do_move_torrent_file_now = false;                    // is it running now
 bool do_show_load__torrent_file = false;
 std::string do_show_load__torrent_file_string = "";
+std::string rss_search_podcast_string = "";
 float do_move_torrent_file_now_done = 0.0f;               // is it running now
 bool do_show_setup = false;                               // show setup menu
 bool do_show_setup_sound = false;                         // Show sound setup view
@@ -6322,7 +6324,7 @@ void display() {
       strcpy(stream_playing_desc,streamoversigt.get_stream_desc(stream_playnr-1));
       stream_playing_icon=streamoversigt.get_texture(stream_playnr-1);
     }
-    if (strcmp("internal",configdefaultplayer)!=0)  {
+    if (strcmp("internal",configdefaultplayer)!=0) {
       fprintf(stderr,"Start stream nr %d Player is firefox \n",sknapnr);
       strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
       strcat(systemcommand,"'");
@@ -9814,15 +9816,21 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         radio_select_iconnr-=numbers_radio_covers_on_line;			// add to next line
       }
     }
-    // update or scroll stream up/down/play
+    // update or scroll stream up/down/play/open sub view
     if ((vis_stream_oversigt) && (stream_jump==false)) {
       if ((retfunc==0) && (sknapnr>0) && (do_play_stream)) {
         if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr-1,streamoversigt.get_stream_groupantal(sknapnr-1),streamoversigt.type,streamoversigt.streamantal());
         if (streamoversigt.type==0) {
           strncpy(temptxt,streamoversigt.get_stream_name(sknapnr-1),200);
-          streamoversigt.clean_stream_oversigt();
           fprintf(stderr,"stream nr %d name %s \n ",sknapnr-1,temptxt);
-          streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+          streamoversigt.clean_stream_oversigt();
+          if (streamoversigt.rss_search_podcast_string!="") {
+            streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+            streamoversigt.update_search_podcast_stream_view();
+          } else {
+            streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+          }
+
           do_play_stream=false;
         } else if ((sknapnr-1>0) && (streamoversigt.type!=1)) {
           // update
@@ -10174,6 +10182,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                 }
+                // left key.
                 if ((vis_stream_oversigt) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
                   if (stream_key_selected>1) {
                     stream_key_selected--;
@@ -10315,22 +10324,47 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // Podcast
                 // key right
-                if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.antalstreams()) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
-                  // er vi på første skærm ingen scroll
-                  // så scroll
-                  if ((stream_key_selected % (snumbersoficonline*5)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
-                    // ikke max
-                    if ((stream_select_iconnr+1)<streamoversigt.antal_rss_streams()) {
-                      _sangley+=RADIO_CS;
-                      stream_key_selected-=snumbersoficonline;	// den viste på skærm af 1 til 20
-                      stream_select_iconnr++;			// den rigtige valgte af 1 til stream antal
+                if (vis_stream_oversigt) {
+                  // normal
+                  if (rss_search_podcast_string=="") {
+                    if ((stream_select_iconnr<streamoversigt.antalstreams()) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                      // er vi på første skærm ingen scroll
+                      // så scroll
+                      if ((stream_key_selected % (snumbersoficonline*5)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
+                        // ikke max
+                        if ((stream_select_iconnr+1)<streamoversigt.antal_rss_streams()) {
+                          _sangley+=RADIO_CS;
+                          stream_key_selected-=snumbersoficonline;	// den viste på skærm af 1 til 20
+                          stream_select_iconnr++;			// den rigtige valgte af 1 til stream antal
+                        }
+                      } else {
+                        int ant=streamoversigt.antal_rss_streams();
+                        int ant2=streamoversigt.antalstreams();
+                        if (stream_select_iconnr+1<ant2) {
+                          stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                          stream_key_selected++;
+                        }
+                      }
                     }
                   } else {
-                    int ant=streamoversigt.antal_rss_streams();
-                    int ant2=streamoversigt.antalstreams();
-                    if (stream_select_iconnr+1<ant2) {
-                      stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
-                      stream_key_selected++;
+                    // search podcast list
+                    if ((stream_select_iconnr<streamoversigt.FeedCatalog_search_antalstreams()) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                      // er vi på første skærm ingen scroll
+                      // så scroll
+                      if ((stream_key_selected % (snumbersoficonline*5)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
+                        // ikke max
+                        if ((stream_select_iconnr+1)<streamoversigt.FeedCatalog_search_antalstreams()) {
+                          _sangley+=RADIO_CS;
+                          stream_key_selected-=snumbersoficonline;	// den viste på skærm af 1 til 20
+                          stream_select_iconnr++;			// den rigtige valgte af 1 til stream antal
+                        }
+                      } else {
+                        int ant=streamoversigt.FeedCatalog_search_antalstreams();
+                        if (stream_select_iconnr+1<ant) {
+                          stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                          stream_key_selected++;
+                        }
+                      }
                     }
                   }
                 }
@@ -10480,14 +10514,27 @@ void handlespeckeypress(int key,int x,int y) {
                   // stream_select_iconnr = the real nr in the array
                   // stream_key_selected = the number on the screen
                   if ((vis_stream_oversigt) && (show_stream_options==false)) {
-                    if ((stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
-                      if (stream_key_selected>=(snumbersoficonline*4)) {
-                        if ((stream_key_selected+((_sangley/RADIO_CS)*snumbersoficonline))<streamoversigt.streamantal()) _sangley+=RADIO_CS;
-                      } else {
-                        if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_key_selected+=snumbersoficonline;
+                    if (rss_search_podcast_string=="") {
+                      if ((stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                        if (stream_key_selected>=(snumbersoficonline*4)) {
+                          if ((stream_key_selected+((_sangley/RADIO_CS)*snumbersoficonline))<streamoversigt.streamantal()) _sangley+=RADIO_CS;
+                        } else {
+                          if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_key_selected+=snumbersoficonline;
+                        }
+                        if (stream_select_iconnr>=0) {
+                          if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_select_iconnr+=snumbersoficonline;
+                        }
                       }
-                      if (stream_select_iconnr>=0) {
-                        if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_select_iconnr+=snumbersoficonline;
+                    } else {
+                      if ((stream_select_iconnr+snumbersoficonline<streamoversigt.FeedCatalog_search_antalstreams())  && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
+                        if (stream_key_selected>=(snumbersoficonline*4)) {
+                          if ((stream_key_selected+((_sangley/RADIO_CS)*snumbersoficonline))<streamoversigt.FeedCatalog_search_antalstreams()) _sangley+=RADIO_CS;
+                        } else {
+                          if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.FeedCatalog_search_antalstreams()) stream_key_selected+=snumbersoficonline;
+                        }
+                        if (stream_select_iconnr>=0) {
+                          if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.FeedCatalog_search_antalstreams()) stream_select_iconnr+=snumbersoficonline;
+                        }
                       }
                     }
                   }
@@ -11061,15 +11108,17 @@ void handlespeckeypress(int key,int x,int y) {
                   do_zoom_tvprg_aktiv_nr=0;					                          // slet valget
                 }
                 // podcast view
-                if (vis_stream_oversigt) {
-                  if (streamoversigt.streamantal()>0) {
-                    stream_key_selected-=4*snumbersoficonline;
-                    //stream_key_selected+=streamoversigt.streamantal() % 8;       //
-                    if (stream_key_selected<0) stream_key_selected=0;
-                    //stream_key_selected=5*snumbersoficonline;
-                    stream_select_iconnr=0;
-                    _sangley-=4*RADIO_CS;
-                    if (_sangley<0) _sangley=0;
+                if (rss_search_podcast_string=="") {
+                  if (vis_stream_oversigt) {
+                    if (streamoversigt.streamantal()>0) {
+                      stream_key_selected-=4*snumbersoficonline;
+                      //stream_key_selected+=streamoversigt.streamantal() % 8;       //
+                      if (stream_key_selected<0) stream_key_selected=0;
+                      //stream_key_selected=5*snumbersoficonline;
+                      stream_select_iconnr=0;
+                      _sangley-=4*RADIO_CS;
+                      if (_sangley<0) _sangley=0;
+                    }
                   }
                 }
                 if (do_show_setup) {
@@ -11109,12 +11158,23 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 #endif
                 if (vis_stream_oversigt) {
-                  if (streamoversigt.streamantal()>0) {
-                    stream_key_selected=4*snumbersoficonline;
-                    //stream_key_selected+=streamoversigt.streamantal() % 8;       //
-                    //stream_key_selected=5*snumbersoficonline;
-                    stream_select_iconnr=0;
-                    _sangley=4*RADIO_CS;
+
+                  if (streamoversigt.FeedCatalog_search_antalstreams()==0) {
+                    if (streamoversigt.streamantal()>0) {
+                      stream_key_selected=4*snumbersoficonline;
+                      //stream_key_selected+=streamoversigt.streamantal() % 8;       //
+                      //stream_key_selected=5*snumbersoficonline;
+                      stream_select_iconnr=0;
+                      _sangley=4*RADIO_CS;
+                    }
+                  } else {
+                    if (streamoversigt.FeedCatalog_search_antalstreams()>0) {
+                      stream_key_selected=4*snumbersoficonline;
+                      //stream_key_selected+=streamoversigt.streamantal() % 8;       //
+                      //stream_key_selected=5*snumbersoficonline;
+                      stream_select_iconnr=0;
+                      _sangley=4*RADIO_CS;
+                    }
                   }
                 }
                 // if indside tv overview
@@ -11216,11 +11276,19 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // jump to end on list (podcast)
                 if (vis_stream_oversigt) {
-                  stream_key_selected=((streamoversigt.streamantal()/snumbersoficonline)/2)*snumbersoficonline;
-                  stream_key_selected+=streamoversigt.streamantal() % 8;       //
-                  //stream_key_selected=5*snumbersoficonline;
-                  stream_select_iconnr=0;
-                  _sangley=((streamoversigt.streamantal()/snumbersoficonline)/2)*RADIO_CS;
+                  if (streamoversigt.FeedCatalog_search_antalstreams() == 0) {
+                    stream_key_selected=((streamoversigt.streamantal()/snumbersoficonline)/2)*snumbersoficonline;
+                    stream_key_selected+=streamoversigt.streamantal() % 8;       //
+                    //stream_key_selected=5*snumbersoficonline;
+                    stream_select_iconnr=0;
+                    _sangley=((streamoversigt.streamantal()/snumbersoficonline)/2)*RADIO_CS;
+                  } else {
+                    stream_key_selected=((streamoversigt.FeedCatalog_search_antalstreams()/snumbersoficonline)/2)*snumbersoficonline;
+                    stream_key_selected+=streamoversigt.FeedCatalog_search_antalstreams() % 8;       //
+                    //stream_key_selected=5*snumbersoficonline;
+                    stream_select_iconnr=0;
+                    _sangley=((streamoversigt.FeedCatalog_search_antalstreams()/snumbersoficonline)/2)*RADIO_CS;
+                  }
                 }
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
@@ -11257,13 +11325,19 @@ void handlespeckeypress(int key,int x,int y) {
       if (vis_music_oversigt) fprintf(stderr,"Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
       if (vis_film_oversigt) fprintf(stderr,"film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",film_key_selected,film_select_iconnr,film_oversigt.film_antal());
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
-      if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
-      if (show_setup_rss) fprintf(stderr,"Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
-      if (vis_stream_oversigt) fprintf(stderr,"stream_key_selected = %d  stream_select_iconnr = %d streamoversigt_antal= %d \n ",stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
+      if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);      
+      // if (show_setup_rss) fprintf(stderr,"Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
+      if (vis_stream_oversigt) {
+        if (streamoversigt.FeedCatalog_search_antalstreams()==0) {   
+          fprintf(stderr,"stream_key_selected = %d  stream_select_iconnr = %d streamoversigt_antal= %d stream select name %s \n ",stream_key_selected,stream_select_iconnr,streamoversigt.streamantal(),streamoversigt.get_stream_name(stream_key_selected-1));
+        } else {
+          fprintf(stderr,"stream_key_selected = %d  stream_select_iconnr = %d streamoversigt_antal= %d stream select name %s \n ",stream_key_selected,stream_select_iconnr,streamoversigt.FeedCatalog_search_antalstreams(),streamoversigt.get_stream_name(stream_key_selected-1));
+        } 
+      }
       #ifdef ENABLE_SPOTIFY
       if (vis_spotify_oversigt) fprintf(stderr,"Spotify_key_selected = %d  spotify_select_iconnr = %d spotifycoversigt_antal= \n ",spotify_key_selected,spotify_select_iconnr);
       #endif
-      if (vis_stream_oversigt) fprintf(stderr,"antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
+      
     }
 }
 
@@ -11498,7 +11572,19 @@ void handleKeypress(unsigned char key, int x, int y) {
           }
         }
       }
+      if (vis_stream_oversigt) {
+        if (keybufferindex<80) {
+          if ((key!=13) && (key!=8) && (key!=127)) {
+            keybuffer[keybufferindex]=key;
+            keybufferindex++;
+            keybuffer[keybufferindex]='\0';
+            streamoversigt.rss_search_podcast_string=keybuffer;
 
+            streamoversigt.update_search_podcast_stream_view();
+
+          }
+        }
+      }
 
       if (do_show_setup_screen) {
         switch (do_show_setup_select_linie) {
@@ -11518,6 +11604,11 @@ void handleKeypress(unsigned char key, int x, int y) {
             keybufferindex--;
             keybuffer[keybufferindex]=0;
           }
+          if (vis_stream_oversigt)  {
+            streamoversigt.rss_search_podcast_string=keybuffer;
+            streamoversigt.update_search_podcast_stream_view();
+          }
+
           // used for save or search playlist
           if (vis_tidal_oversigt) {
             if (keybufferindex>=0) playlistfilename[keybufferindex]=0;

@@ -45,8 +45,10 @@ class stream_class : vlc_controller {
     private:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         std::vector<stream_oversigt_type> FeedCatalog;
+        std::vector<stream_oversigt_type> FeedCatalog_search_view;
         int antal;					                       	                            // Antal streams
         int antalrss_feeds;                                                     // antal feeds
+        int antal_in_search_view;
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
         void set_texture(int nr,GLuint idtexture);
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      //
@@ -59,6 +61,7 @@ class stream_class : vlc_controller {
         int parsexmlrssfile_new(char *filename,char *baseiconfile);
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
+        std::string rss_search_podcast_string;
         bool stream_is_playing;
         bool stream_is_pause;
         int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
@@ -70,7 +73,7 @@ class stream_class : vlc_controller {
         char *get_stream_desc(int nr);                                          // get desc
         char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_gfx_mythtv); else return(0); }
         char *get_stream_path(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_path); else return(0); }
-        char *get_stream_url(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_streamurl); else return(0);  }
+        char *get_stream_url(int nr);
         char *get_stream_gfx_url(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_gfx_url); else return(0); }
         unsigned int get_stream_groupantal(unsigned int nr) { if (nr<antal) return (FeedCatalog[nr].feed_group_antal); else return(0); }
         unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (FeedCatalog[nr].feed_path_antal); else return(0); }
@@ -93,6 +96,7 @@ class stream_class : vlc_controller {
         int streamantal() { return(antal); }
         // int streamantal() { return(FeedCatalog.size()); }
         void clean_stream_oversigt();
+        void clean_stream_search_oversigt();
         int opdatere_stream_oversigt(char *art,char *fpath);
         int loadrssfile(bool updaterssfile);                                    // download file from web
 //        int opdatere_stream_oversigt(char *searchtxt);
@@ -100,6 +104,10 @@ class stream_class : vlc_controller {
         float getstream_pos();
         void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
         bool cleanup_rss_db();
+        void update_search_podcast_stream_view();
+
+        int FeedCatalog_search_antalstreams();
+
 };
 
 void *loadweb(void *data);

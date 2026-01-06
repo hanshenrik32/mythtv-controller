@@ -1,6 +1,7 @@
 #ifndef MYCTRL_UTILITY
 #define MYCTRL_UTILITY
 #include <string>
+
 bool file_exists(const char * filename);
 int gotoxy(int x, int y);
 int clearscreen();
