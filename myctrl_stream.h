@@ -26,6 +26,20 @@ struct Data {
 
 
 
+// new template<typename T>
+
+struct StreamItem {
+  std::string title;
+  GLuint cover;
+  bool selected = false;
+};
+
+struct Color {
+    float r, g, b, a;
+};
+
+
+
 struct stream_oversigt_type {
     char feed_showtxt[feed_namelength+1];			// show name
     char feed_name[feed_namelength+1];				// mythtv db feedtitle
@@ -52,15 +66,34 @@ class stream_class : vlc_controller {
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
         void set_texture(int nr,GLuint idtexture);
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      //
-        bool startup_loaded;					                                          // load stream icons statios list
-        bool stream_oversigt_loaded;
-        int stream_oversigt_loaded_nr;
+        
+      
         int stream_oversigt_nowloading;				                                  // denne tæller op når der loades gfx
         int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
         int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
         int parsexmlrssfile_new(char *filename,char *baseiconfile);
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
+
+      // new scroll vars
+      float scrollPos = 0.0f;
+      float scrollVel = 0.0f;
+
+      const float friction = 0.90f;
+      const float accel    = 2.0f;
+
+      int itemsPerRow = 8;
+      int rowHeight   = 198;
+      int itemWidth   = 198;
+
+      int startX = 20;
+      int startY = 882;
+      int viewHeight = 780;
+      // end new scroll vars
+
+      int stream_oversigt_loaded_nr;
+      bool startup_loaded;					                                          // load stream icons statios list
+      bool stream_oversigt_loaded;
         std::string rss_search_podcast_string;
         bool stream_is_playing;
         bool stream_is_pause;
@@ -69,6 +102,7 @@ class stream_class : vlc_controller {
         bool gfx_loaded;					                                              //
         void update_rss_nr_of_view(char *url);                                  // save rss to db file (struct)
         void set_rss_new(int nr,bool ny) { if (nr<antal) FeedCatalog[nr].nyt=ny; }                 // set new flag
+        bool get_rss_new(int nr) { return(FeedCatalog[nr].nyt); }                 // set new flag
         char *get_stream_name(int nr);                                          // get name
         char *get_stream_desc(int nr);                                          // get desc
         char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (FeedCatalog[nr].feed_gfx_mythtv); else return(0); }
@@ -103,13 +137,22 @@ class stream_class : vlc_controller {
         void playstream(char *url);
         float getstream_pos();
         void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
+
+        // new
+        void show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int stream_key_selected);
+        void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+        void onScroll(float delta) { scrollVel += delta * accel; }
+        // end new
+
         bool cleanup_rss_db();
-        void update_search_podcast_stream_view();
+        int update_search_podcast_stream_view();
 
         int FeedCatalog_search_antalstreams();
 
 };
 
 void *loadweb(void *data);
+void fill_streamlist();
+
 
 #endif

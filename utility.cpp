@@ -121,8 +121,8 @@ int getuserhomedir(char *homedir) {
 
 
 
-bool file_exists(const char * filename)
-{
+bool file_exists(const char * filename) {
+	if (strlen(filename)==0) return false;
     if (FILE * file = fopen(filename, "r")) {
       fclose(file);
       return true;

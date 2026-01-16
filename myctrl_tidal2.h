@@ -32,6 +32,12 @@ class tidal_device_def {
 };
 
 
+struct Color4 {
+    float r, g, b, a;
+};
+
+
+
 //
 // playlist/song overview def tidal
 //
@@ -172,6 +178,25 @@ class tidal_class {
 
     std::string playlist_type;            // playlist type from json file (used to only create playlist then save to db)
 
+
+
+     // new scroll vars
+      float scrollPos = 0.0f;
+      float scrollVel = 0.0f;
+
+      const float friction = 0.90f;
+      const float accel    = 2.0f;
+
+      int itemsPerRow = 8;
+      int rowHeight   = 198;
+      int itemWidth   = 198;
+
+      int startX = 20;
+      int startY = 882;
+      int viewHeight = 780;
+      // end new scroll vars
+
+
     // end webserver
     tidal_class();
     ~tidal_class();
@@ -271,6 +296,13 @@ class tidal_class {
 
     int get_artist_from_file_and_update_for_editor(char *filename);
     int save_tidal_artistlist(char *filename);
+
+
+
+    void onScroll(float delta) { scrollVel += delta * accel; }
+    void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+    void show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+
 };
 
 #endif

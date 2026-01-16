@@ -666,6 +666,172 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
 }
 
 
+
+
+
+
+
+
+// All new ********************************************************************************************************************************************
+//
+//
+
+
+// ****************************************************************************************
+//
+// draw rectangle outline
+//
+// ****************************************************************************************
+
+void drawRect(int x, int y, int w, int h, Color2 c) {
+  glColor4f(c.r, c.g, c.b, c.a);
+  glBegin(GL_LINE_LOOP);
+  glVertex2i(x,     y);
+  glVertex2i(x + w, y);
+  glVertex2i(x + w, y + h);
+  glVertex2i(x,     y + h);
+  glEnd();
+}
+
+
+
+// ****************************************************************************************
+//
+// draw cover gfx
+//
+// ****************************************************************************************
+
+void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c) {
+  std::string temptxt;
+  glEnable(GL_TEXTURE_2D);
+  glColor4f(c.r, c.g, c.b, c.a);
+  glBindTexture(GL_TEXTURE_2D, textureId2);
+  // draw cover frame
+  glLoadName(id);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex2i(x,     y);
+  glTexCoord2f(1, 0); glVertex2i(x + w, y);
+  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
+  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
+  glEnd();
+  // draw actual cover
+  glBindTexture(GL_TEXTURE_2D, textureId);
+  glLoadName(id);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex2i(x + 10,          y + 10);
+  glTexCoord2f(1, 0); glVertex2i(x + 10 + w - 20, y + 10);
+  glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
+  glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
+  glEnd();
+  
+  /*
+  if (streamoversigt.get_stream_groupantal(id-100)>1) {
+    // show numbers in group
+    temptxt = fmt::format("Feeds {}",streamoversigt.get_stream_groupantal(id-100)-1);    
+    drawText(temptxt.c_str(), x+8,y+6, 0.3f,1);
+  }
+  */
+}
+
+
+
+
+// ****************************************************************************************
+//
+// draw single stream item
+//
+// ****************************************************************************************
+
+
+void radiostation_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
+  // Baggrund
+  std::string temprgtxt;
+  std::string gfxfilename;
+  GLuint texture;
+  Color2 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
+  Color2 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  /*
+  if (ii == radio_key_selected-1)
+      drawRect(x - 2, y - 2, itemWidth + 4, rowHeight - 4, highcolor); // Highlight color
+  else
+      drawRect(x - 4, y - 4, itemWidth + 8, rowHeight - 8, normalcolor); // Normal color
+  */
+  // Cover
+  gfxfilename = "/opt/mythtv-controller/images/radiostations/";
+  gfxfilename = gfxfilename + stack[ii].gfxfilename;
+  if (strlen(stack[ii].gfxfilename)>0) {
+    // load texture if not loaded
+    if (stack[ii].textureId == 0) {
+      if (file_exists(gfxfilename.c_str())) {
+        stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
+      } else strcpy(stack[ii].gfxfilename,"");
+    }
+  }
+  // Titel
+  temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
+  temprgtxt.resize(20);
+  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = onlineradio_empty;
+  if (ii == radio_key_selected-1) {
+    drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
+    drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 2);
+  } else {
+    drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
+    drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 0);
+  }
+  // Debug grid
+  // drawRectOutline(x, y, itemWidth, rowHeight, Color::Red);
+}
+
+//      glBindTexture(GL_TEXTURE_2D,onlineradio_selected);
+
+
+// ****************************************************************************************
+//
+// show radio stations overview new version 2
+//
+//
+// ****************************************************************************************
+
+
+bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+  // ---- KINETIC SCROLL ---------------------------------------
+  scrollVel *= friction;
+  scrollPos += scrollVel;
+  if (fabs(scrollVel) < 0.01f) scrollVel = 0;
+  int totalRows   = (int)ceil((float)stack.size() / itemsPerRow);
+  int visibleRows = viewHeight / rowHeight;
+  float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
+  if (scrollPos < 0) {
+      scrollPos = 0;
+      scrollVel = 0;
+  } else if (scrollPos > maxScroll) {
+      scrollPos = maxScroll;
+      scrollVel = 0;
+  }
+  // ---- CALC --------------------------------------------------
+  int firstRow   = (int)(scrollPos / rowHeight);
+  float subOff   = fmod(scrollPos, rowHeight);
+  int ssofset     = firstRow * itemsPerRow;
+  int screenTop = startY;
+  int xof = startX;
+  int visibleItems = (visibleRows + 2) * itemsPerRow;
+  // ---- RENDER -----------------------------------------------
+  for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
+    int index = ssofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    int x = xof + col * itemWidth + 40;
+    int y = screenTop - (row * rowHeight) + subOff - 40;
+    draw_stream_item( x, y, index, normal_icon, normal_icon, radio_key_selected);
+  }
+  return(true);
+}
+
+
+
+
+
+
 // ****************************************************************************************
 //
 // skal vi opdatere sort type oversigt første gang

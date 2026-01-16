@@ -26,11 +26,17 @@ extern int debugmode;                                           // 64 = radio st
 // ****************************************************************************************
 //
 // return string (fname) for filename long = last path + name as filename
+// cleaned from special char ? % : * | " < > \ /
 //
 // ****************************************************************************************
 
 
 int get_webfilenamelong(char* fname, char* webpath) {
+    const char* exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif"};
+    std::string filename="";
+    std::string filename1="";
+    std::string trimmedPath;
+    std::size_t secondLastSlash;
     if (webpath == nullptr || strlen(webpath) == 0) {
         return 0;
     }
@@ -39,11 +45,22 @@ int get_webfilenamelong(char* fname, char* webpath) {
     if (lastSlash == std::string::npos) {
         return 0;
     }
-    std::string filename = path.substr(lastSlash + 1);
-    std::string trimmedPath = path.substr(0, lastSlash);
-    std::size_t secondLastSlash = trimmedPath.rfind('/');
+    filename = path.substr(lastSlash + 1);
+    trimmedPath = path.substr(0, lastSlash);
+    secondLastSlash = trimmedPath.rfind('/');
     if (secondLastSlash == std::string::npos) {
         return 0;
+    }
+    filename1=filename;
+    for (auto ext : exts) {
+      size_t pos = filename1.find(ext);
+      if (pos != std::string::npos)
+      filename=filename1.substr(0, pos + strlen(ext));
+    }
+    for(char & c: filename) {
+        if(c == '?' || c == '%' || c == ':' || c == '*' || c == '|' || c == '"' || c == '<' || c == '>' || c == '\\' || c == '/') {
+            c = '_';
+        }
     }
     // In den oprindelige version blev kun `filename` kopieret til `fname`
     strcpy(fname, filename.c_str());
@@ -238,7 +255,7 @@ int get_webfile2(char *webpath,char *outfile) {
   std::string command;
   // check file ext is image yes download
   if ((check_filename_ext(webpath)) && (strlen(webpath)<300)) {
-    command = "wget \"";
+    command = "wget --quiet \"";
     command = command + webpath;
     command = command + "\" -O- | convert -thumbnail 'x320^' - - > ";
     command = command + outfile;

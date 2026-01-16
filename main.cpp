@@ -3158,7 +3158,7 @@ void display() {
           _angle++;
           //mybox.settexture(musicoversigt);
            mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
-          if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+           if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
           break;
       case PICTURE3D:
           // picture screen saver
@@ -3711,7 +3711,10 @@ void display() {
     // music view
     if (vis_music_oversigt) {    
       if (do_show_music_search_oversigt==false) {
-        musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+        // musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+
+        musicoversigt.show_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else {
         musicoversigt.show_search_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
@@ -3721,7 +3724,10 @@ void display() {
       glPushMatrix();
       //aktivfont.selectfont("DejaVu Sans");
       // old ver show_movie_oversigt
-      film_oversigt.show_film_oversigt(_fangley,film_select_iconnr);
+      // film_oversigt.show_film_oversigt(_fangley,film_select_iconnr);
+
+      // new ver show_film_oversigt1
+      film_oversigt.show_film_oversigt1(_fangley,film_select_iconnr);
 
        // printf("film_key_selected = %d film_select_iconnr = %d fknapnr = %d \n",film_key_selected,film_select_iconnr,fknapnr);
 
@@ -3729,15 +3735,22 @@ void display() {
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else if (vis_stream_oversigt) {
       glPushMatrix();
-      streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
+      // streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
+
+      streamoversigt.show_stream_oversigt1(onlinestream, onlinestream_empty, radio_key_selected);
+
       // if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
       glPopMatrix();
     } else if (vis_radio_oversigt) {
-      radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
+      // radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
+
+      radio_pictureloaded=radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
       // show radio options menu
+      /*
       if ((show_radio_options) && (!(visur))) {
         radiooversigt.show_radio_options();
       }
+      */
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
     }
     #ifdef ENABLE_SPOTIFY
@@ -3771,7 +3784,11 @@ void display() {
       if (do_show_tidal_search_oversigt==false) {
         // show Tidal overview
         tidal_oversigt.set_textureloaded(false);
-        tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
+        // old vers
+        // tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
+
+          // new vers
+        tidal_oversigt.show_tidal_oversigt1( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
         
         printf("tidal_selected_startofset = %d \n",tidal_selected_startofset);
         
@@ -7530,6 +7547,19 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
         // enable music search
         if (vis_music_oversigt) {
+
+            if (names[i*4+3]==23) {
+              if (debugmode & 4) fprintf(stderr,"scroll down\n");
+              returnfunc = 4;
+              fundet = true;
+            }
+            if (names[i*4+3]==24) {
+              if (debugmode & 4) fprintf(stderr,"scroll up\n");
+              returnfunc = 5;
+              fundet = true;
+            }
+
+          
           if (names[i*4+3]==5) {
             strcpy(keybuffer,"");                                                 // reset text buffer
             keybufferindex=0;                                                     //
@@ -7561,12 +7591,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // we have a select mouse/touch element dirid
             if (names[i*4+3]==23) {
               if (debugmode & 4) fprintf(stderr,"scroll down\n");
-              returnfunc = 1;
+              returnfunc = 4;
               fundet = true;
             }
             if (names[i*4+3]==24) {
               if (debugmode & 4) fprintf(stderr,"scroll up\n");
-              returnfunc = 2;
+              returnfunc = 5;
               fundet = true;
             }
             if (names[i*4+3]==27) {
@@ -7591,13 +7621,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // scroll down
             if (names[i*4+3]==23) {
               if (debugmode & 8) fprintf(stderr,"scroll down\n");
-              returnfunc = 1;
+              returnfunc = 6;
               fundet = true;
             }
             // scroll up
             if (names[i*4+3]==24) {
               if (debugmode & 8) fprintf(stderr,"scroll up\n");
-              returnfunc = 2;
+              returnfunc = 5;
               fundet = true;
             }
             // close window
@@ -7644,7 +7674,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
         //
-        // music
+        // music open play cover view
         //
         if ((vis_music_oversigt) || ((vis_music_oversigt==false) && (do_zoom_music_cover))) {
           if (!(fundet)) {
@@ -8109,23 +8139,23 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               }              
               // scroll up button
               if (names[i*4+3]==23) {
-                // write debug log
-                sprintf(debuglogdata,"scroll down tidal_selected_startofset = %d ",tidal_selected_startofset);
-                write_logfile(logfile,(char *) debuglogdata);
+                /*
                 if (tidal_selected_startofset+40<tidal_oversigt.streamantal()) {
                   tidal_selected_startofset+=8;
                   tidal_selected_startofset+=8;
                   returnfunc = 2;
                   fundet = true;
                 }
+                */
+                returnfunc = 2;
+                fundet = true;
               }
               // scroll down button
               if (names[i*4+3]==24) {
-                // write debug log
-                sprintf(debuglogdata,"scroll up tidal_selected_startofset = %d",tidal_selected_startofset);
-                write_logfile(logfile,(char *) debuglogdata);
+                /*
                 if ((tidal_selected_startofset+8)>8) tidal_selected_startofset-=8;
                 if (tidal_selected_startofset<0) tidal_selected_startofset=0;
+                */
                 returnfunc = 1;
                 fundet = true;
               }
@@ -8530,7 +8560,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             sprintf(debuglogdata,"stream selected=%u",sknapnr);
             write_logfile(logfile,(char *) debuglogdata);
             fundet = true;
-          }
+          } else if (!(fundet)) sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
           // close open stream or movie
           if (names[i*4+3]==3) {
             fundet = true;
@@ -8598,7 +8628,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // we have a select mouse/touch
           if ((film_oversigt.editmode==0) &&  (!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-            fknapnr=names[i*4+3]-119;			                                // get movie id
+            fknapnr=names[i*4+3]-99;			                                // get movie id
             film_key_selected=fknapnr;
             // fprintf(stderr,"Film selected=%d names[i*4+3] = %d \n",fknapnr,names[i*4+3]);                                 //
             // write debug log
@@ -8790,7 +8820,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
 
 
-
 // ****************************************************************************************
 //
 // get selected icon
@@ -8846,7 +8875,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
   numbers_cd_covers_on_line=8;        // 9
   numbers_film_covers_on_line=9;
   numbers_radio_covers_on_line=8;
-  numbers_stream_covers_on_line=9;
+  numbers_stream_covers_on_line=8;                         // old numbers_stream_covers_on_line=9;
   strcpy(temptxt,"");
   saver_irq=true;					// stop screen saver
   if (visur==false) {
@@ -9267,6 +9296,30 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             */
             break;
     }
+
+
+    // scroll i music oversigt in new version 2 view
+    if (vis_music_oversigt) {
+      // scroll down
+      if ((retfunc==0) && (button==4)) {
+        musicoversigt.onScroll(+1.0);
+      }
+      // scroll up
+      if ((retfunc==0) && (button==3)) {
+        // stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+        musicoversigt.onScroll(-1.0);
+      }
+      // scroll down
+      if ((retfunc==5) && (button==0)) {
+        musicoversigt.onScroll(+11.22);
+      }
+      // scroll up
+      if ((retfunc==4) && (button==0)) {
+        // stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+        musicoversigt.onScroll(-11.22);
+      }
+    }
+
     if (vis_music_oversigt) {
       // auto opendir
       // PROBLEM
@@ -9561,6 +9614,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         // scroll spotify up/down
         // and open / play / stop / next / last play control // open playlist
         if (!(do_zoom_tidal_cover)) {
+          /*
+          // old version 1
+          // scroll down
           if ((retfunc == 2 ) || (button == 4 )) {
             if (tidal_selected_startofset+40<tidal_oversigt.streamantal()) tidal_selected_startofset+=8;
             button=0;
@@ -9570,6 +9626,28 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if ((tidal_selected_startofset+8)>8) tidal_selected_startofset-=8;
             if (tidal_selected_startofset<0) tidal_selected_startofset=0;
             button=0;
+          }
+          */
+          // new version 2
+          // scroll down
+          if ((retfunc == 0 ) && (button == 4 )) {
+            tidal_oversigt.onScroll(+1);
+            button=0;
+          }
+          // scroll up
+          if ((retfunc == 0 ) && (button == 3 )) {
+            tidal_oversigt.onScroll(-1);
+            button=0;
+          }
+
+          if ((retfunc == 1 ) && (button == 0 )) {
+            tidal_oversigt.onScroll(+11.25);
+            // button=0;
+          }
+          // scroll up
+          if ((retfunc == 2 ) && (button == 0 )) {
+            tidal_oversigt.onScroll(-11.25);
+            // button=0;
           }
         }
         if (do_zoom_tidal_cover) {
@@ -9769,6 +9847,33 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     // scroll film up/down
     // scroll down
     if (vis_film_oversigt) {
+      
+      // new scroll code
+      // scroll down
+      if ((retfunc==0) && (button==4)) {
+        film_oversigt.onScroll(+1);
+      }
+      // scroll up
+      if ((retfunc==0) && (button==3)) {
+        // stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+        film_oversigt.onScroll(-1);
+      }
+
+      if ((retfunc==5) && (button==0)) {
+        film_oversigt.onScroll(+15.15);
+      }
+      // scroll up
+      if ((retfunc==6) && (button==0)) {
+        // stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+        film_oversigt.onScroll(-15.15);
+      }
+
+
+
+      /*
+      // old scroll code
+
+      // scroll down
       if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+9<film_oversigt.film_antal()-1)) {
         do_movie_icon_anim_icon_ofset=1;
         switch(screen_size) {
@@ -9799,23 +9904,43 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         film_select_iconnr-=numbers_film_covers_on_line;			// move to last line
         if (film_select_iconnr<0) film_select_iconnr=0;       //
       }
+      */
+
+
     }
     // scroll radio up/down
     if (vis_radio_oversigt) {
       // scroll down
       //printf("radio rangley= %d   \n",_rangley);
+      /*
       if (((retfunc==2) || (button==4)) && ((_rangley/41.0f)+4<(int) (radiooversigt_antal/numbers_radio_covers_on_line))) { // scroll button
-        //do_music_icon_anim_icon_ofset=1;				// direction -1 = up 1 = down
         _rangley+=(41.0f);						// scroll window down one icon
         radio_select_iconnr+=numbers_radio_covers_on_line;			// add to next line
       }
-      // scroll up
-      if (((retfunc==1) || (button==3)) && (_rangley>0)) {
-        //do_music_icon_anim_icon_ofset=-1;				// direction -1 = up 1 = down
+      if ((retfunc==0) && (button==3)) {
         _rangley-=(41.0f);						// scroll window up
         radio_select_iconnr-=numbers_radio_covers_on_line;			// add to next line
       }
+      */
+
+      // scroll up
+      if ((retfunc==0) && (button==3)) {
+        radiooversigt.onScroll(-1);
+      }
+      // scroll down
+      if ((retfunc==0) && (button==4)) {
+        radiooversigt.onScroll(+1);
+      }
+      // scroll up
+      if ((retfunc==1) && (button==0)) {
+        radiooversigt.onScroll(-12.0);
+      }
+      // scroll down
+      if ((retfunc==2) && (button==0)) {
+        radiooversigt.onScroll(+12.0);
+      }
     }
+
     // update or scroll stream up/down/play/open sub view
     if ((vis_stream_oversigt) && (stream_jump==false)) {
       if ((retfunc==0) && (sknapnr>0) && (do_play_stream)) {
@@ -9823,14 +9948,47 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         if (streamoversigt.type==0) {
           strncpy(temptxt,streamoversigt.get_stream_name(sknapnr-1),200);
           fprintf(stderr,"stream nr %d name %s \n ",sknapnr-1,temptxt);
-          streamoversigt.clean_stream_oversigt();
-          if (streamoversigt.rss_search_podcast_string!="") {
-            streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
-            streamoversigt.update_search_podcast_stream_view();
-          } else {
-            streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+
+          if ((streamoversigt.rss_search_podcast_string!="") && (strcmp(temptxt,"BACK")==0)) {
+              // streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+              // streamoversigt.update_search_podcast_stream_view();
+            streamoversigt.rss_search_podcast_string="";
+            keybufferindex=0;
+            keybuffer[0]='\0';
+            streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
           }
 
+          streamoversigt.clean_stream_oversigt();
+          streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+          printf("Antal streams i oversigt streamoversigt %d \n",streamoversigt.streamantal());
+          if (streamoversigt.rss_search_podcast_string!="") streamoversigt.update_search_podcast_stream_view();
+          
+          streamoversigt.stream_oversigt_loaded=false;
+          streamoversigt.stream_oversigt_loaded_nr=0;
+          printf("Antal efter search in stream  %d  startup_loaded %d \n",streamoversigt.FeedCatalog_search_antalstreams(),streamoversigt.startup_loaded);
+
+
+
+          /*
+          if ((streamoversigt.rss_search_podcast_string!="") && (strcmp(temptxt,"BACK")==0)) {
+            // streamoversigt.clean_stream_search_oversigt();
+            streamoversigt.clean_stream_oversigt();
+            streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+            streamoversigt.update_search_podcast_stream_view();
+            streamoversigt.rss_search_podcast_string="";
+            keybufferindex=0;
+            keybuffer[0]='\0';
+            printf("Antal search streams i oversigt search streamoversigt %d \n",streamoversigt.FeedCatalog_search_antalstreams());
+
+          } else {
+            streamoversigt.clean_stream_oversigt();
+            if (strcmp(temptxt,"")!=0) streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+            else streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
+
+            printf("Antal streams i oversigt streamoversigt %d \n",streamoversigt.streamantal());
+
+          }
+          */
           do_play_stream=false;
         } else if ((sknapnr-1>0) && (streamoversigt.type!=1)) {
           // update
@@ -9869,16 +10027,37 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         stream_select_iconnr = 0;
         _sangley = 0.0f;
       }
+      /*
+      // old version scroll down
       if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
-        //do_music_icon_anim_icon_ofset=1;				                // direction -1 = up 1 = down
         _sangley+=(41.0f);						                            // scroll window down one icon
         stream_select_iconnr+=numbers_stream_covers_on_line;			// add to next line
       }
       // scroll up
       if (((retfunc==1) || (button==3)) && (_sangley>0)) {
-        //do_music_icon_anim_icon_ofset=-1;				                // direction -1 = up 1 = down
         _sangley-=(41.0f);						                            // scroll window up
         stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+      }
+      */
+      // scroll down
+      if ((retfunc==2) || (button==4)) {
+        // stream_select_iconnr-=numbers_stream_covers_on_line;			// sub to last line
+        streamoversigt.onScroll(+1);
+      }
+      // scroll up
+      if ((retfunc==1) || (button==3)) {
+        // stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+        streamoversigt.onScroll(-1);
+      }
+      // button on screeen
+      if ((retfunc==5) && (button==0)) {
+        // stream_select_iconnr-=numbers_stream_covers_on_line;			// sub to last line
+        streamoversigt.onScroll(+12);
+      }
+      // button on screeen
+      if ((retfunc==4) && (button==0)) {
+        // stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+        streamoversigt.onScroll(-12);
       }
     }
   }
@@ -9915,8 +10094,6 @@ void handlespeckeypress(int key,int x,int y) {
     MOVIE_CS=46.0f;					                            // movie dvd cover side
     MUSIC_CS=41.0;					                            // music cd cover side
     RADIO_CS=41.0;					                            // radio cd cover side
-
-    
 
     switch(key) {
         // F1 setup menu
@@ -9967,13 +10144,13 @@ void handlespeckeypress(int key,int x,int y) {
                   if (tidal_oversigt.searchtype>2) tidal_oversigt.searchtype=0;
                 }
                 break;
-        case 2:
+        case 2: 
                 // F2 exit app key
                 fprintf(stderr,"Close down now exit(2)\n");
                 remove("mythtv-controller.lock");
                 exit(2);
                 break;
-        case 3: 
+        case 3: // F3
                 do_show_torrent =  ! do_show_torrent;
                 tidal_oversigt.do_setup_tidal_start_entry = false;
                 break;
@@ -9995,7 +10172,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 */
                 break;
-        case 4: // F4 start mythtv og luk mythtv_controller
+        case 4: // F4
                 tidal_oversigt.do_setup_tidal_start_entry = ! tidal_oversigt.do_setup_tidal_start_entry;
                 do_show_torrent = false;
                 /*
@@ -10010,7 +10187,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 */
                 break;
-        case 5: // F5 start mythtv og luk mythtv_controller
+        case 5: // F5
                 if (strcmp(configkeyslayout[2].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[2].cmdname,"playlistrestore")==0) {
@@ -10021,7 +10198,7 @@ void handlespeckeypress(int key,int x,int y) {
                   //exit(100);
                 }
                 break;
-        case 6: // F6 start mythtv og luk mythtv_controller
+        case 6: // F6
                 if (strcmp(configkeyslayout[3].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[3].cmdname,"playlistrestore")==0) {
@@ -10032,7 +10209,7 @@ void handlespeckeypress(int key,int x,int y) {
                   //exit(100);
                 }
                 break;
-        case 7: // F7 start mythtv og luk mythtv_controller
+        case 7: // F7
                 if (strcmp(configkeyslayout[4].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[4].cmdname,"playlistrestore")==0) {
@@ -10043,7 +10220,7 @@ void handlespeckeypress(int key,int x,int y) {
                   //exit(100);
                 }
                 break;
-        case 8: // F8 start mythtv og luk mythtv_controller
+        case 8: // F8
                 if (strcmp(configkeyslayout[5].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[5].cmdname,"playlistrestore")==0) {
@@ -10054,7 +10231,7 @@ void handlespeckeypress(int key,int x,int y) {
                   //exit(100);
                 }
                 break;
-        case 9: // F9 start mythtv og luk mythtv_controller
+        case 9: // F9
                 if (strcmp(configkeyslayout[6].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[6].cmdname,"playlistrestore")==0) {
@@ -10065,7 +10242,7 @@ void handlespeckeypress(int key,int x,int y) {
                   //exit(100);
                 }
                 break;
-        case 10: // F10 start mythtv og luk mythtv_controller
+        case 10: // F10
                 if (strcmp(configkeyslayout[7].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[7].cmdname,"playlistrestore")==0) {
@@ -10076,7 +10253,7 @@ void handlespeckeypress(int key,int x,int y) {
                   //exit(100);
                 }
                 break;
-        case 11: // F11 start mythtv og luk mythtv_controller
+        case 11: // F11
                 if (strcmp(configkeyslayout[8].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[8].cmdname,"playlistrestore")==0) {
@@ -10087,7 +10264,7 @@ void handlespeckeypress(int key,int x,int y) {
                   //exit(100);
                 }
                 break;
-        case 12: // F12 start mythtv og luk mythtv_controller
+        case 12: // F12
                 if (strcmp(configkeyslayout[9].cmdname,"playlistbackup")==0) {
                   do_playlist_backup_playlist();
                 } else if (strcmp(configkeyslayout[9].cmdname,"playlistrestore")==0) {
@@ -11319,8 +11496,8 @@ void handlespeckeypress(int key,int x,int y) {
                 printf("CTRL key pressed \n");
                 break;
     }
-    debugmode=true;
-    if (debugmode) {
+    // debugmode=true;
+    if (debugmode==false) {
       if (vis_radio_oversigt) fprintf(stderr,"Radio_key_selected = %d  radio_select_iconnr = %d \n ",radio_key_selected,radio_select_iconnr);
       if (vis_music_oversigt) fprintf(stderr,"Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
       if (vis_film_oversigt) fprintf(stderr,"film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",film_key_selected,film_select_iconnr,film_oversigt.film_antal());
@@ -11329,9 +11506,9 @@ void handlespeckeypress(int key,int x,int y) {
       // if (show_setup_rss) fprintf(stderr,"Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
       if (vis_stream_oversigt) {
         if (streamoversigt.FeedCatalog_search_antalstreams()==0) {   
-          fprintf(stderr,"stream_key_selected = %d  stream_select_iconnr = %d streamoversigt_antal= %d stream select name %s \n ",stream_key_selected,stream_select_iconnr,streamoversigt.streamantal(),streamoversigt.get_stream_name(stream_key_selected-1));
+          fprintf(stderr,"stream_key_selected = %d  stream_select_iconnr = %d streamoversigt_antal= %d stream select name %s url for gfx file %s \n ",stream_key_selected,stream_select_iconnr,streamoversigt.streamantal(),streamoversigt.get_stream_name(stream_key_selected-1),streamoversigt.get_stream_mythtvgfx_path(stream_key_selected-1));
         } else {
-          fprintf(stderr,"stream_key_selected = %d  stream_select_iconnr = %d streamoversigt_antal= %d stream select name %s \n ",stream_key_selected,stream_select_iconnr,streamoversigt.FeedCatalog_search_antalstreams(),streamoversigt.get_stream_name(stream_key_selected-1));
+          fprintf(stderr,"stream_key_selected = %d  stream_select_iconnr = %d streamoversigt_antal= %d stream select name %s url for gfx file %s \n ",stream_key_selected,stream_select_iconnr,streamoversigt.FeedCatalog_search_antalstreams(),streamoversigt.get_stream_name(stream_key_selected-1),streamoversigt.get_stream_mythtvgfx_path(stream_key_selected-1));
         } 
       }
       #ifdef ENABLE_SPOTIFY
@@ -11579,9 +11756,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             keybufferindex++;
             keybuffer[keybufferindex]='\0';
             streamoversigt.rss_search_podcast_string=keybuffer;
-
             streamoversigt.update_search_podcast_stream_view();
-
           }
         }
       }
@@ -16977,6 +17152,9 @@ int main(int argc, char** argv) {
     }
 
     thread t1(opdate_threadfunction); // start thread to update torrent
+
+
+    fill_streamlist();
 
     // Normal in use
     // do update rss

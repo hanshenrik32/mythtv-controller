@@ -2862,7 +2862,7 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
             new_tidal_record.feed_group_antal=0;
             new_tidal_record.feed_path_antal=0;
             new_tidal_record.textureId=0;
-            new_tidal_record.intnr=atoi(row[5]);                               // før 3
+            new_tidal_record.intnr=0; // atoi(row[5]);                               // før 3
             new_tidal_record.nyt=false;
             new_tidal_record.type=0;            
             // top level (load playlist)
@@ -4921,6 +4921,130 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     // drawText("No tidal account enabled.", xof+20+(buttonsize/2),yof-10, 0.4f,1);
   }
 }
+
+
+// new code ************************************************************************************************************************
+
+
+
+// ****************************************************************************************
+//
+// Draw cover with new icon overlay
+//
+// ****************************************************************************************
+
+
+void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color4 c) {
+  std::string temptxt;
+  glEnable(GL_TEXTURE_2D);
+  glColor4f(c.r, c.g, c.b, c.a);
+  glBindTexture(GL_TEXTURE_2D, textureId);
+  glLoadName(id);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex2i(x,     y);
+  glTexCoord2f(1, 0); glVertex2i(x + w, y);
+  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
+  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
+  glEnd();
+}
+
+// ****************************************************************************************
+//
+// Draw stream item
+//
+// ****************************************************************************************
+
+
+void tidal_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
+  // Baggrund
+  std::string temprgtxt;
+  std::string gfxfilename;
+  GLuint texture;
+  Color4 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
+  Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  /*  
+  if (get_stream_intnr(ii) == stream_key_selected)
+      drawRect(x - 4, y - 4, itemWidth + 8, rowHeight - 8, highcolor); // Highlight color
+  else
+      drawRect(x - 2, y - 2, itemWidth + 4, rowHeight - 4, normalcolor); // Normal color
+  */
+  // Cover
+  gfxfilename = stack[ii].feed_gfx_url;
+  if (gfxfilename.size() > 0) {
+    // load texture if not loaded
+    if (stack[ii].textureId == 0) {
+      if (file_exists(gfxfilename.c_str())) {
+        stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
+      }
+    }
+  }
+  // Titel
+  temprgtxt = fmt::format("{:^20}",stack[ii].feed_showtxt);
+  temprgtxt.resize(20);
+  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = normal_icon;
+  if (ii == stream_key_selected-1) {
+    drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+    drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 2);
+  } else {
+    drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
+    drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 0);
+  }
+  // Debug grid
+  // drawRectOutline(x, y, itemWidth, rowHeight, Color::Red);
+}
+
+
+
+
+
+
+// ************************************************************************************************************************
+//
+// Show tidal view
+//
+// ************************************************************************************************************************
+
+
+void tidal_class::show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
+  // ---- KINETIC SCROLL ---------------------------------------
+  scrollVel *= friction;
+  scrollPos += scrollVel;
+  if (fabs(scrollVel) < 0.01f) scrollVel = 0;
+  int totalRows   = (int)ceil((float)stack.size() / itemsPerRow);
+  int visibleRows = viewHeight / rowHeight;
+  float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
+
+
+  // scrollPos = std::clamp(scrollPos, 0.0f, maxScroll);
+  if (scrollPos < 0) {
+      scrollPos = 0;
+      scrollVel = 0;
+  }
+  else if (scrollPos > maxScroll) {
+      scrollPos = maxScroll;
+      scrollVel = 0;
+  }
+
+  // ---- CALC --------------------------------------------------
+  int firstRow   = (int)(scrollPos / rowHeight);
+  float subOff   = fmod(scrollPos, rowHeight);
+  int ssofset     = firstRow * itemsPerRow;
+  int screenTop = startY;
+  int xof = startX;
+  int visibleItems = (visibleRows + 2) * itemsPerRow;
+  // ---- RENDER -----------------------------------------------
+  for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
+    int index = ssofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    int x = xof + col * itemWidth + 40;
+    int y = screenTop - (row * rowHeight) + subOff - 40;
+    draw_stream_item( x, y, index, normal_icon, normal_icon, stream_key_selected);
+  }
+}
+
+
+
 
 
 

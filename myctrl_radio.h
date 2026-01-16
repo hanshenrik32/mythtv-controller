@@ -42,9 +42,15 @@ int set_radio_popular(int stationid);                //
 const int radiooptionsmax=40;				                 // mxa antal typer af radio stationer
 
 
+struct Color2 {
+    float r, g, b, a;
+};
+
+
+
 class radiostation_class {
     private:
-        enum { maxantal=753 };				          		                            // MAX antal radio stationer
+        enum { maxantal=10000 };				          		                        // MAX antal radio stationer
         std::vector<radio_oversigt_type> stack;
         int antal;							                                            // Antal
         radiotype_type radiosortopt[radiooptionsmax];			                        // radio typer
@@ -85,6 +91,26 @@ class radiostation_class {
         int opdatere_radio_oversigt(char *searchtxt);
         int opdatere_radio_oversigt();
         bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
+
+
+              // new scroll vars
+      float scrollPos = 0.0f;
+      float scrollVel = 0.0f;
+
+      const float friction = 0.90f;
+      const float accel    = 2.0f;
+
+      int itemsPerRow = 8;
+      int rowHeight   = 198;
+      int itemWidth   = 198;
+
+      int startX = 20;
+      int startY = 882;
+      int viewHeight = 780;
+      // end new scroll vars
+      void onScroll(float delta) { scrollVel += delta * accel; }
+      void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);  // draw single stream item
+      bool show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 };
 
 #endif

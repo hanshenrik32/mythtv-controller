@@ -26,6 +26,13 @@ class music_oversigt_type {
     char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
 };
 
+
+
+struct Color3 {
+    float r, g, b, a;
+};
+
+
 class musicoversigt_class {
   private:
     unsigned int antal_music_oversigt;
@@ -38,6 +45,22 @@ class musicoversigt_class {
     bool search_loaded;
     int searchtype;
     bool loaded_begin;
+
+     // new scroll vars
+      float scrollPos = 0.0f;
+      float scrollVel = 0.0f;
+
+      const float friction = 0.90f;
+      const float accel    = 2.0f;
+
+      int itemsPerRow = 8;
+      int rowHeight   = 198;
+      int itemWidth   = 198;
+
+      int startX = 20;
+      int startY = 882;
+      int viewHeight = 780;
+      // end new scroll vars
     
     bool search_music_online_done;
     bool play() { return(do_play);}    
@@ -72,6 +95,12 @@ class musicoversigt_class {
     int update_afspillinger_music_song(char *filename);
     void set_music_is_playing(bool flag) { music_is_playing = flag; }
     bool get_music_is_playing() { return(music_is_playing); }
+
+
+    // new version 2 with kinetic scroll
+    void onScroll(float delta) { scrollVel += delta * accel; }
+    void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+    void show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
 };
 
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);

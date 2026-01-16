@@ -117,6 +117,25 @@ class film_oversigt_typem : vlc_controller {
       float getmovieposition();
       bool show_search_view;
   public:
+
+
+     // new scroll vars
+      float scrollPos = 0.0f;
+      float scrollVel = 0.0f;
+
+      const float friction = 0.90f;
+      const float accel    = 2.0f;
+
+      int itemsPerRow = 8;
+      int rowHeight   = 198+75;
+      int itemWidth   = 198;
+
+      int startX = 20;
+      int startY = 882;
+      int viewHeight = 780;
+      // end new scroll vars
+
+
       int editmode;
       bool get_search_view() { return (show_search_view); }
       void set_search_view(bool val) { show_search_view=val; }
@@ -150,6 +169,11 @@ class film_oversigt_typem : vlc_controller {
       std::string select_movie_type();
       bool update_movierec_in_db(int recnr);
       bool update_movierec_in_db_all(int recnr);
+
+
+      void onScroll(float delta) { scrollVel += delta * accel; }
+      void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+      void show_film_oversigt1(float _mangley,int filmnr);
 };
 
 
