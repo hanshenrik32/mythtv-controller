@@ -1190,7 +1190,7 @@ bool tidal_class::delete_record_in_view(long tidalknapnr) {
   playlistid = stack[n].playlistid;
   if (tidalknapnr<=stack.size()) {
     // remove element from view
-    stack.erase(stack.begin()+n);    // remove element from vector
+    stack.erase(stack.begin()+n);    // remove element from vector    
     // delete from db
     antalplaylists--;  
     // clean up in db to.
@@ -2442,6 +2442,7 @@ int tidal_class::auth_device_authorization() {
 void tidal_class::clean_tidal_oversigt() {
     startup_loaded=false;
     stack.clear();
+    // stack.clear();
     /*
     for(int i=1;i<antal-1;i++) {
       if (stack[i]) {
@@ -2974,7 +2975,8 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {
   }
   antal=0;
   // clear old view
-  clean_tidal_oversigt();
+  // clean_tidal_oversigt();
+  stack.clear();
   sqlselect=fmt::format("select name,p.paththumb,playpath,p.playlistid,t.id from mythtvcontroller.tidalcontent t left join mythtvcontroller.tidalcontentplaylist p on t.playlistid = p.playlistid WHERE t.name like '%{}%' order by t.name", keybuffer);
   if (dbexist) {
     //get_antal_rss_feeds_sources(conn);
@@ -3008,7 +3010,8 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {
             if (row[1]) strncpy(new_tidal_record.feed_gfx_url,row[1],tidal_namelength);
             new_tidal_record.type=1;              
             if (row[2]) strcpy(new_tidal_record.playlistid,row[2]);                              // id is path here
-            stack.push_back(new_tidal_record);                                                   // add to stack
+            // stack.push_back(new_tidal_record);                                                   // add to stack
+            stack.push_back(new_tidal_record);                                             // add to search stack
             antal++;
           }
         }
@@ -3040,7 +3043,7 @@ void tidal_class::process_object_tidal_search_result(json_value* value, int dept
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     // print_depth_shift(depth);
-    fprintf(stderr,"x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
+    // fprintf(stderr,"x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name , "attributes")==0) {      
       tidal_process_attributes=true;
     } else if (strcmp(value->u.object.values[x].name , "id" )==0) {
@@ -3155,31 +3158,31 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
         }
         if ( tidal_process_id ) {
           tidal_process_id=false;
-          if ((depth==4) && (x==1)) {
+          if ((depth==4) && (x==0)) {                                                  // old if ((depth==4) && (x==1)) {
             // get artist name
             if (artist_name.size()==0) artist_name = value->u.string.ptr;
           }
           // playlist id
-          if ((depth==5) && (x==1)) {
+          if ((depth==5) && (x==0)) {
             playlistid = value->u.string.ptr;
           }
         }
 
         if (tidal_process_numberOfItems) {
           tidal_process_numberOfItems=false;
-          if ((depth==7) && (x==11)) {
+          if ((depth==6) && (x==3)) {                                      // old if ((depth==7) && (x==11)) {
             numberOfTracks = value->u.integer;
           }
         }
         if (tidal_process_releasedate) {
           tidal_process_releasedate=false;
-          if ((depth==7) && (x==11)) {
+          if ((depth==7) && (x==6)) {                                  // if ((depth==7) && (x==11)) {
             release_date = value->u.string.ptr;
           }
         }         
         if ( tidal_process_title ) {
           tidal_process_title=false;
-          if ((depth==7) && (x==12)) {
+          if ((depth==7) && (x==0)) {                            // old if ((depth==7) && (x==12)) {
             playlistname = value->u.string.ptr;
           }
         }
@@ -3190,7 +3193,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
 
         if (tidal_process_type) {
           tidal_process_type=false;
-          if ((depth==7) && (x==13)) {
+          if ((depth==12) && (x==0)) {                              // if ((depth==7) && (x==13)) {
             if (playlistname.length()>0) {
               antalplaylists++;
               antal++;
@@ -3324,7 +3327,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     else searchbuffer=searchbuffer+"%20";
     n++;
   }
-  url="curl -X 'GET' 'https://openapi.tidal.com/v2/searchResults/";
+  url="curl -s -X 'GET' 'https://openapi.tidal.com/v2/searchResults/";
   url = url + searchbuffer;
   switch (type) {
             // albums
@@ -4455,7 +4458,7 @@ void tidal_class::clear_tidal_aktiv_songlist() {
     recnr++;
   }
 }
-
+/*
 
 // ****************************************************************************************
 //
@@ -4917,11 +4920,13 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize*4), buttonsizey*4 , 0.0);
     glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize*4), 10 , 0.0);
     glEnd();
-    glcRenderString("No tidal account enabled.");
+    glcRenderString("No search result found.");
     // drawText("No tidal account enabled.", xof+20+(buttonsize/2),yof-10, 0.4f,1);
   }
 }
 
+
+*/
 
 // new code ************************************************************************************************************************
 
@@ -4955,19 +4960,13 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color4 c) {
 // ****************************************************************************************
 
 
-void tidal_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
+void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   // Baggrund
   std::string temprgtxt;
   std::string gfxfilename;
   GLuint texture;
   Color4 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  /*  
-  if (get_stream_intnr(ii) == stream_key_selected)
-      drawRect(x - 4, y - 4, itemWidth + 8, rowHeight - 8, highcolor); // Highlight color
-  else
-      drawRect(x - 2, y - 2, itemWidth + 4, rowHeight - 4, normalcolor); // Normal color
-  */
   // Cover
   gfxfilename = stack[ii].feed_gfx_url;
   if (gfxfilename.size() > 0) {
@@ -4975,7 +4974,7 @@ void tidal_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint
     if (stack[ii].textureId == 0) {
       if (file_exists(gfxfilename.c_str())) {
         stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
-      }
+      } else strcpy(stack[ii].feed_gfx_url, "");
     }
   }
   // Titel
@@ -4989,11 +4988,52 @@ void tidal_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
     drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 0);
   }
-  // Debug grid
-  // drawRectOutline(x, y, itemWidth, rowHeight, Color::Red);
 }
 
 
+
+
+// ****************************************************************************************
+//
+// Draw search stream item
+//
+// ****************************************************************************************
+
+
+
+void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
+  // Baggrund
+  std::string temprgtxt;
+  std::string gfxfilename;
+  GLuint texture;
+  Color4 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
+  Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  // Cover
+  gfxfilename = stack[ii].feed_gfx_url;
+  if (gfxfilename.size() > 0) {
+    // load texture if not loaded
+    if (stack[ii].textureId == 0) {
+      if (file_exists(gfxfilename.c_str())) {
+        stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
+      } else strcpy(stack[ii].feed_gfx_url, "");
+    }
+  }
+  // Titel
+  temprgtxt = fmt::format("{:^20}",stack[ii].feed_showtxt);
+  temprgtxt.resize(20);
+  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = normal_icon;
+  if (ii == stream_key_selected-1) {
+    if (y<search_startY-30) {
+      drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+      drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 2);
+    }
+  } else {
+    if (y<search_startY-30) {
+      drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
+      drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 0);
+    }
+  }
+}
 
 
 
@@ -5005,7 +5045,7 @@ void tidal_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint
 // ************************************************************************************************************************
 
 
-void tidal_class::show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
+void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;
@@ -5013,14 +5053,12 @@ void tidal_class::show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuin
   int totalRows   = (int)ceil((float)stack.size() / itemsPerRow);
   int visibleRows = viewHeight / rowHeight;
   float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
-
-
+  
   // scrollPos = std::clamp(scrollPos, 0.0f, maxScroll);
   if (scrollPos < 0) {
       scrollPos = 0;
       scrollVel = 0;
-  }
-  else if (scrollPos > maxScroll) {
+  } else if (scrollPos > maxScroll) {
       scrollPos = maxScroll;
       scrollVel = 0;
   }
@@ -5039,13 +5077,127 @@ void tidal_class::show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuin
     int row = i / itemsPerRow;
     int x = xof + col * itemWidth + 40;
     int y = screenTop - (row * rowHeight) + subOff - 40;
-    draw_stream_item( x, y, index, normal_icon, normal_icon, stream_key_selected);
+    draw_tidal_item( x, y, index, normal_icon, normal_icon, stream_key_selected);
   }
 }
 
 
 
 
+
+
+// ************************************************************************************************************************
+//
+// Show search tidal view
+//
+// ************************************************************************************************************************
+
+
+void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
+  float yof_top=orgwinsizey-(rowHeight*1)+20;                               // start ypos
+  float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
+  static time_t rawtime;
+  static time_t last_rawtime=0;  
+  static bool timefirsttime=false;
+  struct timeval lasttime;
+  struct timeval tim;
+  static bool cursor=true;
+  static bool doneloadsearch=false;
+
+  // ---- KINETIC SCROLL ---------------------------------------
+  scrollVel *= friction;
+  scrollPos += scrollVel;
+  if (fabs(scrollVel) < 0.01f) scrollVel = 0;
+  int totalRows   = (int)ceil((float)stack.size() / itemsPerRow);
+  int visibleRows = viewHeight / rowHeight;
+  float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
+  // scrollPos = std::clamp(scrollPos, 0.0f, maxScroll);
+
+  if (scrollPos < 0) {
+      scrollPos = 0;
+      scrollVel = 0;
+  } else if (scrollPos > maxScroll) {
+      scrollPos = maxScroll;
+      scrollVel = 0;
+  }    
+
+  rawtime=time(NULL);                                                         // hent now time
+  if (timefirsttime==false) {
+    timefirsttime=true;
+    tim.tv_usec=0;
+    lasttime.tv_usec=0;
+  }  
+  if (last_rawtime==0) {
+    last_rawtime=rawtime;
+  }
+  if (rawtime>(last_rawtime+1)) {
+    cursor=!cursor;
+    last_rawtime=rawtime;
+  }
+
+  // ---- CALC --------------------------------------------------
+  int firstRow   = (int)(scrollPos / rowHeight);
+  float subOff   = fmod(scrollPos, rowHeight);
+  int ssofset     = firstRow * itemsPerRow;
+  int screenTop = search_startY;
+  int xof = search_startX;
+  int visibleItems = (visibleRows + 2) * itemsPerRow;
+
+  glEnable(GL_TEXTURE_2D);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  // type of search
+  switch (searchtype) {
+    case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+            break;
+    case 1: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_album);
+            break;
+    case 2: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+            break;
+    case 3: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
+            break;
+    default:glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+  }
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glLoadName(0);
+  glBegin(GL_QUADS); 
+  glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+  glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+rowHeight-20, 0.0);
+  glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+rowHeight-20 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+  glEnd();
+
+  // show tidal search string
+  if (strcmp(searchstring,"")!=0) {
+    drawText(searchstring, 300.0f, 980.0f, 1.2f, 0);
+    if (cursor) drawText("_", 300.0f+strlen(searchstring)*20, 980.0f, 1.2f, 0);
+    /*
+    glPushMatrix();
+    glTranslatef(10, 1000, 0);
+    glRasterPos2f(0, 0);
+    glScalef(120, 120, 1.0);
+    glcRenderString("searchstring");
+    if (cursor) glcRenderString("_"); else glcRenderString(" ");
+    glPopMatrix();
+    */
+
+  }
+  if (search_loaded==false) doneloadsearch=false;
+  if ((search_loaded==true) && (doneloadsearch==false)) {
+    doneloadsearch=true;
+    load_tidal_iconoversigt();
+  }
+  // ---- RENDER -----------------------------------------------
+  for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
+    int index = ssofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    int x = xof + col * itemWidth + 40;
+    int y = screenTop - (row * rowHeight) + subOff - 40;
+    draw_tidal_search_item( x, y, index, normal_icon, normal_icon, stream_key_selected);
+  }
+  
+}
 
 
 // ****************************************************************************************

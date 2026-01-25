@@ -106,75 +106,74 @@ public:
 
 class film_oversigt_typem : vlc_controller {
   private:
-      unsigned int filmoversigtsize;			                                      // antal elementer i array MAX def
-      bool film_oversigt_loaded;
-      bool film_is_pause;                                                       // pause ?
-      unsigned int filmoversigt_antal;			  	                                // loaded antal
-      int volume;
-      // load vlc stuf
+    unsigned int filmoversigtsize;			                                      // antal elementer i array MAX def
+    bool film_oversigt_loaded;
+    bool film_is_pause;                                                       // pause ?
+    unsigned int filmoversigt_antal;			  	                                // loaded antal
+    int volume;
+    // load vlc stuf
 //      libvlc_instance_t *vlc_inst;              //
 //      libvlc_media_player_t *vlc_mp;            //
-      float getmovieposition();
-      bool show_search_view;
+    float getmovieposition();
+    bool show_search_view;
   public:
+    int selected_icon_in_view=1;
+
+    // new scroll vars
+    float scrollPos = 0.0f;
+    float scrollVel = 0.0f;
+
+    const float friction = 0.90f;
+    const float accel    = 2.0f;
+
+    int itemsPerRow = 8;
+    int rowHeight   = 198+75;
+    int itemWidth   = 198;
+
+    int startX = 20;
+    int startY = 882;
+    int viewHeight = 780;
+    // end new scroll vars
 
 
-     // new scroll vars
-      float scrollPos = 0.0f;
-      float scrollVel = 0.0f;
+    int editmode;
+    bool get_search_view() { return (show_search_view); }
+    void set_search_view(bool val) { show_search_view=val; }
+    bool film_is_playing;                                                     // playing ?
+    std::vector<film_oversigt_type> filmoversigt;                             // vector of movies
+    void sortfilm(int type);
+    unsigned int film_antal(void) { return(filmoversigt_antal); }
+    void set_film_antal(unsigned int antal) { filmoversigt_antal=antal; }
+    int get_film_antal() { return (filmoversigt_antal); }
+    // show startup new added movies
+    void show_minifilm_oversigt(float _mangley,int filmnr);
+    void resetallefilm();
+    int load_film_dvcovers();
+    int playmovie(int nr);
+    void stopmovie();
+    void next_movie_chapther();
+    void prevous_movie_chapther();
+    void volumeup();
+    void volumedown();
+    void setcolume(int volume);                                         // do not store volume in volume member int vaule
+    void pausemovie();      
+    // void show_film_oversigt(float _mangley,int filmnr);
+    film_oversigt_typem(unsigned int antal);
+    ~film_oversigt_typem();
+    // overload func
+    int opdatere_film_oversigt(void);
+    int opdatere_film_oversigt(char *movietitle);
+    bool createdb(MYSQL *conn);
 
-      const float friction = 0.90f;
-      const float accel    = 2.0f;
+    std::string select_file_name(std::string startpath);
+    std::string select_movie_type();
+    bool update_movierec_in_db(int recnr);
+    bool update_movierec_in_db_all(int recnr);
 
-      int itemsPerRow = 8;
-      int rowHeight   = 198+75;
-      int itemWidth   = 198;
-
-      int startX = 20;
-      int startY = 882;
-      int viewHeight = 780;
-      // end new scroll vars
-
-
-      int editmode;
-      bool get_search_view() { return (show_search_view); }
-      void set_search_view(bool val) { show_search_view=val; }
-      bool film_is_playing;                                                     // playing ?
-      std::vector<film_oversigt_type> filmoversigt;                             // vector of movies
-      void sortfilm(int type);
-      unsigned int film_antal(void) { return(filmoversigt_antal); }
-      void set_film_antal(unsigned int antal) { filmoversigt_antal=antal; }
-      int get_film_antal() { return (filmoversigt_antal); }
-      // show startup new added movies
-      void show_minifilm_oversigt(float _mangley,int filmnr);
-      void resetallefilm();
-      int load_film_dvcovers();
-      int playmovie(int nr);
-      void stopmovie();
-      void next_movie_chapther();
-      void prevous_movie_chapther();
-      void volumeup();
-      void volumedown();
-      void setcolume(int volume);                                         // do not store volume in volume member int vaule
-      void pausemovie();      
-      void show_film_oversigt(float _mangley,int filmnr);
-      film_oversigt_typem(unsigned int antal);
-      ~film_oversigt_typem();
-      // overload func
-      int opdatere_film_oversigt(void);
-      int opdatere_film_oversigt(char *movietitle);
-      bool createdb(MYSQL *conn);
-
-      std::string select_file_name(std::string startpath);
-      std::string select_movie_type();
-      bool update_movierec_in_db(int recnr);
-      bool update_movierec_in_db_all(int recnr);
-
-
-      void onScroll(float delta) { scrollVel += delta * accel; }
-      void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
-      void show_film_oversigt1(float _mangley,int filmnr);
+    //
+    void onScroll(float delta) { scrollVel += delta * accel; }
+    void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+    void show_film_oversigt(float _mangley,int filmnr);
 };
-
 
 #endif

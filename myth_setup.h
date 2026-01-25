@@ -111,4 +111,9 @@ void show_setup_rss(unsigned int startofset);                                   
 void show_wlan_networks(int valgtnr);
 void show_setup_torrent();
 int team_settings_load();
+
+void drawVUMeter(float x, float y, float value,GLuint textureId);
+void getLevels();
+void render_uv();
+
 #endif

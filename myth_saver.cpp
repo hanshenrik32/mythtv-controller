@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-
+#include <cmath>
 #include "myth_saver.h"
 #include "myctrl_music.h"
 #include "readjpg.h"
@@ -1825,6 +1825,40 @@ float sinofsetz[]={
 1.75,1.73,1.71,1.69,1.67,1.65,1.63,1.61,1.59,1.57,1.55,1.53,1.51,1.49,1.47,1.45};
 
 
+
+
+float plasmaTime = 0.0f;
+
+void drawPlasma(int width, int height) {
+    plasmaTime += 0.02f;
+
+    glBegin(GL_POINTS);
+    for (int y = 0; y < height; y=y+2)
+    {
+        for (int x = 0; x < width; x=x+2)
+        {
+            float nx = (float)x / width;
+            float ny = (float)y / height;
+
+            float v =
+                sin(nx * 10.0f + plasmaTime) +
+                cos(ny * 10.0f + plasmaTime) +
+                sin((nx + ny) * 10.0f + plasmaTime) +
+                cos(sqrt(nx*nx + ny*ny) * 15.0f + plasmaTime);
+
+            v = (v + 4.0f) * 0.25f;  // normalize to 0..1
+
+            // Plasma color mapping
+            float r = 0.5f + 0.5f * sin(v * 6.2831f);
+            float g = 0.5f + 0.5f * sin(v * 6.2831f + 2.0f);
+            float b = 0.5f + 0.5f * sin(v * 6.2831f + 4.0f);
+
+            glColor3f(r, g, b);
+            glVertex2f((float)x, (float)y);
+        }
+    }
+    glEnd();
+}
 
 
 

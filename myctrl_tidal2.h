@@ -88,17 +88,17 @@ class tidal_active_play_info_type {                // sample data down here
 
 class tidal_class {
   private:
-    enum { maxantal=5000 };					                                        // MAX antal rss stream in wiew
-    std::vector<tidal_oversigt_type> stack;
+    enum { maxantal=5000 };					                                      // MAX antal rss stream in wiew
+    std::vector<tidal_oversigt_type> stack;                               // tidal overview stack
     tidal_device_def tidal_device[10];
     int tidal_device_antal;                                               // antal device found
-    tidal_active_play_info_type tidal_aktiv_song[200];                      //
+    tidal_active_play_info_type tidal_aktiv_song[200];                   // aktiv song list
     std::vector<tidal_active_play_info_type> tidal_aktiv_song1; // change to vector (NOT DONE for now)
     
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
     int tidal_playingnr;
-    bool tidal_update_loaded_begin;
+    bool tidal_update_loaded_begin;    
     //
     // char tidaltoken[512];                                                 // access_token
     char countryCode[512];                                                //
@@ -126,6 +126,7 @@ class tidal_class {
     int tidal_get_artists_all_albums(char *artistid,bool force);
     int update_playcount(const char *playpath);
   public:
+    int selected_icon_in_view=1;
     char tidaltoken[512];                                                 // access_token
     bool do_setup_tidal_start_entry;                                            // show tidal start id entrys
     bool do_update_tidal_start_entry;                                           // do the udpate and save / load settings
@@ -195,6 +196,10 @@ class tidal_class {
       int startY = 882;
       int viewHeight = 780;
       // end new scroll vars
+      // search vars
+      int search_startX = 20;
+      int search_startY = 762;
+      int search_viewHeight = 660;
 
 
     // end webserver
@@ -222,8 +227,8 @@ class tidal_class {
     char *get_tidal_playlistid(int nr);                                   // get id to play
     int tidal_refresh_token();
     int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
-    void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
-    void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
+    // void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+    // void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
     // not in use
     int auth_device_authorization();
@@ -300,8 +305,10 @@ class tidal_class {
 
 
     void onScroll(float delta) { scrollVel += delta * accel; }
-    void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
-    void show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+    void draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+    void draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+    void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+    void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
 };
 

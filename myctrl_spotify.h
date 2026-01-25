@@ -14,6 +14,13 @@
 const int playlisttype=0;                         // playlist type
 const int songlisttype=1;                         // song list type
 
+
+
+struct Color5 {
+    float r, g, b, a;
+};
+
+
 //
 // device struct
 //
@@ -120,6 +127,24 @@ class spotify_class : vlc_controller {
         bool anim_viewer_search;
         float anim_angle;
     public:
+        int selected_icon_in_view;
+      // new scroll vars
+        float scrollPos = 0.0f;
+        float scrollVel = 0.0f;
+
+        const float friction = 0.90f;
+        const float accel    = 2.0f;
+
+        int itemsPerRow = 8;
+        int rowHeight   = 198;
+        int itemWidth   = 198;
+
+        int startX = 20;
+        int startY = 882;
+        int viewHeight = 780;
+        // end new scroll vars
+
+
         bool do_amin_in_viewer() { return(anim_viewer); }
         bool reset_amin_in_viewer();
         bool set_search_loaded() { search_loaded=true; return(1); }
@@ -222,6 +247,12 @@ class spotify_class : vlc_controller {
         void show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
         void show_spotify_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
         void show_spotify_search_oversigt_old(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
+
+
+        void onScroll(float delta) { scrollVel += delta * accel; }
+        void draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+        void show_spotify_oversigt1(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+
 };
 
 int download_image(char *imgurl,char *filename);

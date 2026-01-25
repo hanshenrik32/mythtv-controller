@@ -48,7 +48,6 @@ class boxarray {
     void roll_array();
 };
 
-
-
+void drawPlasma(int width, int height);
 
 #endif

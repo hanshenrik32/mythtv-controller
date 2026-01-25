@@ -22,6 +22,11 @@
 
 // mysql support
 #include <mysql.h>
+
+// sound system
+#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod_errors.h"
+
 // program include
 #include "text3d.h"
 #include "readjpg.h"
@@ -42,12 +47,21 @@ extern float configdefaultmusicfontsize;
 extern float configdefaultstreamfontsize;
 extern float configdefaultmoviefontsize;
 
+// uv stuf
+extern float spectrum_left[];                                                      // used for spectium
+extern float spectrum_right[];                                                     // used for spectium
+extern float spectrum[];                                                     // used for spectium
+
+
 extern int configuvmeter;
 extern int debugmode;
 extern int vis_nyefilm_oversigt;
 extern char localuserhomedir[4096];
 
+extern GLuint textureId_uv2;
+extern GLuint _textureId28;
 
+extern FMOD::System    *sndsystem;
 extern const char *dbname;                                                      // internal database name in mysql (music,movie,radio)
 
 // controll rss
@@ -147,6 +161,189 @@ const GLfloat selectcolor[3]={1.0f,1.0f,0.0f};		                              //
 
 extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
 extern char keybuffer[];                                    // keyboard buffer
+
+
+float leftLevel = 0.0f;
+float rightLevel = 0.0f;
+float vuLeftSmooth = 0.0f;
+float vuRightSmooth = 0.0f;
+
+float peakLeft = 0.0f;
+float peakRight = 0.0f;
+// float peakFallSpeed = 0.005f;
+float peakHoldValue = 0.005f;     // 0..1
+float peakFallSpeed = 0.0005f; // how fast the peak falls
+
+
+
+void updatePeakHold(float vuValue) {
+  if (vuValue > peakHoldValue)
+    peakHoldValue = vuValue;          // new peak
+  else
+    peakHoldValue -= peakFallSpeed;  // fall slowly
+  if (peakHoldValue < 0.0f) peakHoldValue = 0.0f;
+}
+
+
+// *****************************************************************************
+//
+// 
+//
+// *****************************************************************************
+
+
+void drawPeakMarker(float cx, float cy, float value) {
+    if (value < 0) value = 0;
+    if (value > 1) value = 1;
+
+    const float minAngle = -80.0f;
+    const float maxAngle =  80.0f;
+
+    float angle = minAngle + (maxAngle - minAngle) * value;
+    float rad   = angle * 3.14159265f / 180.0f;
+
+    float inner = 150.0f;
+    float outer = 170.0f;
+
+    float x1 = cx + sin(rad) * inner;
+    float y1 = cy + cos(rad) * inner;
+    float x2 = cx + sin(rad) * outer;
+    float y2 = cy + cos(rad) * outer;
+
+    glColor3f(1.0f, 1.0f, 0.0f); // bright yellow
+    glLineWidth(4.0f);
+
+    glBegin(GL_LINES);
+        glVertex2f(x1, y1);
+        glVertex2f(x2, y2);
+    glEnd();
+}
+
+
+
+// *****************************************************************************
+//
+// ---------------- SMOOTHING ----------------
+//
+// *****************************************************************************
+
+float smoothVU(float current, float target) {
+    const float attack = 0.35f;
+    const float release = 0.08f;
+    if (target > current)
+      current += (target - current) * attack;
+    else
+      current += (target - current) * release;
+    return current;
+}
+
+
+// *****************************************************************************
+//
+// ---------------- GET LEVELS ----------------
+// 
+// *****************************************************************************
+
+void getLevels() {
+  float left[512];
+  float right[512];
+  float faktor=120.0f;                             /// faktor 512 default 
+  float l = 0, r = 0;
+
+  for (int i = 0; i < 512; ++i) {    
+    l += fabs(spectrum_left[i]);
+    r += fabs(spectrum_right[i]);
+  }
+
+  l /= faktor;
+  r /= faktor;
+
+  vuLeftSmooth  = smoothVU(vuLeftSmooth, l);
+  vuRightSmooth = smoothVU(vuRightSmooth, r);
+
+  // updatePeakHold(vuLeftSmooth);
+
+  // Peak hold
+  if (vuLeftSmooth > peakLeft)  peakLeft  = vuLeftSmooth;
+  else peakLeft -= peakFallSpeed;
+
+  if (vuRightSmooth > peakRight) peakRight = vuRightSmooth;
+  else peakRight -= peakFallSpeed;
+
+  if (peakLeft < 0)  peakLeft = 0;
+  if (peakRight < 0) peakRight = 0;
+
+}
+
+// *********************************************************************************
+//
+// ---------------- DRAW NEEDLE ----------------
+//
+// *********************************************************************************
+
+void drawNeedle(float cx, float cy, float value) {
+  float minAngle = -60.0f;
+  float maxAngle = 60.0f;
+  // if (value < 0) value = 0;
+  // if (value > 1) value = 1;
+  float angle = minAngle + (maxAngle - minAngle) * value;
+  float rad = angle * 3.14159265f / 180.0f;
+  float len = 160;
+  float x2 = cx + sin(rad) * len;
+  float y2 = cy + cos(rad) * len;
+
+  glColor3f(1, 0, 0);
+  glLineWidth(3);
+  glBegin(GL_LINES);
+  glVertex2f(cx, cy);
+  glVertex2f(x2, y2);
+  glEnd();
+}
+
+
+
+// ******************************************
+//
+// DRAW METER
+//
+// ******************************************
+
+void drawVUMeter(float x, float y, float value,GLuint textureId) {
+  float cx = x + 220;
+  float cy = y + 50;
+  glEnable(GL_TEXTURE_2D);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D, textureId);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // glColor3f(0.2f, 0.2f, 0.2f);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex2f(x, y);
+  glTexCoord2f(1, 0); glVertex2f(x + 442, y);
+  glTexCoord2f(1, 1); glVertex2f(x + 442, y + 326);
+  glTexCoord2f(0, 1); glVertex2f(x, y + 326);
+  glEnd();
+  glDisable(GL_TEXTURE_2D);
+  drawNeedle(cx, cy, value);
+  
+  // drawPeakMarker(cx,cy,value);
+}
+
+
+
+// ****************************************************************************************
+// 
+// ---------------- MAIN LOOP include function ----------------
+//
+// ****************************************************************************************
+
+void render_uv() {
+  getLevels();
+  drawVUMeter( 500, 400, vuLeftSmooth , textureId_uv2);
+  drawVUMeter( 1000, 400, vuRightSmooth, textureId_uv2);
+}
+
+
 
 
 // ****************************************************************************************
@@ -4311,3 +4508,9 @@ void show_setup_interface() {
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
 }
+
+
+
+
+
+

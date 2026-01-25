@@ -1573,6 +1573,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 //
 // ****************************************************************************************
 
+/*
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int i=0;
@@ -1672,6 +1673,9 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   }
 }
 
+
+*/
+
 // All new versions 2 *****************************************************************************************************************
 
 
@@ -1711,12 +1715,6 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
   GLuint texture;
   Color3 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  /*  
-  if (get_stream_intnr(ii) == stream_key_selected)
-      drawRect(x - 4, y - 4, itemWidth + 8, rowHeight - 8, highcolor); // Highlight color
-  else
-      drawRect(x - 2, y - 2, itemWidth + 4, rowHeight - 4, normalcolor); // Normal color
-  */
   // Cover
   gfxfilename = filmoversigt[ii].getfilmcoverfile();
   if (gfxfilename.size() > 0) {
@@ -1731,15 +1729,13 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
   temprgtxt = fmt::format("{:^20}",filmoversigt[ii].getfilmtitle());
   temprgtxt.resize(20);
   if (filmoversigt[ii].gettextureid() ) texture = filmoversigt[ii].gettextureid(); else texture = normal_icon;
-  if (ii == film_key_selected-1) {
+  if (ii == selected_icon_in_view-1) {                                                       // if (ii == film_key_selected-1) {
     movie_drawcover(x + 18, y + 18, 174, 214, texture ,ii+100,highcolor);
     drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 2);
   } else {
-    movie_drawcover(x + 20, y + 20, 170, 210, texture ,ii+100,normalcolor);
+    movie_drawcover(x + 20, y + 20, 170, 210, texture ,ii+100,normalcolor);                                         // if (ii == film_key_selected-1) {
     drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 0);
   }
-  // Debug grid
-  // drawRectOutline(x, y, itemWidth, rowHeight, Color::Red);
 }
 
 
@@ -1755,7 +1751,7 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
 
 
 
-void film_oversigt_typem::show_film_oversigt1(float _mangley,int filmnr) {
+void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;

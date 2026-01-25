@@ -74,7 +74,7 @@ class stream_class : vlc_controller {
         int parsexmlrssfile_new(char *filename,char *baseiconfile);
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
-
+      int selected_icon_in_view=1;
       // new scroll vars
       float scrollPos = 0.0f;
       float scrollVel = 0.0f;

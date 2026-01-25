@@ -41,6 +41,7 @@ class musicoversigt_class {
     bool music_is_playing;                                                // do we play ?
     
   public:
+    int selected_icon_in_view=1;
     char overview_show_band_name[256];                                  // show band name in overview
     bool search_loaded;
     int searchtype;
@@ -58,10 +59,16 @@ class musicoversigt_class {
       int itemWidth   = 198;
 
       int startX = 20;
-      int startY = 882;
+      int startY = 895;
       int viewHeight = 780;
       // end new scroll vars
-    
+
+      int search_startX = 20;
+      int search_startY = 762;
+      int search_viewHeight = 660;
+      // end new scroll vars
+
+
     bool search_music_online_done;
     bool play() { return(do_play);}    
     void clean_music_oversigt();
@@ -81,7 +88,7 @@ class musicoversigt_class {
     // load playliste find_dir_id
     int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
     // show playlistes in opengl
-    void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
+    // void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     void show_search_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     // henter playlist oversigt
     int opdatere_music_oversigt_playlists();
@@ -95,12 +102,15 @@ class musicoversigt_class {
     int update_afspillinger_music_song(char *filename);
     void set_music_is_playing(bool flag) { music_is_playing = flag; }
     bool get_music_is_playing() { return(music_is_playing); }
+    int antal() { return(musicoversigt.size()); }
 
 
     // new version 2 with kinetic scroll
     void onScroll(float delta) { scrollVel += delta * accel; }
-    void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
-    void show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
+    void draw_music_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon, int stream_key_selected);
+    void draw_music_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon, int stream_key_selected);
+    void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
+    void show_search_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
 };
 
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);

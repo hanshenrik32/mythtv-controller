@@ -61,6 +61,7 @@ class radiostation_class {
         bool check_radio_online_bool();                                                 // check and set radio station online flag (DO NOT WORK)
 
     public:
+        int selected_icon_in_view=1;
         bool playing;                                                                   // playing radio station
         unsigned long check_radio_online(unsigned int startrecnr);	                    // check and set radio station online flag (DO NOT WORK)
         void nextradiooptselect();		                                    			// select next type in radio type oversigt
@@ -85,7 +86,7 @@ class radiostation_class {
         int get_radio_online(int stationid);
         radiostation_class();
         ~radiostation_class();
-        int radioantal() { return(antal); }
+        int radioantal() { return(stack.size()); }
         void clean_radio_oversigt();
         int opdatere_radio_oversigt(int radiosortorder);
         int opdatere_radio_oversigt(char *searchtxt);
