@@ -10,6 +10,8 @@ Run on most debian based systems, like Ubuntu.
 
 Version.
 
+mythtv-controller ver 0.46.1 - new scroll functions.
+
 mythtv-controller ver 0.45.1
 
 movie struct now use vector
