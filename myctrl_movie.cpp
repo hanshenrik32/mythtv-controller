@@ -1318,7 +1318,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
         }
         filmoversigt.push_back(new_movie);
       }
-      printf("filmoversigt.size() = %d \n",filmoversigt.size());
+      // printf("filmoversigt.size() = %d \n",filmoversigt.size());
     }
     // check if movie is deleted in dir
     if (is_db_updated_then_do_clean_up) {

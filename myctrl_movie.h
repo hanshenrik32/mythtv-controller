@@ -118,24 +118,30 @@ class film_oversigt_typem : vlc_controller {
     bool show_search_view;
   public:
     int selected_icon_in_view=1;
-
+    // touch screen scroll
+    bool dragging=false;
+    float scrollSpeed=1.0f;
+    int lastX=0;
+    int lastY=0;
+    int lastDX=0;
+    int lastDY=0;
+    float viewOffsetX=0.0f;
+    float viewOffsetY=0.0f;
+    // end touch screen scroll
     // new scroll vars
     float scrollPos = 0.0f;
     float scrollVel = 0.0f;
-
     const float friction = 0.90f;
+    float velocityX = 0.0f;
+    float velocityY = 0.0f;    
     const float accel    = 2.0f;
-
     int itemsPerRow = 8;
     int rowHeight   = 198+75;
     int itemWidth   = 198;
-
     int startX = 20;
     int startY = 882;
     int viewHeight = 780;
     // end new scroll vars
-
-
     int editmode;
     bool get_search_view() { return (show_search_view); }
     void set_search_view(bool val) { show_search_view=val; }
