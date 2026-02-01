@@ -75,11 +75,25 @@ class stream_class : vlc_controller {
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
       int selected_icon_in_view=1;
+
+      // touch screen scroll
+      bool dragging=false;
+      float scrollSpeed=1.0f;
+      int lastX=0;
+      int lastY=0;
+      int lastDX=0;
+      int lastDY=0;
+      float viewOffsetX=0.0f;
+      float viewOffsetY=0.0f;
+      // end touch screen scroll
+
       // new scroll vars
       float scrollPos = 0.0f;
       float scrollVel = 0.0f;
 
       const float friction = 0.90f;
+      float velocityX = 0.0f;
+      float velocityY = 0.0f;
       const float accel    = 2.0f;
 
       int itemsPerRow = 8;

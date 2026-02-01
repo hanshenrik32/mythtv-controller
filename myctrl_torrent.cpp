@@ -187,14 +187,28 @@ torrent_loader::torrent_loader() {
   torrent_info_data.num_connections = 0;
   torrent_info_data.automove_done_to_moviepath = false;
   torrent_list.clear(); // Clear the vector before resizing
-  // Højere forbindelsesgrænser
-  pack.set_int(lt::settings_pack::connections_limit, 500);  // total connections
+
+  // Netværk
+  pack.set_int(lt::settings_pack::connections_limit, 500);
   pack.set_int(lt::settings_pack::connections_slack, 50);
   pack.set_int(lt::settings_pack::max_peerlist_size, 2000);
-  // Tillad mange aktive downloads
-  pack.set_int(lt::settings_pack::active_downloads, -1); // ubegrænset
-  pack.set_int(lt::settings_pack::active_seeds, -1);
-  pack.set_int(lt::settings_pack::active_limit, -1);
+
+  // Hastighed (0 = ubegrænset)
+  pack.set_int(lt::settings_pack::download_rate_limit, 0);
+  pack.set_int(lt::settings_pack::upload_rate_limit, 0);
+
+  // Disk/cache
+  pack.set_int(lt::settings_pack::cache_size, 512); // MB
+
+  // Aktivitet
+  pack.set_int(lt::settings_pack::active_downloads, 50);
+  pack.set_int(lt::settings_pack::active_seeds, 50);
+  pack.set_int(lt::settings_pack::active_limit, 100);
+
+  // Adfærd
+  pack.set_bool(lt::settings_pack::dont_count_slow_torrents, true);
+  s.apply_settings(pack);
+
 }
 
 
@@ -405,13 +419,16 @@ void torrent_loader::opdate_progress() {
         if (h.is_valid()) {
           h.set_upload_limit(1);
           lt::torrent_status status = h.status();
+
+          // cout << "Peers: " << status.num_peers << " Seeds: " << status.num_seeds <<  " State: " << status.state << " Error: " << status.errc.message() << "\n";
+
           torrent_list.at(tnr).is_finished = status.is_finished;
           torrent_list.at(tnr).progress = status.progress * 100;
           torrent_list.at(tnr).added_time = status.added_time;
           torrent_list.at(tnr).torrent_name = status.name;
           torrent_list.at(tnr).total_wanted = status.total_wanted;
           torrent_list.at(tnr).downloaded_size = status.total_done;
-          torrent_list.at(tnr).num_connections = status.num_connections;         
+          torrent_list.at(tnr).num_connections = status.num_connections;
           switch(status.state) {
             case libtorrent::torrent_status::checking_files:
               torrent_list.at(tnr).state_text = "Checking files...";

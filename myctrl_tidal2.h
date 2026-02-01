@@ -176,33 +176,36 @@ class tidal_class {
     struct mg_mgr mgr;                                                      // web server
     struct mg_mgr client_mgr;                                               // web server client
     struct mg_connection *c;                                                // connection struct
-
+    // end webserver (NOT IN USE FOR NOW)
     std::string playlist_type;            // playlist type from json file (used to only create playlist then save to db)
-
-
-
-     // new scroll vars
-      float scrollPos = 0.0f;
-      float scrollVel = 0.0f;
-
-      const float friction = 0.90f;
-      const float accel    = 2.0f;
-
-      int itemsPerRow = 8;
-      int rowHeight   = 198;
-      int itemWidth   = 198;
-
-      int startX = 20;
-      int startY = 882;
-      int viewHeight = 780;
-      // end new scroll vars
-      // search vars
-      int search_startX = 20;
-      int search_startY = 762;
-      int search_viewHeight = 660;
-
-
-    // end webserver
+    // touch screen scroll
+    bool dragging=false;
+    float scrollSpeed=0.8f;
+    int lastX=0;
+    int lastY=0;
+    int lastDX=0;
+    int lastDY=0;
+    float viewOffsetX=0.0f;
+    float viewOffsetY=0.0f;
+    // end touch screen scroll
+    // new scroll vars
+    float scrollPos = 0.0f;
+    float scrollVel = 0.0f;
+    float friction = 0.90f;
+    float velocityX = 0.0f;
+    float velocityY = 0.0f;
+    float accel    = 2.0f;
+    int itemsPerRow = 8;
+    int rowHeight   = 198;
+    int itemWidth   = 198;
+    int startX = 20;
+    int startY = 882;
+    int viewHeight = 780;
+    // end new scroll vars
+    // search vars
+    int search_startX = 20;
+    int search_startY = 762;
+    int search_viewHeight = 660;
     tidal_class();
     ~tidal_class();
     int streamantal() { return( stack.size()); }                            //

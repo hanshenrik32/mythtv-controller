@@ -94,11 +94,24 @@ class radiostation_class {
         bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 
 
-              // new scroll vars
+      // touch screen scroll
+      bool dragging=false;
+      float scrollSpeed=1.0f;
+      int lastX=0;
+      int lastY=0;
+      int lastDX=0;
+      int lastDY=0;
+      float viewOffsetX=0.0f;
+      float viewOffsetY=0.0f;
+      // end touch screen scroll
+
+      // new scroll vars
       float scrollPos = 0.0f;
       float scrollVel = 0.0f;
 
       const float friction = 0.90f;
+      float velocityX = 0.0f;
+      float velocityY = 0.0f;
       const float accel    = 2.0f;
 
       int itemsPerRow = 8;
