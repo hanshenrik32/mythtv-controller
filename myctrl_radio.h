@@ -91,7 +91,7 @@ class radiostation_class {
         int opdatere_radio_oversigt(int radiosortorder);
         int opdatere_radio_oversigt(char *searchtxt);
         int opdatere_radio_oversigt();
-        bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
+        // bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 
 
       // touch screen scroll
@@ -124,7 +124,7 @@ class radiostation_class {
       // end new scroll vars
       void onScroll(float delta) { scrollVel += delta * accel; }
       void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);  // draw single stream item
-      bool show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
+      bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 };
 
 #endif

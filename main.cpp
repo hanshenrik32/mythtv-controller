@@ -740,6 +740,7 @@ const int PICTURE3D=5;
 const int MUSICMETER=6;
 const int MUSICMETER2=7;
 const int UV_METER=8;
+const int PLASMA=9;
 
 int urtype=1;                                   // set default screen saver
 
@@ -1506,6 +1507,7 @@ int save_config(char * filename) {
     else if (urtype==MUSICMETER) fputs("MUSICMETER\n",file);
     else if (urtype==MUSICMETER2) fputs("MUSICMETER2\n",file);
     else if (urtype==UV_METER) fputs("UV-METER\n",file);
+    else if (urtype==PLASMA) fputs("PLASMA\n",file);
     else fputs("None\n",file);
     snprintf(temp,sizeof(temp),"screensize=%d\n",screen_size);
     fputs(temp,file);
@@ -3744,41 +3746,26 @@ void display() {
     // music view
     if (vis_music_oversigt) {    
       if (do_show_music_search_oversigt==false) {
-        // musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-
         musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else {
-        // musicoversigt.show_search_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-
         musicoversigt.show_search_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       }  
     } else if (vis_film_oversigt) {
       glPushMatrix();
       //aktivfont.selectfont("DejaVu Sans");
-      // old ver show_movie_oversigt
-      // film_oversigt.show_film_oversigt(_fangley,film_select_iconnr);
-
-      // new ver show_film_oversigt1
       film_oversigt.show_film_oversigt(_fangley,film_select_iconnr);
-
        // printf("film_key_selected = %d film_select_iconnr = %d fknapnr = %d \n",film_key_selected,film_select_iconnr,fknapnr);
-
       glPopMatrix();
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else if (vis_stream_oversigt) {
       glPushMatrix();
-      // streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
-
-      streamoversigt.show_stream_oversigt1(onlinestream, onlinestream_empty, radio_key_selected);
-
+      streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty, radio_key_selected);
       // if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
       glPopMatrix();
     } else if (vis_radio_oversigt) {
-      // radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
-      radio_pictureloaded=radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
+      radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
       // show radio options menu
       /*
       if ((show_radio_options) && (!(visur))) {
@@ -3818,17 +3805,11 @@ void display() {
       if (do_show_tidal_search_oversigt==false) {
         // show Tidal overview
         tidal_oversigt.set_textureloaded(false);
-        // old vers
-        // tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
-
           // new vers
-        tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
-        
+        tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );      
         // printf("tidal_selected_startofset = %d \n",tidal_selected_startofset);
-        
       } else {
         // show Tidal search
-        // tidal_oversigt.show_tidal_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr , keybuffer );
         tidal_oversigt.show_tidal_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr , keybuffer );
       }
       if (debugmode & 1) cout << "Tidal Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
@@ -5999,24 +5980,23 @@ void display() {
         drawText(temptxt, 700.0f, 610.0f, 0.4f,1);
       }
     }
-    
 
-    
 
     // Show setup stuf windows
     if (do_show_setup) {
+      do_zoom_tidal_cover = false;
+      do_zoom_film_cover = false;
+      do_zoom_music_cover = false;
+      do_zoom_radio = false;
+      do_zoom_stream_cover = false;
       // reset color to nomal after uv
       glColor4f(1.0,1.0,1.0,1.0);
       show_setup_interface();                                             // show setup interface
       if (do_show_setup_sound) show_setup_sound();                        // sound device
       if (do_show_setup_screen) show_setup_screen();                      //
       if (do_show_videoplayer) show_setup_video();                        //
-      if (do_show_setup_sql) {
-        show_setup_sql();                                                 //
-      }
-      if (do_show_setup_torrent) {
-        show_setup_torrent();                                             //
-      }
+      if (do_show_setup_sql) show_setup_sql();                                                 //
+      if (do_show_setup_torrent) show_setup_torrent();                                             //
       if (do_show_setup_tema) show_setup_tema();                          // select tema
       if (do_show_setup_network) {                                        //
         show_setup_network();
@@ -8596,7 +8576,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
         // stream oversigt
-        if ((vis_stream_oversigt) && (!(fundet))  && (streamoversigt.dragging==false)) {
+        if ((vis_stream_oversigt) && (!(fundet))) {
           if (names[i*4+3]>=100) {
             sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
             // write debug log
@@ -8898,136 +8878,63 @@ int gl_select(int x,int y) {
 
 // ******************************************************************************************
 //
-// for mouse motions
+// for touch mouse motions template
 // 
 // ******************************************************************************************
 
 
+template<typename T>
 
+void handleDragGeneric(bool visible, T& o, int x, int y) {
+    if (!visible || !o.dragging) return;
+    int dx = x - o.lastX;
+    int dy = y - o.lastY;
+    o.scrollPos -= dy;
+    o.viewOffsetX += dx * o.scrollSpeed;
+    o.viewOffsetY -= dy * o.scrollSpeed;
+    o.lastDX = dx;
+    o.lastDY = dy;
+    o.lastX = x;
+    o.lastY = y;
+}
+
+
+// ******************************************************************************************
+//
+// for touch mouse motions template
+// 
+// ******************************************************************************************
+
+template<typename T>
+
+void handlefrictionGeneric(T& o) {
+  if (!o.dragging) {
+    o.velocityX *= o.friction;
+    o.velocityY *= o.friction;
+
+    o.viewOffsetX += o.velocityX;
+    o.viewOffsetY += o.velocityY;
+
+    // stop når det er meget langsomt
+    if (fabs(o.velocityX) < 0.01f) o.velocityX = 0;
+    if (fabs(o.velocityY) < 0.01f) o.velocityY = 0;  
+  }
+}
+
+
+// ******************************************************************************************
+//
+// for mouse motions
+// 
+// ******************************************************************************************
 
 void mouseMotion(int x, int y) {
-
-
-  if (vis_spotify_oversigt) {
-    if (!tidal_oversigt.dragging) return;
-
-    int dx = x - spotify_oversigt.lastX;
-    int dy = y - spotify_oversigt.lastY;
-    
-
-    spotify_oversigt.scrollPos-=dy;
-
-    spotify_oversigt.viewOffsetX += dx * spotify_oversigt.scrollSpeed;
-    spotify_oversigt.viewOffsetY -= dy * spotify_oversigt.scrollSpeed;  // minus pga. OpenGL vs skærm-koordinater
-
-    spotify_oversigt.lastDX = dx;
-    spotify_oversigt.lastDY = dy;
-
-    spotify_oversigt.lastX = x;
-    spotify_oversigt.lastY = y;
-  }
-
-  // for tidal view
-  if (vis_tidal_oversigt) {
-    if (!tidal_oversigt.dragging) return;
-
-    int dx = x - tidal_oversigt.lastX;
-    int dy = y - tidal_oversigt.lastY;
-    
-
-    tidal_oversigt.scrollPos-=dy;
-
-    tidal_oversigt.viewOffsetX += dx * tidal_oversigt.scrollSpeed;
-    tidal_oversigt.viewOffsetY -= dy * tidal_oversigt.scrollSpeed;  // minus pga. OpenGL vs skærm-koordinater
-
-    tidal_oversigt.lastDX = dx;
-    tidal_oversigt.lastDY = dy;
-
-    tidal_oversigt.lastX = x;
-    tidal_oversigt.lastY = y;
-  }
-  // for music view
-  if (vis_music_oversigt) {
-    if (!musicoversigt.dragging) return;
-
-    int dx = x - musicoversigt.lastX;
-    int dy = y - musicoversigt.lastY;
-
-    printf("mouse x=%d y=%d dx=%d dy=%d \n",x,y,dx,dy);
-
-    musicoversigt.scrollPos-=dy;
-
-    musicoversigt.viewOffsetX += dx * musicoversigt.scrollSpeed;
-    musicoversigt.viewOffsetY -= dy * musicoversigt.scrollSpeed;  // minus pga. OpenGL vs skærm-koordinater
-
-    musicoversigt.lastDX = dx;
-    musicoversigt.lastDY = dy;
-
-    musicoversigt.lastX = x;
-    musicoversigt.lastY = y;
-  }
-
-  // for radio view
-  if (vis_radio_oversigt) {
-    if (!radiooversigt.dragging) return;
-
-    int dx = x - radiooversigt.lastX;
-    int dy = y - radiooversigt.lastY;
-
-    printf("mouse x=%d y=%d dx=%d dy=%d \n",x,y,dx,dy);
-
-    radiooversigt.scrollPos-=dy;
-
-    radiooversigt.viewOffsetX += dx * radiooversigt.scrollSpeed;
-    radiooversigt.viewOffsetY -= dy * radiooversigt.scrollSpeed;  // minus pga. OpenGL vs skærm-koordinater
-
-    radiooversigt.lastDX = dx;
-    radiooversigt.lastDY = dy;
-
-    radiooversigt.lastX = x;
-    radiooversigt.lastY = y;
-  }
-
-    // for stream view
-  if (vis_stream_oversigt) {
-    if (!streamoversigt.dragging) return;
-
-    int dx = x - streamoversigt.lastX;
-    int dy = y - streamoversigt.lastY;
-
-    printf("mouse x=%d y=%d dx=%d dy=%d \n",x,y,dx,dy);
-
-    streamoversigt.scrollPos-=dy;
-
-    streamoversigt.viewOffsetX += dx * streamoversigt.scrollSpeed;
-    streamoversigt.viewOffsetY -= dy * streamoversigt.scrollSpeed;  // minus pga. OpenGL vs skærm-koordinater
-
-    streamoversigt.lastDX = dx;
-    streamoversigt.lastDY = dy;
-
-    streamoversigt.lastX = x;
-    streamoversigt.lastY = y;
-  }
-
-  if (vis_film_oversigt) {
-    if (!film_oversigt.dragging) return;
-
-    int dx = x - film_oversigt.lastX;
-    int dy = y - film_oversigt.lastY;
-
-    printf("mouse x=%d y=%d dx=%d dy=%d \n",x,y,dx,dy);
-
-    film_oversigt.scrollPos-=dy;
-
-    film_oversigt.viewOffsetX += dx * film_oversigt.scrollSpeed;
-    film_oversigt.viewOffsetY -= dy * film_oversigt.scrollSpeed;  // minus pga. OpenGL vs skærm-koordinater
-
-    film_oversigt.lastDX = dx;
-    film_oversigt.lastDY = dy;
-
-    film_oversigt.lastX = x;
-    film_oversigt.lastY = y;
-  }
+  handleDragGeneric(vis_spotify_oversigt, spotify_oversigt, x, y);
+  handleDragGeneric(vis_tidal_oversigt,   tidal_oversigt,   x, y);
+  handleDragGeneric(vis_music_oversigt,   musicoversigt,   x, y);
+  handleDragGeneric(vis_radio_oversigt,   radiooversigt,   x, y);
+  handleDragGeneric(vis_stream_oversigt,  streamoversigt,  x, y);
+  handleDragGeneric(vis_film_oversigt,    film_oversigt,   x, y);
   glutPostRedisplay();
 }
 
@@ -9039,86 +8946,12 @@ void mouseMotion(int x, int y) {
 // ******************************************************************************************
 
 void idle() {
-  if (vis_spotify_oversigt) {
-    if (!spotify_oversigt.dragging) {
-      spotify_oversigt.velocityX *= spotify_oversigt.friction;
-      spotify_oversigt.velocityY *= spotify_oversigt.friction;
-
-      spotify_oversigt.viewOffsetX += spotify_oversigt.velocityX;
-      spotify_oversigt.viewOffsetY += spotify_oversigt.velocityY;
-
-      // stop når det er meget langsomt
-      if (fabs(spotify_oversigt.velocityX) < 0.01f) spotify_oversigt.velocityX = 0;
-      if (fabs(spotify_oversigt.velocityY) < 0.01f) spotify_oversigt.velocityY = 0;  
-    }
-  }
-
-  if (vis_tidal_oversigt) {
-    if (!tidal_oversigt.dragging) {
-      tidal_oversigt.velocityX *= tidal_oversigt.friction;
-      tidal_oversigt.velocityY *= tidal_oversigt.friction;
-
-      tidal_oversigt.viewOffsetX += tidal_oversigt.velocityX;
-      tidal_oversigt.viewOffsetY += tidal_oversigt.velocityY;
-
-      // stop når det er meget langsomt
-      if (fabs(tidal_oversigt.velocityX) < 0.01f) tidal_oversigt.velocityX = 0;
-      if (fabs(tidal_oversigt.velocityY) < 0.01f) tidal_oversigt.velocityY = 0;  
-    }
-  }
-  if (vis_music_oversigt) {
-    if (!musicoversigt.dragging) {
-      musicoversigt.velocityX *= musicoversigt.friction;
-      musicoversigt.velocityY *= musicoversigt.friction;
-
-      musicoversigt.viewOffsetX += musicoversigt.velocityX;
-      musicoversigt.viewOffsetY += musicoversigt.velocityY;
-
-      // stop når det er meget langsomt
-      if (fabs(musicoversigt.velocityX) < 0.01f) musicoversigt.velocityX = 0;
-      if (fabs(musicoversigt.velocityY) < 0.01f) musicoversigt.velocityY = 0;  
-    }
-  }
-
-  if (vis_radio_oversigt) {
-    if (!radiooversigt.dragging) {
-      radiooversigt.velocityX *= radiooversigt.friction;
-      radiooversigt.velocityY *= radiooversigt.friction;
-
-      radiooversigt.viewOffsetX += radiooversigt.velocityX;
-      radiooversigt.viewOffsetY += radiooversigt.velocityY;
-
-      // stop når det er meget langsomt
-      if (fabs(radiooversigt.velocityX) < 0.01f) radiooversigt.velocityX = 0;
-      if (fabs(radiooversigt.velocityY) < 0.01f) radiooversigt.velocityY = 0;  
-    }
-  }
-  if (vis_stream_oversigt) {
-    if (!streamoversigt.dragging) {
-      streamoversigt.velocityX *= streamoversigt.friction;
-      streamoversigt.velocityY *= streamoversigt.friction;
-
-      streamoversigt.viewOffsetX += streamoversigt.velocityX;
-      streamoversigt.viewOffsetY += streamoversigt.velocityY;
-
-      // stop når det er meget langsomt
-      if (fabs(streamoversigt.velocityX) < 0.01f) streamoversigt.velocityX = 0;
-      if (fabs(streamoversigt.velocityY) < 0.01f) streamoversigt.velocityY = 0;  
-    }
-  }
-  if (vis_film_oversigt) {
-    if (!film_oversigt.dragging) {
-      film_oversigt.velocityX *= film_oversigt.friction;
-      film_oversigt.velocityY *= film_oversigt.friction;
-
-      film_oversigt.viewOffsetX += film_oversigt.velocityX;
-      film_oversigt.viewOffsetY += film_oversigt.velocityY;
-
-      // stop når det er meget langsomt
-      if (fabs(film_oversigt.velocityX) < 0.01f) film_oversigt.velocityX = 0;
-      if (fabs(film_oversigt.velocityY) < 0.01f) film_oversigt.velocityY = 0;  
-    }
-  }
+  handlefrictionGeneric(spotify_oversigt);
+  handlefrictionGeneric(tidal_oversigt);
+  handlefrictionGeneric(musicoversigt);
+  handlefrictionGeneric(radiooversigt);
+  handlefrictionGeneric(streamoversigt);
+  handlefrictionGeneric(film_oversigt);
   glutPostRedisplay();
 }
 
@@ -9154,52 +8987,48 @@ void handleMouse(int button,int state,int mousex,int mousey) {
   if (visur==false) {
     switch(button) {                                                            //
         case GLUT_LEFT_BUTTON:
-            if (vis_spotify_oversigt) {
-              // touch screen scroll
-              if (state==GLUT_DOWN) {
+            if (state==GLUT_DOWN) {
+              if (vis_spotify_oversigt) {
+                // touch screen scroll
                 spotify_oversigt.dragging = true;
                 spotify_oversigt.lastX = mousex;
                 spotify_oversigt.lastY = mousey;
+                spotify_oversigt.velocityX = spotify_oversigt.velocityY = 0; // nulstil
               }
-            }
-            if (vis_tidal_oversigt) {
-              // touch screen scroll
-              if (state==GLUT_DOWN) {
+              if (vis_tidal_oversigt) {
+                // touch screen scroll
                 tidal_oversigt.dragging = true;
                 tidal_oversigt.lastX = mousex;
                 tidal_oversigt.lastY = mousey;
-              }
-            }            
-            if (vis_music_oversigt) {
-              // touch screen scroll
-              if (state==GLUT_DOWN) {
+                tidal_oversigt.velocityX = tidal_oversigt.velocityY = 0; // nulstil
+              }            
+              if (vis_music_oversigt) {
+                // touch screen scroll
                 musicoversigt.dragging = true;
                 musicoversigt.lastX = mousex;
                 musicoversigt.lastY = mousey;
+                musicoversigt.velocityX = musicoversigt.velocityY = 0; // nulstil
               }
-            }
-            if (vis_radio_oversigt) {
-              // touch screen scroll
-              if (state==GLUT_DOWN) {
+              if (vis_radio_oversigt) {
+                // touch screen scroll
                 radiooversigt.dragging = true;
                 radiooversigt.lastX = mousex;
                 radiooversigt.lastY = mousey;
+                radiooversigt.velocityX = radiooversigt.velocityY = 0; // nulstil
               }
-            }
-            if (vis_stream_oversigt) {
-              // touch screen scroll
-              if (state==GLUT_DOWN) {
+              if (vis_stream_oversigt) {
+                // touch screen scroll
                 streamoversigt.dragging = true;
                 streamoversigt.lastX = mousex;
                 streamoversigt.lastY = mousey;
+                streamoversigt.velocityX = streamoversigt.velocityY = 0; // nulstil
               }
-            }
-            if (vis_film_oversigt) {
-              // touch screen scroll
-              if (state==GLUT_DOWN) {
+              if (vis_film_oversigt) {
+                // touch screen scroll
                 film_oversigt.dragging = true;
                 film_oversigt.lastX = mousex;
                 film_oversigt.lastY = mousey;
+                film_oversigt.velocityX = film_oversigt.velocityY = 0; // nulstil
               }
             }
             if (state==GLUT_UP) {
@@ -9228,7 +9057,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 radiooversigt.velocityY = -radiooversigt.lastDY * 1.5f;
               }
               if (vis_stream_oversigt) {
-                spotify_oversigt.dragging=false;
+                streamoversigt.dragging=false;
                 // giv slip → brug sidste bevægelse som start-hastighed
                 streamoversigt.velocityX = streamoversigt.lastDX * 1.5f;
                 streamoversigt.velocityY = -streamoversigt.lastDY * 1.5f;
@@ -9239,8 +9068,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 film_oversigt.velocityX = film_oversigt.lastDX * 1.5f;
                 film_oversigt.velocityY = -film_oversigt.lastDY * 1.5f;
               }
-
-
               retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
               // nu er mknapnr/fknapnr/rknapnr/spotifyknapnr/tidalknapnr=den som er trykket på bliver sat i gl_select
               // retfunc er !=0 hvis der er trykket på en knap up/down
@@ -12348,10 +12175,20 @@ void handleKeypress(unsigned char key, int x, int y) {
         }
       }
 
-      if (do_show_setup_screen) {
+      if (do_show_setup_screen) {        
         switch (do_show_setup_select_linie) {
           case 0: break;
-          case 1: break;
+          case 1: if (urtype==DIGITAL) strcpy(keybuffer,"digital");
+                  else if (urtype==ANALOG) strcpy(keybuffer,"analog");
+                  else if (urtype==SAVER3D) strcpy(keybuffer,"3D");                  
+                  else if (urtype==SAVER3D2) strcpy(keybuffer,"3D2");
+                  else if (urtype==PICTURE3D) strcpy(keybuffer,"PICTURE3D");
+                  else if (urtype==MUSICMETER) strcpy(keybuffer,"MUSICMETER");
+                  else if (urtype==MUSICMETER2) strcpy(keybuffer,"MUSICMETER2");
+                  else if (urtype==UV_METER) strcpy(keybuffer,"UV-METER");
+                  else if (urtype==PLASMA) strcpy(keybuffer,"PLASMA");
+                  else strcpy(keybuffer,"analog"); 
+                  break;
           case 2: strcpy(keybuffer,configscreensavertimeout);
                   break;
           default:
@@ -12707,9 +12544,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                     strcpy(keybuffer,"PICTURE3D");
                     urtype=PICTURE3D;
                   } else if (strcmp(keybuffer,"PICTURE3D")==0) {
-                    strcpy(keybuffer,"None");
-                    urtype=0;
-                  } else if (strcmp(keybuffer,"None")==0) {
+                    strcpy(keybuffer,"UV-METER");
+                    urtype=UV_METER;
+                  } else if (strcmp(keybuffer,"UV-METER")==0) {
+                    strcpy(keybuffer,"PLASMA");
+                    urtype=PLASMA;
+                  } else if (strcmp(keybuffer,"PLASMA")==0) {
                     strcpy(keybuffer,"analog");
                     urtype=ANALOG;
                   } else strcpy(keybuffer,"analog");
@@ -17469,6 +17309,8 @@ void opdate_threadfunction() {
   }
 }
 
+
+
 // ****************************************************************************************
 //
 // main
@@ -17624,10 +17466,6 @@ int main(int argc, char** argv) {
     bool tidalok;
     // login tidal
     tidalok=tidal_oversigt.get_access_token((char *) "your access token");
-
-
-
-
     if (tidalok) {   
       
       // tidal_oversigt.opdatere_tidal_userCollections("131776836");

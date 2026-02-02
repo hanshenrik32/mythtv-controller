@@ -1711,7 +1711,7 @@ int stream_class::FeedCatalog_search_antalstreams() {
 // 
 // ****************************************************************************************
 
-
+/*
 void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected) {
   int j,ii,k,pos;
   // float buttonsizey=160.0f;                                                   // button size
@@ -1876,13 +1876,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     // draw from search view
     int antal1=FeedCatalog_search_view.size();
     while((ii<lstreamoversigt_antal) && (ii+sofset<antal1) && (i<FeedCatalog_search_view.size())) {
-      /*
-      if ((rss_search_podcast_string!="")) {
-        if (regexContains(FeedCatalog_search_view[ii+sofset].feed_showtxt,rss_search_podcast_string)) {
-          draw=true;
-        } else draw=false;
-      } else draw=true;
-      */
+  
       draw=true;
       if (draw) {          
         if (((ii % bonline)==0) && (ii>0)) {
@@ -2247,7 +2241,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
             }          
             glVertex2f(x,cy+(0.5*dy));
             glEnd();
-            */
+  
             
             // indsite draw icon rss gfx
             glEnable(GL_TEXTURE_2D);
@@ -2425,9 +2419,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
 
 
 
-
-
-
+*/
 
 
 
@@ -2520,10 +2512,10 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   if (FeedCatalog[ii].textureId ) texture = FeedCatalog[ii].textureId; else texture = normal_icon;
   if (ii == selected_icon_in_view-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 2);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 0);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 0);
   }
 }
 
@@ -2534,7 +2526,7 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
 //
 // ************************************************************************************
 
-void stream_class::show_stream_oversigt1(GLuint normal_icon, GLuint empty_icon, int stream_key_selected) {
+void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, int stream_key_selected) {
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;

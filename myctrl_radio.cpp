@@ -453,6 +453,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 //
 // ****************************************************************************************
 
+/*
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
   static bool show_all_kode_errors=false;
   int buttonsizex = config_menu.config_radio_main_window_icon_sizex;
@@ -666,7 +667,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
 }
 
 
-
+*/
 
 
 
@@ -738,7 +739,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
 
 // ****************************************************************************************
 //
-// draw single stream item
+// draw single radio item
 //
 // ****************************************************************************************
 
@@ -776,18 +777,18 @@ void radiostation_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 2);
+      drawText(temprgtxt.c_str(), x + 10, y - 4, 0.3f, 2);
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 0);
+      drawText(temprgtxt.c_str(), x + 10, y - 4, 0.3f, 0);
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 2);
+      drawText(temprgtxt.c_str(), x + 10, y - 4, 0.3f, 2);
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 0);
+      drawText(temprgtxt.c_str(), x + 10, y - 4, 0.3f, 0);
     }
   }
 }
@@ -803,7 +804,7 @@ void radiostation_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon
 // ****************************************************************************************
 
 
-bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;

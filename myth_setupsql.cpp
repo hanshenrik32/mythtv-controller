@@ -415,7 +415,16 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('HBR1.com - Tranceponder', 'Trance', 'http://ubuntu.hbr1.com:19800/trance.ogg', '', '', 1, 128, 0, 1, '2017-12-01', 14364, 0, '2014-06-11 00:00:00', 1), \
 ('HBR1.com -  Tronic Lounge','House', 'http://ubuntu.hbr1.com:19800/tronic.ogg', '', '', 1, 128, 0, 1, '2017-12-01', 14364, 0, '2014-06-11 00:00:00', 1), \
 ('jule radio', 'jul', 'http://tx-bauerdk.sharp-stream.com/http_live.php?i=395_dk_aacp&amsparams=playerid:SBS_RP_WEB;skey:1512330381;&awparams=loggedin:false', '', '', 1, 128, 0, 1, '2017-12-01', 14365, 0, '2017-12-01 00:00:00', 1), \
-('Vegas Alternative', 'Vegas Alternative Rock', 'http://player.radio.com/listen/station/x-1075', '', '', 1, 128, 0, 1, '2017-12-01', 14366, 0, '2017-12-01 00:00:00', 1)";
+('Fun Radio', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'www.funradio.sk', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('Radio Euro Disco', '', 'https://broadcast.miami/proxy/eurodisco?mp=/stream/;', 'https://broadcast.miami/', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('Techno Lovers FM Vocal Trance', '', 'https://stream.technolovers.fm/vocal-trance', 'https://broadcast.miami/', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('100 GREATEST JAZZ LOUNGE BAR', '', 'https://cast1.torontocast.com:4640/stream', 'https://broadcast.miami/', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('0nlineradio GREATEST HITS', '', 'https://stream.0nlineradio.com/greatest-hits?ref=radiobrowser', 'https://broadcast.miami/', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('1.FM - Deep House Radio', '', 'http://strm112.1.fm/deephouse_mobile_mp3', 'http://www.1.fm/', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('1.FM - Deep Techno & Deep House', '', 'http://strm112.1.fm/deeptech_mobile_mp3', 'http://www.1.fm/', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('1.FM - Dance One Radio', '', 'http://strm112.1.fm/dance_mobile_mp3', 'http://www.1.fm/', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('101 Smooth Jazz', '', 'http://jking.cdnstream1.com/b22139_128mp3', 'http://www.1.fm/', '', 1, 128, 0, 1, '2026-02-02', 0, 0, '2026-02-02 00:00:00', 1), \
+('Vegas Alternative', 'Vegas Alternative Rock', 'http://player.radio.com/listen/station/x-1075', '', '', 1, 128, 0, 1, '2017-12-01', 0, 0, '2017-12-01 00:00:00', 1)";
 
 // 700 -> 1000 is free on intnr
 

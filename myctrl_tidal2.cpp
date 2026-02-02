@@ -4438,8 +4438,7 @@ int tidal_class::tidal_refresh_token() {
 
 // ****************************************************************************************
 //
-// 
-// 
+// clear tidal aktiv songlist
 //  
 // ****************************************************************************************
 
@@ -4458,6 +4457,8 @@ void tidal_class::clear_tidal_aktiv_songlist() {
     recnr++;
   }
 }
+
+
 /*
 
 // ****************************************************************************************
@@ -4955,7 +4956,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color4 c) {
 
 // ****************************************************************************************
 //
-// Draw stream item
+// Draw tidal item
 //
 // ****************************************************************************************
 
@@ -4983,10 +4984,10 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = normal_icon;
   if (ii == stream_key_selected-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 10, 0.4f, 2);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 10, 0.4f, 0);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 0);
   }
 }
 
@@ -4995,7 +4996,7 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
 
 // ****************************************************************************************
 //
-// Draw search stream item
+// Draw search tidal item
 //
 // ****************************************************************************************
 
