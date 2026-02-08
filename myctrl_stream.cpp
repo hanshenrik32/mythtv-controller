@@ -2496,6 +2496,7 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   GLuint texture;
   Color highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  float fontsize=float (configdefaultstreamfontsize/100)*2;
   // Cover
   gfxfilename = FeedCatalog[ii].feed_gfx_mythtv;
   if (gfxfilename.size() > 0) {
@@ -2512,10 +2513,10 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   if (FeedCatalog[ii].textureId ) texture = FeedCatalog[ii].textureId; else texture = normal_icon;
   if (ii == selected_icon_in_view-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 2);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 0);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
   }
 }
 

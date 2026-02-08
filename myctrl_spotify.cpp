@@ -102,7 +102,7 @@ extern GLuint mobileplayer_icon;
 extern GLuint pcplayer_icon;
 extern GLuint unknownplayer_icon;
 extern GLuint spotify_pil;
-extern float configdefaultstreamfontsize;
+extern float configdefaultspotifyfontsize;
 extern int tema;
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
@@ -4765,7 +4765,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       pline=0;
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
-      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+      glScalef(configdefaultspotifyfontsize, configdefaultspotifyfontsize, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);      
       glDisable(GL_TEXTURE_2D);
@@ -5155,6 +5155,7 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
   Color5 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = stack[ii]->feed_gfx_url;
+  float fontsize = float (configdefaultspotifyfontsize/100)*2;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (stack[ii]->textureId == 0) {
@@ -5169,10 +5170,10 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
   if (stack[ii]->textureId ) texture = stack[ii]->textureId; else texture = normal_icon;
   if (ii == stream_key_selected-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 2);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 0);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
   }
 }
 

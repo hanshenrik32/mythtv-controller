@@ -93,6 +93,11 @@ class radiostation_class {
         int opdatere_radio_oversigt();
         // bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 
+        int downTimeMs=0;
+        bool moved=false;
+        bool gettouchbutton;
+        int downX=0;
+        int downY=0;
 
       // touch screen scroll
       bool dragging=false;
@@ -123,7 +128,7 @@ class radiostation_class {
       int viewHeight = 780;
       // end new scroll vars
       void onScroll(float delta) { scrollVel += delta * accel; }
-      void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);  // draw single stream item
+      void draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);  // draw single stream item
       bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 };
 

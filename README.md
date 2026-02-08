@@ -10,6 +10,8 @@ Run on most debian based systems, like Ubuntu.
 
 Version.
 
+mythtv-controller ver 0.50.0 - New plasma screen saver. Other errors is fixed to.
+
 mythtv-controller ver 0.46.1 - new scroll functions.
 
 mythtv-controller ver 0.45.1

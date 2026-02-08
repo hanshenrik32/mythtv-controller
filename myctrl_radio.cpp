@@ -387,7 +387,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 
     } else {
       if (radiosortorder==0)			// start order default
-        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by intnr";
+        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1  order by popular desc,name";
       else if (radiosortorder==28)		// bit rate
         sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name";
       else if (radiosortorder==27)		// land kode
@@ -744,19 +744,13 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
 // ****************************************************************************************
 
 
-void radiostation_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
+void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
   // Baggrund
   std::string temprgtxt;
   std::string gfxfilename;
   GLuint texture;
   Color2 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color2 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  /*
-  if (ii == radio_key_selected-1)
-      drawRect(x - 2, y - 2, itemWidth + 4, rowHeight - 4, highcolor); // Highlight color
-  else
-      drawRect(x - 4, y - 4, itemWidth + 8, rowHeight - 8, normalcolor); // Normal color
-  */
   // Cover
   gfxfilename = "/opt/mythtv-controller/images/radiostations/";
   gfxfilename = gfxfilename + stack[ii].gfxfilename;
@@ -772,23 +766,21 @@ void radiostation_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon
   temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
   temprgtxt.resize(20);
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = onlineradio_empty;
-
-
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 4, 0.3f, 2);
+      drawText(temprgtxt.c_str(), x + 10, y + 4, 0.3f, 2);
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 4, 0.3f, 0);
+      drawText(temprgtxt.c_str(), x + 10, y + 4, 0.3f, 0);
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 4, 0.3f, 2);
+      drawText(temprgtxt.c_str(), x + 10, y + 4, 0.3f, 2);
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 4, 0.3f, 0);
+      drawText(temprgtxt.c_str(), x + 10, y + 4, 0.3f, 0);
     }
   }
 }
@@ -833,7 +825,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     int row = i / itemsPerRow;
     int x = xof + col * itemWidth + 40;
     int y = screenTop - (row * rowHeight) + subOff - 40;
-    draw_stream_item( x, y, index, normal_icon, normal_icon, radio_key_selected);
+    draw_radio_item( x, y, index, normal_icon, normal_icon, radio_key_selected);
   }
   return(true);
 }

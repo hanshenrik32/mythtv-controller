@@ -87,6 +87,13 @@ class stream_class : vlc_controller {
       float viewOffsetY=0.0f;
       // end touch screen scroll
 
+
+      int downTimeMs=0;
+      bool moved=false;
+      bool gettouchbutton;
+      int downX=0;
+      int downY=0;
+      
       // new scroll vars
       float scrollPos = 0.0f;
       float scrollVel = 0.0f;

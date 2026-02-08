@@ -48,6 +48,12 @@ class musicoversigt_class {
     bool loaded_begin;
 
 
+      int downTimeMs=0;
+      bool moved=false;
+      bool gettouchbutton;
+      int downX=0;
+      int downY=0;
+
       // touch screen scroll
       bool dragging=false;
       float scrollSpeed=1.0f;

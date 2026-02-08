@@ -1763,7 +1763,7 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
   GLuint texture;
   Color3 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  float fontsize = configdefaultmusicfontsize/45;
+  float fontsize = float (configdefaultmusicfontsize/100)*2;
   if (fontsize<0.2f) fontsize = 0.4f;
 
   // Cover
@@ -1783,17 +1783,17 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
     if (ii==0) {
       if (musicoversigt[ii].oversigttype!=-1) {
         drawcover(x + 18, y + 18, 164, 164, back_icon , _textureId28, ii+100, highcolor);
-        if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
-        else drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+        if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+        else drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
       } else {
         drawcover(x + 18, y + 18, 164, 164, _textureId28 , _textureId28, ii+100, highcolor);
-        if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
-        else drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+        if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+        else drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
       }
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, normalcolor);
-      if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
-      else drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+      if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+      else drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
     }
   // }
 }
@@ -1816,6 +1816,7 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
   Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = musicoversigt[ii].album_coverfile;
+  float fontsize = float (configdefaultmusicfontsize/100)*2;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (musicoversigt[ii].textureId == 0) {
@@ -1833,11 +1834,11 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
       if (ii==0) {
         if (musicoversigt[ii].oversigttype!=-1) {
           drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
-          drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 2);
+          drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
         } else {
           if (texture==0) texture=normal_icon;
           drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
-          drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 0);
+          drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
           // none
         }
       } else {
@@ -1845,19 +1846,19 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
         else glBindTexture(GL_TEXTURE_2D,musicoversigt[ii].textureId);
 
         drawcover(x + 18, y + 18, 164, 164, texture , normal_icon, ii+100, highcolor);
-        drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 2);
+        drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
       }
     }
   } else {
     if (ii==0) {
       if (y<search_startY-30) {
         drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
-        drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 2);
+        drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
       }
     } else {
       if (y<search_startY-30) {
         drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, normalcolor);
-        drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 0);
+        drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
       }
     }
   }

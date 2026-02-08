@@ -179,7 +179,12 @@ class tidal_class {
     // end webserver (NOT IN USE FOR NOW)
     std::string playlist_type;            // playlist type from json file (used to only create playlist then save to db)
     // touch screen scroll
+    int downTimeMs=0;
+    bool moved=false;
     bool dragging=false;
+    bool gettouchbutton;
+    int downX=0;
+    int downY=0;
     float scrollSpeed=0.8f;
     int lastX=0;
     int lastY=0;

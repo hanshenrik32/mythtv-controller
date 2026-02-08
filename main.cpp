@@ -234,7 +234,9 @@ float configdefaulttvguidefontsize=18;                  // default font size tv 
 float configdefaultradiofontsize=30;                    // default font size radio
 float configdefaultmusicfontsize=18;                    // default font size music
 float configdefaultstreamfontsize=18;                   // default font size stream
-float configdefaultmoviefontsize=18;                    // default font size
+float configdefaultmoviefontsize=18;                    // default font size movie
+float configdefaulttidalfontsize=18;                    // default font size tidal
+float configdefaultspotifyfontsize=18;                  // default font size spotify
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
 char configbackend_tvgraber[256];                       // internal tv graber to use
@@ -1080,7 +1082,7 @@ int parse_config(char *filename) {
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
                    settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath, \
                    setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize, \
-                   streamfontsize,moviefontsize,spotifydefaultdevice,starred_playlistname,startspotifyonboot,rssgraberupdate,trash_torrent_files,torrent_automove_file,torrent_download_path};
+                   streamfontsize,moviefontsize,tidalfontsize,spotifyfontsize,spotifydefaultdevice,starred_playlistname,startspotifyonboot,rssgraberupdate,trash_torrent_files,torrent_automove_file,torrent_download_path};
     int commandlength;
     char value[200];
     bool command = false;
@@ -1227,6 +1229,14 @@ int parse_config(char *filename) {
             } else if (strncmp(buffer+n,"moviefontsize",12)==0) {
               command = true;
               command_nr=moviefontsize;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"tidalfontsize",12)==0) {
+              command = true;
+              command_nr=tidalfontsize;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"spotifyfontsize",14)==0) {
+              command = true;
+              command_nr=spotifyfontsize;
               commandlength=12;
             } else if (strncmp(buffer+n,"spotifydefaultdevice",19)==0) {
               printf("Set command to set default spotify play device\n");
@@ -1428,6 +1438,10 @@ int parse_config(char *filename) {
               configdefaultstreamfontsize=atof(value);                          // set stream font size
             } else if (command_nr==moviefontsize) {
               configdefaultmoviefontsize=atof(value);                           // set movie font size
+            } else if (command_nr==tidalfontsize) {
+              configdefaulttidalfontsize=atof(value);                           // set movie font size
+            } else if (command_nr==spotifyfontsize) {
+              configdefaultspotifyfontsize=atof(value);                           // set movie font size
             } else if (command_nr==spotifydefaultdevice) {                      // do now work for now
               printf("Set default spotify play device to %s\n",value);
               #ifdef ENABLE_SPOTIFY
@@ -1550,6 +1564,10 @@ int save_config(char * filename) {
     snprintf(temp,sizeof(temp),"streamfontsize=%0.0f\n",configdefaultstreamfontsize);
     fputs(temp,file);
     snprintf(temp,sizeof(temp),"moviefontsize=%0.0f\n",configdefaultmoviefontsize);
+    fputs(temp,file);
+    snprintf(temp,sizeof(temp),"tidalfontsize=%0.0f\n",configdefaulttidalfontsize);
+    fputs(temp,file);
+    snprintf(temp,sizeof(temp),"spotifyfontsize=%0.0f\n",configdefaultspotifyfontsize);
     fputs(temp,file);
     //aktiv_tv_oversigt.vistvguidecolors=true;
     if (aktiv_tv_oversigt.vistvguidecolors) sprintf(temp,"tvguidercolor=yes\n");
@@ -1694,6 +1712,8 @@ void load_config(char * filename) {
       fputs("musicfontsize=18\n",file);
       fputs("streamfontsize=18\n",file);
       fputs("moviefontsize=18\n",file);
+      fputs("tidalfontsize=18\n",file);
+      fputs("spotifyfontsize=18\n",file);
       fputs("spotifydefaultdevice=\n",file);
       fputs("tidaldefaultdevice=\n",file);
       fputs("starred_playlistname=starred\n",file);       // default name for starred play list in spotify
@@ -5307,6 +5327,15 @@ void display() {
   // *********************** Show play stuf ***************************************************************************
   //
   // show radio player
+
+  /*
+  if (vis_tidal_oversigt) printf("move %d  gettouchbutton %d lastY = %d lastDY = %d Dragging = %d \n",tidal_oversigt.moved,tidal_oversigt.gettouchbutton,tidal_oversigt.lastY, tidal_oversigt.lastDY ,tidal_oversigt.dragging);
+  if (vis_radio_oversigt) printf("move %d  gettouchbutton %d lastY = %d lastDY = %d Dragging = %d \n",radiooversigt.moved,radiooversigt.gettouchbutton,radiooversigt.lastY, radiooversigt.lastDY , radiooversigt.dragging);
+  if (vis_music_oversigt) printf("move %d  gettouchbutton %d lastY = %d lastDY = %d Dragging = %d \n",musicoversigt.moved,musicoversigt.gettouchbutton,musicoversigt.lastY, musicoversigt.lastDY ,musicoversigt.dragging);
+  if (vis_stream_oversigt) printf("move %d  gettouchbutton %d lastY = %d lastDY = %d Dragging = %d \n",streamoversigt.moved,streamoversigt.gettouchbutton,streamoversigt.lastY, streamoversigt.lastDY ,streamoversigt.dragging);
+  if (vis_film_oversigt) printf("move %d  gettouchbutton %d lastY = %d lastDY = %d Dragging = %d \n",film_oversigt.moved,film_oversigt.gettouchbutton,film_oversigt.lastY, film_oversigt.lastDY ,film_oversigt.dragging);
+  */
+  
   if (!(visur)) {
     // show tidal player status NEW version    
     if ((snd) && (!(visur))) {
@@ -5572,10 +5601,10 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+400 ,  480 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+400 ,  200+480, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 200+480 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 480, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+400 ,  480-100 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+400 ,  200+480-100, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 200+480-100 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 480-100, 0.0);
           glEnd();
         }
         // play position
@@ -7565,7 +7594,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         #endif
 
         // enable music search
-        if (vis_music_oversigt) {
+        if ((vis_music_oversigt)  && (musicoversigt.moved==false) && (musicoversigt.gettouchbutton==true)) {
 
           if (names[i*4+3]==23) {
             if (debugmode & 4) fprintf(stderr,"scroll down\n");
@@ -7580,6 +7609,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
           if ((names[i*4+3]>99) && (fundet==false)) {
             mknapnr=names[i*4+3]-99;
+
+            musicoversigt.selected_icon_in_view=mknapnr;
+
             fundet = true;
           }
           
@@ -7699,7 +7731,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         //
         // music open play cover view
         //
-        if ((vis_music_oversigt) || ((vis_music_oversigt==false) && (do_zoom_music_cover))) {
+        if (((vis_music_oversigt) || ((vis_music_oversigt==false)) && ((do_zoom_music_cover)  && (musicoversigt.moved==false) && (musicoversigt.gettouchbutton==true)))) {
           if (!(fundet)) {
             // we have a select mouse/touch element dirid
             // scroll down
@@ -7738,7 +7770,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
             // we have a select mouse/touch element dirid
             if (names[i*4+3]>=100) {                                         // i*4+3
-              mknapnr=(GLuint) names[i*4+3]-99;				                                // hent music knap nr
+              mknapnr = (GLuint) names[i*4+3]-99;				                                // hent music knap nr
+              music_key_selected = mknapnr;
+              
+              musicoversigt.selected_icon_in_view=mknapnr;
+
               if (debugmode & 2) fprintf(stderr,"music selected=%u  \n",mknapnr);
               fundet = true;
               //do_zoom_music_cover=true; 
@@ -7746,7 +7782,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // husk last
             if (mknapnr!=0) swknapnr=mknapnr;                                     // swknapnr = last button (hvis vi vil tilbage senere)
             // mknapnr=mknapnr+(music_icon_anim_icon_ofsety*4);
-            mknapnr = mknapnr+(_mangley/41)*8;
+            // mknapnr = mknapnr+(_mangley/41)*8;
           }
           //
           // hvis vis ask_open_dir_or_play window (select songs to play)
@@ -7841,6 +7877,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((!(do_show_setup_spotify))  && (!(fundet))) {
               if (names[i*4+3]>=100) {
                 spotifyknapnr = (GLuint) names[i*4+3]-99;				                  // hent spotify knap nr
+                spotify_oversigt.selected_icon_in_view=spotifyknapnr;
                 spotify_select_iconnr=spotifyknapnr;
                 fundet = true;                                                    //
                 do_zoom_spotify_cover = false;                                    // close player status to ask about play other selected playlist/song
@@ -7949,6 +7986,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               if ((GLuint) names[i*4+3]>=100) {
                 spotifyknapnr = (GLuint) names[i*4+3]-99;				                    // hent spotify knap nr
                 spotify_select_iconnr=spotifyknapnr;
+
+                spotify_oversigt.selected_icon_in_view=spotifyknapnr;
+
                 fundet = true;
                 do_zoom_spotify_cover = false;                                      // close player status to ask about play other selected playlist/song
                 if (spotify_oversigt.type==0) {                                     // playlist type
@@ -8084,13 +8124,19 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         //
         // tidal stuf offline search (only in local db)
         //
+        
         #ifdef ENABLE_TIDAL
-        if ((vis_tidal_oversigt) || ((do_zoom_tidal_cover) && (vis_tidal_oversigt==false)) && (tidal_oversigt.dragging==true)) {
+        // if ((vis_tidal_oversigt) || ((do_zoom_tidal_cover) && (vis_tidal_oversigt==false)) && (tidal_oversigt.moved==false) && (tidal_oversigt.gettouchbutton==false)) {
+        if ((vis_tidal_oversigt) || ((do_zoom_tidal_cover)) && (tidal_oversigt.moved==false) && (tidal_oversigt.gettouchbutton==true)) {
+          tidal_oversigt.gettouchbutton=false;
           if ((do_show_tidal_search_oversigt==false) || (do_show_tidal_search_oversigt==true)) {
             if ((!(do_show_setup_tidal))  && (!(fundet))) {
               if ((GLuint) names[i*4+3]>=100) {
-                tidalknapnr = (GLuint) names[i*4+3]-99;				                  // hent tidal knap nr
+                tidalknapnr=(GLuint) names[i*4+3]-99;				                  // hent tidalknapnr
                 tidal_select_iconnr=tidalknapnr;
+
+                tidal_oversigt.selected_icon_in_view=tidalknapnr;
+
                 fundet = true;                                                    //
                 do_zoom_tidal_cover = false;                                    // close player status to ask about play other selected playlist/song
                 if (tidal_oversigt.type==0) {
@@ -8518,12 +8564,16 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
         }
-        if ((vis_radio_oversigt) && (show_radio_options==false) && (radiooversigt.dragging==false)) {
+        if ((vis_radio_oversigt) && (show_radio_options==false) && (radiooversigt.dragging==false)  && (radiooversigt.moved==false) && (radiooversigt.gettouchbutton==true)) {
           // Bruges vist kun til mus/touch skærm (radio stationer)
           if (!(fundet)) {		// hvis ingen valgt
             // we have a select mouse/touch element dirid
             if (names[i*4+3]>=100) {
               rknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
+              radio_key_selected = rknapnr;
+
+              radiooversigt.selected_icon_in_view=rknapnr;
+
               // write debug log
               sprintf(debuglogdata,"radio station selected=%d glID=%u ",rknapnr,names[i*4+3]-99);
               write_logfile(logfile,(char *) debuglogdata);
@@ -8532,6 +8582,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // husk last
             if (rknapnr!=0) swknapnr=rknapnr;
             rknapnr = rknapnr+(_mangley/41)*8;
+
           }
           // stop radio player if vis_radio_oversigt
           if (!(fundet)) {
@@ -8553,7 +8604,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         } // radio overview
         // vælg skal der spilles film eller stream
-        if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
+        if ((vis_stream_or_movie_oversigt) && (!(fundet)) ) {
           // stream
           if (names[i*4+3]==80) {
             fundet = true;
@@ -8576,9 +8627,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
         // stream oversigt
-        if ((vis_stream_oversigt) && (!(fundet))) {
+        if ((vis_stream_oversigt) && (!(fundet)) && (streamoversigt.dragging==false)  && (streamoversigt.moved==false) && (streamoversigt.gettouchbutton==true)) {
           if (names[i*4+3]>=100) {
             sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
+            
+            streamoversigt.selected_icon_in_view=sknapnr;
+
             // write debug log
             sprintf(debuglogdata,"stream selected=%u",sknapnr);
             write_logfile(logfile,(char *) debuglogdata);
@@ -8634,7 +8688,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
         // film oversigt
-        if ((vis_film_oversigt) && (!(fundet))  && (film_oversigt.dragging==false)) {
+        if ((vis_film_oversigt) && (!(fundet))  && (film_oversigt.dragging==false) ) {
           if (names[i*4+3]==25) {
             // write debug log
             write_logfile(logfile,(char *) "Start movie player.");
@@ -8650,9 +8704,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             stopmovie = true;
           }
           // we have a select mouse/touch
-          if ((film_oversigt.editmode==0) &&  (!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
+          if ((film_oversigt.editmode==0) &&  (!(fundet)) && ((GLuint) names[i*4+3]>=100) && (film_oversigt.dragging==false)  && (film_oversigt.moved==false) && (film_oversigt.gettouchbutton==true)) {
             fknapnr=names[i*4+3]-99;			                                // get movie id
             film_key_selected=fknapnr;
+
+            film_oversigt.selected_icon_in_view=fknapnr;
+
             // fprintf(stderr,"Film selected=%d names[i*4+3] = %d \n",fknapnr,names[i*4+3]);                                 //
             // write debug log
             sprintf(debuglogdata,"Movie selected=%d",fknapnr);
@@ -8889,6 +8946,11 @@ void handleDragGeneric(bool visible, T& o, int x, int y) {
     if (!visible || !o.dragging) return;
     int dx = x - o.lastX;
     int dy = y - o.lastY;
+    int dist2 = (x - o.downX)*(x - o.downX) + (y - o.downY)*(y - o.downY);
+    if (dist2>16) {
+      o.moved=true;
+      o.dragging=true;
+    }
     o.scrollPos -= dy;
     o.viewOffsetX += dx * o.scrollSpeed;
     o.viewOffsetY -= dy * o.scrollSpeed;
@@ -8916,8 +8978,8 @@ void handlefrictionGeneric(T& o) {
     o.viewOffsetY += o.velocityY;
 
     // stop når det er meget langsomt
-    if (fabs(o.velocityX) < 0.01f) o.velocityX = 0;
-    if (fabs(o.velocityY) < 0.01f) o.velocityY = 0;  
+    if (fabs(o.velocityX) < 0.001f) o.velocityX = 0;
+    if (fabs(o.velocityY) < 0.001f) o.velocityY = 0;  
   }
 }
 
@@ -9001,6 +9063,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 tidal_oversigt.lastX = mousex;
                 tidal_oversigt.lastY = mousey;
                 tidal_oversigt.velocityX = tidal_oversigt.velocityY = 0; // nulstil
+                tidal_oversigt.downTimeMs = glutGet(GLUT_ELAPSED_TIME);
+                tidal_oversigt.moved=false;
               }            
               if (vis_music_oversigt) {
                 // touch screen scroll
@@ -9008,6 +9072,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 musicoversigt.lastX = mousex;
                 musicoversigt.lastY = mousey;
                 musicoversigt.velocityX = musicoversigt.velocityY = 0; // nulstil
+                musicoversigt.downTimeMs = glutGet(GLUT_ELAPSED_TIME);
+                musicoversigt.moved=false;
               }
               if (vis_radio_oversigt) {
                 // touch screen scroll
@@ -9015,6 +9081,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 radiooversigt.lastX = mousex;
                 radiooversigt.lastY = mousey;
                 radiooversigt.velocityX = radiooversigt.velocityY = 0; // nulstil
+                radiooversigt.downTimeMs = glutGet(GLUT_ELAPSED_TIME);
+                radiooversigt.moved=false;
               }
               if (vis_stream_oversigt) {
                 // touch screen scroll
@@ -9022,6 +9090,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 streamoversigt.lastX = mousex;
                 streamoversigt.lastY = mousey;
                 streamoversigt.velocityX = streamoversigt.velocityY = 0; // nulstil
+                streamoversigt.downTimeMs = glutGet(GLUT_ELAPSED_TIME);
+                streamoversigt.moved=false;
               }
               if (vis_film_oversigt) {
                 // touch screen scroll
@@ -9029,44 +9099,64 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 film_oversigt.lastX = mousex;
                 film_oversigt.lastY = mousey;
                 film_oversigt.velocityX = film_oversigt.velocityY = 0; // nulstil
+                film_oversigt.downTimeMs = glutGet(GLUT_ELAPSED_TIME);
+                film_oversigt.moved=false;
               }
             }
             if (state==GLUT_UP) {
               if (vis_spotify_oversigt) {
                 spotify_oversigt.dragging=false;
                 // giv slip → brug sidste bevægelse som start-hastighed
-                spotify_oversigt.velocityX = spotify_oversigt.lastDX * 1.5f;
-                spotify_oversigt.velocityY = -spotify_oversigt.lastDY * 1.5f;
+                spotify_oversigt.velocityX = spotify_oversigt.lastDX * 3.0f;
+                spotify_oversigt.velocityY = -spotify_oversigt.lastDY * 3.0f;
+                int upTime=glutGet(GLUT_ELAPSED_TIME);
+                int dt=upTime - spotify_oversigt.downTimeMs;
+                if ((!spotify_oversigt.moved) && (dt<200)) spotify_oversigt.gettouchbutton=true;
               }
               if (vis_tidal_oversigt) {
                 tidal_oversigt.dragging=false;
                 // giv slip → brug sidste bevægelse som start-hastighed
-                tidal_oversigt.velocityX = tidal_oversigt.lastDX * 1.5f;
-                tidal_oversigt.velocityY = -tidal_oversigt.lastDY * 1.5f;
+                tidal_oversigt.velocityX = tidal_oversigt.lastDX * 3.0f;
+                tidal_oversigt.velocityY = -tidal_oversigt.lastDY * 3.0f;
+                int upTime=glutGet(GLUT_ELAPSED_TIME);
+                int dt=upTime - tidal_oversigt.downTimeMs;
+                if ((!tidal_oversigt.moved) && (dt<200)) tidal_oversigt.gettouchbutton=true;
               }
               if (vis_music_oversigt) {
                 musicoversigt.dragging=false;
                 // giv slip → brug sidste bevægelse som start-hastighed
-                musicoversigt.velocityX = musicoversigt.lastDX * 1.5f;
-                musicoversigt.velocityY = -musicoversigt.lastDY * 1.5f;
+                musicoversigt.velocityX = musicoversigt.lastDX * 3.0f;
+                musicoversigt.velocityY = -musicoversigt.lastDY * 3.0f;
+                int upTime=glutGet(GLUT_ELAPSED_TIME);
+                int dt=upTime - musicoversigt.downTimeMs;
+                if ((!musicoversigt.moved) && (dt<200)) musicoversigt.gettouchbutton=true;
               }
               if (vis_radio_oversigt) {
                 radiooversigt.dragging=false;
                 // giv slip → brug sidste bevægelse som start-hastighed
-                radiooversigt.velocityX = radiooversigt.lastDX * 1.5f;
-                radiooversigt.velocityY = -radiooversigt.lastDY * 1.5f;
+                radiooversigt.velocityX = radiooversigt.lastDX * 3.0f;
+                radiooversigt.velocityY = -radiooversigt.lastDY * 3.0f;
+                int upTime=glutGet(GLUT_ELAPSED_TIME);
+                int dt=upTime - radiooversigt.downTimeMs;
+                if ((!radiooversigt.moved) && (dt<200)) radiooversigt.gettouchbutton=true;
               }
               if (vis_stream_oversigt) {
                 streamoversigt.dragging=false;
                 // giv slip → brug sidste bevægelse som start-hastighed
-                streamoversigt.velocityX = streamoversigt.lastDX * 1.5f;
-                streamoversigt.velocityY = -streamoversigt.lastDY * 1.5f;
+                streamoversigt.velocityX = streamoversigt.lastDX * 3.0f;
+                streamoversigt.velocityY = -streamoversigt.lastDY * 3.0f;
+                int upTime=glutGet(GLUT_ELAPSED_TIME);
+                int dt=upTime - streamoversigt.downTimeMs;
+                if ((!streamoversigt.moved) && (dt<200)) streamoversigt.gettouchbutton=true;
               }
               if (vis_film_oversigt) {
                 film_oversigt.dragging=false;
                 // giv slip → brug sidste bevægelse som start-hastighed
-                film_oversigt.velocityX = film_oversigt.lastDX * 1.5f;
-                film_oversigt.velocityY = -film_oversigt.lastDY * 1.5f;
+                film_oversigt.velocityX = film_oversigt.lastDX * 3.0f;
+                film_oversigt.velocityY = -film_oversigt.lastDY * 3.0f;
+                int upTime=glutGet(GLUT_ELAPSED_TIME);
+                int dt=upTime - film_oversigt.downTimeMs;
+                if ((!film_oversigt.moved) && (dt<200)) film_oversigt.gettouchbutton=true;
               }
               retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
               // nu er mknapnr/fknapnr/rknapnr/spotifyknapnr/tidalknapnr=den som er trykket på bliver sat i gl_select
@@ -9098,7 +9188,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if (debugmode & 8) fprintf(stderr,"fknapnr = %d\n",fknapnr-1);
               }
               // any music buttons active
-              if ((mknapnr>0) && (vis_music_oversigt)) {                  
+              if ((mknapnr>0) && (vis_music_oversigt)) {
                 if ((retfunc==0) && ((mknapnr-1==0) || (musicoversigt.get_directory_id(mknapnr-1)!=0)) && (!(do_zoom_music_cover))) {
                   // normal song list
                   if (musicoversigt.get_album_type(mknapnr-1)==0) {
@@ -15012,7 +15102,7 @@ printf("LIRC-DOWN  ask_open_dir_or_play = %d stream antal %d \n",ask_open_dir_or
           // start play radio
           if ((vis_radio_oversigt) && (!(show_radio_options))) {
             // play radio station
-            rknapnr=radio_key_selected;		// hent button
+            rknapnr=radio_key_selected;		// hent button           
             if (rknapnr>0) do_play_radio=1;
           }
           // opdatere radio oversigt efter pressed on the remorte control from lirc

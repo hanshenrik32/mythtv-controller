@@ -118,6 +118,13 @@ class film_oversigt_typem : vlc_controller {
     bool show_search_view;
   public:
     int selected_icon_in_view=1;
+
+    int downTimeMs=0;
+    bool moved=false;
+    bool gettouchbutton;
+    int downX=0;
+    int downY=0;
+
     // touch screen scroll
     bool dragging=false;
     float scrollSpeed=1.0f;

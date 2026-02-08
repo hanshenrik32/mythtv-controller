@@ -10,6 +10,9 @@ dpkg-buildpackage -b -uc -khanshenrik32@gmail.com
 
 # brug denne 
 
+
+#for set version use nano debian/changelog
+
 dpkg-buildpackage -b -uc -khanshenrik32@gmail.com
 
 cp ../mythtv-controller_0.42.4_amd64.deb ../mythtv-controller_0.42.6_amd64.deb 

@@ -128,6 +128,13 @@ class spotify_class : vlc_controller {
         float anim_angle;
     public:
         int selected_icon_in_view;
+
+        int downTimeMs=0;
+        bool moved=false;
+        bool gettouchbutton;
+        int downX=0;
+        int downY=0;
+        
         // touch screen scroll
         bool dragging=false;
         float scrollSpeed=1.0f;
