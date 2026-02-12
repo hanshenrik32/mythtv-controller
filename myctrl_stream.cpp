@@ -2524,7 +2524,7 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
 
 // *************************************************************************************
 //
-// STREAM OVERSIGT RENDERING - GL new version - NORMAL AND SEARCH VIEW.
+// search view - draw itim in search view - FeedCatalog_search_view
 //
 // *************************************************************************************
 
@@ -2564,7 +2564,7 @@ void stream_class::draw_search_stream_item(int x, int y,int ii,GLuint normal_ico
 
 // ************************************************************************************
 //
-// STREAM OVERSIGT RENDERING - GL new version
+// normal view - draw stream oversigt - FeedCatalog
 //
 // ************************************************************************************
 
@@ -2677,5 +2677,4 @@ void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, i
     }
   }
 }
-
 

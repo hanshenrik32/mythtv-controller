@@ -3599,9 +3599,8 @@ void display() {
       }
       glPopMatrix();
   }
-  //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
-  // show new film
-  if ((vis_music_oversigt) || (vis_tidal_oversigt) || (vis_spotify_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
+  // show new movies overview for 5 seconds after update
+  if ((vis_music_oversigt) || (vis_stream_oversigt) || (vis_tidal_oversigt) || (vis_spotify_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
     show_newmovietimeout = 0;
     vis_nyefilm_oversigt = false;
     if ((vis_tv_oversigt) && (getstarttidintvguidefromarray == true)) {
