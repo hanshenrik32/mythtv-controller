@@ -3,6 +3,43 @@
 
 const char *SHOWVER={"0.50.0 Beta"};
 
+
+const int DOWNKEY=23;
+const int UPKEY=24;
+const int CLOSE=27;
+
+const int TV=1;
+const int MOVIE_STREAM=3;
+const int MUSIC=2;
+const int RECORDED=4;
+const int SETUP=5;
+const int PLAYBUTTON=8;
+const int STOPBUTTON=9;
+const int LASTSONG=10;
+const int NEXTSONG=11;
+const int PAUSEBUTTON=12;
+
+const int SHOW_RADIO_OVERVIEW=80;
+const int SHOW_MUSIC_OVERVIEW=81;
+const int SHOW_SPOTIFY_OVERVIEW=82;
+const int SHOW_TIDAL_OVERVIEW=83;
+
+const int SOUND_SETUP_OVERVIEW=30;
+const int NETWORK_SETUP_OVERVIEW=31;
+const int SCREEN_SETUP_OVERVIEW=33;
+const int TORRENT_SETUP_OVERVIEW=34;
+const int FKEYS_SETUP_OVERVIEW=36;
+const int TTF_SETUP_OVERVIEW=35;
+const int TVGRABER_SETUP_OVERVIEW=39;
+const int TEMA_SETUP_OVERVIEW=41;
+const int RSS_SETUP_OVERVIEW=42;
+const int SPOTIFY_SETUP_OVERVIEW=43;
+const int TIDAL_SETUP_OVERVIEW=44;
+const int EXIT_PROGRAM=96;
+
+// const int TIDAL=6;
+
+
 // debug modes
 // 1  = wifi net
 // 2  = music

@@ -2417,8 +2417,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   }
 }
 
-
-
 */
 
 
@@ -2431,6 +2429,8 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
 //
 //
 // ************************************************************************************
+
+
 
 std::vector<StreamItem> streamlist;
 
@@ -2445,6 +2445,7 @@ void fill_streamlist() {
         streamlist.push_back(item);
     }
 }
+
 
 
 void drawRect(int x, int y, int w, int h, Color c) {
@@ -2521,6 +2522,46 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
 }
 
 
+// *************************************************************************************
+//
+// STREAM OVERSIGT RENDERING - GL new version - NORMAL AND SEARCH VIEW.
+//
+// *************************************************************************************
+
+void stream_class::draw_search_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
+  // Baggrund
+  std::string temprgtxt;
+  std::string gfxfilename;
+  GLuint texture;
+  Color highcolor={0.30f, 0.50f, 0.90f, 1.0f};
+  Color normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  float fontsize=float (configdefaultstreamfontsize/100)*2;
+  // Cover
+  gfxfilename = FeedCatalog_search_view[ii].feed_gfx_mythtv;
+  if (gfxfilename.size() > 0) {
+    // load texture if not loaded
+    if (FeedCatalog_search_view[ii].textureId == 0) {
+      if (file_exists(gfxfilename.c_str())) {
+        FeedCatalog_search_view[ii].textureId = loadTexture((char *) gfxfilename.c_str());
+      }
+    }
+  }
+  // Titel
+  temprgtxt = fmt::format("{:^20}",FeedCatalog_search_view[ii].feed_showtxt);
+  temprgtxt.resize(20);
+  if (FeedCatalog_search_view[ii].textureId ) texture = FeedCatalog_search_view[ii].textureId; else texture = normal_icon;
+  if (ii == selected_icon_in_view-1) {
+    drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+  } else {
+    drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+  }
+}
+
+
+
+
 // ************************************************************************************
 //
 // STREAM OVERSIGT RENDERING - GL new version
@@ -2541,21 +2582,88 @@ void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, i
   float subOff   = fmod(scrollPos, rowHeight);
   int sofset     = firstRow * itemsPerRow;
   int screenTop = startY;
+  int screenTop_search = startY_search_view;
   int xof = startX;
   int visibleItems = (visibleRows + 2) * itemsPerRow;
-  // ---- RENDER -----------------------------------------------
-  for (int i = 0; i < visibleItems && (sofset + i) < FeedCatalog.size(); ++i) {
-    int index = sofset + i;
-    int col = i % itemsPerRow;
-    int row = i / itemsPerRow;
-    int x = xof + col * itemWidth + 40;
-    int y = screenTop - (row * rowHeight) + subOff - 40;
-    draw_stream_item( x, y, index, normal_icon, empty_icon, stream_key_selected);
+  int yof=0;
+  int searchtype=0; // 0 album, 1 artist, 2 track
+  int yof_top=850;
+  int xof_top=250;
+  int buttonsizey=200;
+  // draw search bar
+  if (rss_search_podcast_string != "") {
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // type of search
+    switch (searchtype) {
+      case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_album);
+              break;
+      case 1: glBindTexture(GL_TEXTURE_2D,0);
+              break;
+      default:glBindTexture(GL_TEXTURE_2D,0);
+    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(0);
+    glBegin(GL_QUADS); 
+    glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+buttonsizey-20 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+    glEnd();
+    glPopMatrix();
+    
+    // show tidal search string
+    glPushMatrix();
+    // glTranslatef(xof+210+(buttonsizex/2),yof+240,0);
+    glTranslatef(xof_top+90,yof_top+50,0);
+    glDisable(GL_TEXTURE_2D);
+    glScalef(120, 120, 1.0);
+    if (rss_search_podcast_string.length()>0) {
+      glcRenderString(rss_search_podcast_string.c_str());
+      // printf("Search string : %s \n",rss_search_podcast_string.c_str());
+    }
+    bool cursor=true;
+    // if (cursor) glcRenderString("_"); else glcRenderString(" ");
+    glPopMatrix();
+    yof=yof-200;
   }
-
-  // ---- EMPTY STATE ------------------------------------------
-  if (FeedCatalog.empty())
-  {
+  if ((rss_search_podcast_string!="") && (FeedCatalog_search_view.size()>0)) {
+    // ---- RENDER search view ---------------------------------
+    for (int i = 0; i < visibleItems && (sofset + i) < FeedCatalog_search_view.size(); ++i) {
+      int index = sofset + i;
+      int col = i % itemsPerRow;
+      int row = i / itemsPerRow;
+      int x = xof + col * itemWidth + 40;
+      int y = screenTop_search - (row * rowHeight) + subOff - 40;
+      draw_search_stream_item( x, y, index, normal_icon, empty_icon, stream_key_selected);
+    }
+    // ---- EMPTY STATE ------------------------------------------
+    if (FeedCatalog_search_view.empty()) {
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D, _textureIdloading);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0,0); glVertex3f(orgwinsizex/3, 200, 0);
+        glTexCoord2f(0,1); glVertex3f(orgwinsizex/3, 350, 0);
+        glTexCoord2f(1,1); glVertex3f(orgwinsizex/3+400, 350, 0);
+        glTexCoord2f(1,0); glVertex3f(orgwinsizex/3+400, 200, 0);
+        glEnd();
+        drawText("No streams found ...", 700, 260, 0.4f, 1);
+    }
+  } else if ((rss_search_podcast_string.empty()) && (FeedCatalog.size() > 0)) {
+    // ---- RENDER Normal view ---------------------------------
+    for (int i = 0; i < visibleItems && (sofset + i) < FeedCatalog.size(); ++i) {
+      int index = sofset + i;
+      int col = i % itemsPerRow;
+      int row = i / itemsPerRow;
+      int x = xof + col * itemWidth + 40;
+      int y = screenTop - (row * rowHeight) + subOff - 40;
+      draw_stream_item( x, y, index, normal_icon, empty_icon, stream_key_selected);
+    }
+    // ---- EMPTY STATE ------------------------------------------
+    if (FeedCatalog.empty()) {
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       glBindTexture(GL_TEXTURE_2D, _textureIdloading);
@@ -2566,6 +2674,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, i
       glTexCoord2f(1,0); glVertex3f(orgwinsizex/3+400, 200, 0);
       glEnd();
       drawText("Please wait Loading ...", 700, 260, 0.4f, 1);
+    }
   }
 }
 

@@ -1914,6 +1914,9 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
 // ****************************************************************************************
 
 void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
+  char searchstring[200];
+  bool cursor=true;
+  int buttonsize=180;
   float yof_top=orgwinsizey-(rowHeight*1)+20;                               // start ypos
   float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
   // ---- KINETIC SCROLL ---------------------------------------
@@ -1962,6 +1965,16 @@ void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint 
   glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
   glEnd();
 
+  glPushMatrix();
+  glTranslatef(xof+210+(buttonsize/2),400+540,0);
+  glDisable(GL_TEXTURE_2D);
+  glScalef(100, 100, 1.0);
+  strcpy(searchstring,keybuffer);
+  if (strcmp(searchstring,"")!=0) {
+    glcRenderString(searchstring);
+  }
+  if (cursor) glcRenderString("_"); else glcRenderString(" ");
+  glPopMatrix();
 
   // ---- RENDER -----------------------------------------------
   for (int i = 0; i < visibleItems && (sofset + i) < musicoversigt.size(); ++i) {

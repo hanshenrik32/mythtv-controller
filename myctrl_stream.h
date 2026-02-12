@@ -13,20 +13,10 @@ const int feed_pathlength=200;
 const int feed_url=400;
 
 
-// not in use for now.
-
-template<typename streamoversigt_type>
-struct Data {
-  Data(const std::size_t size)
-    : data(new streamoversigt_type[size]) {
-  }
-  ~Data() { delete [] data; }
-  streamoversigt_type *data;
-};
-
-
 
 // new template<typename T>
+
+
 
 struct StreamItem {
   std::string title;
@@ -34,10 +24,12 @@ struct StreamItem {
   bool selected = false;
 };
 
+
+
+
 struct Color {
     float r, g, b, a;
 };
-
 
 
 struct stream_oversigt_type {
@@ -109,6 +101,7 @@ class stream_class : vlc_controller {
 
       int startX = 20;
       int startY = 882;
+      int startY_search_view = 682;
       int viewHeight = 780;
       // end new scroll vars
 
@@ -162,6 +155,7 @@ class stream_class : vlc_controller {
         // new
         void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,int stream_key_selected);
         void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+        void draw_search_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
         void onScroll(float delta) { scrollVel += delta * accel; }
         // end new
 
