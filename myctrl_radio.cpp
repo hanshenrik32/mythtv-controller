@@ -763,24 +763,25 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
     }
   }
   // Titel
-  temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
-  temprgtxt.resize(20);
+  // temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
+  temprgtxt = stack[ii].station_name;
+  // temprgtxt.resize(20);
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = onlineradio_empty;
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y + 4, 0.3f, 2);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y + 4, 0.3f, 0);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y + 4, 0.3f, 2);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y + 4, 0.3f, 0);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
     }
   }
 }

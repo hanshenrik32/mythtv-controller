@@ -198,7 +198,7 @@ void drawLinesOfText(const std::string& text, float x, float y, float scale,int 
                 drawText(formattext.c_str(), x, y + yoffset, scale, color);
                 currentLine = word; // Start a new line with the current word
                 linecount++;
-                yoffset-=20.0f;
+                yoffset-=18.0f;
             } else {
                 currentLine = word; // Start a new line with the current word
             }
@@ -215,7 +215,7 @@ void drawLinesOfText(const std::string& text, float x, float y, float scale,int 
         if (!currentLine.empty()) {
             if (currentLine.length()>maxWidth) currentLine.resize(maxWidth);
             if (center) formattext = fmt::format("{:^{}s}",currentLine,maxWidth);
-            else formattext = fmt::format("{}",currentLine);
+            else formattext = fmt::format("^{}",currentLine,maxWidth);
             drawText(formattext.c_str(), x, y + yoffset, scale, color);
         }
     }

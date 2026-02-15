@@ -5000,7 +5000,7 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
   Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = stack[ii].feed_gfx_url;
-  float fontsize=float (configdefaulttidalfontsize/100)*2;
+  float fontsize=float (configdefaulttidalfontsize/120)*2;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (stack[ii].textureId == 0) {
@@ -5011,14 +5011,14 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
   }
   // Titel
   temprgtxt = fmt::format("{:^20}",stack[ii].feed_showtxt);
-  temprgtxt.resize(20);
+  // temprgtxt.resize(20);
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = normal_icon;
   if (ii == stream_key_selected-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);                              // drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 2);
+    drawLinesOfText(temprgtxt, x + 18, y + 4, fontsize, 22, 2, 2, true);
   } else {
-    drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);                                // drawText(temprgtxt.c_str(), x + 10, y - 4, 0.4f, 0);
+    drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);    
+    drawLinesOfText(temprgtxt, x + 18, y + 4, fontsize, 22, 2, 15, true);
   }
 }
 
@@ -5042,7 +5042,7 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
   Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = stack[ii].feed_gfx_url;
-  float fontsize=float (configdefaulttidalfontsize/100)*2;
+  float fontsize=float (configdefaulttidalfontsize/120)*2;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (stack[ii].textureId == 0) {
@@ -5053,17 +5053,19 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
   }
   // Titel
   temprgtxt = fmt::format("{:^20}",stack[ii].feed_showtxt);
-  temprgtxt.resize(20);
+  // temprgtxt.resize(20);
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = normal_icon;
   if (ii == stream_key_selected-1) {
     if (y<search_startY-30) {
       drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
+      // drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
+      drawLinesOfText(temprgtxt, x + 18, y - 4, fontsize, 22, 2, 15, true);
     }
   } else {
     if (y<search_startY-30) {
       drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+      // drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+      drawLinesOfText(temprgtxt, x + 18, y - 4, fontsize, 22, 2, 15, true);
     }
   }
 }
