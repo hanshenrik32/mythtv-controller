@@ -186,12 +186,6 @@ static bool do_update_spotify_playlist = false;           // do it first time th
 
 char debuglogdata[4096];                                  // used by log system
 
-// struct used by keyboard config of functions keys
-
-struct configkeytype {
-    char cmdname[200];
-    unsigned int scrnr;
-};
 
 int cmd_error;                                          // for cmd call
 int numCPU;                                             // have the numbers of cpu cores
@@ -267,7 +261,7 @@ char configdeviceid[256];                               // music device name
 float configsoundvolume=1.0f;                           // default sound volume
 char configscreensavertimeout[256];			                // default screensaver timeout
 char configfontname[200];				                        // default ttf font name to load and use
-configkeytype configkeyslayout[12];	                		// functions keys startfunc
+extern configkeytype configkeyslayout[];	           		// functions keys startfunc
 char configuse3deffect[20];			                      	// use 3d effects
 // ************************************************************************************************
 char configvideoplayer[200];                            // default video player
@@ -1603,7 +1597,9 @@ int save_config(char * filename) {
   } else error = true;
   file = fopen("mythtv-controller.keys", "w");
   if (file) {
-    fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
+    for(int i=0;i<12;i++) {
+      fwrite(&configkeyslayout[i],sizeof(configkeytype),1,file);
+    }
     fclose(file);
   }
   return(!(error));
@@ -1658,11 +1654,16 @@ void load_config(char * filename) {
   configsoundvolume=1.0f;
   configuvmeter=1;                                          // default uv meter type 1
   for(int t=0;t<12;t++) {
-    strcpy(configkeyslayout[t].cmdname,"");
+    configkeyslayout[t].cmdname="";
     configkeyslayout[t].scrnr=0;
   }
   // set default keys
-  strcpy(configkeyslayout[0].cmdname,"spotify");
+  configkeyslayout[0].cmdname="spotify";
+  configkeyslayout[0].scrnr=0;
+  configkeyslayout[1].cmdname="kodi";
+  configkeyslayout[1].scrnr=1;
+  configkeyslayout[2].cmdname="tidal";
+  configkeyslayout[2].scrnr=1;
   // load/parse config file in to globals ver
   if (!(parse_config(filename))) {
     strcpy(configaktivescreensavername,"analog");				  // default analog clock
@@ -1875,18 +1876,16 @@ void load_config(char * filename) {
     fprintf(stderr,"No access to mysql database... Can not read config infomations.\n\nUse setup (F1) to config mythtv sql access.\n");
   }
   // read key file setup
+  /*
   if ((file = fopen("mythtv-controller.keys", "r"))) {
     if (!(feof(file))) {
-      fread(configkeyslayout,sizeof(configkeytype)*12,1,file);
+      for(int i=0;i<12;i++) {
+        fread(&configkeyslayout[i],sizeof(configkeytype),1,file);
+      }
       fclose(file);
     }
-  } else {
-    file = fopen("mythtv-controller.keys", "w");
-    if (file) {
-      fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
-      fclose(file);
-    } else fprintf(stderr,"Disk write error, saving mythtv-controller.keys\n");
   }
+  */
   #ifdef ENABLE_SPOTIFY
   // get/set default play device on spotify
   if (strcmp(spotify_oversigt.active_default_play_device_name,"")!=0) {
@@ -2370,7 +2369,7 @@ int saveexitcommand(configkeytype command) {
   FILE *file;
   file=fopen("mythtv-controller.cmd","w");
   if (file) {
-    fputs(command.cmdname,file);
+    fputs(command.cmdname.c_str(),file);
     fputs(";",file);
     fprintf(file,"%d",command.scrnr);
     fputs("\n",file);
@@ -3610,8 +3609,8 @@ void display() {
       getstarttidintvguidefromarray = false;
     }
   }
-  // show oversigt over nye film inden timeout
-  if ((vis_nyefilm_oversigt) && (do_show_setup == false)) {
+  // show oversigt over new movies before timeout if not other stuf is started.
+  if ((vis_nyefilm_oversigt) && (do_show_setup == false) && (vis_spotify_oversigt == false) && (vis_tidal_oversigt == false) && (vis_music_oversigt == false) && (vis_stream_oversigt == false) && (vis_film_oversigt == false) && (vis_recorded_oversigt == false) && (vis_tv_oversigt == false) && (vis_radio_oversigt == false) && (vis_stream_oversigt == false)) {
     if (show_newmovietimeout == 0) vis_nyefilm_oversigt = false;
     if (fknapnr == 0) show_newmovietimeout--;
     film_oversigt.show_minifilm_oversigt(0,0);
@@ -3784,13 +3783,13 @@ void display() {
       // if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
       glPopMatrix();
     } else if (vis_radio_oversigt) {
-      radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
+      radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , onlineradio320 , _rangley);
       // show radio options menu
-      /*
+      
       if ((show_radio_options) && (!(visur))) {
         radiooversigt.show_radio_options();
       }
-      */
+      
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
     }
     #ifdef ENABLE_SPOTIFY
@@ -4500,7 +4499,7 @@ void display() {
             //
             do_zoom_tidal_cover=true;                                       // show we play
             musicoversigt.set_music_is_playing(false);
-            antal_i_tidal_playlist = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
+            antal_i_tidal_playlist = tidal_oversigt.tidal_play_now_album((char *) tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
             tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
             snd = 1;                                // set play new flag
             if (antal_i_tidal_playlist) {
@@ -4524,7 +4523,7 @@ void display() {
               snd=0;                                // set play new flag
             }
             write_logfile(logfile,(char *) "Tidal start play song");
-            tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);                
+            tidal_player_start_status = tidal_oversigt.tidal_play_now_song((char *) tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);                
             tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
           }
           // try play search result
@@ -4551,7 +4550,7 @@ void display() {
 
             // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
 
-            antal_i_tidal_playlist = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
+            antal_i_tidal_playlist = tidal_oversigt.tidal_play_now_album((char *) tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
 
             musicoversigt.set_music_is_playing(false);
             tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
@@ -4610,7 +4609,7 @@ void display() {
             // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
             // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
             // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-            tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+            tidal_player_start_status = tidal_oversigt.tidal_play_now_song((char *) tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
             musicoversigt.set_music_is_playing(false);
             tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
             keybufferindex=0;
@@ -9944,7 +9943,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             sprintf(debuglogdata,"Open tidal playliste %s ", tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
             write_logfile(logfile,(char *) debuglogdata);
             // opdate view from intnr id.
-            tidal_oversigt.opdatere_tidal_oversigt(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));         // update view           
+            tidal_oversigt.opdatere_tidal_oversigt((char *) tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));         // update view           
             // tidal_oversigt.load_tidal_iconoversigt();                                                           // load icons            
             tidalknapnr=0;                                                                                      // reset select
             tidal_selected_startofset=0;                                                                        // and start ofset to.
@@ -10089,7 +10088,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       write_logfile(logfile,(char *) "Tidal start play album");
                       if (sound) sound->release();
                       // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1 );
-                      tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
+                      tidal_player_start_status = tidal_oversigt.tidal_play_now_album((char *) tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
                       musicoversigt.set_music_is_playing(false);
                       tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
                       break;
@@ -10101,7 +10100,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       // tidal_player_start_status = tidal_oversigt.tidal_play_now_artist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1 );                        
                       write_logfile(logfile,(char *) "Tidal start play song");
                       if (sound) sound->release();
-                      tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1 );
+                      tidal_player_start_status = tidal_oversigt.tidal_play_now_song((char *) tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1 );
                       tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
                       break;
               case 3: fprintf(stderr,"button nr %d play tidal album %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
@@ -10294,7 +10293,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         } else if ((sknapnr-1>0) && (streamoversigt.type!=1)) {
           // update
           streamoversigt.clean_stream_oversigt();
-          streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),streamoversigt.get_stream_path(sknapnr-1));
+          streamoversigt.opdatere_stream_oversigt((char *) streamoversigt.get_stream_name(sknapnr-1),(char *) streamoversigt.get_stream_path(sknapnr-1));
           do_play_stream=false;
         } else {
           // back button
@@ -10302,7 +10301,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (streamoversigt.type==2) {
               // one level up
               streamoversigt.clean_stream_oversigt();
-              streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),(char *)"");
+              streamoversigt.opdatere_stream_oversigt((char *) streamoversigt.get_stream_name(sknapnr-1),(char *)"");
               do_play_stream=false;
             } else {
               // jump to top
@@ -10425,7 +10424,7 @@ void handlespeckeypress(int key,int x,int y) {
                 } else if (vis_music_oversigt) {
                   if (findtype==0) findtype=1;
                   else if (findtype==1) findtype=0;
-                } else if ((!(vis_radio_oversigt)) && (!(vis_radio_or_music_oversigt)) && (!(vis_tidal_oversigt))) {
+                } else if ((!(do_show_setup_keys)) && (!(vis_radio_oversigt)) && (!(vis_radio_or_music_oversigt)) && (!(vis_tidal_oversigt)) && (configkeyslayout[1].cmdname.length()==0)) {
                   // if (do_show_setup) do_save_config = true;		                   // set save config file flag
                   do_save_config = true;		                   // set save config file flag
                   do_save_setup_rss = true;                                      // save rss setup
@@ -10438,14 +10437,17 @@ void handlespeckeypress(int key,int x,int y) {
                   vis_radio_or_music_oversigt = false;
                   vis_stream_or_movie_oversigt = false;
                   do_show_setup =! do_show_setup;
-                }
-                if ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt)) {
-                  /*
-                  if (findtype==0) findtype=1;
-                  else if (findtype==1) findtype=0;
-                  */
-                  tidal_oversigt.searchtype++;
-                  if (tidal_oversigt.searchtype>2) tidal_oversigt.searchtype=0;
+                } if ((do_show_setup) && (do_show_setup_keys)) {
+                  printf("do_show_setup_select_linie = %d \n",do_show_setup_select_linie);
+                  select_exe_functions_keys_name();
+                } else {
+                  if ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt)) {
+                    tidal_oversigt.searchtype++;
+                    if (tidal_oversigt.searchtype>2) tidal_oversigt.searchtype=0;
+                  } else {
+                    saveexitcommand(configkeyslayout[0]);
+                    doexitcommand();
+                  }
                 }
                 break;
         case 2: 
@@ -10477,104 +10479,98 @@ void handlespeckeypress(int key,int x,int y) {
                 */
                 break;
         case 4: // F4
-                tidal_oversigt.do_setup_tidal_start_entry = ! tidal_oversigt.do_setup_tidal_start_entry;
-                do_show_torrent = false;
-                /*
-                if (strcmp(configkeyslayout[1].cmdname,"playlistbackup")==0) {
-                  do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[1].cmdname,"playlistrestore")==0) {
-                  do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[1].cmdname,"")!=0) {
-                  saveexitcommand(configkeyslayout[1]);
-                  doexitcommand();
-                  //exit(100);
-                }
-                */
-                break;
-        case 5: // F5
-                if (strcmp(configkeyslayout[2].cmdname,"playlistbackup")==0) {
-                  do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[2].cmdname,"playlistrestore")==0) {
-                  do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[2].cmdname,"")!=0) {
-                  saveexitcommand(configkeyslayout[2]);
-                  doexitcommand();
-                  //exit(100);
-                }
-                break;
-        case 6: // F6
-                if (strcmp(configkeyslayout[3].cmdname,"playlistbackup")==0) {
-                  do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[3].cmdname,"playlistrestore")==0) {
-                  do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[3].cmdname,"")!=0) {
+                if (configkeyslayout[3].cmdname.length() > 0) {
                   saveexitcommand(configkeyslayout[3]);
                   doexitcommand();
-                  //exit(100);
+                } else {
+                  tidal_oversigt.do_setup_tidal_start_entry = ! tidal_oversigt.do_setup_tidal_start_entry;
+                  do_show_torrent = false;
                 }
                 break;
-        case 7: // F7
-                if (strcmp(configkeyslayout[4].cmdname,"playlistbackup")==0) {
+        case 5: // F5
+                if (configkeyslayout[4].cmdname == "playlistbackup") {
                   do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[4].cmdname,"playlistrestore")==0) {
+                } else if (configkeyslayout[4].cmdname == "playlistrestore") {
                   do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[4].cmdname,"")!=0) {
+                } else if (configkeyslayout[4].cmdname.length() > 0) {
                   saveexitcommand(configkeyslayout[4]);
                   doexitcommand();
                   //exit(100);
                 }
                 break;
-        case 8: // F8
-                if (strcmp(configkeyslayout[5].cmdname,"playlistbackup")==0) {
+        case 6: // F6
+                if (configkeyslayout[5].cmdname == "playlistbackup") {
                   do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[5].cmdname,"playlistrestore")==0) {
+                } else if (configkeyslayout[5].cmdname == "playlistrestore") {
                   do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[5].cmdname,"")!=0) {
+                } else  if (configkeyslayout[5].cmdname.length() > 0) {
                   saveexitcommand(configkeyslayout[5]);
                   doexitcommand();
                   //exit(100);
                 }
                 break;
-        case 9: // F9
-                if (strcmp(configkeyslayout[6].cmdname,"playlistbackup")==0) {
+        case 7: // F7
+                if (configkeyslayout[6].cmdname == "playlistbackup") {
                   do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[6].cmdname,"playlistrestore")==0) {
+                } else if (configkeyslayout[6].cmdname == "playlistrestore") {
                   do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[6].cmdname,"")!=0) {
+                } else  if (configkeyslayout[6].cmdname.length() > 0) {
                   saveexitcommand(configkeyslayout[6]);
                   doexitcommand();
                   //exit(100);
                 }
                 break;
-        case 10: // F10
-                if (strcmp(configkeyslayout[7].cmdname,"playlistbackup")==0) {
+        case 8: // F8
+                if (configkeyslayout[7].cmdname == "playlistbackup") {
                   do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[7].cmdname,"playlistrestore")==0) {
+                } else if (configkeyslayout[7].cmdname == "playlistrestore") {
                   do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[7].cmdname,"")!=0) {
+                } else  if (configkeyslayout[7].cmdname.length() > 0) {
                   saveexitcommand(configkeyslayout[7]);
                   doexitcommand();
                   //exit(100);
                 }
                 break;
-        case 11: // F11
-                if (strcmp(configkeyslayout[8].cmdname,"playlistbackup")==0) {
+        case 9: // F9
+                if (configkeyslayout[8].cmdname == "playlistbackup") {
                   do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[8].cmdname,"playlistrestore")==0) {
+                } else if (configkeyslayout[8].cmdname == "playlistrestore") {
                   do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[8].cmdname,"")!=0) {
+                } else  if (configkeyslayout[8].cmdname.length() > 0) {
                   saveexitcommand(configkeyslayout[8]);
                   doexitcommand();
                   //exit(100);
                 }
                 break;
-        case 12: // F12
-                if (strcmp(configkeyslayout[9].cmdname,"playlistbackup")==0) {
+        case 10: // F10
+                if (configkeyslayout[9].cmdname == "playlistbackup") {
                   do_playlist_backup_playlist();
-                } else if (strcmp(configkeyslayout[9].cmdname,"playlistrestore")==0) {
+                } else if (configkeyslayout[9].cmdname == "playlistrestore") {
                   do_playlist_restore_playlist();
-                } else  if (strcmp(configkeyslayout[9].cmdname,"")!=0) {
+                } else  if (configkeyslayout[9].cmdname.length() > 0) {
                   saveexitcommand(configkeyslayout[9]);
+                  doexitcommand();
+                  //exit(100);
+                }
+                break;
+        case 11: // F11
+                if (configkeyslayout[10].cmdname == "playlistbackup") {
+                  do_playlist_backup_playlist();
+                } else if (configkeyslayout[10].cmdname == "playlistrestore") {
+                  do_playlist_restore_playlist();
+                } else  if (configkeyslayout[10].cmdname.length() > 0) {
+                  saveexitcommand(configkeyslayout[10]);
+                  doexitcommand();
+                  //exit(100);
+                }
+                break;
+        case 12: // F12
+                if (configkeyslayout[11].cmdname == "playlistbackup") {
+                  do_playlist_backup_playlist();
+                } else if (configkeyslayout[11].cmdname == "playlistrestore") {
+                  do_playlist_restore_playlist();
+                } else  if (configkeyslayout[11].cmdname.length() > 0) {
+                  saveexitcommand(configkeyslayout[11]);
                   doexitcommand();
                   //exit(100);
                 }
@@ -12325,6 +12321,32 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }            
           }
+          if (do_show_setup_keys) {
+            switch (do_show_setup_select_linie) {
+              case 0: if (keybufferindex>=0) configkeyslayout[0].cmdname=keybuffer;
+                      break;
+              case 1: if (keybufferindex>=0) configkeyslayout[1].cmdname=keybuffer;
+                      break;
+              case 2: if (keybufferindex>=0) configkeyslayout[2].cmdname=keybuffer;
+                      break;
+              case 3: if (keybufferindex>=0) configkeyslayout[3].cmdname=keybuffer;
+                      break;
+              case 4: if (keybufferindex>=0) configkeyslayout[4].cmdname=keybuffer;
+                      break;
+              case 5: if (keybufferindex>=0) configkeyslayout[5].cmdname=keybuffer;
+                      break;
+              case 6: if (keybufferindex>=0) configkeyslayout[6].cmdname=keybuffer;
+                      break;
+              case 7: if (keybufferindex>=0) configkeyslayout[7].cmdname=keybuffer;
+                      break;
+              case 8: if (keybufferindex>=0) configkeyslayout[8].cmdname=keybuffer;
+                      break;
+              case 9: if (keybufferindex>=0) configkeyslayout[9].cmdname=keybuffer;
+                      break;
+              case 10: if (keybufferindex>=0) configkeyslayout[10].cmdname=keybuffer;
+                      break;                      
+            }
+          }
         } else {
           // delete key 127
           if (key==127) {
@@ -13009,48 +13031,48 @@ void handleKeypress(unsigned char key, int x, int y) {
              }
          }
          if (do_show_setup_keys) {
-             switch(do_show_setup_select_linie) {
-                 case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
-                         break;
-                 case 1: configkeyslayout[0].scrnr=atoi(keybuffer);
-                         break;
-                 case 2: strcpy(configkeyslayout[1].cmdname,keybuffer);
-                         break;
-                 case 3: configkeyslayout[1].scrnr=atoi(keybuffer);
-                         break;
-                 case 4: strcpy(configkeyslayout[2].cmdname,keybuffer);
-                         break;
-                 case 5: configkeyslayout[2].scrnr=atoi(keybuffer);
-                         break;
-                 case 6: strcpy(configkeyslayout[3].cmdname,keybuffer);
-                         break;
-                 case 7: configkeyslayout[3].scrnr=atoi(keybuffer);
-                         break;
-                 case 8: strcpy(configkeyslayout[4].cmdname,keybuffer);
-                         break;
-                 case 9: configkeyslayout[4].scrnr=atoi(keybuffer);
-                         break;
-                 case 10: strcpy(configkeyslayout[5].cmdname,keybuffer);
-                         break;
-                 case 11: configkeyslayout[5].scrnr=atoi(keybuffer);
-                          break;
-                 case 12: strcpy(configkeyslayout[6].cmdname,keybuffer);
-                          break;
-                 case 13: configkeyslayout[6].scrnr=atoi(keybuffer);
-                          break;
-                 case 14: strcpy(configkeyslayout[7].cmdname,keybuffer);
-                          break;
-                 case 15: configkeyslayout[7].scrnr=atoi(keybuffer);
-                          break;
-                 case 16: strcpy(configkeyslayout[8].cmdname,keybuffer);
-                          break;
-                 case 17: configkeyslayout[8].scrnr=atoi(keybuffer);
-                          break;
-                 case 18: strcpy(configkeyslayout[9].cmdname,keybuffer);
-                          break;
-                 case 19: configkeyslayout[9].scrnr=atoi(keybuffer);
-                          break;
-             }
+            switch(do_show_setup_select_linie) {
+              case 0: configkeyslayout[0].cmdname=keybuffer;
+                      break;
+              case 1: configkeyslayout[0].scrnr=atoi(keybuffer);
+                      break;
+              case 2: configkeyslayout[1].cmdname=keybuffer;
+                      break;
+              case 3: configkeyslayout[1].scrnr=atoi(keybuffer);
+                      break;
+              case 4: configkeyslayout[2].cmdname=keybuffer;
+                      break;
+              case 5: configkeyslayout[2].scrnr=atoi(keybuffer);
+                      break;
+              case 6: configkeyslayout[3].cmdname=keybuffer;
+                      break;
+              case 7: configkeyslayout[3].scrnr=atoi(keybuffer);
+                      break;
+              case 8: configkeyslayout[4].cmdname=keybuffer;
+                      break;
+              case 9: configkeyslayout[4].scrnr=atoi(keybuffer);
+                      break;
+              case 10: configkeyslayout[5].cmdname=keybuffer;
+                      break;
+              case 11: configkeyslayout[5].scrnr=atoi(keybuffer);
+                      break;
+              case 12: configkeyslayout[6].cmdname=keybuffer;
+                      break;
+              case 13: configkeyslayout[6].scrnr=atoi(keybuffer);
+                      break;
+              case 14: configkeyslayout[7].cmdname=keybuffer;
+                      break;
+              case 15: configkeyslayout[7].scrnr=atoi(keybuffer);
+                      break;
+              case 16: configkeyslayout[8].cmdname=keybuffer;
+                      break;
+              case 17: configkeyslayout[8].scrnr=atoi(keybuffer);
+                      break;
+              case 18: configkeyslayout[9].cmdname=keybuffer;
+                      break;
+              case 19: configkeyslayout[9].scrnr=atoi(keybuffer);
+                      break;
+            }
          } else if (do_show_videoplayer) {
             switch(do_show_setup_select_linie) {
                 case 0: strcpy(configdefaultplayer,keybuffer);
@@ -13761,7 +13783,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       if (streamoversigt.type==2) {
                         // one level up
                         streamoversigt.clean_stream_oversigt();
-                        streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),(char *) "");
+                        streamoversigt.opdatere_stream_oversigt((char *) streamoversigt.get_stream_name(sknapnr),(char *) "");
                         do_play_stream=false;
                         do_play_stream=false;
                         stream_key_selected=1;
@@ -15153,7 +15175,7 @@ printf("LIRC-DOWN  ask_open_dir_or_play = %d stream antal %d \n",ask_open_dir_or
                 if (streamoversigt.type==2) {
                   // one level up
                   streamoversigt.clean_stream_oversigt();
-                  streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),(char *)"");
+                  streamoversigt.opdatere_stream_oversigt((char *) streamoversigt.get_stream_name(sknapnr),(char *)"");
                   do_play_stream=false;
                   do_play_stream=false;
                   stream_key_selected=1;
@@ -17551,7 +17573,7 @@ int main(int argc, char** argv) {
     #ifdef ENABLE_TIDAL
     bool tidalok;
     // login tidal
-    tidalok=tidal_oversigt.get_access_token((char *) "your access token");
+    tidalok=tidal_oversigt.get_access_token((char *) "TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {   
       
       // tidal_oversigt.opdatere_tidal_userCollections("131776836");

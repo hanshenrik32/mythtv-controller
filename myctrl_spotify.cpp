@@ -4152,13 +4152,14 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
 // thread web loader (loading all icons)
 //
 // ****************************************************************************************
+/*
 
 void *load_spotify_web(void *data) {
   if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
   //streamoversigt.loadweb_stream_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"Stop spotify loader thread\n");  
 }
-
+*/
 
 
 // ****************************************************************************************

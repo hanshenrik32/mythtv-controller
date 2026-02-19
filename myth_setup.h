@@ -21,6 +21,12 @@ struct tv_graber_config {
 };
 
 
+struct configkeytype {
+    std::string cmdname="";
+    unsigned int scrnr=0;
+};
+
+
 const char tvguide_dat_filename[]="tvguide_channels.dat";
 
 
@@ -115,5 +121,7 @@ int team_settings_load();
 void drawVUMeter(float x, float y, float value,GLuint textureId);
 void getLevels();
 void render_uv();
+
+void select_exe_functions_keys_name();
 
 #endif
