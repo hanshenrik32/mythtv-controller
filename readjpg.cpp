@@ -26,7 +26,7 @@ int loadTexture ( char *filename ) {
   GLenum errorCode;
   sdlimage = IMG_Load(filename);
   if ( !sdlimage ) {
-    printf("SDL_Image load error: %s on %s\n", IMG_GetError(),filename);
+    // printf("SDL_Image load error: %s on %s\n", IMG_GetError(),filename);
     return 0;
   }
   if ( sdlimage->format->BytesPerPixel < 2 ) {

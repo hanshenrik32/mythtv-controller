@@ -102,7 +102,7 @@ extern GLuint mobileplayer_icon;
 extern GLuint pcplayer_icon;
 extern GLuint unknownplayer_icon;
 extern GLuint spotify_pil;
-extern float configdefaultstreamfontsize;
+extern float configdefaultspotifyfontsize;
 extern int tema;
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
@@ -4152,13 +4152,14 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
 // thread web loader (loading all icons)
 //
 // ****************************************************************************************
+/*
 
 void *load_spotify_web(void *data) {
   if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
   //streamoversigt.loadweb_stream_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"Stop spotify loader thread\n");  
 }
-
+*/
 
 
 // ****************************************************************************************
@@ -4417,6 +4418,7 @@ bool spotify_class::reset_amin_in_viewer() {
 //
 // ****************************************************************************************
 
+/*
 void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
 
     int j,ii,k,pos;
@@ -4570,43 +4572,6 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
-      /*
-      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-      base=temptxt;
-      length=strlen(temptxt);                               // get length
-      width = 19;                                           // max length to show
-      bool stop=false;                                      // done
-      while(*base) {
-        // if text can be on line
-        if(length <= width) {
-          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
-          glcRenderString(base);
-          pline++;
-          break;
-        }
-        right_margin = base+width;
-        while((!isspace(*right_margin)) && (stop==false)) {
-          right_margin--;
-          if (right_margin == base) {
-            right_margin += width;
-            while(!isspace(*right_margin)) {
-              if (*right_margin == '\0') break;
-              else stop=true;
-              right_margin++;
-            }
-          }
-        }
-        if (stop) *(base+width)='\0';
-        *right_margin = '\0';
-        glcRenderString(base);
-        pline++;
-        glTranslatef(-(1.0f+(strlen(base)/2)),-pline*1.2f,0.0f);
-        //glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
-        length -= right_margin-base+1;                         // +1 for the space
-        base = right_margin+1;
-        if (pline>=2) break;
-      }
-      */
       drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+20,yof-10,0.38f,20,2,1,true);
       glPopMatrix();
       // next button
@@ -4615,7 +4580,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
     }
 }
 
-
+*/
 
 
 // ****************************************************************************************
@@ -4801,7 +4766,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       pline=0;
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
-      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+      glScalef(configdefaultspotifyfontsize, configdefaultspotifyfontsize, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);      
       glDisable(GL_TEXTURE_2D);
@@ -4847,6 +4812,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     }
 }
 
+/*
 
 void spotify_class::show_spotify_search_oversigt_old(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
   int j,ii,k,pos;
@@ -5150,7 +5116,7 @@ void spotify_class::show_spotify_search_oversigt_old(GLuint normal_icon,GLuint s
   }
 }
 
-
+*/
 
 
 // ****************************************************************************************
@@ -5190,6 +5156,7 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
   Color5 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = stack[ii]->feed_gfx_url;
+  float fontsize = float (configdefaultspotifyfontsize/100)*2;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (stack[ii]->textureId == 0) {
@@ -5204,10 +5171,10 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
   if (stack[ii]->textureId ) texture = stack[ii]->textureId; else texture = normal_icon;
   if (ii == stream_key_selected-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 2);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 0);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
   }
 }
 
@@ -5219,7 +5186,7 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
 //
 // ****************************************************************************************
 
-void spotify_class::show_spotify_oversigt1(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
+void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;

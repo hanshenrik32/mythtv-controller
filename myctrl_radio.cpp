@@ -195,19 +195,19 @@ int radiostation_class::load_radio_stations_gfx() {
         if (file_exists(tmpfilename.c_str())) {		// den har et navn samt gfx filen findes.
           texture=loadTexture ((char *) tmpfilename.c_str());                                 // load texture
           set_texture(i,texture);                         		            // save it in radio station struct
-          strncpy(stack[i].gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
-          strcat(stack[i].gfxfilename,".png");
-          opdatere_radiostation_gfx(stack[i].intnr,stack[i].gfxfilename);           // and update db filename
+          stack[i].gfxfilename=(char *) get_station_name(i);      // update station gfxfilename to station name
+          stack[i].gfxfilename = stack[i].gfxfilename + ".png";
+          opdatere_radiostation_gfx(stack[i].intnr,(char *) stack[i].gfxfilename.c_str());           // and update db filename
         } else {
           tmpfilename = "/opt/mythtv-controller/images/radiostations/";
           tmpfilename = tmpfilename + radiooversigt.get_station_name(i);
           tmpfilename = tmpfilename + ".jpg";
           if (file_exists(tmpfilename.c_str())) {
-            texture=loadTexture ((char *) tmpfilename.c_str());                                 // load texture
-            set_texture(i,texture);     		                                            // save it in radio station struct
-            strncpy(stack[i].gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
-            strcat(stack[i].gfxfilename,".png");
-            opdatere_radiostation_gfx(stack[i].intnr,stack[i].gfxfilename);           // and update db filename
+            texture=loadTexture ((char *) tmpfilename.c_str());                                        // load texture
+            set_texture(i,texture);     		                                                           // save it in radio station struct
+            stack[i].gfxfilename=get_station_name(i);                                                  // update station gfxfilename to station name
+            stack[i].gfxfilename = stack[i].gfxfilename +".png";
+            opdatere_radiostation_gfx(stack[i].intnr,(char *) stack[i].gfxfilename.c_str());           // and update db filename
           }
         }
       } else {
@@ -266,10 +266,10 @@ int radiostation_class::opdatere_radio_oversigt() {
           online=atoi(row[8]);
           land=atoi(row[9]);
           strncpy(new_station.station_name,row[0],stationamelength);
-          strncpy(new_station.desc,row[4],statiodesclength);
-          strncpy(new_station.streamurl,row[1],statiourl_homepage);
-          strncpy(new_station.homepage,row[2],statiourl_homepage);
-          strncpy(new_station.gfxfilename,row[5],stationamelength);
+          new_station.desc=std::string(row[4]);
+          new_station.streamurl=std::string(row[1]);
+          new_station.homepage=std::string(row[2]);
+          new_station.gfxfilename=std::string(row[5]);
           new_station.art=art;
           new_station.kbps=kbps;
           new_station.online=online;
@@ -337,10 +337,10 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
             online=atoi(row[8]);
             land=atoi(row[9]);
             strncpy(new_station.station_name,row[0],stationamelength);
-            strncpy(new_station.desc,row[4],statiodesclength);
-            strncpy(new_station.streamurl,row[1],statiourl_homepage);
-            strncpy(new_station.homepage,row[2],statiourl_homepage);
-            strncpy(new_station.gfxfilename,row[5],stationamelength);
+            new_station.desc=std::string(row[4]);
+            new_station.streamurl=std::string(row[1]);
+            new_station.homepage=std::string(row[2]);
+            new_station.gfxfilename=std::string(row[5]);
             new_station.art=art;
             new_station.kbps=kbps;
             new_station.online=online;
@@ -387,7 +387,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 
     } else {
       if (radiosortorder==0)			// start order default
-        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by intnr";
+        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1  order by popular desc,name";
       else if (radiosortorder==28)		// bit rate
         sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name";
       else if (radiosortorder==27)		// land kode
@@ -413,10 +413,10 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
               online=atoi(row[8]);
               land=atoi(row[9]);
               strncpy(new_station.station_name,row[0],stationamelength);
-              strncpy(new_station.desc,row[4],statiodesclength);
-              strncpy(new_station.streamurl,row[1],statiourl_homepage);
-              strncpy(new_station.homepage,row[2],statiourl_homepage);
-              strncpy(new_station.gfxfilename,row[5],stationamelength);
+              new_station.desc=std::string(row[4]);
+              new_station.streamurl=std::string(row[1]);
+              new_station.homepage=std::string(row[2]);
+              new_station.gfxfilename=std::string(row[5]);
               new_station.art=art;
               new_station.kbps=kbps;
               new_station.online=online;
@@ -453,6 +453,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 //
 // ****************************************************************************************
 
+/*
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
   static bool show_all_kode_errors=false;
   int buttonsizex = config_menu.config_radio_main_window_icon_sizex;
@@ -666,7 +667,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
 }
 
 
-
+*/
 
 
 
@@ -738,56 +739,49 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
 
 // ****************************************************************************************
 //
-// draw single stream item
+// draw single radio item
 //
 // ****************************************************************************************
 
 
-void radiostation_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
+void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
   // Baggrund
   std::string temprgtxt;
   std::string gfxfilename;
   GLuint texture;
   Color2 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color2 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  /*
-  if (ii == radio_key_selected-1)
-      drawRect(x - 2, y - 2, itemWidth + 4, rowHeight - 4, highcolor); // Highlight color
-  else
-      drawRect(x - 4, y - 4, itemWidth + 8, rowHeight - 8, normalcolor); // Normal color
-  */
   // Cover
   gfxfilename = "/opt/mythtv-controller/images/radiostations/";
   gfxfilename = gfxfilename + stack[ii].gfxfilename;
-  if (strlen(stack[ii].gfxfilename)>0) {
+  if (stack[ii].gfxfilename.length()>0) {
     // load texture if not loaded
     if (stack[ii].textureId == 0) {
       if (file_exists(gfxfilename.c_str())) {
         stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
-      } else strcpy(stack[ii].gfxfilename,"");
+      } else stack[ii].gfxfilename="";
     }
   }
   // Titel
-  temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
-  temprgtxt.resize(20);
-  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = onlineradio_empty;
-
-
+  // temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
+  temprgtxt = stack[ii].station_name;
+  // temprgtxt.resize(20);
+  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 2);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 0);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 2);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-      drawText(temprgtxt.c_str(), x + 10, y - 6, 0.3f, 0);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
     }
   }
 }
@@ -799,11 +793,10 @@ void radiostation_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon
 //
 // show radio stations overview new version 2
 //
-//
 // ****************************************************************************************
 
 
-bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;
@@ -832,7 +825,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     int row = i / itemsPerRow;
     int x = xof + col * itemWidth + 40;
     int y = screenTop - (row * rowHeight) + subOff - 40;
-    draw_stream_item( x, y, index, normal_icon, normal_icon, radio_key_selected);
+    draw_radio_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
   }
   return(true);
 }
@@ -1129,6 +1122,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
   bool radiook=false;
   bool cerror;
   struct timeval tv;
+  std::string debuglogdata;
   fd_set myset;
   if (check_radio_online_switch) {
     conn=mysql_init(NULL);
@@ -1147,8 +1141,8 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
             // get port and ip
             port=get_url_data(hostname,ipadresse);
             // write debug log
-            sprintf(debuglogdata,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
-            write_logfile(logfile,(char *) debuglogdata);
+            debuglogdata=fmt::format("Checking Station : {} - hostname : {} port {}",row[0],hostname,port);
+            write_logfile(logfile,(char *) debuglogdata.c_str());
             sock=socket(PF_INET, SOCK_STREAM, 0);
             if (sock) {
               //fcntl(sock, F_SETFL, O_NONBLOCK);

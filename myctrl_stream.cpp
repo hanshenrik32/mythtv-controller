@@ -384,14 +384,14 @@ stream_class::~stream_class() {
 //
 // ****************************************************************************************
 
-char *stream_class::get_stream_name(int nr) {
+const char *stream_class::get_stream_name(int nr) {
   if (FeedCatalog_search_view.size()==0) {
     if (nr<antal) {
-      return (FeedCatalog[nr].feed_name);
+      return (FeedCatalog[nr].feed_name.c_str());
     }
   } else {
     if (nr<FeedCatalog_search_view.size()) {
-      return (FeedCatalog_search_view[nr].feed_name);
+      return (FeedCatalog_search_view[nr].feed_name.c_str());
     }
   }
   return NULL;
@@ -403,11 +403,11 @@ char *stream_class::get_stream_name(int nr) {
 //
 // ****************************************************************************************
 
-char *stream_class::get_stream_desc(int nr) {
+const char *stream_class::get_stream_desc(int nr) {
   if (FeedCatalog_search_view.size()==0) {
-    if (nr<antal) return (FeedCatalog[nr].feed_desc); else return (NULL);
+    if (nr<antal) return (FeedCatalog[nr].feed_desc.c_str()); else return (NULL);
   } else  {
-    if (nr<FeedCatalog_search_view.size()) return (FeedCatalog_search_view[nr].feed_desc); else return (NULL);
+    if (nr<FeedCatalog_search_view.size()) return (FeedCatalog_search_view[nr].feed_desc.c_str()); else return (NULL);
   }
   return (NULL);
 }
@@ -528,11 +528,11 @@ int stream_class::pausestream(int pause) {
 char *stream_class::get_stream_url(int nr) {
   if (FeedCatalog_search_view.size()==0) {
     if (nr<antal) {
-      return (FeedCatalog[nr].feed_streamurl);
+      return (const_cast<char*>(FeedCatalog[nr].feed_streamurl.c_str()));
     }
   } else {
     if (nr<FeedCatalog_search_view.size()) {
-      return (FeedCatalog_search_view[nr].feed_streamurl);
+      return (const_cast<char*>(FeedCatalog_search_view[nr].feed_streamurl.c_str()));
     }
   }
   return(0);
@@ -1388,13 +1388,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
         //if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
         if (antal<maxantal) {
-          strcpy(new_stream_recrord.feed_showtxt,"");          	        // show name
-          strcpy(new_stream_recrord.feed_name,"");		        // mythtv db feedtitle
-          strcpy(new_stream_recrord.feed_desc,"");                       // desc
-          strcpy(new_stream_recrord.feed_path,"");                       // mythtv db path
-          strcpy(new_stream_recrord.feed_gfx_url,"");			//
-          strcpy(new_stream_recrord.feed_gfx_mythtv,"");			//
-          strcpy(new_stream_recrord.feed_streamurl,"");			//
+          new_stream_recrord.feed_showtxt="";          	        // show name
+          new_stream_recrord.feed_name="";		        // mythtv db feedtitle
+          new_stream_recrord.feed_desc="";                       // desc
+          new_stream_recrord.feed_path="";                       // mythtv db path
+          new_stream_recrord.feed_gfx_url="";			//
+          new_stream_recrord.feed_gfx_mythtv="";			//
+          new_stream_recrord.feed_streamurl="";			//
           new_stream_recrord.feed_group_antal=0;				//
           new_stream_recrord.feed_path_antal=0;				//
           new_stream_recrord.textureId=0;				//
@@ -1405,14 +1405,14 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
           if (getart==0) {
             if (row[9]) strcpy(tmpfilename,row[9]);
             // begin new ver
-            strncpy(new_stream_recrord.feed_showtxt,row[0],feed_pathlength);          	        // show name
-            strncpy(new_stream_recrord.feed_name,row[0],feed_namelength);
-            if (row[1]) strcpy(new_stream_recrord.feed_path,row[1]);
+            new_stream_recrord.feed_showtxt=std::string(row[0]);          	        // show name
+            new_stream_recrord.feed_name=std::string(row[0]);		        // mythtv db feedtitle
+            if (row[1]) new_stream_recrord.feed_path=std::string(row[1]);
             if (row[0]) new_stream_recrord.feed_group_antal=get_podcasttype_antal(row[0]);        // get antal
             else new_stream_recrord.feed_group_antal=0;
-            if (row[3]) strncpy(new_stream_recrord.feed_desc,row[3],feed_desclength);
+            if (row[3]) new_stream_recrord.feed_desc=std::string(row[3]);
             if (row[7]) strncat(tmpfilename,row[7],20);                                     // get image path
-            strcpy(new_stream_recrord.feed_gfx_mythtv,tmpfilename);            	       		      // icon file URL
+            new_stream_recrord.feed_gfx_mythtv=std::string(tmpfilename);            	       		      // icon file URL
             // end new ver
 
             get_webfilenamelong(downloadfilename,tmpfilename);                              // get file name from url to gfx
@@ -1431,7 +1431,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
               } else strcpy(tmpfilename,"");
             } strcpy(tmpfilename,downloadfilenamelong);
             // tmpfilename is now the bame of the icon
-            strncpy(new_stream_recrord.feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
+            new_stream_recrord.feed_gfx_mythtv=std::string(tmpfilename);	                // mythtv icon file
             new_stream_recrord.nyt=false;					// new podcast
             FeedCatalog.push_back(new_stream_recrord);                     // save new record in vector
 
@@ -1440,35 +1440,35 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
             // if first creat back button
             if (antal==0) {
               new_stream_recrord.textureId=_textureIdback;			                    // back icon
-              strcpy(new_stream_recrord.feed_showtxt,"BACK");
-              if (row[0]) strncpy(new_stream_recrord.feed_name,row[0],feed_namelength);
-              if (row[1]) strncpy(new_stream_recrord.feed_path,row[1],feed_pathlength);
+              new_stream_recrord.feed_showtxt="BACK";
+              if (row[0]) new_stream_recrord.feed_name=std::string(row[0]);
+              if (row[1]) new_stream_recrord.feed_path=std::string(row[1]);
               //strcpy(new_stream_recrord.feed_streamurl,row[4]);
-              if (row[3]) strncpy(new_stream_recrord.feed_desc,row[3],feed_desclength);
-              if (row[5]) strncpy(new_stream_recrord.feed_gfx_url,row[5],feed_url);            // feed (db link) url
+              if (row[3]) new_stream_recrord.feed_desc=std::string(row[3]);
+              if (row[5]) new_stream_recrord.feed_gfx_url=std::string(row[5]);            // feed (db link) url
               new_stream_recrord.feed_group_antal=0;
               new_stream_recrord.intnr=0;	                               					// intnr=
               FeedCatalog.push_back(new_stream_recrord);                     // save new record in vector
               antal++;
             }
-            if (row[5]) strncpy(new_stream_recrord.feed_gfx_url,row[5],feed_url);
+            if (row[5]) new_stream_recrord.feed_gfx_url=std::string(row[5]);
             if (getart==1) {
               if (row[2]) {
-                strncpy(new_stream_recrord.feed_showtxt,row[2],feed_pathlength);
+                new_stream_recrord.feed_showtxt=std::string(row[2]);
               }
             } else {
               if (row[2]) {
-                strncpy(new_stream_recrord.feed_showtxt,row[2],feed_pathlength);
+                new_stream_recrord.feed_showtxt=std::string(row[2]);
               }
             }
             if (row[1]) {
-              strncpy(new_stream_recrord.feed_path,row[1],feed_pathlength);		// path
+              new_stream_recrord.feed_path=std::string(row[1]);		// path
             }
             if (row[2]) {
-              strncpy(new_stream_recrord.feed_name,row[0],feed_namelength);		// feedtitle
+              new_stream_recrord.feed_name=std::string(row[2]);		// feedtitle
             }
             if (row[8]) {
-              strncpy(new_stream_recrord.feed_streamurl,row[8],feed_url);		  // save play url
+              new_stream_recrord.feed_streamurl=std::string(row[8]);		  // save play url
             }
             switch(getart) {
               case 0: if (row[9]) strcpy(tmpfilename,row[9]);
@@ -1525,9 +1525,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 strcpy(tmpfilename,downloadfilenamelong);
               }
             } else strcpy(tmpfilename,"");
-            strncpy(new_stream_recrord.feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
+            new_stream_recrord.feed_gfx_mythtv=std::string(tmpfilename);	                // save icon file path in stack struct
             if (row[3]) {
-              strncpy(new_stream_recrord.feed_desc,row[3],feed_desclength);
+              new_stream_recrord.feed_desc=std::string(row[3]);
             }
             // no texture now
             new_stream_recrord.textureId=0;
@@ -1575,7 +1575,7 @@ int stream_class::loadweb_stream_iconoversigt() {
   this->gfx_loaded=false;
   write_logfile(logfile,(char *) "RSS stream graphic download start.");
   while(nr<antal) {
-    if (strcmp(FeedCatalog[nr].feed_gfx_mythtv,"")!=0) {
+    if (FeedCatalog[nr].feed_gfx_mythtv.length()>0) {
       loadstatus=0;
       // return downloadfilename from stack[nr]->feed_gfx_mythtv
       tmpfilename=FeedCatalog[nr].feed_gfx_mythtv;
@@ -1592,10 +1592,10 @@ int stream_class::loadweb_stream_iconoversigt() {
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,(char *) tmpfilename.c_str());
           loadstatus=get_webfile((char *) tmpfilename.c_str(),downloadfilenamelong);
-          strcpy(FeedCatalog[nr].feed_gfx_mythtv,downloadfilenamelong);
+          FeedCatalog[nr].feed_gfx_mythtv=std::string(downloadfilenamelong);
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2((char *) tmpfilename.c_str(),downloadfilenamelong);
-          strcpy(FeedCatalog[nr].feed_gfx_mythtv,downloadfilenamelong);
+          FeedCatalog[nr].feed_gfx_mythtv=std::string(downloadfilenamelong);
             //printf("File exist %s then set filename \n",downloadfilenamelong);
         }
       } else if (strncmp((char *) tmpfilename.c_str(),"https://",8)==0) {
@@ -1611,17 +1611,17 @@ int stream_class::loadweb_stream_iconoversigt() {
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0)) {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,(char *) tmpfilename.c_str());
           loadstatus=get_webfile2((char *) tmpfilename.c_str(),downloadfilenamelong);
-          strcpy(FeedCatalog[nr].feed_gfx_mythtv,downloadfilenamelong);
+          FeedCatalog[nr].feed_gfx_mythtv=std::string(downloadfilenamelong);
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2((char *) tmpfilename.c_str(),downloadfilenamelong);
           // file downloaded
           if (loadstatus==0) {
-            strcpy(FeedCatalog[nr].feed_gfx_mythtv,downloadfilenamelong);
+            FeedCatalog[nr].feed_gfx_mythtv=std::string(downloadfilenamelong);
             //snprintf(tmpfilename,sizeof(tmpfilename),"RSS stream graphic download file %s",downloadfilenamelong);
             tmpfilename = "RSS stream graphic download file ";
             tmpfilename = tmpfilename + downloadfilenamelong;
             write_logfile(logfile,(char *) tmpfilename.c_str());
-          } else strcpy(FeedCatalog[nr].feed_gfx_mythtv,"");
+          } else FeedCatalog[nr].feed_gfx_mythtv=std::string("");
         }
       }
       // set recordnr loaded info to update users view
@@ -1711,7 +1711,7 @@ int stream_class::FeedCatalog_search_antalstreams() {
 // 
 // ****************************************************************************************
 
-
+/*
 void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected) {
   int j,ii,k,pos;
   // float buttonsizey=160.0f;                                                   // button size
@@ -1876,13 +1876,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     // draw from search view
     int antal1=FeedCatalog_search_view.size();
     while((ii<lstreamoversigt_antal) && (ii+sofset<antal1) && (i<FeedCatalog_search_view.size())) {
-      /*
-      if ((rss_search_podcast_string!="")) {
-        if (regexContains(FeedCatalog_search_view[ii+sofset].feed_showtxt,rss_search_podcast_string)) {
-          draw=true;
-        } else draw=false;
-      } else draw=true;
-      */
+  
       draw=true;
       if (draw) {          
         if (((ii % bonline)==0) && (ii>0)) {
@@ -2247,7 +2241,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
             }          
             glVertex2f(x,cy+(0.5*dy));
             glEnd();
-            */
+  
             
             // indsite draw icon rss gfx
             glEnable(GL_TEXTURE_2D);
@@ -2423,11 +2417,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
   }
 }
 
-
-
-
-
-
+*/
 
 
 
@@ -2439,6 +2429,8 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
 //
 //
 // ************************************************************************************
+
+
 
 std::vector<StreamItem> streamlist;
 
@@ -2453,6 +2445,7 @@ void fill_streamlist() {
         streamlist.push_back(item);
     }
 }
+
 
 
 void drawRect(int x, int y, int w, int h, Color c) {
@@ -2497,6 +2490,13 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color c) {
 }
 
 
+
+// *************************************************************************************
+//
+// normal view - draw itim in normal view - FeedCatalog
+//
+// *************************************************************************************
+
 void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   // Baggrund
   std::string temprgtxt;
@@ -2504,6 +2504,7 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   GLuint texture;
   Color highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  float fontsize=float (configdefaultstreamfontsize/100)*2;
   // Cover
   gfxfilename = FeedCatalog[ii].feed_gfx_mythtv;
   if (gfxfilename.size() > 0) {
@@ -2517,24 +2518,64 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   // Titel
   temprgtxt = fmt::format("{:^20}",FeedCatalog[ii].feed_showtxt);
   temprgtxt.resize(20);
-  if (FeedCatalog[ii].textureId ) texture = FeedCatalog[ii].textureId; else texture = normal_icon;
+  if (FeedCatalog[ii].textureId ) texture = FeedCatalog[ii].textureId; else texture=empty_icon; // texture = normal_icon;
   if (ii == selected_icon_in_view-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 2);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 12, 0.4f, 0);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
   }
 }
 
 
+// *************************************************************************************
+//
+// search view - draw itim in search view - FeedCatalog_search_view
+//
+// *************************************************************************************
+
+void stream_class::draw_search_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
+  // Baggrund
+  std::string temprgtxt;
+  std::string gfxfilename;
+  GLuint texture;
+  Color highcolor={0.30f, 0.50f, 0.90f, 1.0f};
+  Color normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  float fontsize=float (configdefaultstreamfontsize/100)*2;
+  // Cover
+  gfxfilename = FeedCatalog_search_view[ii].feed_gfx_mythtv;
+  if (gfxfilename.size() > 0) {
+    // load texture if not loaded
+    if (FeedCatalog_search_view[ii].textureId == 0) {
+      if (file_exists(gfxfilename.c_str())) {
+        FeedCatalog_search_view[ii].textureId = loadTexture((char *) gfxfilename.c_str());
+      }
+    }
+  }
+  // Titel
+  temprgtxt = fmt::format("{:^20}",FeedCatalog_search_view[ii].feed_showtxt);
+  temprgtxt.resize(20);
+  if (FeedCatalog_search_view[ii].textureId ) texture = FeedCatalog_search_view[ii].textureId; else texture = normal_icon;
+  if (ii == selected_icon_in_view-1) {
+    drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+  } else {
+    drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
+    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+  }
+}
+
+
+
+
 // ************************************************************************************
 //
-// STREAM OVERSIGT RENDERING - GL new version
+// normal view - draw stream oversigt - FeedCatalog
 //
 // ************************************************************************************
 
-void stream_class::show_stream_oversigt1(GLuint normal_icon, GLuint empty_icon, int stream_key_selected) {
+void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, int stream_key_selected) {
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;
@@ -2548,21 +2589,88 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon, GLuint empty_icon, 
   float subOff   = fmod(scrollPos, rowHeight);
   int sofset     = firstRow * itemsPerRow;
   int screenTop = startY;
+  int screenTop_search = startY_search_view;
   int xof = startX;
   int visibleItems = (visibleRows + 2) * itemsPerRow;
-  // ---- RENDER -----------------------------------------------
-  for (int i = 0; i < visibleItems && (sofset + i) < FeedCatalog.size(); ++i) {
-    int index = sofset + i;
-    int col = i % itemsPerRow;
-    int row = i / itemsPerRow;
-    int x = xof + col * itemWidth + 40;
-    int y = screenTop - (row * rowHeight) + subOff - 40;
-    draw_stream_item( x, y, index, normal_icon, empty_icon, stream_key_selected);
+  int yof=0;
+  int searchtype=0; // 0 album, 1 artist, 2 track
+  int yof_top=850;
+  int xof_top=250;
+  int buttonsizey=200;
+  // draw search bar
+  if (rss_search_podcast_string != "") {
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // type of search
+    switch (searchtype) {
+      case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_album);
+              break;
+      case 1: glBindTexture(GL_TEXTURE_2D,0);
+              break;
+      default:glBindTexture(GL_TEXTURE_2D,0);
+    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(0);
+    glBegin(GL_QUADS); 
+    glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+buttonsizey-20 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+    glEnd();
+    glPopMatrix();
+    
+    // show tidal search string
+    glPushMatrix();
+    // glTranslatef(xof+210+(buttonsizex/2),yof+240,0);
+    glTranslatef(xof_top+90,yof_top+50,0);
+    glDisable(GL_TEXTURE_2D);
+    glScalef(120, 120, 1.0);
+    if (rss_search_podcast_string.length()>0) {
+      glcRenderString(rss_search_podcast_string.c_str());
+      // printf("Search string : %s \n",rss_search_podcast_string.c_str());
+    }
+    bool cursor=true;
+    // if (cursor) glcRenderString("_"); else glcRenderString(" ");
+    glPopMatrix();
+    yof=yof-200;
   }
-
-  // ---- EMPTY STATE ------------------------------------------
-  if (FeedCatalog.empty())
-  {
+  if ((rss_search_podcast_string!="") && (FeedCatalog_search_view.size()>0)) {
+    // ---- RENDER search view ---------------------------------
+    for (int i = 0; i < visibleItems && (sofset + i) < FeedCatalog_search_view.size(); ++i) {
+      int index = sofset + i;
+      int col = i % itemsPerRow;
+      int row = i / itemsPerRow;
+      int x = xof + col * itemWidth + 40;
+      int y = screenTop_search - (row * rowHeight) + subOff - 40;
+      draw_search_stream_item( x, y, index, normal_icon, empty_icon, stream_key_selected);
+    }
+    // ---- EMPTY STATE ------------------------------------------
+    if (FeedCatalog_search_view.empty()) {
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D, _textureIdloading);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0,0); glVertex3f(orgwinsizex/3, 200, 0);
+        glTexCoord2f(0,1); glVertex3f(orgwinsizex/3, 350, 0);
+        glTexCoord2f(1,1); glVertex3f(orgwinsizex/3+400, 350, 0);
+        glTexCoord2f(1,0); glVertex3f(orgwinsizex/3+400, 200, 0);
+        glEnd();
+        drawText("No streams found ...", 700, 260, 0.4f, 1);
+    }
+  } else if ((rss_search_podcast_string.empty()) && (FeedCatalog.size() > 0)) {
+    // ---- RENDER Normal view ---------------------------------
+    for (int i = 0; i < visibleItems && (sofset + i) < FeedCatalog.size(); ++i) {
+      int index = sofset + i;
+      int col = i % itemsPerRow;
+      int row = i / itemsPerRow;
+      int x = xof + col * itemWidth + 40;
+      int y = screenTop - (row * rowHeight) + subOff - 40;
+      draw_stream_item( x, y, index, normal_icon, empty_icon, stream_key_selected);
+    }
+    // ---- EMPTY STATE ------------------------------------------
+    if (FeedCatalog.empty()) {
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       glBindTexture(GL_TEXTURE_2D, _textureIdloading);
@@ -2573,7 +2681,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon, GLuint empty_icon, 
       glTexCoord2f(1,0); glVertex3f(orgwinsizex/3+400, 200, 0);
       glEnd();
       drawText("Please wait Loading ...", 700, 260, 0.4f, 1);
+    }
   }
 }
-
 

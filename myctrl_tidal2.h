@@ -31,12 +31,9 @@ class tidal_device_def {
     tidal_device_def();
 };
 
-
 struct Color4 {
     float r, g, b, a;
 };
-
-
 
 //
 // playlist/song overview def tidal
@@ -44,14 +41,14 @@ struct Color4 {
 
 class tidal_oversigt_type {
   public:
-    char        feed_showtxt[80+1];			          // what to show in overview
-    char        feed_name[80+1];				          // playlist/song name
-    char        feed_artist[80+1];                // artist
-    char        feed_desc[80+1];				          // desc
-    char        feed_gfx_url[1024+1];             //
-    char        feed_release_date[40+1];				  //
-    char        playlistid[100+1];                // playlist id
-    char        playlisturl[1024+1];               // play list url + tidal command
+    std::string feed_showtxt;			          // what to show in overview
+    std::string feed_name;
+    std::string feed_artist;
+    std::string feed_desc;
+    std::string feed_gfx_url;
+    std::string feed_release_date;
+    std::string playlistid;
+    std::string playlisturl;
     unsigned int feed_group_antal;
     unsigned int numberOfTracks;
     char        type_of_media[80+1];              // album or single
@@ -67,22 +64,24 @@ class tidal_oversigt_type {
 // to show active song to play in window
 //
 
+
 class tidal_active_play_info_type {                // sample data down here
   public:
     tidal_active_play_info_type();
     long progress_ms;                                   // 27834
     long duration_ms;                                   // 245119
-    char song_name[200];                                // Joe Bonamassa
-    char artist_name[200];                              // Joe Bonamassa
-    char cover_image_url[256];                          // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
+    std::string song_name;                                // Joe Bonamassa
+    std::string artist_name;                              // Joe Bonamassa
+    std::string cover_image_url;                          // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
     GLuint cover_image;
-    char album_name[200];                               // (British Blues Explosion Live)
-    char release_date[24];                              //
+    std::string album_name;                               // (British Blues Explosion Live)
+    std::string release_date;                              //
     long popularity;                                    // (27)
     bool is_playing;                                    // (true)
-    char playlistid[120];                               // playlistid
-    char playurl[2048];
+    std::string playlistid;                               // playlistid
+    std::string playurl;
 };
+
 
 // tidal global class
 
@@ -92,8 +91,8 @@ class tidal_class {
     std::vector<tidal_oversigt_type> stack;                               // tidal overview stack
     tidal_device_def tidal_device[10];
     int tidal_device_antal;                                               // antal device found
-    tidal_active_play_info_type tidal_aktiv_song[200];                   // aktiv song list
-    std::vector<tidal_active_play_info_type> tidal_aktiv_song1; // change to vector (NOT DONE for now)
+    // playlist info
+    std::vector<tidal_active_play_info_type> tidal_aktiv_song1;           // change to vector (NOT DONE for now)
     
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
@@ -179,7 +178,12 @@ class tidal_class {
     // end webserver (NOT IN USE FOR NOW)
     std::string playlist_type;            // playlist type from json file (used to only create playlist then save to db)
     // touch screen scroll
+    int downTimeMs=0;
+    bool moved=false;
     bool dragging=false;
+    bool gettouchbutton;
+    int downX=0;
+    int downY=0;
     float scrollSpeed=0.8f;
     int lastX=0;
     int lastY=0;
@@ -226,8 +230,8 @@ class tidal_class {
     int tidal_last_play();                                                // play last song
     int tidal_next_play();                                                // play next song
     int get_tidal_playlistid();
-    char *get_tidal_name(int nr);                                         // get record name
-    char *get_tidal_playlistid(int nr);                                   // get id to play
+    const char *get_tidal_name(int nr);                                   // get record name
+    const char *get_tidal_playlistid(int nr);                             // get id to play
     int tidal_refresh_token();
     int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
     // void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
@@ -235,15 +239,14 @@ class tidal_class {
 
     // not in use
     int auth_device_authorization();
-
-    char *tidal_aktiv_song_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].song_name ); };                       //
-    char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].artist_name ); };                   // aktiv sang som spilles
-    char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[tidal_aktiv_song_nr].release_date ); };            //
-    char *tidal_aktiv_album_name(int nr) { return( tidal_aktiv_song[nr].album_name ); };
+    const char *tidal_aktiv_song_name() { return(tidal_aktiv_song1[tidal_aktiv_song_nr].song_name.c_str()); };                       //
+    const char *tidal_aktiv_artist_name() { return(tidal_aktiv_song1[tidal_aktiv_song_nr].artist_name.c_str()); };                   // aktiv sang som spilles
+    const char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song1[tidal_aktiv_song_nr].release_date.c_str() ); };
+    const char *tidal_aktiv_album_name(int nr) { return( tidal_aktiv_song1[nr].album_name.c_str() ); };
     bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; return(true); }
-    GLuint get_tidal_aktiv_cover_image() { return(tidal_aktiv_song[tidal_aktiv_song_nr].cover_image); };
-    void set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song[tidal_aktiv_song_nr].cover_image=img; };
-    char *tidal_aktiv_cover_image_url() { return(tidal_aktiv_song[0].cover_image_url); };                                 // Only use icon 0 
+    GLuint get_tidal_aktiv_cover_image() { return(tidal_aktiv_song1[tidal_aktiv_song_nr].cover_image); };
+    void set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song1[tidal_aktiv_song_nr].cover_image=img; };
+    const char *tidal_aktiv_cover_image_url() { return(tidal_aktiv_song1[0].cover_image_url.c_str() ); };                                 // Only use icon 0 
     // new
     int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
     int total_aktiv_songs() { return(tidal_aktiv_song_antal); };                                                          // # of songs in playlist
@@ -251,12 +254,15 @@ class tidal_class {
     // return type playlist
     int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr].type); else return(0); }
     // GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
-    char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr].feed_gfx_url); else return(0); }
-    char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr].feed_showtxt); else return(0); }
-    char *get_tidal_feed_artistname(int nr) { if ( nr < antal ) return(stack[nr].feed_artist); else return(0); }
+    const char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr].feed_gfx_url.c_str()); else return(0); }
+    const char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr].feed_showtxt.c_str()); else return(0); }
+    const char *get_tidal_feed_artistname(int nr) { if ( nr < antal ) return(stack[nr].feed_artist.c_str()); else return(0); }
   
-    char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
-    char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].playurl ); else return(0); }
+    // char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
+    const char *get_tidal_artistname(int nr) {if ( nr < tidal_aktiv_song1.size()) return(tidal_aktiv_song1[nr].artist_name.c_str()); else return(0); }
+   
+    const char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song1[nr].playurl.c_str() ); else return(0); }
+
     char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
     void process_value_playlist(json_value* value, int depth,int x);
     void process_object_playlist(json_value* value, int depth);
@@ -286,13 +292,13 @@ class tidal_class {
     int get_users_album(char *albumid);                                                             // download json file for album id
     int tidal_download_image(char *imgurl,char *filename);
 
-    void set_tidal_feed_showtxt(char *name,int nr) { strcpy(stack[nr].feed_showtxt,name); }
-    void set_tidal_feed_artistname(char *name,int nr) { strcpy(stack[nr].feed_artist,name); }
-    void set_tidal_feed_name(char *name,int nr) { strcpy(stack[nr].feed_name,name); }
-    void set_tidal_feed_desc(char *name,int nr) { strcpy(stack[nr].feed_desc,name); }
-    void set_tidal_feed_gfx_url(char *name,int nr) { strcpy(stack[nr].feed_gfx_url,name); }
-    void set_tidal_feed_release_date(char *name,int nr) { strcpy(stack[nr].feed_release_date,name); }
-    void set_tidal_playlistid(char *name,int nr) { strcpy(stack[nr].playlistid,name); }
+    void set_tidal_feed_showtxt(char *name,int nr) { stack[nr].feed_showtxt=name; }
+    void set_tidal_feed_artistname(char *name,int nr) { stack[nr].feed_artist=name; }
+    void set_tidal_feed_name(char *name,int nr) { stack[nr].feed_name=name; }
+    void set_tidal_feed_desc(char *name,int nr) { stack[nr].feed_desc=name; }
+    void set_tidal_feed_gfx_url(char *name,int nr) { stack[nr].feed_gfx_url=name; }
+    void set_tidal_feed_release_date(char *name,int nr) { stack[nr].feed_release_date=name; }
+    void set_tidal_playlistid(char *name,int nr) { stack[nr].playlistid=name; }
 
     int opdatere_tidal_userCollections(char *uid);
     int opdatere_tidal_userCollections2(char *uid);

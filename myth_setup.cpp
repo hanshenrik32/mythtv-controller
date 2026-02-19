@@ -17,8 +17,10 @@
 #include <libxml/parser.h>
 #include <fstream>
 #include <fmt/format.h>
-
+#include <filesystem>
 #include <iostream>
+
+namespace fs = std::filesystem;
 
 // mysql support
 #include <mysql.h>
@@ -52,6 +54,7 @@ extern float spectrum_left[];                                                   
 extern float spectrum_right[];                                                     // used for spectium
 extern float spectrum[];                                                     // used for spectium
 
+extern unsigned int keybufferindex;                          // keyboard buffer index
 
 extern int configuvmeter;
 extern int debugmode;
@@ -69,10 +72,6 @@ extern const char *dbname;                                                      
 rss_stream_class rssstreamoversigt;
 //
 
-struct configkeytype {
-  char cmdname[200];
-  unsigned int scrnr;
-};
 
 extern bool hent_tv_channels;
 extern tv_graber_config  aktiv_tv_graber;
@@ -105,7 +104,7 @@ extern char configfontname[200];				        // default ttf font name to load and
 extern long configtvguidelastupdate;            // last xmltv update
 extern char configbackend_tvgraber[256];        // internal tv graber to use
 extern char configbackend_tvgraberland[256];    // internal tv graber to use country
-extern configkeytype configkeyslayout[12];			// functions keys startfunc
+struct configkeytype configkeyslayout[12];			// functions keys startfunc
 extern char configuse3deffect[20];
 // extern char configvideoplayer[200];             // default video player
 extern char configdefaultplayer[200];
@@ -2364,17 +2363,77 @@ void show_setup_sql() {
   if (do_show_setup_select_linie==7) showcoursornow(-200,-550,strlen(configrecordpath));
 }
 
+
+
+// ****************************************************************************************
+//
+// select file for functions keys setup
+//
+// ****************************************************************************************
+
+void select_exe_functions_keys_name() {
+  char filenamepath[16380];
+  strcpy(filenamepath,"");
+  std::string filenamepath1;
+  std::string filename="";
+  std::string tmp;
+  std::string dest_file="";
+  std::string realpath="";
+  std::ofstream torrentfile;
+  FILE *f = popen("/usr/bin/zenity --file-selection --file-filter=*.* --modal --title=\"Select torrent file.\" 2> /dev/null", "r");
+  fgets(filenamepath, 16380, f);
+  if (!(f)) {
+    return;
+  }  
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+    filename.erase(std::remove(filename.begin(), filename.end(), '\n'), filename.cend());
+    switch (do_show_setup_select_linie) {
+      case 0: configkeyslayout[0].cmdname = filename;
+              break;
+      case 2: configkeyslayout[1].cmdname = filename;
+              break;
+      case 4: configkeyslayout[2].cmdname = filename;
+              break;
+      case 6: configkeyslayout[3].cmdname = filename;
+              break;
+      case 8: configkeyslayout[4].cmdname = filename;
+              break;
+      case 10:configkeyslayout[5].cmdname = filename;
+              break;
+      case 12:configkeyslayout[6].cmdname = filename;
+              break;
+      case 14:configkeyslayout[7].cmdname = filename;
+              break;
+      case 16:configkeyslayout[8].cmdname = filename;
+              break;
+      case 18:configkeyslayout[9].cmdname = filename;
+              break;
+      case 20:configkeyslayout[10].cmdname = filename;
+              break;
+    }
+  }
+}
+
+
+
+
 // ****************************************************************************************
 //
 // Setup keys
 //
 // ****************************************************************************************
+
+
 void show_setup_keys() {
   int winsizx=100;
   int winsizy=300;
   int xpos=0;
   int ypos=0;
   char text[200];
+  std::string onlyfname="";
+  std::string onlypname="";
   // background
   glPushMatrix();
   glTranslatef(0.0f, 0.0f, 0.0f);
@@ -2416,7 +2475,7 @@ void show_setup_keys() {
   glColor3f(1.0f, 1.0f, 1.0f);
   glTranslatef(680, 680, 0.0f);
   glRasterPos2f(0.0f, 0.0f);
-  myglprint4((char *) "Command to execute.                                                              ScrNr");
+  myglprint4((char *) "Command to execute.                                    ScrNr");
   glPopMatrix();
   glPushMatrix();
   // F3
@@ -2673,11 +2732,13 @@ void show_setup_keys() {
   glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
   glEnd();
   glPopMatrix();
+  /*
   glPushMatrix();
   xpos=810;
   ypos=100;
   winsizx=50;
   winsizy=30;
+  
   for(int i=0;i<9;i++) {
     glEnable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -2694,17 +2755,22 @@ void show_setup_keys() {
     glEnd();
   }
   glPopMatrix();
+  */
+  
+  
   // line 0
   glDisable(GL_TEXTURE_2D);
   glPushMatrix();
   glTranslatef(680 , 650 , 0.0f);
   glRasterPos2f(0.0f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[0].cmdname).filename();          // return filename with extension.
+  if ((onlyfname.length() > 0) && (!(fs::path(configkeyslayout[0].cmdname).empty()))) onlyfname = "/.../" + onlyfname;
+  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==0) {
-    strcpy(keybuffer,configkeyslayout[0].cmdname);
-    myglprint4((char *) keybuffer);   // keybuffer
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
-    myglprint4((char *) configkeyslayout[0].cmdname);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==0) showcoursornow(311,500,strlen(keybuffer));
@@ -2722,17 +2788,20 @@ void show_setup_keys() {
   }
   glPopMatrix();
   if (do_show_setup_select_linie==1) showcoursornow(812,500,strlen(keybuffer));
+
+
   // line 1
   glPushMatrix();
   glTranslatef(680 , 600 , 0.0f);
   glRasterPos2f(0.0f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[1].cmdname).filename();          // return filename with extension.
+  if ((onlyfname.length() > 0) && (!(fs::path(configkeyslayout[1].cmdname).empty()))) onlyfname = "/.../" + onlyfname;
+  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==2) {
-    strcpy(keybuffer,configkeyslayout[1].cmdname);
-    myglprint4((char *) keybuffer);
+    if (configkeyslayout[1].cmdname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
-    sprintf(text,"%s",configkeyslayout[1].cmdname);
-    myglprint4((char *) text);
+    if (configkeyslayout[1].cmdname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==2) showcoursornow(311,450,strlen(keybuffer));
@@ -2755,12 +2824,13 @@ void show_setup_keys() {
   glTranslatef(680 , 550 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[2].cmdname).filename();          // return filename with extension.
+  if ((onlyfname.length() > 0) && (!(fs::path(configkeyslayout[2].cmdname).empty()))) onlyfname = "/.../" + onlyfname;
+  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==4) {
-    strcpy(keybuffer,configkeyslayout[2].cmdname);
-    myglprint4((char *) keybuffer);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
-    glColor3f(1.0f,1.0f,1.0f);
-    myglprint4((char *) configkeyslayout[2].cmdname);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==4) showcoursornow(311,400,strlen(keybuffer));
@@ -2783,12 +2853,14 @@ void show_setup_keys() {
   glTranslatef(680 , 500 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[3].cmdname).filename();          // return filename with extension.
+  if (fs::path(configkeyslayout[3].cmdname).has_parent_path()) onlyfname = "/.../" + onlyfname;
+  strcpy(keybuffer, onlyfname.c_str());
+  keybufferindex=onlyfname.length();
   if (do_show_setup_select_linie==6) {
-    strcpy(keybuffer,configkeyslayout[3].cmdname);
-    myglprint4((char *) keybuffer);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
-    glColor3f(1.0f,1.0f,1.0f);
-    myglprint4((char *) configkeyslayout[3].cmdname);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==6) showcoursornow(311,350,strlen(keybuffer));
@@ -2811,12 +2883,15 @@ void show_setup_keys() {
   glTranslatef(680 , 450 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[4].cmdname).filename();          // return filename with extension.
+  onlypname=fs::path(configkeyslayout[4].cmdname).parent_path();      // return path without filename.
+  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;
+  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==8) {
-    strcpy(keybuffer,configkeyslayout[4].cmdname);
-    myglprint4((char *) keybuffer);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
     glColor3f(1.0f,1.0f,1.0f);
-    myglprint4((char *) configkeyslayout[4].cmdname);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==8) showcoursornow(311,300,strlen(keybuffer));
@@ -2839,12 +2914,14 @@ void show_setup_keys() {
   glTranslatef(680 , 400 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[5].cmdname).filename();          // return filename with extension.
+  onlypname=fs::path(configkeyslayout[5].cmdname).parent_path();      // return path without filename.
+  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==10) {
-    strcpy(keybuffer,configkeyslayout[5].cmdname);
-    myglprint4((char *) keybuffer);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
     glColor3f(1.0f,1.0f,1.0f);
-    myglprint4((char *) configkeyslayout[5].cmdname);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==10) showcoursornow(311,250,strlen(keybuffer));
@@ -2867,12 +2944,15 @@ void show_setup_keys() {
   glTranslatef(680 , 350 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[6].cmdname).filename();          // return filename with extension.
+  onlypname=fs::path(configkeyslayout[6].cmdname).parent_path();      // return path without filename.
+  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
+  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==12) {
-    strcpy(keybuffer,configkeyslayout[6].cmdname);
-    myglprint4((char *) keybuffer);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
     glColor3f(1.0f,1.0f,1.0f);
-    myglprint4((char *) configkeyslayout[6].cmdname);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==12) showcoursornow(311,200,strlen(keybuffer));
@@ -2895,12 +2975,15 @@ void show_setup_keys() {
   glTranslatef(680 , 300 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[7].cmdname).filename();          // return filename with extension.
+  onlypname=fs::path(configkeyslayout[7].cmdname).parent_path();      // return path without filename.
+  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
+  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==14) {
-    strcpy(keybuffer,configkeyslayout[7].cmdname);
-    myglprint4((char *) keybuffer);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
     glColor3f(1.0f,1.0f,1.0f);
-    myglprint4((char *) configkeyslayout[7].cmdname);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==14) showcoursornow(311,150,strlen(keybuffer));
@@ -2923,12 +3006,15 @@ void show_setup_keys() {
   glTranslatef(680 , 250 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
+  onlyfname=fs::path(configkeyslayout[8].cmdname).filename();          // return filename with extension.
+  onlypname=fs::path(configkeyslayout[8].cmdname).parent_path();      // return path without filename.
+  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
+  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==16) {
-    strcpy(keybuffer,configkeyslayout[8].cmdname);
-    myglprint4((char *) keybuffer);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   } else {
     glColor3f(1.0f,1.0f,1.0f);
-    myglprint4((char *) configkeyslayout[8].cmdname);
+    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==16) showcoursornow(311,100,strlen(keybuffer));
@@ -2951,7 +3037,11 @@ void show_setup_keys() {
   }
 }
 
-
+// ****************************************************************************************
+//
+// show rss list
+//
+// ****************************************************************************************
 
 
 void showrss_list() {

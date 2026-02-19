@@ -38,51 +38,51 @@ class musicoversigt_class {
     unsigned int antal_music_oversigt;
     std::vector <music_oversigt_type> musicoversigt;
     bool do_play;
-    bool music_is_playing;                                                // do we play ?
-    
+    bool music_is_playing;                                                // do we play ?   
   public:
     int selected_icon_in_view=1;
     char overview_show_band_name[256];                                  // show band name in overview
     bool search_loaded;
     int searchtype;
     bool loaded_begin;
+    int downTimeMs=0;
+    bool moved=false;
+    bool gettouchbutton;
+    int downX=0;
+    int downY=0;
+    // touch screen scroll
+    bool dragging=false;
+    float scrollSpeed=1.0f;
+    int lastX=0;
+    int lastY=0;
+    int lastDX=0;
+    int lastDY=0;
+    float viewOffsetX=0.0f;
+    float viewOffsetY=0.0f;
+    // end touch screen scroll
 
+    // new scroll vars
+    float scrollPos = 0.0f;
+    float scrollVel = 0.0f;
 
-      // touch screen scroll
-      bool dragging=false;
-      float scrollSpeed=1.0f;
-      int lastX=0;
-      int lastY=0;
-      int lastDX=0;
-      int lastDY=0;
-      float viewOffsetX=0.0f;
-      float viewOffsetY=0.0f;
-      // end touch screen scroll
+    const float friction = 0.90f;
+    float velocityX = 0.0f;
+    float velocityY = 0.0f;
+    const float accel    = 2.0f;
 
-     // new scroll vars
-      float scrollPos = 0.0f;
-      float scrollVel = 0.0f;
+    int itemsPerRow = 8;
+    int rowHeight   = 198;
+    int itemWidth   = 198;
 
-      const float friction = 0.90f;
-      float velocityX = 0.0f;
-      float velocityY = 0.0f;
-      const float accel    = 2.0f;
+    int startX = 20;
+    int startY = 895;
+    int viewHeight = 780;
+    // end new scroll vars
 
-      int itemsPerRow = 8;
-      int rowHeight   = 198;
-      int itemWidth   = 198;
-
-      int startX = 20;
-      int startY = 895;
-      int viewHeight = 780;
-      // end new scroll vars
-
-      int search_startX = 20;
-      int search_startY = 762;
-      int search_viewHeight = 660;
-      // end new scroll vars
-
-
+    int search_startX = 20;
+    int search_startY = 762;
+    int search_viewHeight = 660;
+    // end new scroll vars
     bool search_music_online_done;
     bool play() { return(do_play);}    
     void clean_music_oversigt();
