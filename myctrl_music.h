@@ -66,9 +66,9 @@ class musicoversigt_class {
     float scrollVel = 0.0f;
 
     const float friction = 0.90f;
-    float velocityX = 0.0f;
-    float velocityY = 0.0f;
-    const float accel    = 2.0f;
+    float velocityX   = 0.0f;
+    float velocityY   = 0.0f;
+    const float accel = 2.0f;
 
     int itemsPerRow = 8;
     int rowHeight   = 198;

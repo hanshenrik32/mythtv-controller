@@ -122,8 +122,9 @@ class tidal_class {
     void process_value(json_value* value, int depth);
     void process_array(json_value* value, int depth);
 
-    int tidal_get_artists_all_albums(char *artistid,bool force);
-    int update_playcount(const char *playpath);
+    int tidal_get_artists_all_albums(char *artistid,bool force);    
+    int update_song_playcount(const char *playpath);
+    
   public:
     int selected_icon_in_view=1;
     char tidaltoken[512];                                                 // access_token
@@ -246,7 +247,7 @@ class tidal_class {
     bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; return(true); }
     GLuint get_tidal_aktiv_cover_image() { return(tidal_aktiv_song1[tidal_aktiv_song_nr].cover_image); };
     void set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song1[tidal_aktiv_song_nr].cover_image=img; };
-    const char *tidal_aktiv_cover_image_url() { return(tidal_aktiv_song1[0].cover_image_url.c_str() ); };                                 // Only use icon 0 
+    const char *tidal_aktiv_cover_image_url() { if (tidal_aktiv_song1[0].cover_image_url.length()>0) return(tidal_aktiv_song1[0].cover_image_url.c_str() ); else return(0); };                                 // Only use icon 0 
     // new
     int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
     int total_aktiv_songs() { return(tidal_aktiv_song_antal); };                                                          // # of songs in playlist
@@ -257,6 +258,8 @@ class tidal_class {
     const char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr].feed_gfx_url.c_str()); else return(0); }
     const char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr].feed_showtxt.c_str()); else return(0); }
     const char *get_tidal_feed_artistname(int nr) { if ( nr < antal ) return(stack[nr].feed_artist.c_str()); else return(0); }
+
+    int get_tidal_feed_nr_of_songs(int nr) { if ( nr < antal ) return(stack[nr].numberOfTracks); else return(-1); }
   
     // char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
     const char *get_tidal_artistname(int nr) {if ( nr < tidal_aktiv_song1.size()) return(tidal_aktiv_song1[nr].artist_name.c_str()); else return(0); }
@@ -279,7 +282,7 @@ class tidal_class {
     int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
     int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
     void set_textureloaded(bool set);                                               // set flag for textures loaded
-    int save_tidal_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid,char *artistname);
+    int save_tidal_oversigt_playlists(char *playlistfilename,int tidalknapnr);
     bool delete_record_in_view(long tidalknapnr);
     int get_users_playlist_plus_favorite(bool cleandb);
     void set_tidal_playing_flag(bool flag);    
@@ -319,6 +322,7 @@ class tidal_class {
     void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
     void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
+    int update_playlist_playcount(const char *playid);
 };
 
 #endif

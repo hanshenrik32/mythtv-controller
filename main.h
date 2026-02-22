@@ -1,7 +1,7 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
-const char *SHOWVER={"0.50.0 Beta"};
+const char *SHOWVER={"0.50.2 Beta"};
 
 
 const int DOWNKEY=23;
