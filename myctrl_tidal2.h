@@ -89,6 +89,7 @@ class tidal_class {
   private:
     enum { maxantal=5000 };					                                      // MAX antal rss stream in wiew
     std::vector<tidal_oversigt_type> stack;                               // tidal overview stack
+    std::vector<tidal_oversigt_type> stack_search;                        // tidal search overview stack
     tidal_device_def tidal_device[10];
     int tidal_device_antal;                                               // antal device found
     // playlist info
@@ -103,6 +104,10 @@ class tidal_class {
     char countryCode[512];                                                //
     char tidaltoken_refresh[512];                                         // refresh_token
     int antal;					                       	                            // Antal songs in playlist
+
+    int antal_search;                                 	                    // Antal songs in playlist search
+    int antalplaylists_search;
+
     int antalplaylists;                                                     // antal playlist in view
     bool tidal_is_playing;                                                // do we play ?
     bool tidal_is_pause;                                                  // do we pause
@@ -162,7 +167,7 @@ class tidal_class {
     char tidal_playlistname[256];
     char tidal_playlistid[256];
     char client_id[120];                                                    // tidal client id
-    char client_secret[120];                                                // tidal client secret
+    std::string client_secret;
     int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
     void set_texture(int nr,GLuint idtexture);                              // set texture
     bool startup_loaded;					                                          // load stream icons statios list
@@ -218,6 +223,7 @@ class tidal_class {
     char *tidal_get_token() { return(tidaltoken); };                        // get token from struct
     int tidal_get_user_id();
     void clean_tidal_oversigt();
+    void clean_tidal_search_oversigt();
     int gettoken();                               // TEST
     int opdatere_tidal_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
     int tidal_get_user_playlists(bool force,int startoffset);
@@ -231,8 +237,10 @@ class tidal_class {
     int tidal_last_play();                                                // play last song
     int tidal_next_play();                                                // play next song
     int get_tidal_playlistid();
+    // int get_tidal_search_playlistid();
     const char *get_tidal_name(int nr);                                   // get record name
     const char *get_tidal_playlistid(int nr);                             // get id to play
+    const char *get_tidal_search_playlistid(int nr);                      // get id to play for search
     int tidal_refresh_token();
     int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
     // void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
@@ -247,7 +255,7 @@ class tidal_class {
     bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; return(true); }
     GLuint get_tidal_aktiv_cover_image() { return(tidal_aktiv_song1[tidal_aktiv_song_nr].cover_image); };
     void set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song1[tidal_aktiv_song_nr].cover_image=img; };
-    const char *tidal_aktiv_cover_image_url() { if (tidal_aktiv_song1[0].cover_image_url.length()>0) return(tidal_aktiv_song1[0].cover_image_url.c_str() ); else return(0); };                                 // Only use icon 0 
+    const char *tidal_aktiv_cover_image_url() { if ((tidal_aktiv_song1[0].cover_image_url.size()>0) && (tidal_aktiv_song1[0].cover_image_url.length()>0)) return(tidal_aktiv_song1[0].cover_image_url.c_str() ); else return(0); };                                 // Only use icon 0 
     // new
     int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
     int total_aktiv_songs() { return(tidal_aktiv_song_antal); };                                                          // # of songs in playlist
@@ -289,6 +297,7 @@ class tidal_class {
     bool get_tidal_playing_flag();
     int get_artist_from_file(char *filename, bool update_start_playlist);                                                       // load artis playlists in db
     int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
+    int tidal_play_now_search_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
     int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
     int load_tidal_iconoversigt();                                                                  // load all icons
     int get_access_token(char *loginbase64);                                                        // get token
@@ -314,8 +323,6 @@ class tidal_class {
     int get_artist_from_file_and_update_for_editor(char *filename);
     int save_tidal_artistlist(char *filename);
 
-
-
     void onScroll(float delta) { scrollVel += delta * accel; }
     void draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
     void draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
@@ -323,6 +330,7 @@ class tidal_class {
     void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
     int update_playlist_playcount(const char *playid);
+    void convert_m4a_to_flac(char *path,int tidalknapnr);
 };
 
 #endif
