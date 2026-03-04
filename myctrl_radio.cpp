@@ -10,12 +10,22 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <fmt/format.h>
 #include <sqlite3.h>                    // sqlite interface to xbmc
+#include <curl/curl.h>                  // lib curl
 
+// json parser
+#include <iostream>
+#include <jsoncpp/json/json.h>
+#include <fstream>
+
+
+
+#include "myctrl_readwebfile.h"
 #include "myctrl_radio.h"
 #include "utility.h"
 #include "myth_ttffont.h"
@@ -112,6 +122,156 @@ void radiostation_class::clean_radio_oversigt() {
   }
   antal=0;
 }
+
+
+
+// ****************************************************************************************
+//
+// write data
+//
+// ****************************************************************************************
+
+static size_t radio_write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+  size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+  return written;
+}
+
+
+// *******************************************************************************************
+//
+//
+//
+// *******************************************************************************************
+
+int radiostation_class::radio_download_image(char *imgurl,char *filename) {
+  FILE *file;
+  std::string response_string;
+  CURLcode res;
+  CURL *curl;
+  char *base64_code;
+  char errbuf[CURL_ERROR_SIZE];
+  if (!(file_exists(filename))) {
+    curl = curl_easy_init();
+    if (curl) {
+      curl_easy_setopt(curl, CURLOPT_URL, imgurl);
+      // send data to curl_writeFunction_file
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, radio_write_data);
+      // ask libcurl to use TLS version 1.3 or later
+      curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
+      curl_easy_setopt(curl, CURLOPT_VERBOSE,0L);
+      curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:89.0) Gecko/20100101 Firefox/89.0");
+      curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); // <-- ssl don't forget this
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); // <-- ssl and this
+      curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 3000L);
+      curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10000L);
+      curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1L);
+      curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 5L);      errbuf[0] = 0;
+      try {
+        file = fopen(filename, "wb");
+        if (file) {
+          curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+          // get file
+          res = curl_easy_perform(curl);
+          fclose(file);
+        }
+        if(res != CURLE_OK) {
+          fprintf(stderr, "%s\n", curl_easy_strerror(res));
+        }
+      }
+      catch (...) {
+        printf("Error write file.\n");
+      }
+      curl_easy_cleanup(curl);
+    }
+  }
+  return(1);
+}
+
+
+
+
+
+// ******************************************************************************************
+//
+// json radio file paser
+//
+// ******************************************************************************************
+
+
+
+int radiostation_class::load_radio_stations_from_json_file() {
+  MYSQL *conn1;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  const char *database = (char *) "mythtvcontroller";
+  int ok=0;
+  radio_oversigt_type new_radio_record;
+  int antal=0;
+  char downloadfilename[8192];
+  std::string downloadfilenamelong;
+  std::string downloadfilenamelong_out;
+  std::string downloadfilenamelong2;
+  std::string do_cmd;
+  std::string sql_update;
+  Json::Value cfg_root;
+  conn1=mysql_init(NULL);
+  if (mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+    std::ifstream cfgfile("stations-big.json");
+    cfgfile >> cfg_root;
+    // Tjek at root er array
+    if (!cfg_root.isArray()) {
+      std::cout << "Root er ikke et array!\n";
+      return 0;
+    }
+    // loop gemmen array
+    for (const auto& station : cfg_root) {
+      std::string name = station.get("name", "").asString();
+      std::string url  = station.get("url_resolved", "").asString();
+      std::string country = station.get("country", "").asString();
+      std::string gfxurl = station.get("favicon", "").asString();
+      int bitrate = station.get("bitrate", 0).asInt();   
+      strncpy(new_radio_record.station_name,name.c_str(),10);
+      new_radio_record.station_name[11]=0;
+      new_radio_record.streamurl=url;
+      new_radio_record.art=0;
+      new_radio_record.online=true;
+      new_radio_record.aktiv=true;
+      new_radio_record.kbps=bitrate;
+      get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+      downloadfilenamelong = downloadfilename;
+      downloadfilenamelong2 = "/opt/mythtv-controller/images/radiostations/";
+      downloadfilenamelong2 = downloadfilenamelong2 + downloadfilename;
+      radio_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong2.c_str());                // download file
+      downloadfilenamelong_out = downloadfilenamelong + ".png";
+      new_radio_record.gfxfilename=downloadfilenamelong;
+      std::cout << "long file name: " << downloadfilenamelong << std::endl;   
+      if (file_exists(downloadfilenamelong.c_str())) {
+        do_cmd = "convert -resize 256x256! -type TrueColor -alpha set -background none -transparent white '";
+        do_cmd = do_cmd + downloadfilenamelong;
+        do_cmd = do_cmd + "' '";
+        do_cmd = do_cmd +downloadfilenamelong_out;
+        do_cmd = do_cmd + "'";
+        if (!(file_exists(downloadfilenamelong_out.c_str()))) 
+          ok=system(do_cmd.c_str());
+          if (ok==0) new_radio_record.gfxfilename=downloadfilenamelong_out;
+      }
+      new_radio_record.textureId=0;
+      // new_radio_record.desc="";
+      if (conn1) {
+        // FIX mig. inset dubble
+        sql_update  = fmt::format("insert IGNORE INTO radio_stations(name,stream_url,homepage,aktiv,art,gfx_link,bitrate,online,intnr) values ('{}','{}','{}',{},{},'{}',{},{},{})",new_radio_record.station_name, new_radio_record.streamurl, new_radio_record.homepage, 1, 0, new_radio_record.gfxfilename,0,1,0);
+        mysql_query(conn1,sql_update.c_str());
+        res = mysql_store_result(conn1);
+      }
+      antal++;
+    }
+    mysql_close(conn1);
+  }
+  if (antal>0) return(1); else return(0);
+}
+
+
 
 // *******************************************************************************************
 
@@ -387,7 +547,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 
     } else {
       if (radiosortorder==0)			// start order default
-        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1  order by popular desc,name";
+        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by popular desc,name";
       else if (radiosortorder==28)		// bit rate
         sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name";
       else if (radiosortorder==27)		// land kode
@@ -1199,3 +1359,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
   printf("radiostation=%ld\n",radiostation);
   return(radiostation);		// we are done check all radio stations in database
 }
+
+//
+// CREATE UNIQUE INDEX radio_stations_stream_url_IDX USING BTREE ON mythtvcontroller.radio_stations (stream_url);
+//

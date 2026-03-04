@@ -58,7 +58,7 @@ int get_webfilenamelong(char* fname, char* webpath) {
       filename=filename1.substr(0, pos + strlen(ext));
     }
     for(char & c: filename) {
-        if(c == '?' || c == '%' || c == ':' || c == '*' || c == '|' || c == '"' || c == '<' || c == '>' || c == '\\' || c == '/') {
+        if(c == '?' || c == '%' || c == '=' || c == ':' || c == '*' || c == '|' || c == '"' || c == '<' || c == '>' || c == '\\' || c == '/') {
             c = '_';
         }
     }

@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <vector>
+#include "json-parser/json.h"
 //#include <irrKlang.h>
 
 const int stationamelength=40;
@@ -124,6 +125,14 @@ class radiostation_class {
     void onScroll(float delta) { scrollVel += delta * accel; }
     void draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);  // draw single stream item
     bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
+
+    // json parser
+    int load_radio_stations_from_json_file();
+    int radio_download_image(char *imgurl,char *filename);
+    void process_object_radio(json_value* value, int depth);
+    void process_array_radio(json_value* value, int depth);
+    void process_value_radio(json_value* value, int depth,int x);
+
 };
 
 #endif

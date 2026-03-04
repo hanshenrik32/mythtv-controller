@@ -93,7 +93,7 @@ class tidal_class {
     tidal_device_def tidal_device[10];
     int tidal_device_antal;                                               // antal device found
     // playlist info
-    std::vector<tidal_active_play_info_type> tidal_aktiv_song1;           // change to vector (NOT DONE for now)
+    std::vector<tidal_active_play_info_type> tidal_aktiv_song;           // change to vector (NOT DONE for now)
     
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
@@ -248,14 +248,14 @@ class tidal_class {
 
     // not in use
     int auth_device_authorization();
-    const char *tidal_aktiv_song_name() { return(tidal_aktiv_song1[tidal_aktiv_song_nr].song_name.c_str()); };                       //
-    const char *tidal_aktiv_artist_name() { return(tidal_aktiv_song1[tidal_aktiv_song_nr].artist_name.c_str()); };                   // aktiv sang som spilles
-    const char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song1[tidal_aktiv_song_nr].release_date.c_str() ); };
-    const char *tidal_aktiv_album_name(int nr) { return( tidal_aktiv_song1[nr].album_name.c_str() ); };
+    const char *tidal_aktiv_song_name() { if (tidal_aktiv_song_antal>0) return(tidal_aktiv_song[tidal_aktiv_song_nr].song_name.c_str()); else return(nullptr); };                       //
+    const char *tidal_aktiv_artist_name() { if (tidal_aktiv_song_antal>0) return(tidal_aktiv_song[tidal_aktiv_song_nr].artist_name.c_str()); else return(nullptr); };                   // aktiv sang som spilles
+    const char *tidal_aktiv_song_release_date() { if (tidal_aktiv_song_antal>0) return( tidal_aktiv_song[tidal_aktiv_song_nr].release_date.c_str()); else return(nullptr); };
+    const char *tidal_aktiv_album_name(int nr) { if (tidal_aktiv_song_antal>0) return( tidal_aktiv_song[nr].album_name.c_str()); else return(nullptr); };
     bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; return(true); }
-    GLuint get_tidal_aktiv_cover_image() { return(tidal_aktiv_song1[tidal_aktiv_song_nr].cover_image); };
-    void set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song1[tidal_aktiv_song_nr].cover_image=img; };
-    const char *tidal_aktiv_cover_image_url() { if ((tidal_aktiv_song1[0].cover_image_url.size()>0) && (tidal_aktiv_song1[0].cover_image_url.length()>0)) return(tidal_aktiv_song1[0].cover_image_url.c_str() ); else return(0); };                                 // Only use icon 0 
+    GLuint get_tidal_aktiv_cover_image() { if (tidal_aktiv_song_antal>0) return(tidal_aktiv_song[tidal_aktiv_song_nr].cover_image); else return(0); };
+    void set_tidal_aktiv_cover_image(GLuint img) { tidal_aktiv_song[tidal_aktiv_song_nr].cover_image=img; };
+    const char *tidal_aktiv_cover_image_url() { if (tidal_aktiv_song_antal>0) return(tidal_aktiv_song[0].cover_image_url.c_str() ); else return(0); };  // Only use icon 0 
     // new
     int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
     int total_aktiv_songs() { return(tidal_aktiv_song_antal); };                                                          // # of songs in playlist
@@ -270,9 +270,9 @@ class tidal_class {
     int get_tidal_feed_nr_of_songs(int nr) { if ( nr < antal ) return(stack[nr].numberOfTracks); else return(-1); }
   
     // char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
-    const char *get_tidal_artistname(int nr) {if ( nr < tidal_aktiv_song1.size()) return(tidal_aktiv_song1[nr].artist_name.c_str()); else return(0); }
+    const char *get_tidal_artistname(int nr) {if ( nr < tidal_aktiv_song.size()) return(tidal_aktiv_song[nr].artist_name.c_str()); else return(0); }
    
-    const char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song1[nr].playurl.c_str() ); else return(0); }
+    const char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].playurl.c_str() ); else return(0); }
 
     char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
     void process_value_playlist(json_value* value, int depth,int x);
