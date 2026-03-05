@@ -350,6 +350,9 @@ bool hent_tidal_search = false;                          // skal vi søge efter 
 bool do_show_spotify_search_oversigt=false;
 bool do_show_tidal_search_oversigt=false;
 bool do_show_music_search_oversigt=false;                 // show music search oversigt
+
+bool do_show_radio_search_oversigt=false;                 // do search radio flag
+
 bool do_show_movie_search_oversigt=false;                 // show music search oversigt
 bool hent_spotify_search_online=false;                    // skal vi starte search online
 bool do_hent_spotify_search_online=false;                 // skal vi starte search online (do it)
@@ -3648,7 +3651,6 @@ void display() {
         write_logfile(logfile,(char *) debuglogdata);
         radiooversigt.clean_radio_oversigt();			// clean old liste
         radiooversigt.opdatere_radio_oversigt(keybuffer);	// load new
-        radiooversigt.load_radio_stations_gfx();
         keybuffer[0] = 0;
         keybufferindex = 0;
         _angley = 0.0f;
@@ -3658,6 +3660,7 @@ void display() {
       }
     }
   }
+  
   // search func for music after enter is pressed
   if ((vis_music_oversigt) && (do_show_music_search_oversigt) && (!(visur)) && (!(ask_save_playlist)))  {
     if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
@@ -3690,6 +3693,9 @@ void display() {
       }
     }
   }
+
+
+
   #ifdef ENABLE_SPOTIFY
   // spotify do the search after enter is pressed
   if ((vis_spotify_oversigt) && (!(visur)) && (do_show_spotify_search_oversigt==false)) {
@@ -12231,7 +12237,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       }
 
 
-      if (tidal_oversigt.do_setup_tidal_start_entry) {
+      if ((do_show_setup_tidal) && (tidal_oversigt.do_setup_tidal_start_entry)) {
         if (do_show_editor_select_linie<tidal_oversigt.tidal_start_playlist_array.size()) {
           strcpy(keybuffer,tidal_oversigt.tidal_start_playlist_array[do_show_editor_select_linie].c_str());
           keybufferindex=strlen(keybuffer);

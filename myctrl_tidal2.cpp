@@ -41,8 +41,6 @@
 #include <cerrno>
 #include <cstring>
 
-
-
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -5928,16 +5926,6 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     drawText(searchstring, 300.0f, 980.0f, 1.2f, 0);
     float textWidth = getTextWidth(searchstring, 1.2f);
     if (cursor) drawText("_", 300.0f+textWidth, 980.0f, 1.2f, 0);
-    /*
-    glPushMatrix();
-    glTranslatef(10, 1000, 0);
-    glRasterPos2f(0, 0);
-    glScalef(120, 120, 1.0);
-    glcRenderString("searchstring");
-    if (cursor) glcRenderString("_"); else glcRenderString(" ");
-    glPopMatrix();
-    */
-
   }
   if (search_loaded==false) doneloadsearch=false;
   if ((search_loaded==true) && (doneloadsearch==false)) {

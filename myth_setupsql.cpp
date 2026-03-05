@@ -494,6 +494,9 @@ int create_radio_oversigt() {
                 dbexist=true;
             }
         }
+
+
+
         if (!(dbexist)) {
             res = mysql_store_result(conn);
             mysql_query(conn,create_sql_radiostations);		  // create radio stations table
@@ -537,9 +540,10 @@ int create_radio_oversigt() {
               printf("%s\n" , create_sql_lande_db);
               exit(1);
             }
-
-
-// create radio stations from here
+            mysql_query(conn,"CREATE UNIQUE INDEX radio_stations_stream_url_IDX USING BTREE ON mythtvcontroller.radio_stations (stream_url)");
+            res = mysql_store_result(conn);
+            
+            // create radio stations from here
 
             mysql_query(conn,radio_station_setupsql);
             res = mysql_store_result(conn);
