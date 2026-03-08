@@ -227,7 +227,7 @@ int radiostation_class::load_radio_stations_from_json_file() {
   int art=0;
   conn1=mysql_init(NULL);
   if (mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {    
-    std::cout << "Please wait process json file stations-big.json " << std::endl;
+    std::cout << "Please wait process json file stations-big_all.json " << std::endl;
     std::ifstream cfgfile("stations-big.json");
     cfgfile >> cfg_root;
     // Tjek at root er array
@@ -311,7 +311,7 @@ int radiostation_class::load_radio_stations_from_json_file() {
         res = mysql_store_result(conn1);
       }
 
-      // std::cout << sql_update << std::endl;
+      std::cout << sql_update << std::endl;
 
       antal++;
     }
