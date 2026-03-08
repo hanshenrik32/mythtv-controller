@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <iostream>
+#include <random>
 #include "myctrl_readwebfile.h"
 
 
@@ -73,15 +74,25 @@ int get_webfilenamelong(char* fname, char* webpath) {
 //
 // ****************************************************************************************
 
+std::string random_filename(size_t length = 12, const std::string& ext = "") {
+  static const std::string chars =
+      "abcdefghijklmnopqrstuvwxyz"
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      "0123456789";
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  static std::uniform_int_distribution<> dis(0, chars.size() - 1);
+  std::string name;
+  for (size_t i = 0; i < length; ++i)
+    name += chars[dis(gen)];
+  return name + ext;
+}
+
 
 int get_webfilename(char *fname,char *webpath) {
-  char *npointer=NULL;
-  npointer=strrchr(webpath,'/');
-  if (npointer) {
-    strcpy(fname,npointer+1);
-    return(1);
-  }
-  return(0);
+  std::string filrname = random_filename(16,".png");
+  strcpy(fname,filrname.c_str());
+  return(1);  
 }
 
 

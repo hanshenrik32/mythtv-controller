@@ -17576,7 +17576,7 @@ int main(int argc, char** argv) {
     bool tidalok;
     // login tidal
 
-    radiooversigt.load_radio_stations_from_json_file();
+    // radiooversigt.load_radio_stations_from_json_file();
 
     tidalok=tidal_oversigt.get_access_token((char *) "TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {   
@@ -17645,14 +17645,17 @@ int main(int argc, char** argv) {
       system("/snap/bin/spotify &");
     }
 
-    // Create radio mysql database if not exist
+    // Create radio database if not exist (db is created)
     if (create_radio_oversigt()) {
+      radiooversigt.load_radio_stations_from_json_file();
       radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
       strcpy(configbackend_tvgraber_old,"");
     } else {
       write_logfile(logfile,(char *) "Exit program, Not posible to load radio overview.");
       exit(1);
     }
+
+
     // if kodi
     if ((strncmp(configbackend,"xbmc",4)==0) || (strncmp(configbackend,"kodi",4)==0)) {
       // music loader

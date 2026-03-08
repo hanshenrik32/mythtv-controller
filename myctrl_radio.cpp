@@ -174,8 +174,6 @@ int radiostation_class::radio_download_image(char *imgurl,char *filename) {
       curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 5L);      
       // folow redirect
       curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-
-
       try {
         file = fopen(filename, "wb");
         if (file) {
@@ -185,7 +183,7 @@ int radiostation_class::radio_download_image(char *imgurl,char *filename) {
           fclose(file);
         }
         if(res != CURLE_OK) {
-          fprintf(stderr, "%s\n", curl_easy_strerror(res));
+          // fprintf(stderr, "%s\n", curl_easy_strerror(res));
         }
       }
       catch (...) {
@@ -217,6 +215,7 @@ int radiostation_class::load_radio_stations_from_json_file() {
   int ok=0;
   radio_oversigt_type new_radio_record;
   int antal=0;
+  bool fundet=false;
   char downloadfilename[8192];
   std::string downloadfilenamelong;
   std::string downloadfilenamelong_out;
@@ -228,7 +227,7 @@ int radiostation_class::load_radio_stations_from_json_file() {
   conn1=mysql_init(NULL);
   if (mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {    
     std::cout << "Please wait process json file stations-big_all.json " << std::endl;
-    std::ifstream cfgfile("stations-big.json");
+    std::ifstream cfgfile("stations-big_all.json");
     cfgfile >> cfg_root;
     // Tjek at root er array
     if (!cfg_root.isArray()) {
@@ -246,6 +245,7 @@ int radiostation_class::load_radio_stations_from_json_file() {
       std::string contrycode = station.get("contrycode", "").asString();
       int bitrate = station.get("bitrate", 0).asInt();   
       std::string desc = station.get("tags", "").asString();
+      int clickcount = station.get("clickcount", "").asInt();
       strncpy(new_radio_record.station_name,name.c_str(),10);
       new_radio_record.station_name[11]=0;
       new_radio_record.streamurl=url;
@@ -283,37 +283,46 @@ int radiostation_class::load_radio_stations_from_json_file() {
       else if (desc.find("chillout") != std::string::npos) art=20;
       else if (desc.find("culture") != std::string::npos) art=21;
       else art=0;
-
-      get_webfilename(downloadfilename,(char *) gfxurl.c_str());
-      downloadfilenamelong = downloadfilename;
-      downloadfilenamelong2 = "/opt/mythtv-controller/images/radiostations/";
-      downloadfilenamelong2 = downloadfilenamelong2 + downloadfilename;
-      radio_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong2.c_str());                // download file
-      downloadfilenamelong_out = downloadfilenamelong2 + ".png";
-      new_radio_record.gfxfilename=downloadfilenamelong;
-      // std::cout << "long file name: " << downloadfilenamelong << std::endl;   
-      if ((!(file_exists(downloadfilenamelong_out.c_str()))) && (file_exists(downloadfilenamelong2.c_str()))) {
-        do_cmd = "convert '";
-        do_cmd = do_cmd + downloadfilenamelong2;
-        do_cmd = do_cmd + "' -resize 256x256! ";
-        do_cmd = do_cmd + " -alpha set -bordercolor none -border 1 -fuzz 20%   -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
-        do_cmd = do_cmd +downloadfilenamelong_out;
-        do_cmd = do_cmd + "'  2> /dev/null";
-        // std::cout << "cmd : " << do_cmd << std::endl;
-        ok=system(do_cmd.c_str());
-        if (ok==0) new_radio_record.gfxfilename=downloadfilenamelong_out;
+      fundet=false;
+      sql_update  = fmt::format("select name from radio_stations where stream_url = '{}'",new_radio_record.streamurl);
+      mysql_query(conn1,sql_update.c_str());
+      res = mysql_store_result(conn1);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          fundet=true;
+        }
       }
-      new_radio_record.textureId=0;
-      // new_radio_record.desc="";
-      if (conn1) {
-        sql_update  = fmt::format("insert IGNORE INTO radio_stations(name,beskriv,stream_url,homepage,aktiv,art,gfx_link,bitrate,online,landekode,createdate,intnr) values ('{}','{}','{}','{}',{},{},'{}',{},{},{},now(),{})",new_radio_record.station_name,desc, new_radio_record.streamurl, new_radio_record.homepage, 1, art, new_radio_record.gfxfilename,new_radio_record.kbps,1,new_radio_record.land,0);
-        mysql_query(conn1,sql_update.c_str());
-        res = mysql_store_result(conn1);
+      // if not found create db record
+      if (fundet==false) {
+        // get random name back
+        get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+        downloadfilenamelong = downloadfilename;
+        downloadfilenamelong2 = "/opt/mythtv-controller/images/radiostations/";
+        downloadfilenamelong2 = downloadfilenamelong2 + downloadfilename;
+        radio_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong2.c_str());                // download file
+        downloadfilenamelong_out = downloadfilenamelong2 + ".png";
+        new_radio_record.gfxfilename=downloadfilename;
+        if ((!(file_exists(downloadfilenamelong_out.c_str()))) && (file_exists(downloadfilenamelong2.c_str()))) {
+          do_cmd = "convert '";
+          do_cmd = do_cmd + downloadfilenamelong2;
+          do_cmd = do_cmd + "' -resize 256x256! ";
+          do_cmd = do_cmd + " -alpha set -bordercolor none -border 1 -fuzz 20%   -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
+          do_cmd = do_cmd + downloadfilenamelong_out;
+          do_cmd = do_cmd + "'  2> /dev/null";
+          // std::cout << "cmd : " << do_cmd << std::endl;
+          ok=system(do_cmd.c_str());
+          if (ok==0) new_radio_record.gfxfilename=downloadfilename;
+        }
+        new_radio_record.textureId=0;
+        // new_radio_record.desc="";
+        if (conn1) {
+          sql_update  = fmt::format("insert IGNORE INTO radio_stations(name,beskriv,stream_url,homepage,aktiv,art,gfx_link,bitrate,online,landekode,createdate,popular,intnr) values ('{}','{}','{}','{}',{},{},'{}',{},{},{},now(),{},{})",new_radio_record.station_name,desc, new_radio_record.streamurl, new_radio_record.homepage, 1, art, new_radio_record.gfxfilename,new_radio_record.kbps,1,new_radio_record.land,clickcount,0);
+          mysql_query(conn1,sql_update.c_str());
+          res = mysql_store_result(conn1);
+        }
+        // std::cout << sql_update << std::endl;
+        antal++;
       }
-
-      std::cout << sql_update << std::endl;
-
-      antal++;
     }
     std::cout << std::endl;
     std::cout << "Done parrsing json file." << std::endl;
@@ -934,14 +943,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
   glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
   glEnd();
-  
-  /*
-  if (streamoversigt.get_stream_groupantal(id-100)>1) {
-    // show numbers in group
-    temptxt = fmt::format("Feeds {}",streamoversigt.get_stream_groupantal(id-100)-1);    
-    drawText(temptxt.c_str(), x+8,y+6, 0.3f,1);
-  }
-  */
+ 
 }
 
 
