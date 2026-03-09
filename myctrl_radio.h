@@ -20,6 +20,7 @@ struct radio_oversigt_type {
     std::string gfxfilename;
     int art;
     int land;
+    bool noiconloaded;
     bool online;
     bool aktiv;
     unsigned int kbps;

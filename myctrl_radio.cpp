@@ -98,7 +98,7 @@ radiostation_class::radiostation_class() : antal(0) {
     radiosortopt[i].antal=0;
   }
   radiooptionsselect=0;							// selected line in radio options
-  playing=false;						// playing radio station
+  playing=false;						// playing radio station  
 }
 
 
@@ -215,6 +215,7 @@ int radiostation_class::load_radio_stations_from_json_file() {
   int ok=0;
   radio_oversigt_type new_radio_record;
   int antal=0;
+  int antal_in_db=0;
   bool fundet=false;
   char downloadfilename[8192];
   std::string downloadfilenamelong;
@@ -235,93 +236,108 @@ int radiostation_class::load_radio_stations_from_json_file() {
       return 0;
     }
     // loop gemmen array
-    for (const auto& station : cfg_root) {
-      printf(".");
-      fflush( stdout );
-      std::string name = station.get("name", "").asString();
-      std::string url  = station.get("url_resolved", "").asString();
-      std::string country = station.get("country", "").asString();
-      std::string gfxurl = station.get("favicon", "").asString();
-      std::string contrycode = station.get("contrycode", "").asString();
-      int bitrate = station.get("bitrate", 0).asInt();   
-      std::string desc = station.get("tags", "").asString();
-      int clickcount = station.get("clickcount", "").asInt();
-      strncpy(new_radio_record.station_name,name.c_str(),10);
-      new_radio_record.station_name[11]=0;
-      new_radio_record.streamurl=url;
-      new_radio_record.art=0;
-      new_radio_record.online=true;
-      new_radio_record.aktiv=true;
-      new_radio_record.kbps=bitrate;
-      std::transform(contrycode.begin(), contrycode.end(), contrycode.begin(), ::toupper);
-      if (contrycode=="US") new_radio_record.land=7;
-      else if (contrycode=="GERMAN") new_radio_record.land=8;
-      else if (contrycode=="FR") new_radio_record.land=4;
-      else if (contrycode=="CN") new_radio_record.land=63;
-      else if (contrycode=="IN") new_radio_record.land=37;
-      else if (contrycode=="RU") new_radio_record.land=10;
-      else if (contrycode=="DE") new_radio_record.land=8;
-      else if (contrycode=="PL") new_radio_record.land=22;
-      else if (contrycode=="IT") new_radio_record.land=42;
-      else if (contrycode=="CA") new_radio_record.land=27;
-      else if (contrycode=="MX") new_radio_record.land=30;
-      else if (contrycode=="DK") new_radio_record.land=45;
-    
-      if (desc.find("news") != std::string::npos) art=1;
-      else if (desc.find("rock") != std::string::npos) art=3;
-      else if (desc.find("pop") != std::string::npos) art=4;
-      else if (desc.find("house") != std::string::npos) art=5;
-      else if (desc.find("trance") != std::string::npos) art=6;
-      else if (desc.find("classical") != std::string::npos) art=7;
-      else if (desc.find("talk") != std::string::npos) art=8;
-      else if (desc.find("music") != std::string::npos) art=9;
-      else if (desc.find("electronic") != std::string::npos) art=10;
-      else if (desc.find("comedy") != std::string::npos) art=11;
-      else if (desc.find("country") != std::string::npos) art=12;
-      else if (desc.find("80s") != std::string::npos) art=13;
-      else if (desc.find("dance") != std::string::npos) art=9;
-      else if (desc.find("chillout") != std::string::npos) art=20;
-      else if (desc.find("culture") != std::string::npos) art=21;
-      else art=0;
-      fundet=false;
-      sql_update  = fmt::format("select name from radio_stations where stream_url = '{}'",new_radio_record.streamurl);
-      mysql_query(conn1,sql_update.c_str());
-      res = mysql_store_result(conn1);
-      if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          fundet=true;
-        }
+    int antal_in_json=cfg_root.size();
+
+    sql_update  = fmt::format("select count(name) from radio_stations");
+    mysql_query(conn1,sql_update.c_str());
+    res = mysql_store_result(conn1);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        antal_in_db=atoi(row[0]);
       }
-      // if not found create db record
-      if (fundet==false) {
-        // get random name back
-        get_webfilename(downloadfilename,(char *) gfxurl.c_str());
-        downloadfilenamelong = downloadfilename;
-        downloadfilenamelong2 = "/opt/mythtv-controller/images/radiostations/";
-        downloadfilenamelong2 = downloadfilenamelong2 + downloadfilename;
-        radio_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong2.c_str());                // download file
-        downloadfilenamelong_out = downloadfilenamelong2 + ".png";
-        new_radio_record.gfxfilename=downloadfilename;
-        if ((!(file_exists(downloadfilenamelong_out.c_str()))) && (file_exists(downloadfilenamelong2.c_str()))) {
-          do_cmd = "convert '";
-          do_cmd = do_cmd + downloadfilenamelong2;
-          do_cmd = do_cmd + "' -resize 256x256! ";
-          do_cmd = do_cmd + " -alpha set -bordercolor none -border 1 -fuzz 20%   -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
-          do_cmd = do_cmd + downloadfilenamelong_out;
-          do_cmd = do_cmd + "'  2> /dev/null";
-          // std::cout << "cmd : " << do_cmd << std::endl;
-          ok=system(do_cmd.c_str());
-          if (ok==0) new_radio_record.gfxfilename=downloadfilename;
+    }
+
+    // std::cout << "antal_in_db = " << antal_in_db << " antal_in_json " << antal_in_json << std::endl;
+
+    if (antal_in_db==0) {
+      for (const auto& station : cfg_root) {
+        printf(".");
+        fflush( stdout );
+        std::string name = station.get("name", "").asString();
+        std::string url  = station.get("url_resolved", "").asString();
+        std::string country = station.get("country", "").asString();
+        std::string gfxurl = station.get("favicon", "").asString();
+        std::string contrycode = station.get("contrycode", "").asString();
+        int bitrate = station.get("bitrate", 0).asInt();   
+        std::string desc = station.get("tags", "").asString();
+        int clickcount = station.get("clickcount", "").asInt();
+        strncpy(new_radio_record.station_name,name.c_str(),10);
+        new_radio_record.station_name[11]=0;
+        new_radio_record.streamurl=url;
+        new_radio_record.art=0;
+        new_radio_record.online=true;
+        new_radio_record.aktiv=true;
+        new_radio_record.kbps=bitrate;
+        std::transform(contrycode.begin(), contrycode.end(), contrycode.begin(), ::toupper);
+        if (contrycode=="US") new_radio_record.land=7;
+        else if (contrycode=="GERMAN") new_radio_record.land=8;
+        else if (contrycode=="FR") new_radio_record.land=4;
+        else if (contrycode=="CN") new_radio_record.land=63;
+        else if (contrycode=="IN") new_radio_record.land=37;
+        else if (contrycode=="RU") new_radio_record.land=10;
+        else if (contrycode=="DE") new_radio_record.land=8;
+        else if (contrycode=="PL") new_radio_record.land=22;
+        else if (contrycode=="IT") new_radio_record.land=42;
+        else if (contrycode=="CA") new_radio_record.land=27;
+        else if (contrycode=="MX") new_radio_record.land=30;
+        else if (contrycode=="DK") new_radio_record.land=45;
+      
+        if (desc.find("news") != std::string::npos) art=1;
+        else if (desc.find("rock") != std::string::npos) art=3;
+        else if (desc.find("pop") != std::string::npos) art=4;
+        else if (desc.find("house") != std::string::npos) art=5;
+        else if (desc.find("trance") != std::string::npos) art=6;
+        else if (desc.find("classical") != std::string::npos) art=7;
+        else if (desc.find("talk") != std::string::npos) art=8;
+        else if (desc.find("music") != std::string::npos) art=9;
+        else if (desc.find("electronic") != std::string::npos) art=10;
+        else if (desc.find("comedy") != std::string::npos) art=11;
+        else if (desc.find("country") != std::string::npos) art=12;
+        else if (desc.find("80s") != std::string::npos) art=13;
+        else if (desc.find("dance") != std::string::npos) art=9;
+        else if (desc.find("chillout") != std::string::npos) art=20;
+        else if (desc.find("culture") != std::string::npos) art=21;
+        else art=0;
+        fundet=false;
+        sql_update  = fmt::format("select name from radio_stations where stream_url = '{}'",new_radio_record.streamurl);
+        mysql_query(conn1,sql_update.c_str());
+        res = mysql_store_result(conn1);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            fundet=true;
+          }
         }
-        new_radio_record.textureId=0;
-        // new_radio_record.desc="";
-        if (conn1) {
-          sql_update  = fmt::format("insert IGNORE INTO radio_stations(name,beskriv,stream_url,homepage,aktiv,art,gfx_link,bitrate,online,landekode,createdate,popular,intnr) values ('{}','{}','{}','{}',{},{},'{}',{},{},{},now(),{},{})",new_radio_record.station_name,desc, new_radio_record.streamurl, new_radio_record.homepage, 1, art, new_radio_record.gfxfilename,new_radio_record.kbps,1,new_radio_record.land,clickcount,0);
-          mysql_query(conn1,sql_update.c_str());
-          res = mysql_store_result(conn1);
+        // if not found create db record
+        if (fundet==false) {
+          // get random name back
+          get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+          downloadfilenamelong = downloadfilename;
+          downloadfilenamelong2 = "/opt/mythtv-controller/images/radiostations/";
+          downloadfilenamelong2 = downloadfilenamelong2 + downloadfilename;
+          radio_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong2.c_str());                // download file
+          downloadfilenamelong_out = downloadfilenamelong2 + ".png";
+          new_radio_record.gfxfilename=downloadfilename;
+          if ((!(file_exists(downloadfilenamelong_out.c_str()))) && (file_exists(downloadfilenamelong2.c_str()))) {
+            do_cmd = "convert '";
+            do_cmd = do_cmd + downloadfilenamelong2;
+            do_cmd = do_cmd + "' -resize 256x256! ";
+            do_cmd = do_cmd + " -set colorspace RGB -alpha set -bordercolor none -border 1 -fuzz 20%   -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
+            do_cmd = do_cmd + downloadfilenamelong_out;
+            do_cmd = do_cmd + "'  2> /dev/null";
+            // std::cout << "cmd : " << do_cmd << std::endl;
+            ok=system(do_cmd.c_str());
+            if (ok==0) new_radio_record.gfxfilename=downloadfilename;
+          }
+          new_radio_record.textureId=0;
+          // new_radio_record.desc="";
+          if (conn1) {
+            sql_update  = fmt::format("insert IGNORE INTO radio_stations(name,beskriv,stream_url,homepage,aktiv,art,gfx_link,bitrate,online,landekode,createdate,popular,intnr) values ('{}','{}','{}','{}',{},{},'{}',{},{},{},now(),{},{})",new_radio_record.station_name,desc, new_radio_record.streamurl, new_radio_record.homepage, 1, art, new_radio_record.gfxfilename,new_radio_record.kbps,1,new_radio_record.land,clickcount,0);
+            mysql_query(conn1,sql_update.c_str());
+            res = mysql_store_result(conn1);
+          }
+          // std::cout << sql_update << std::endl;
+          antal++;
         }
-        // std::cout << sql_update << std::endl;
-        antal++;
       }
     }
     std::cout << std::endl;
@@ -642,6 +658,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
               new_station.land=land;
               new_station.textureId=0;
               new_station.intnr=intnr;
+              new_station.noiconloaded=false;
               stack.push_back(new_station);
               antal++;
             }
@@ -969,8 +986,9 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
   if (stack[ii].gfxfilename.length()>0) {
     // load texture if not loaded
     if (stack[ii].textureId == 0) {
-      if (file_exists(gfxfilename.c_str())) {
+      if ((file_exists(gfxfilename.c_str())) && (stack[ii].noiconloaded==false)) {
         stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
+        if (stack[ii].textureId==0) stack[ii].noiconloaded=true; else stack[ii].noiconloaded=false;
       } else stack[ii].gfxfilename="";
     }
   }

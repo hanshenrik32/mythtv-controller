@@ -139,6 +139,7 @@ const char *create_sql_lande_db="REPLACE INTO `radio_countries` (`land`, `landek
 //
 
 
+/*
 const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('P1 DK', 'Danish radio play clasisk music [Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A03H.mp3', '', 'DR-P1-908.png', 8, 320, 63, 1, '2011-07-29', 1, 45, '2011-09-16 21:50:41', 1), \
 ('P2 DK', 'Dansk radio', 'http://live-icy.gss.dr.dk:8000/A/A04H.mp3', 'www.dr.dk/P2', 'DR-P2-1023.png', 1, 320, 62, 1, '2011-07-28', 2, 45, '2011-09-15 22:20:34', 1), \
@@ -425,6 +426,8 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('1.FM - Dance One Radio', '', 'http://strm112.1.fm/dance_mobile_mp3', 'http://www.1.fm/', '1.fm-radio.png', 1, 192, 22, 1, '2026-02-02', 14373, 0, '2026-02-02 00:00:00', 1), \
 ('101 Smooth Jazz', '', 'http://jking.cdnstream1.com/b22139_128mp3', 'http://www.1.fm/', '', 1, 128, 0, 1, '2026-02-02', 14374, 0, '2026-02-02 00:00:00', 1), \
 ('Vegas Alternative', 'Vegas Alternative Rock', 'http://player.radio.com/listen/station/x-1075', '', '', 1, 128, 0, 1, '2017-12-01', 14375, 0, '2017-12-01 00:00:00', 1)";
+
+*/
 
 // 700 -> 1000 is free on intnr
 
