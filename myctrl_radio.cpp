@@ -206,7 +206,6 @@ int radiostation_class::radio_download_image(char *imgurl,char *filename) {
 // ******************************************************************************************
 
 
-
 int radiostation_class::load_radio_stations_from_json_file() {
   MYSQL *conn1;
   MYSQL_RES *res;
@@ -216,6 +215,7 @@ int radiostation_class::load_radio_stations_from_json_file() {
   radio_oversigt_type new_radio_record;
   int antal=0;
   int antal_in_db=0;
+  int return_code;
   bool fundet=false;
   char downloadfilename[8192];
   std::string downloadfilenamelong;
@@ -316,20 +316,26 @@ int radiostation_class::load_radio_stations_from_json_file() {
           downloadfilenamelong2 = downloadfilenamelong2 + downloadfilename;
           radio_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong2.c_str());                // download file
           downloadfilenamelong_out = downloadfilenamelong2 + ".png";
-          new_radio_record.gfxfilename=downloadfilename;
+          new_radio_record.gfxfilename=downloadfilenamelong;
           if ((!(file_exists(downloadfilenamelong_out.c_str()))) && (file_exists(downloadfilenamelong2.c_str()))) {
             do_cmd = "convert '";
-            do_cmd = do_cmd + downloadfilenamelong2;
-            do_cmd = do_cmd + "' -resize 256x256! ";
-            do_cmd = do_cmd + " -set colorspace RGB -alpha set -bordercolor none -border 1 -fuzz 20%   -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
-            do_cmd = do_cmd + downloadfilenamelong_out;
-            do_cmd = do_cmd + "'  2> /dev/null";
-            // std::cout << "cmd : " << do_cmd << std::endl;
-            ok=system(do_cmd.c_str());
-            if (ok==0) new_radio_record.gfxfilename=downloadfilename;
+            char filenamepath[1024];
+            std::string popenstring="/usr/bin/convert '";
+            popenstring = popenstring + downloadfilenamelong2;
+            popenstring = popenstring + "' -resize 256x256! ";
+            popenstring = popenstring + " -set colorspace RGB -alpha set -bordercolor none -border 1 -fuzz 20%   -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
+            popenstring = popenstring + downloadfilenamelong_out;
+            popenstring = popenstring + "' 2> /dev/null";
+            FILE *f = popen(popenstring.c_str(), "r");
+            if (f) {
+              fgets(filenamepath, 1024, f);
+              return_code=pclose(f);
+            }
+            if (return_code==0) {
+              new_radio_record.gfxfilename=downloadfilename;
+            } else new_radio_record.gfxfilename="";
           }
           new_radio_record.textureId=0;
-          // new_radio_record.desc="";
           if (conn1) {
             sql_update  = fmt::format("insert IGNORE INTO radio_stations(name,beskriv,stream_url,homepage,aktiv,art,gfx_link,bitrate,online,landekode,createdate,popular,intnr) values ('{}','{}','{}','{}',{},{},'{}',{},{},{},now(),{},{})",new_radio_record.station_name,desc, new_radio_record.streamurl, new_radio_record.homepage, 1, art, new_radio_record.gfxfilename,new_radio_record.kbps,1,new_radio_record.land,clickcount,0);
             mysql_query(conn1,sql_update.c_str());
@@ -582,6 +588,7 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
             new_station.land=land;
             new_station.textureId=0;
             new_station.intnr=intnr;
+            new_station.noiconloaded=false;
             stack.push_back(new_station);
             antal++;
           }
