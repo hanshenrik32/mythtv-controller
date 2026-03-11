@@ -153,22 +153,24 @@ void drawText(const char *text, float x, float y, float scale,int color) {
     // glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     // Tegn hvert tegn
-    for (size_t i = 0; i < strlen(text); i++) {
-        char c = text[i];
-        Character ch = characters[c];
-        float xpos = x + ch.bearingX * scale;
-        float ypos = y - (ch.height - ch.bearingY) * scale;
-        float w = ch.width * scale;
-        float h = ch.height * scale;
-        // Tegn et kvadrat for teksturen
-        glBindTexture(GL_TEXTURE_2D, ch.texture);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex2f(xpos, ypos);
-        glTexCoord2f(1.0, 0.0); glVertex2f(xpos + w, ypos);
-        glTexCoord2f(1.0, 1.0); glVertex2f(xpos + w, ypos + h);
-        glTexCoord2f(0.0, 1.0); glVertex2f(xpos, ypos + h);
-        glEnd();
-        x += (ch.advance) * scale; // Flyt til næste tegn
+    if (text) {
+        for (size_t i = 0; i < strlen(text); i++) {
+            char c = text[i];
+            Character ch = characters[c];
+            float xpos = x + ch.bearingX * scale;
+            float ypos = y - (ch.height - ch.bearingY) * scale;
+            float w = ch.width * scale;
+            float h = ch.height * scale;
+            // Tegn et kvadrat for teksturen
+            glBindTexture(GL_TEXTURE_2D, ch.texture);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0); glVertex2f(xpos, ypos);
+            glTexCoord2f(1.0, 0.0); glVertex2f(xpos + w, ypos);
+            glTexCoord2f(1.0, 1.0); glVertex2f(xpos + w, ypos + h);
+            glTexCoord2f(0.0, 1.0); glVertex2f(xpos, ypos + h);
+            glEnd();
+            x += (ch.advance) * scale; // Flyt til næste tegn
+        }
     }
     glDisable(GL_TEXTURE_2D);
     // glDisable(GL_BLEND);

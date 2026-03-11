@@ -139,6 +139,7 @@ const char *create_sql_lande_db="REPLACE INTO `radio_countries` (`land`, `landek
 //
 
 
+/*
 const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('P1 DK', 'Danish radio play clasisk music [Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A03H.mp3', '', 'DR-P1-908.png', 8, 320, 63, 1, '2011-07-29', 1, 45, '2011-09-16 21:50:41', 1), \
 ('P2 DK', 'Dansk radio', 'http://live-icy.gss.dr.dk:8000/A/A04H.mp3', 'www.dr.dk/P2', 'DR-P2-1023.png', 1, 320, 62, 1, '2011-07-28', 2, 45, '2011-09-15 22:20:34', 1), \
@@ -426,6 +427,8 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('101 Smooth Jazz', '', 'http://jking.cdnstream1.com/b22139_128mp3', 'http://www.1.fm/', '', 1, 128, 0, 1, '2026-02-02', 14374, 0, '2026-02-02 00:00:00', 1), \
 ('Vegas Alternative', 'Vegas Alternative Rock', 'http://player.radio.com/listen/station/x-1075', '', '', 1, 128, 0, 1, '2017-12-01', 14375, 0, '2017-12-01 00:00:00', 1)";
 
+*/
+
 // 700 -> 1000 is free on intnr
 
 
@@ -490,172 +493,174 @@ int create_radio_oversigt() {
         mysql_query(conn,"select count(*) from 'mythtvcontroller.radio_stations'");
         res = mysql_store_result(conn);
         if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-                dbexist=true;
-            }
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            dbexist=true;
+          }
         }
         if (!(dbexist)) {
-            res = mysql_store_result(conn);
-            mysql_query(conn,create_sql_radiostations);		  // create radio stations table
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , create_sql_radiostations);
-              exit(1);
-            }
-            mysql_query(conn,create_sql_radio_countries);		// create country table
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , create_sql_radio_countries);
-              exit(1);
-            }
-            mysql_query(conn,create_sql_radio_types);				// create types table
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , create_sql_radio_types);
-              exit(1);
-            }
-            mysql_query(conn,create_sql_radio_types_data);	// create types data
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , create_sql_radio_types_data);
-              exit(1);
-            }
+          res = mysql_store_result(conn);
+          mysql_query(conn,create_sql_radiostations);		  // create radio stations table
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , create_sql_radiostations);
+            exit(1);
+          }
+          mysql_query(conn,create_sql_radio_countries);		// create country table
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , create_sql_radio_countries);
+            exit(1);
+          }
+          mysql_query(conn,create_sql_radio_types);				// create types table
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , create_sql_radio_types);
+            exit(1);
+          }
+          mysql_query(conn,create_sql_radio_types_data);	// create types data
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , create_sql_radio_types_data);
+            exit(1);
+          }
 
-            mysql_query(conn,create_sql_lande_db);					// create lande data
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , create_sql_lande_db);
-              exit(1);
-            }
+          mysql_query(conn,create_sql_lande_db);					// create lande data
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , create_sql_lande_db);
+            exit(1);
+          }
+          mysql_query(conn,"CREATE UNIQUE INDEX radio_stations_stream_url_IDX USING BTREE ON mythtvcontroller.radio_stations (stream_url)");
+          res = mysql_store_result(conn);
+          
+          // create radio stations from here
+          /*
+          mysql_query(conn,radio_station_setupsql);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql4);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql4);
+            exit(1);
+          }
 
+          mysql_query(conn,radio_station_setupsql8);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql8);
+            exit(1);
+          }
 
-// create radio stations from here
+          mysql_query(conn,radio_station_setupsql13);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql13);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql17);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql17);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql27);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql27);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql31);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql31);
+            exit(1);
+          }
 
-            mysql_query(conn,radio_station_setupsql);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql4);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql4);
-              exit(1);
-            }
-
-            mysql_query(conn,radio_station_setupsql8);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql8);
-              exit(1);
-            }
-
-            mysql_query(conn,radio_station_setupsql13);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql13);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql17);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql17);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql27);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql27);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql31);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql31);
-              exit(1);
-            }
-
-            mysql_query(conn,radio_station_setupsql39);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql39);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql40);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql40);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql41);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql41);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql42);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql42);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql43);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql43);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql44);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql44);
-              exit(1);
-            }
-            mysql_query(conn,radio_station_setupsql45);
-            res = mysql_store_result(conn);
-            mysqlerror=mysql_errno(conn);
-            if (mysqlerror) {
-              printf("%d\n" , mysqlerror);
-              printf("%s\n" , radio_station_setupsql45);
-              exit(1);
-            }
+          mysql_query(conn,radio_station_setupsql39);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql39);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql40);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql40);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql41);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql41);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql42);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql42);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql43);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql43);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql44);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql44);
+            exit(1);
+          }
+          mysql_query(conn,radio_station_setupsql45);
+          res = mysql_store_result(conn);
+          mysqlerror=mysql_errno(conn);
+          if (mysqlerror) {
+            printf("%d\n" , mysqlerror);
+            printf("%s\n" , radio_station_setupsql45);
+            exit(1);
+          }
+          */
 // end create radio stations
         }
         mysql_close(conn);

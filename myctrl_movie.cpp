@@ -119,6 +119,8 @@ film_oversigt_type::~film_oversigt_type() {
 */
 }
 
+
+
 // ****************************************************************************************
 //
 // gem texture filname
@@ -330,9 +332,9 @@ void film_oversigt_typem::stopmovie() {
     //write to debug log
     if (strcmp("internal",configdefaultplayer)!=0) {
       systemplayer=configdefaultplayer;
-      if (systemplayer=="/usr/bin/mpv") system("killall -9 mpv");
-      else if (systemplayer=="/snap/bin/vlc") system("killall -9 vlc");
-      else if (systemplayer=="/usr/bin/mplayer") system("killall -9 mplayer");
+      if (systemplayer=="/usr/bin/mpv") do_system_call("killall -9 mpv");
+      else if (systemplayer=="/snap/bin/vlc") do_system_call("killall -9 vlc");
+      else if (systemplayer=="/usr/bin/mplayer") do_system_call("killall -9 mplayer");
     }
     write_logfile(logfile,(char *) "Stop playing movie.");
   }
@@ -390,7 +392,7 @@ int film_oversigt_typem::playmovie(int nr) {
     else if (useconfigdefaultplayer=="/snap/bin/vlc") useconfigdefaultplayer=useconfigdefaultplayer + " --fullscreen";
     else if (useconfigdefaultplayer=="/usr/bin/mplayer") useconfigdefaultplayer=useconfigdefaultplayer + " -fs";
     systemcmd = fmt::format("{} '{}' &",useconfigdefaultplayer,this->filmoversigt[nr].getfilmfilename());
-    err=system(systemcmd.c_str());
+    if (do_system_call(systemcmd)==false) err=-1; else err=0;
   }
   if ((err==-1) || (err==127)) {
     sprintf(debuglogdata,"Error start default player cmd: %s ",systemcmd.c_str());
@@ -651,6 +653,8 @@ std::string film_oversigt_typem::select_file_name(std::string startpath) {
   }
   return(filename);
 }
+
+
 
 
 // ****************************************************************************************

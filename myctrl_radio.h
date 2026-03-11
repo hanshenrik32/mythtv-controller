@@ -5,9 +5,11 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <vector>
+#include "json-parser/json.h"
 //#include <irrKlang.h>
 
 const int stationamelength=40;
+
 
 // station info struct
 struct radio_oversigt_type {
@@ -18,6 +20,7 @@ struct radio_oversigt_type {
     std::string gfxfilename;
     int art;
     int land;
+    bool noiconloaded;
     bool online;
     bool aktiv;
     unsigned int kbps;
@@ -53,8 +56,9 @@ class radiostation_class {
     int opdatere_radiostation_gfx(int nr,char *gfxpath);		                    // update gfx
     bool startup_loaded;			                                         	    // load radio statios list
     bool check_radio_online_bool();                                                 // check and set radio station online flag (DO NOT WORK)
-
   public:
+    bool search_radio_online_done;
+    bool search_loaded;
     int selected_icon_in_view=1;
     bool playing;                                                                   // playing radio station
     unsigned long check_radio_online(unsigned int startrecnr);	                    // check and set radio station online flag (DO NOT WORK)
@@ -85,6 +89,7 @@ class radiostation_class {
     int opdatere_radio_oversigt(int radiosortorder);
     int opdatere_radio_oversigt(char *searchtxt);
     int opdatere_radio_oversigt();
+
     // bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 
     int downTimeMs=0;
@@ -117,13 +122,26 @@ class radiostation_class {
     int rowHeight   = 198;
     int itemWidth   = 198;
 
+    int search_startX = 20;
+    int search_startY = 762;
+    int search_viewHeight = 660;
+
     int startX = 20;
     int startY = 882;
     int viewHeight = 780;
     // end new scroll vars
     void onScroll(float delta) { scrollVel += delta * accel; }
     void draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);  // draw single stream item
+    void draw_radio_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected);
     bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
+
+    // json parser
+    int load_radio_stations_from_json_file();
+    int radio_download_image(char *imgurl,char *filename);
+    void process_object_radio(json_value* value, int depth);
+    void process_array_radio(json_value* value, int depth);
+    void process_value_radio(json_value* value, int depth,int x);
+
 };
 
 #endif

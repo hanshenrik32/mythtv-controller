@@ -3,6 +3,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <algorithm>
 #include <string.h>
 #include <mysql.h>
 #include <GL/glc.h>
@@ -10,12 +11,22 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <fmt/format.h>
 #include <sqlite3.h>                    // sqlite interface to xbmc
+#include <curl/curl.h>                  // lib curl
 
+// json parser
+#include <iostream>
+#include <jsoncpp/json/json.h>
+#include <fstream>
+
+
+
+#include "myctrl_readwebfile.h"
 #include "myctrl_radio.h"
 #include "utility.h"
 #include "myth_ttffont.h"
@@ -26,21 +37,23 @@
 #include "myth_config.h"
 
 extern config_icons config_menu;
-
+extern GLuint tidal_big_search_bar_artist;
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                  // used by log system
 
+extern Character characters[];
+
 extern int orgwinsizey;                                                         // screen size
 extern int orgwinsizex;
 
-
+extern char keybuffer[];                                    // keyboard buffer
 extern float configdefaultradiofontsize;
 extern const char *dbname;                                    // db name in mysql
-extern char configmysqluser[256];                             //
-extern char configmysqlpass[256];                             //
-extern char configmysqlhost[256];                             //
-extern char configmusicpath[256];
+extern char configmysqluser[];                             //
+extern char configmysqlpass[];                             //
+extern char configmysqlhost[];                             //
+extern char configmusicpath[];
 extern int configmythtvver;
 extern int screen_size;                                       //
 extern int screensizey;                                       //
@@ -67,6 +80,7 @@ extern bool radio_oversigt_loaded;
 extern bool radio_oversigt_loaded_done;
 extern bool radio_oversigt_loaded_begin;
 
+
 extern int radio_oversigt_loaded_nr;
 extern int radio_oversigt_antal;
 extern bool do_sqlite;
@@ -84,7 +98,7 @@ radiostation_class::radiostation_class() : antal(0) {
     radiosortopt[i].antal=0;
   }
   radiooptionsselect=0;							// selected line in radio options
-  playing=false;						// playing radio station
+  playing=false;						// playing radio station  
 }
 
 
@@ -110,15 +124,244 @@ void radiostation_class::clean_radio_oversigt() {
   for(int i=0;i<antal;i++) {
     if (stack[i].textureId) glDeleteTextures(1, &stack[i].textureId);	// delete radio texture
   }
+  stack.clear();
   antal=0;
 }
 
+
+
+// ****************************************************************************************
+//
+// write data
+//
+// ****************************************************************************************
+
+static size_t radio_write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+  size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+  return written;
+}
+
+
 // *******************************************************************************************
+//
+//
+//
+// *******************************************************************************************
+
+int radiostation_class::radio_download_image(char *imgurl,char *filename) {
+  FILE *file;
+  std::string response_string;
+  CURLcode res;
+  CURL *curl;
+  char *base64_code;
+  char errbuf[CURL_ERROR_SIZE];
+  if (!(file_exists(filename))) {
+    curl = curl_easy_init();
+    if (curl) {
+      curl_easy_setopt(curl, CURLOPT_URL, imgurl);
+      // send data to curl_writeFunction_file
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, radio_write_data);
+      // ask libcurl to use TLS version 1.3 or later
+      curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
+      curl_easy_setopt(curl, CURLOPT_VERBOSE,0L);
+      curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:89.0) Gecko/20100101 Firefox/89.0");
+      curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); // <-- ssl don't forget this
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); // <-- ssl and this
+      curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 3000L);
+      curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10000L);
+      curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1L);
+      curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 5L);      
+      // folow redirect
+      curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+      try {
+        file = fopen(filename, "wb");
+        if (file) {
+          curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+          // get file
+          res = curl_easy_perform(curl);
+          fclose(file);
+        }
+        if(res != CURLE_OK) {
+          // fprintf(stderr, "%s\n", curl_easy_strerror(res));
+        }
+      }
+      catch (...) {
+        printf("Error write file.\n");
+      }
+      curl_easy_cleanup(curl);
+    }
+  }
+  return(1);
+}
+
+
+
+
+
+// ******************************************************************************************
+//
+// json radio file paser
+//
+// ******************************************************************************************
+
+
+int radiostation_class::load_radio_stations_from_json_file() {
+  MYSQL *conn1;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  const char *database = (char *) "mythtvcontroller";
+  int ok=0;
+  radio_oversigt_type new_radio_record;
+  int antal=0;
+  int antal_in_db=0;
+  int return_code;
+  bool fundet=false;
+  char downloadfilename[8192];
+  std::string downloadfilenamelong;
+  std::string downloadfilenamelong_out;
+  std::string downloadfilenamelong2;
+  std::string do_cmd;
+  std::string sql_update;
+  Json::Value cfg_root;
+  int art=0;
+  conn1=mysql_init(NULL);
+  if (mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {    
+    std::cout << "Please wait process json file stations-big_all.json " << std::endl;
+    std::ifstream cfgfile("stations-big_all.json");
+    cfgfile >> cfg_root;
+    // Tjek at root er array
+    if (!cfg_root.isArray()) {
+      std::cout << "Root er ikke et array!\n";
+      return 0;
+    }
+    // loop gemmen array
+    int antal_in_json=cfg_root.size();
+
+    sql_update  = fmt::format("select count(name) from radio_stations");
+    mysql_query(conn1,sql_update.c_str());
+    res = mysql_store_result(conn1);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        antal_in_db=atoi(row[0]);
+      }
+    }
+
+    // std::cout << "antal_in_db = " << antal_in_db << " antal_in_json " << antal_in_json << std::endl;
+
+    if (antal_in_db==0) {
+      for (const auto& station : cfg_root) {
+        printf(".");
+        fflush( stdout );
+        std::string name = station.get("name", "").asString();
+        std::string url  = station.get("url_resolved", "").asString();
+        std::string country = station.get("country", "").asString();
+        std::string gfxurl = station.get("favicon", "").asString();
+        std::string contrycode = station.get("contrycode", "").asString();
+        int bitrate = station.get("bitrate", 0).asInt();   
+        std::string desc = station.get("tags", "").asString();
+        int clickcount = station.get("clickcount", "").asInt();
+        strncpy(new_radio_record.station_name,name.c_str(),10);
+        new_radio_record.station_name[11]=0;
+        new_radio_record.streamurl=url;
+        new_radio_record.art=0;
+        new_radio_record.online=true;
+        new_radio_record.aktiv=true;
+        new_radio_record.kbps=bitrate;
+        std::transform(contrycode.begin(), contrycode.end(), contrycode.begin(), ::toupper);
+        if (contrycode=="US") new_radio_record.land=7;
+        else if (contrycode=="GERMAN") new_radio_record.land=8;
+        else if (contrycode=="FR") new_radio_record.land=4;
+        else if (contrycode=="CN") new_radio_record.land=63;
+        else if (contrycode=="IN") new_radio_record.land=37;
+        else if (contrycode=="RU") new_radio_record.land=10;
+        else if (contrycode=="DE") new_radio_record.land=8;
+        else if (contrycode=="PL") new_radio_record.land=22;
+        else if (contrycode=="IT") new_radio_record.land=42;
+        else if (contrycode=="CA") new_radio_record.land=27;
+        else if (contrycode=="MX") new_radio_record.land=30;
+        else if (contrycode=="DK") new_radio_record.land=45;
+      
+        if (desc.find("news") != std::string::npos) art=1;
+        else if (desc.find("rock") != std::string::npos) art=3;
+        else if (desc.find("pop") != std::string::npos) art=4;
+        else if (desc.find("house") != std::string::npos) art=5;
+        else if (desc.find("trance") != std::string::npos) art=6;
+        else if (desc.find("classical") != std::string::npos) art=7;
+        else if (desc.find("talk") != std::string::npos) art=8;
+        else if (desc.find("music") != std::string::npos) art=9;
+        else if (desc.find("electronic") != std::string::npos) art=10;
+        else if (desc.find("comedy") != std::string::npos) art=11;
+        else if (desc.find("country") != std::string::npos) art=12;
+        else if (desc.find("80s") != std::string::npos) art=13;
+        else if (desc.find("dance") != std::string::npos) art=9;
+        else if (desc.find("chillout") != std::string::npos) art=20;
+        else if (desc.find("culture") != std::string::npos) art=21;
+        else art=0;
+        fundet=false;
+        sql_update  = fmt::format("select name from radio_stations where stream_url = '{}'",new_radio_record.streamurl);
+        mysql_query(conn1,sql_update.c_str());
+        res = mysql_store_result(conn1);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            fundet=true;
+          }
+        }
+        // if not found create db record
+        if (fundet==false) {
+          // get random name back
+          get_webfilename(downloadfilename,(char *) gfxurl.c_str());
+          downloadfilenamelong = downloadfilename;
+          downloadfilenamelong2 = "/opt/mythtv-controller/images/radiostations/";
+          downloadfilenamelong2 = downloadfilenamelong2 + downloadfilename;
+          radio_download_image((char *) gfxurl.c_str(),(char *) downloadfilenamelong2.c_str());                // download file
+          downloadfilenamelong_out = downloadfilenamelong2 + ".png";
+          new_radio_record.gfxfilename=downloadfilenamelong;
+          if ((!(file_exists(downloadfilenamelong_out.c_str()))) && (file_exists(downloadfilenamelong2.c_str()))) {
+            do_cmd = "convert '";
+            char filenamepath[1024];
+            std::string popenstring="/usr/bin/convert '";
+            popenstring = popenstring + downloadfilenamelong2;
+            popenstring = popenstring + "' -resize 256x256! ";
+            popenstring = popenstring + " -set colorspace RGB -alpha set -bordercolor none -border 1 -fuzz 20%   -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
+            popenstring = popenstring + downloadfilenamelong_out;
+            popenstring = popenstring + "' 2> /dev/null";
+            FILE *f = popen(popenstring.c_str(), "r");
+            if (f) {
+              fgets(filenamepath, 1024, f);
+              return_code=pclose(f);
+            }
+            if (return_code==0) {
+              new_radio_record.gfxfilename=downloadfilename;
+            } else new_radio_record.gfxfilename="";
+          }
+          new_radio_record.textureId=0;
+          if (conn1) {
+            sql_update  = fmt::format("insert IGNORE INTO radio_stations(name,beskriv,stream_url,homepage,aktiv,art,gfx_link,bitrate,online,landekode,createdate,popular,intnr) values ('{}','{}','{}','{}',{},{},'{}',{},{},{},now(),{},{})",new_radio_record.station_name,desc, new_radio_record.streamurl, new_radio_record.homepage, 1, art, new_radio_record.gfxfilename,new_radio_record.kbps,1,new_radio_record.land,clickcount,0);
+            mysql_query(conn1,sql_update.c_str());
+            res = mysql_store_result(conn1);
+          }
+          // std::cout << sql_update << std::endl;
+          antal++;
+        }
+      }
+    }
+    std::cout << std::endl;
+    std::cout << "Done parrsing json file." << std::endl;
+    mysql_close(conn1);
+  }
+  if (antal>0) return(1); else return(0);
+}
+
+
+// Next *******************************************************************************************
 
 // select next in radio sort option menu
 void radiostation_class::nextradiooptselect() {
   if ((radiooptionsselect<40) && (strcmp(radiosortopt[radiooptionsselect+1].radiosortopt,"")!=0)) radiooptionsselect++;
 }
+
+// Last *******************************************************************************************
 
 // select last in radio sort option menu
 void radiostation_class::lastradiooptselect() {
@@ -299,8 +542,6 @@ int radiostation_class::opdatere_radio_oversigt() {
 }
 
 
-
-
 // ****************************************************************************************
 //
 // search radio station in db after searchtxt
@@ -347,6 +588,7 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
             new_station.land=land;
             new_station.textureId=0;
             new_station.intnr=intnr;
+            new_station.noiconloaded=false;
             stack.push_back(new_station);
             antal++;
           }
@@ -387,7 +629,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 
     } else {
       if (radiosortorder==0)			// start order default
-        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1  order by popular desc,name";
+        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by popular desc,name";
       else if (radiosortorder==28)		// bit rate
         sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name";
       else if (radiosortorder==27)		// land kode
@@ -423,6 +665,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
               new_station.land=land;
               new_station.textureId=0;
               new_station.intnr=intnr;
+              new_station.noiconloaded=false;
               stack.push_back(new_station);
               antal++;
             }
@@ -724,14 +967,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
   glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
   glEnd();
-  
-  /*
-  if (streamoversigt.get_stream_groupantal(id-100)>1) {
-    // show numbers in group
-    temptxt = fmt::format("Feeds {}",streamoversigt.get_stream_groupantal(id-100)-1);    
-    drawText(temptxt.c_str(), x+8,y+6, 0.3f,1);
-  }
-  */
+ 
 }
 
 
@@ -745,6 +981,58 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
 
 
 void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
+  // Baggrund
+  std::string temprgtxt;
+  std::string gfxfilename;
+  GLuint texture;
+  Color2 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
+  Color2 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  // Cover
+  gfxfilename = "/opt/mythtv-controller/images/radiostations/";
+  gfxfilename = gfxfilename + stack[ii].gfxfilename;
+  if (stack[ii].gfxfilename.length()>0) {
+    // load texture if not loaded
+    if (stack[ii].textureId == 0) {
+      if ((file_exists(gfxfilename.c_str())) && (stack[ii].noiconloaded==false)) {
+        stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
+        if (stack[ii].textureId==0) stack[ii].noiconloaded=true; else stack[ii].noiconloaded=false;
+      } else stack[ii].gfxfilename="";
+    }
+  }
+  // Titel
+  // temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
+  temprgtxt = stack[ii].station_name;
+  // temprgtxt.resize(20);
+  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
+  if (stack[ii].textureId ) {
+    if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
+      drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
+    } else {
+      drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+    }
+  } else {
+    if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
+      drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
+    } else {
+      drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+    }
+  }
+}
+
+
+
+// ****************************************************************************************
+//
+// draw single search radio item
+//
+// ****************************************************************************************
+
+
+void radiostation_class::draw_radio_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
   // Baggrund
   std::string temprgtxt;
   std::string gfxfilename;
@@ -777,16 +1065,32 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
-      drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
+      if (y<search_startY-30) {
+        drawcover(x + 18, y + 18 , 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
+        drawLinesOfText(temprgtxt, x + 18, y + 4 , 0.31f, 22, 3, 2, true);
+      }
     } else {
-      drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+      if (y<search_startY-30) {
+        drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
+        drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+      }
     }
   }
 }
 
+
 //      glBindTexture(GL_TEXTURE_2D,onlineradio_selected);
+
+
+
+float radio_getTextWidth(const std::string& text, float scale) {
+  float width = 0.0f;
+  for (char c : text){
+    Character ch = characters[c];
+    width += ch.advance * scale;  // glyph advance
+  }
+  return width;
+}
 
 
 // ****************************************************************************************
@@ -797,6 +1101,9 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
 
 
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+  static bool cursor;
+  float yof_top=orgwinsizey-(rowHeight*1)+20;                               // start ypos
+  float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;
@@ -818,14 +1125,46 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int screenTop = startY;
   int xof = startX;
   int visibleItems = (visibleRows + 2) * itemsPerRow;
-  // ---- RENDER -----------------------------------------------
-  for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
-    int index = ssofset + i;
-    int col = i % itemsPerRow;
-    int row = i / itemsPerRow;
-    int x = xof + col * itemWidth + 40;
-    int y = screenTop - (row * rowHeight) + subOff - 40;
-    draw_radio_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
+  if (strlen(keybuffer)>0) {
+    screenTop=search_startY;
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(0);
+    glBegin(GL_QUADS); 
+    glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+rowHeight-20, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+rowHeight-20 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+    glEnd();
+    // show seach string
+    if (strcmp(keybuffer,"")!=0) {
+      drawText(keybuffer, 300.0f, 980.0f, 1.3f, 0);
+      float textWidth = radio_getTextWidth(keybuffer, 1.3f);
+      if (cursor) drawText("_", 300.0f+textWidth, 980.0f, 1.3f, 0);
+    }
+    printf("Keybuffer = %s \n",keybuffer);
+    // ---- RENDER -----------------------------------------------
+    for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
+      int index = ssofset + i;
+      int col = i % itemsPerRow;
+      int row = i / itemsPerRow;
+      int x = xof + col * itemWidth + 40;
+      int y = screenTop - (row * rowHeight) + subOff - 40;    
+      draw_radio_search_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
+    }
+  } else {
+    // ---- RENDER -----------------------------------------------
+    for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
+      int index = ssofset + i;
+      int col = i % itemsPerRow;
+      int row = i / itemsPerRow;
+      int x = xof + col * itemWidth + 40;
+      int y = screenTop - (row * rowHeight) + subOff - 40;
+      draw_radio_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
+    }
   }
   return(true);
 }
@@ -1199,3 +1538,4 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
   printf("radiostation=%ld\n",radiostation);
   return(radiostation);		// we are done check all radio stations in database
 }
+

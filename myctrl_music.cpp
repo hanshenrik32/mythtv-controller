@@ -1782,18 +1782,30 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
   if (musicoversigt[ii].textureId ) texture = musicoversigt[ii].textureId; else texture = normal_icon;
     if (ii==0) {
       if (musicoversigt[ii].oversigttype!=-1) {
-        drawcover(x + 18, y + 18, 164, 164, back_icon , _textureId28, ii+100, highcolor);
-        if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
-        else drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+        if (ii == selected_icon_in_view-1) {
+          drawcover(x + 18, y + 18, 184+10, 184+10, back_icon , _textureId28, ii+100, highcolor);
+          drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+        } else {
+          drawcover(x + 18, y + 18, 184, 184, back_icon , _textureId28, ii+100, highcolor);
+          drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+        }
       } else {
-        drawcover(x + 18, y + 18, 164, 164, _textureId28 , _textureId28, ii+100, highcolor);
-        if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
-        else drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+        if (ii == selected_icon_in_view-1) {
+          drawcover(x + 18, y + 18, 184+10, 184+10, _textureId28 , _textureId28, ii+100, highcolor);
+          drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+        } else {
+          drawcover(x + 18, y + 18, 184, 184, _textureId28 , _textureId28, ii+100, highcolor);
+          drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+        }
       }
     } else {
-      drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, normalcolor);
-      if (ii == selected_icon_in_view-1) drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
-      else drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+      if (ii == selected_icon_in_view-1) {
+        drawcover(x + 20, y + 20, 184+10, 184+10, texture , normal_icon, ii+100, normalcolor);
+        drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+      } else {
+        drawcover(x + 20, y + 20, 184, 184, texture , normal_icon, ii+100, normalcolor);
+        drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+      }
     }
   // }
 }
