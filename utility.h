@@ -15,7 +15,7 @@ bool directory_empty(char *path);
 char *b64_encode(const unsigned char *in, size_t len);
 
 unsigned int countEntriesInDir(const char* dirname);
-
+bool do_system_call(std::string cmd);
 std::string getClipboardText();                                                     // get text from clipboard
 
 #endif

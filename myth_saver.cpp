@@ -1830,17 +1830,17 @@ float sinofsetz[]={
 float plasmaTime = 0.0f;
 
 void drawPlasma(int width, int height) {
-  plasmaTime += 0.08f;
+  plasmaTime += 0.020f;
   glBegin(GL_POINTS);
   for (int y = 0; y < height; y=y+2) {
     for (int x = 0; x < width; x=x+2) {
       float nx = (float)x / width;
       float ny = (float)y / height;
       float v =
-          sin(nx * 10.0f + plasmaTime) +
-          cos(ny * 10.0f + plasmaTime) +
-          sin((nx + ny) * 10.0f + plasmaTime) +
-          cos(sqrt(nx*nx + ny*ny) * 15.0f + plasmaTime);
+        sin(nx * 10.0f + plasmaTime) +
+        cos(ny * 10.0f + plasmaTime) +
+        sin((nx + ny) * 10.0f + plasmaTime) +
+        cos(sqrt(nx*nx + ny*ny) * 15.0f + plasmaTime);
 
       v = (v + 4.0f) * 0.25f;  // normalize to 0..1
       // Plasma color mapping
@@ -1958,54 +1958,54 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture) {
                 break;
             case 2:
                 for(y=4;y<7;y++) {
-                    for(x=4;x<7;x++) {
-                        if ((x==5) && (y==5)) {
-                          matrix[x][y].texture=matrix[x][y].musictexture;		// restore texture igen
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                  for(x=4;x<7;x++) {
+                    if ((x==5) && (y==5)) {
+                      matrix[x][y].texture=matrix[x][y].musictexture;		// restore texture igen
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             case 3:
                 for(y=3;y<8;y++) {
-                    for(x=3;x<8;x++) {
-                        if (((x==4) || (x==5) || (x==6)) && ((y==4) || (y==5) || (y==6))) {
-                          matrix[x][y].texture=matrix[x][y].musictexture;
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                  for(x=3;x<8;x++) {
+                    if (((x==4) || (x==5) || (x==6)) && ((y==4) || (y==5) || (y==6))) {
+                      matrix[x][y].texture=matrix[x][y].musictexture;
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             case 4:
                 for(y=2;y<9;y++) {
-                    for(x=2;x<9;x++) {
-                        if (((x==3) || (x==4) || (x==5) || (x==6) || (x==7)) && ((y==3)|| (y==4) || (y==5) || (y==6) || (y==7))) {
-                          matrix[x][y].texture=matrix[x][y].musictexture;
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                  for(x=2;x<9;x++) {
+                    if (((x==3) || (x==4) || (x==5) || (x==6) || (x==7)) && ((y==3)|| (y==4) || (y==5) || (y==6) || (y==7))) {
+                      matrix[x][y].texture=matrix[x][y].musictexture;
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             case 5:
                 for(y=1;y<10;y++) {
-                    for(x=1;x<10;x++) {
-                        if (((x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8)) && ((y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8))) {
-                          matrix[x][y].texture=matrix[x][y].musictexture;
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                  for(x=1;x<10;x++) {
+                    if (((x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8)) && ((y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8))) {
+                      matrix[x][y].texture=matrix[x][y].musictexture;
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             case 6:
                 for(y=0;y<11;y++) {
-                    for(x=0;x<11;x++) {
-                        if (((x==1) || (x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8) || (x==9)) && ((y==1) || (y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8) || (y==9))) {
-                            matrix[x][y].texture=matrix[x][y].musictexture;
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                  for(x=0;x<11;x++) {
+                    if (((x==1) || (x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8) || (x==9)) && ((y==1) || (y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8) || (y==9))) {
+                        matrix[x][y].texture=matrix[x][y].musictexture;
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             default:
                 for(y=0;y<11;y++) {
-                    for(x=0;x<11;x++) {
-                      matrix[x][y].texture=matrix[x][y].musictexture;
-                    }
+                  for(x=0;x<11;x++) {
+                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  }
                 }
                 break;
         }
@@ -2017,54 +2017,54 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture) {
                 break;
             case 2:
                 for(y=4;y<7;y++) {
-                    for(x=4;x<7;x++) {
-                        if ((x==5) && (y==5)) {
+                  for(x=4;x<7;x++) {
+                    if ((x==5) && (y==5)) {
 //                            matrix[x][y].texture=matrix[x][y].musictexture;		// restore texture igen
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             case 3:
                 for(y=3;y<8;y++) {
-                    for(x=3;x<8;x++) {
-                        if (((x==4) || (x==5) || (x==6)) && ((y==4) || (y==5) || (y==6))) {
+                  for(x=3;x<8;x++) {
+                    if (((x==4) || (x==5) || (x==6)) && ((y==4) || (y==5) || (y==6))) {
 //                            matrix[x][y].texture=matrix[x][y].musictexture;
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             case 4:
                 for(y=2;y<9;y++) {
-                    for(x=2;x<9;x++) {
-                        if (((x==3) || (x==4) || (x==5) || (x==6) || (x==7)) && ((y==3)|| (y==4) || (y==5) || (y==6) || (y==7))) {
+                  for(x=2;x<9;x++) {
+                    if (((x==3) || (x==4) || (x==5) || (x==6) || (x==7)) && ((y==3)|| (y==4) || (y==5) || (y==6) || (y==7))) {
 //                            matrix[x][y].texture=matrix[x][y].musictexture;
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             case 5:
                 for(y=1;y<10;y++) {
-                    for(x=1;x<10;x++) {
-                        if (((x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8)) && ((y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8))) {
+                  for(x=1;x<10;x++) {
+                    if (((x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8)) && ((y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8))) {
 //                           matrix[x][y].texture=matrix[x][y].musictexture;
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             case 6:
                 for(y=0;y<11;y++) {
-                    for(x=0;x<11;x++) {
-                        if (((x==1) || (x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8) || (x==9)) && ((y==1) || (y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8) || (y==9))) {
+                  for(x=0;x<11;x++) {
+                    if (((x==1) || (x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8) || (x==9)) && ((y==1) || (y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8) || (y==9))) {
 //                            matrix[x][y].texture=matrix[x][y].musictexture;
-                        } else matrix[x][y].texture=newtexture;
-                    }
+                    } else matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
             default:
                 for(y=0;y<11;y++) {
-                    for(x=0;x<11;x++) {
-                        matrix[x][y].texture=newtexture;
-                    }
+                  for(x=0;x<11;x++) {
+                    matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
         }

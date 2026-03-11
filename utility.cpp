@@ -26,6 +26,18 @@ unsigned int hourtounixtime(int hour) {
 }
 
 
+bool do_system_call(std::string cmd) {
+  char filedata[1025];
+  FILE *f = popen(cmd.c_str(), "r");
+  fgets(filedata, 1024, f);
+  if (!(f)) {
+    return false;
+  }
+  fclose(f);
+  return(true);
+}
+
+
 std::string getClipboardText() {
   gtk_init(nullptr, nullptr);
   GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);

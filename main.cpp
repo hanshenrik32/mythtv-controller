@@ -2400,7 +2400,7 @@ void doexitcommand() {
     if (command!=NULL) ok=true;
     fprintf(stderr,"Command to run %s \n",command);
   }
-  if (ok) system(command);
+  if (ok) do_system_call(command);
 }
 
 // ****************************************************************************************
@@ -3809,7 +3809,7 @@ void display() {
         if (startwebbrowser) {
           write_logfile(logfile,(char *) "start webbrowser to login on spotify.");
           // start webbroser to login on spotify
-          system("firefox localhost:8000");
+          do_system_call("firefox localhost:8000");
           startwebbrowser=false;
         }
       }
@@ -6414,7 +6414,7 @@ void display() {
           strcat(systemcommand,streamoversigt.get_stream_url(sknapnr)+10);
         } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
         strcat(systemcommand,"' &");
-        if (system(systemcommand)!=0) {
+        if (do_system_call(systemcommand)==0) {
           vis_error=true;
           vis_error_timeout=60;
         }
@@ -6443,7 +6443,7 @@ void display() {
           } else strcpy(temprgtxt,streamoversigt.get_stream_url(sknapnr-1));
           strcat(systemcommand,temprgtxt);
           strcat(systemcommand,"' &");
-          if (system(systemcommand)!=0) {
+          if (do_system_call(systemcommand)==0) {
             vis_error=true;
             vis_error_timeout=60;
           }
@@ -6506,7 +6506,7 @@ void display() {
         sprintf(debuglogdata,"Start command :%s ",systemcommand);
         write_logfile(logfile,(char *) debuglogdata);
       }
-      system(systemcommand);
+      do_system_call(systemcommand);
       do_play_recorded_aktiv_nr=0;                                                                // start kun 1 player
     } else {
       // write debug log
@@ -6518,7 +6518,7 @@ void display() {
       // write debug log
       sprintf(debuglogdata,"Start command :%s ",systemcommand);
       write_logfile(logfile,(char *) debuglogdata);
-      system(systemcommand);
+      do_system_call(systemcommand);
       do_play_recorded_aktiv_nr=0;                                                                // start kun 1 player
     }
   }
@@ -13866,7 +13866,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     strcpy(confighostwlanname,id);
                     sprintf(tmptxt,"sudo /sbin/iwconfig wlan0 essid %s",id);
                     fprintf(stderr,"Charge network by %s \n",tmptxt);
-                    system(tmptxt);
+                    do_system_call(tmptxt);
                     sprintf(debuglogdata,"Set wifi to %s ",confighostwlanname);
                     write_logfile(logfile,(char *) debuglogdata);
                   }
@@ -17048,7 +17048,7 @@ int check_radio_stations_icons() {
       strcpy(resl,"cp radiostations/");
       strcat(resl,row[0]);
       strcat(resl," images/radiostations/");
-      system(resl);
+      do_system_call(resl);
     }
   }
   return(1);
@@ -17642,7 +17642,7 @@ int main(int argc, char** argv) {
 
     if (configbackend_openspotify_player) {
       // check if running do not start new.
-      system("/snap/bin/spotify &");
+      do_system_call("/snap/bin/spotify &");
     }
 
     // Create radio database if not exist (db is created)

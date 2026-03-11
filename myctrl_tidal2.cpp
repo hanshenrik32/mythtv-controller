@@ -4758,7 +4758,7 @@ int tidal_class::tidal_play_now_search_album(char *playlist_song,int tidalknapnr
       temptxt1 = temptxt1 + dir_file_array[0];                    // add song nr 1
       // create wav file if not exist by ffmpeg
       if ( file_exists(temptxt1.c_str()) == true ) {
-        convcommand = fmt::format("ffmpeg -y -i '{}' '{}.flac'",temptxt1,temptxt1);
+        convcommand = fmt::format("/usr/bin/ffmpeg -y -i '{}' '{}.flac'",temptxt1,temptxt1);
         error=system(convcommand.c_str());
       }
       // build file path to play.
