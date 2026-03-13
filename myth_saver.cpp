@@ -1854,6 +1854,35 @@ void drawPlasma(int width, int height) {
   glEnd();
 }
 
+void drawPlasma2(int width, int height) {
+  plasmaTime += 0.020f;
+  glBegin(GL_POINTS);
+  for (int y = 0; y < height; y += 2) {
+    for (int x = 0; x < width; x += 2) {
+      float nx = (float)x / width;
+      float ny = (float)y / height;
+
+      // Mere varierede bølger med forskellige frekvenser og retninger
+      float v =
+        sin(nx * 8.0f + plasmaTime * 1.1f) +
+        cos(ny * 6.0f + plasmaTime * 0.9f) +
+        sin((nx * 1.5f - ny) * 7.0f + plasmaTime * 1.3f) +
+        cos(sqrt((nx-0.5f)*(nx-0.5f) + (ny-0.5f)*(ny-0.5f)) * 18.0f - plasmaTime * 1.5f) +
+        sin(nx * ny * 20.0f + plasmaTime);
+
+      v = (v + 5.0f) * 0.2f;  // normalize til 0..1
+
+      // Hvert kanal har sin egen frekvens og fase-offset der ændres med tid
+      float r = 0.5f + 0.5f * sin(v * 9.4248f + plasmaTime * 0.3f);
+      float g = 0.5f + 0.5f * sin(v * 6.2831f + plasmaTime * 0.5f + 2.094f);
+      float b = 0.5f + 0.5f * sin(v * 7.8540f + plasmaTime * 0.4f + 4.189f);
+
+      glColor3f(r, g, b);
+      glVertex2f((float)x, (float)y);
+    }
+  }
+  glEnd();
+}
 
 
 // ****************************************************************************************

@@ -3511,6 +3511,7 @@ bool search_process_name=false;
 bool search_process_items=false;
 bool search_process_track_nr=false;
 
+static spotify_oversigt_type newrecord;
 
 // ****************************************************************************************
 //
@@ -3720,9 +3721,13 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
             }
 
+            strncpy(newrecord.feed_name,value->u.string.ptr,80);
+            strncpy(newrecord.feed_showtxt,value->u.string.ptr,80);
+
             //if (debugmode) fprintf(stderr,"# %d Artist name found : %s gfx url found %s \n",antal,stack[antal]->feed_name,stack[antal]->feed_gfx_url);
 
             stack[antal]->type=2;                                            // set type artist
+            stack1.push_back(newrecord);
             antal++;
             antalplaylists++;
           }
@@ -5150,12 +5155,12 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color5 c) {
 void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   // Baggrund
   std::string temprgtxt;
-  std::string gfxfilename;
+  std::string gfxfilename="";
   GLuint texture;
   Color5 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color5 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
-  gfxfilename = stack[ii]->feed_gfx_url;
+  if (stack[ii]) gfxfilename = stack[ii]->feed_gfx_url;
   float fontsize = float (configdefaultspotifyfontsize/100)*2;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
@@ -5166,15 +5171,17 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
     }
   }
   // Titel
-  temprgtxt = fmt::format("{:^20}",stack[ii]->feed_showtxt);
-  temprgtxt.resize(20);
-  if (stack[ii]->textureId ) texture = stack[ii]->textureId; else texture = normal_icon;
-  if (ii == stream_key_selected-1) {
-    drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
-  } else {
-    drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+  if (stack[ii]) {
+    temprgtxt = fmt::format("{:^20}",stack[ii]->feed_showtxt);
+    temprgtxt.resize(20);
+    if (stack[ii]->textureId ) texture = stack[ii]->textureId; else texture = normal_icon;
+    if (ii == stream_key_selected-1) {
+      drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+      drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+    } else {
+      drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
+      drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+    }
   }
 }
 

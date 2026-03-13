@@ -990,6 +990,7 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
   // Cover
   gfxfilename = "/opt/mythtv-controller/images/radiostations/";
   gfxfilename = gfxfilename + stack[ii].gfxfilename;
+  gfxfilename = gfxfilename + ".png";
   if (stack[ii].gfxfilename.length()>0) {
     // load texture if not loaded
     if (stack[ii].textureId == 0) {
