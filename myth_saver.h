@@ -49,5 +49,5 @@ class boxarray {
 };
 
 void drawPlasma(int width, int height);
-void drawPlasma2(int width, int height);
+
 #endif

@@ -86,7 +86,6 @@ class spotify_class : vlc_controller {
   private:
     enum { maxantal=5000 };					                                        // MAX antal rss stream in wiew
     spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
-    std::vector<spotify_oversigt_type> stack1;
     spotify_device_def spotify_device[10];
     int spotify_device_antal;                                               // antal device found
     spotify_active_play_info_type spotify_aktiv_song[1];                    //

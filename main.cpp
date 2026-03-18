@@ -3194,7 +3194,7 @@ void display() {
           _angle++;
           glPushMatrix();
           start = clock();
-          drawPlasma2(1920, 1080);   // your window size
+          drawPlasma(1920, 1080);   // your window size
           // mybox.show_music_3d(_angle,screensaverbox,screensaverbox,screensaverbox1);
           if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
           glPopMatrix();
@@ -5383,9 +5383,9 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox ,  config_menu.config_tidalplayer_infoy , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox,400+config_menu.config_tidalplayer_infoy, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+640,400+config_menu.config_tidalplayer_infoy , 0.0);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox    ,config_menu.config_tidalplayer_infoy , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox    ,275+config_menu.config_tidalplayer_infoy, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+640,275+config_menu.config_tidalplayer_infoy , 0.0);
         glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+640,config_menu.config_tidalplayer_infoy, 0.0);
         glEnd();
 
@@ -5397,10 +5397,10 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(8);                        // 8 = play
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+50 ,  320 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+50,100+320, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+50+100,100+320 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+50+100,320, 0.0);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+50 ,  300 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+50,100+300, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+50+100,100+300 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+50+100,300, 0.0);
         glEnd();
         // stop button
         glEnable(GL_TEXTURE_2D);
@@ -5410,10 +5410,10 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(9);                        // 9 = stop
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+150 ,  320 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+150,100+320, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+150+100,100+320 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+150+100,320, 0.0);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+150 ,  300 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+150,100+300, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+150+100,100+300 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+150+100,300, 0.0);
         glEnd();
         if (!(do_zoom_radio)) {
           // ff button
@@ -5605,20 +5605,20 @@ void display() {
       
       // radio player info
       if ((radiooversigt.playing) && (do_zoom_radio)) {
-        textureId=radiooversigt.get_texture(aktiv_radio_station);
-        if (textureId) {
+        GLuint textureId_2;
+        textureId_2=radiooversigt.get_texture_r(aktiv_radio_station);
+        if (textureId_2) {
           // radio icon big size
           glEnable(GL_TEXTURE_2D);
           glEnable(GL_BLEND);
-          // if (textureId==0) textureId=onlineradio;                                            // hvis ingen texture (music cover) set default
-          glBindTexture(GL_TEXTURE_2D,textureId);
+          glBindTexture(GL_TEXTURE_2D,textureId_2);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+400 ,  480-100 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+400 ,  200+480-100, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 200+480-100 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+400+200 , 480-100, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+410.0f ,     400.0f, 0.0f);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+410.0f ,     400.0f+119.0f, 0.0f);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+410.0f+202.0f , 400.0f+119.0f, 0.0f);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+410.0f+202.0f , 400.0f, 0.0f);
           glEnd();
         }
         // play position
@@ -5651,15 +5651,15 @@ void display() {
           radio_playtime=0;
         }
 
-        drawText("Song Name ",(orgwinsizex/4)+20, (orgwinsizey/2)+120, 0.4f ,1);
+        drawText("Song Name ",(orgwinsizex/4)+30, (orgwinsizey/2)-0, 0.45f ,1);
         std::string temptxt1;
         temptxt1 = fmt::format("{:38}",aktivsongname);
         temptxt1.resize(38);
-        drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+120, 0.4f,1);
-        drawText("Station ",(orgwinsizex/4)+20, (orgwinsizey/2)+80, 0.4f,1);
+        drawText(temptxt1.c_str(),(orgwinsizex/4)+160, (orgwinsizey/2)-0, 0.45f,1);
+        drawText("Station ",(orgwinsizex/4)+30, (orgwinsizey/2)-50, 0.4f,1);
         temptxt1 = fmt::format(" {:38}",radiooversigt.get_station_name(aktiv_radio_station));
         temptxt1.resize(38);
-        drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+80, 0.4f,1);
+        drawText(temptxt1.c_str(),(orgwinsizex/4)+150, (orgwinsizey/2)-50, 0.4f,1);
         radio_playtime_hour=(radio_playtime/60)/60;
         radio_playtime_min=(radio_playtime/60);
         radio_playtime_sec=radio_playtime-(radio_playtime_min*60);
@@ -5667,14 +5667,14 @@ void display() {
         if (radio_playtime_min>60) radio_playtime_min=0;
         sprintf(temptxt,"%s",music_timename[1]);       // 1 = danish
         temptxt[40]=0;
-        drawText(temptxt,(orgwinsizex/4)+20, (orgwinsizey/2)+60, 0.4f,1);
+        drawText(temptxt,(orgwinsizex/4)+30, (orgwinsizey/2)-70, 0.4f,1);
         temptxt1 = fmt::format(" {:02}:{:02}:{:02}",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
-        drawText(temptxt1.c_str(),(orgwinsizex/4)+140, (orgwinsizey/2)+60, 0.4f,1);
-        drawText("Bitrate ",(orgwinsizex/4)+20, (orgwinsizey/2)+40, 0.4f,1);
-        drawText(" 192 Kbits",(orgwinsizex/4)+140, (orgwinsizey/2)+40, 0.4f,1);
-        drawText("Status ",(orgwinsizex/4)+20, (orgwinsizey/2)+20, 0.4f,1);
+        drawText(temptxt1.c_str(),(orgwinsizex/4)+150, (orgwinsizey/2)-70, 0.4f,1);
+        drawText("Bitrate ",(orgwinsizex/4)+30, (orgwinsizey/2)-110, 0.4f,1);
+        drawText(" 192 Kbits",(orgwinsizex/4)+150, (orgwinsizey/2)-110, 0.4f,1);
+        drawText("Status ",(orgwinsizex/4)+30, (orgwinsizey/2)-130, 0.4f,1);
         sprintf(temptxt," %-20s",aktivsongstatus);
-        drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+20, 0.4f,1);
+        drawText(temptxt,(orgwinsizex/4)+150, (orgwinsizey/2)-130, 0.4f,1);
 
         #if defined USE_FMOD_MIXER
         if ((channel) && (sound) && (snd)) {
@@ -5762,12 +5762,12 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+395 ,   390 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+395,200+390, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+395+200,200+390 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+395+200,390, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+410 ,   444 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+410,    444+176, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+410+200,444+176 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+410+200,444, 0.0);
           glEnd();
-
+          /*
           glEnable(GL_BLEND);
           glBindTexture(GL_TEXTURE_2D,tidal_covermask);
           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);        
@@ -5777,6 +5777,7 @@ void display() {
           glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+395+200,200+390 , 0.0);
           glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+395+200,390, 0.0);
           glEnd();
+          */
           do_we_play_check=0;
           if (do_we_play_check==0) {
             tidal_oversigt.tidal_do_we_play();

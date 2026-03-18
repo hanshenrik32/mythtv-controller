@@ -1225,7 +1225,7 @@ bool tidal_class::delete_record_in_view(long tidalknapnr) {
             }
           }
         } else {
-          printf("Tidal No song to delete on playlist %s \n",stack[tidalknapnr].playlistid.c_str());
+          printf("Tidal No song to delete on playlist %s \n",stack[tidalknapnr].playlistid);
           tmptxt = fmt::format("Tidal No song to delete on playlist: {}",stack[tidalknapnr].playlistid);
           write_logfile(logfile,(char *) tmptxt.c_str());
         }
@@ -1262,7 +1262,7 @@ bool tidal_class::delete_record_in_view(long tidalknapnr) {
             }
           }
         } else {
-          printf("Tidal No song to delete on playlist %s \n",stack_search[tidalknapnr].playlistid.c_str());
+          printf("Tidal No song to delete on playlist %s \n",stack_search[tidalknapnr].playlistid);
           tmptxt = fmt::format("Tidal No song to delete on playlist: {}",stack_search[tidalknapnr].playlistid);
           write_logfile(logfile,(char *) tmptxt.c_str());
         }
