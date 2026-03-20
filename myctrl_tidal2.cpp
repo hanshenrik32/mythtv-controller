@@ -4030,12 +4030,14 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   }
   mysql_res = mysql_store_result(conn);
   if (mysql_res) {
+    std::string playpath="";
     while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
-      // if (file_exists(mysql_row[1])) 
-      skip_download_of_files=true;
+      playpath="/home/hans/download/";
+      playpath = playpath + stack[tidalknapnr].playlistid;
+      if (file_exists(playpath.c_str())) skip_download_of_files=true;
     }
   }
-  // if exist in db load the files to play and be happy
+  // if db load the files to play and be happy
   if (skip_download_of_files) {
     sqlstring = "select playlistname,paththumb,playlistid,release_date,artistid from tidalcontentplaylist where playlistid like ";
     sqlstring = sqlstring + stack[tidalknapnr].playlistid;

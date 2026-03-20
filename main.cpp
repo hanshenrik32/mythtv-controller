@@ -7200,11 +7200,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_tvgraber = false;
             do_show_setup_tidal = false;
             do_show_setup_torrent = false;
-            strcpy(keybuffer,"");
             fundet = true;
           }
           // test for gfx opløsning
-          if ((names[i*4+3]==32) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
+          if ((names[i*4+3]==GFX_SETUP_OVERVIEW) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7279,7 +7278,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           // test for setupclose
-          if ((names[i*4+3]==37) && (do_show_setup_rss==false) && (do_show_setup_spotify==false) && (do_show_setup_tidal==false) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
+          if ((names[i*4+3]==CLOSE_SETUP_OVERVIEW) && (do_show_setup_rss==false) && (do_show_setup_spotify==false) && (do_show_setup_tidal==false) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
             do_show_setup_sound = false;
             do_show_setup_screen = false;
             do_show_setup_sql = false;
@@ -7295,7 +7294,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
             do_save_config = true;             // save setup now
           }
-          if ((names[i*4+3]==38) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          if ((names[i*4+3]==VIDEO_SETUP_OVERVIEW) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
             do_show_videoplayer = true;
             do_show_setup_sound = false;
             do_show_setup_sql = false;
@@ -7652,7 +7651,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
         }
-
         //
         // stream control
         //
