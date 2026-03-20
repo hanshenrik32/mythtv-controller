@@ -175,27 +175,26 @@ unsigned int hent_parent_dir_id(int dirid) {
 int findcoverfile(char *path,char *fundetnavn) {
   int n=0;
   bool fundet=false;
-  const int ANTAL=7;
-  char filename[10][20];
-  char filepath[512];
-  strcpy(filename[0],"Front.jpg");
-  strcpy(filename[1],"front.jpg");
-  strcpy(filename[2],"Cover.jpg");
-  strcpy(filename[3],"cover.jpg");
-  strcpy(filename[4],"Folder.jpg");
-  strcpy(filename[5],"folder.jpg");
-  strcpy(filename[6],"thumbnail.jpg");
-  strcpy(filename[7],"Thumbnail.jpg");
-  while(!(fundet) && (n<=ANTAL)) {
-    strcpy(filepath,path);			// load org path again
-    strcat(filepath,"/");			// add next filetype to test for
-    strcat(filepath,filename[n]);		//
-    if (file_exists(filepath)) fundet=true;
+  std::string filepath=path;
+  std::vector <string> filename;
+  filename.push_back("Front.jpg");
+  filename.push_back("front.jpg");
+  filename.push_back("cover.jpg");
+  filename.push_back("Cover.jpg");
+  filename.push_back("Folder.jpg");
+  filename.push_back("folder.jpg");
+  filename.push_back("thumbnail.jpg");
+  filename.push_back("Thumbnail.jpg");
+  filename.push_back("cover.png");
+  while(!(fundet) && (n<filename.size())) {
+    filepath=filepath + "/";			// add next filetype to test for
+    filepath=filepath + filename[n];
+    if (file_exists(filepath.c_str())) fundet=true;
     n++;
   }
   // return file exist tested path
   if (fundet) {
-    strcpy(fundetnavn,filepath);
+    strcpy(fundetnavn,filepath.c_str());
     return(1);
   } else {
     strcpy(fundetnavn,"");
@@ -1765,8 +1764,7 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
   Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   float fontsize = float (configdefaultmusicfontsize/100)*2;
   if (fontsize<0.2f) fontsize = 0.4f;
-
-  // Cover
+  // Load cover
   gfxfilename = musicoversigt[ii].album_coverfile;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded

@@ -142,7 +142,7 @@
             "musicplayer_info": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
-                "y": 200
+                "y": 300
             },
             "spotifyplayer_info": {
                 "icon_path": "musicplayer-info",
@@ -157,7 +157,7 @@
             "radioplayer_info": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
-                "y": 320
+                "y": 677
             },
             "mediaplayer_info": {
                 "icon_path": "musicplayer-info",
