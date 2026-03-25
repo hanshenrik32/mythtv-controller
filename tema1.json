@@ -69,6 +69,11 @@
                 "x": 1720,
                 "y": 312
             },
+            "multimedia": {
+                "icon_path": "media_button",
+                "x": 1720,
+                "y": 504
+            },
             "movie": {
                 "icon_path": "movie_button",
                 "x": 1720,
@@ -157,7 +162,7 @@
             "radioplayer_info": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
-                "y": 320
+                "y": 677
             },
             "mediaplayer_info": {
                 "icon_path": "musicplayer-info",
