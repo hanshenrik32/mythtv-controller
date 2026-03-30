@@ -75,6 +75,10 @@ extern bool radio_oversigt_loaded_done;
 extern bool radio_oversigt_loaded_begin;
 
 
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
+
 extern int radio_oversigt_loaded_nr;
 extern int radio_oversigt_antal;
 extern bool do_sqlite;
@@ -988,11 +992,12 @@ void drawRect(int x, int y, int w, int h, Color2 c) {
 // ****************************************************************************************
 
 void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c) {
-  std::string temptxt;
   glEnable(GL_TEXTURE_2D);
   glColor4f(c.r, c.g, c.b, c.a);
+
   glBindTexture(GL_TEXTURE_2D, textureId2);
   // draw cover frame
+  /*
   glLoadName(id);
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0); glVertex2i(x,     y);
@@ -1000,6 +1005,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
   glTexCoord2f(0, 1); glVertex2i(x,     y + h);
   glEnd();
+  */
   // draw actual cover
   glBindTexture(GL_TEXTURE_2D, textureId);
   glLoadName(id);
@@ -1008,6 +1014,15 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 0); glVertex2i(x + 10 + w - 20, y + 10);
   glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
   glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
+  glEnd();
+  
+  glBindTexture(GL_TEXTURE_2D, textureId2);
+  glLoadName(id);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex2i(x,     y);
+  glTexCoord2f(1, 0); glVertex2i(x + w, y);
+  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
+  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
   glEnd();
 }
 
@@ -1047,22 +1062,22 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {
       drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
-      sinh = sinh + 0.08f;
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
+      sinh = sinh + 0.09f;
       if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
       sinh = sinh + 0.08f;
       if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
     }
   }
 }
@@ -1103,25 +1118,25 @@ void radiostation_class::draw_radio_search_item(int x, int y,int ii,GLuint norma
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
       drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
-      sinh = sinh + 0.1f;
+      drawLinesOfText(temprgtxt, x + 18, y + 4,   1.0f, 22, 3, 2, true);
+      sinh = sinh + 0.2f;
       if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
       if (y<search_startY-30) {
         drawcover(x + 18, y + 18 , 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
-        drawLinesOfText(temprgtxt, x + 18, y + 4 , 0.31f, 22, 3, 2, true);        
+        drawLinesOfText(temprgtxt, x + 18, y + 4 , 1.0f, 22, 3, 2, true);        
       }
       sinh = sinh + 0.1f;
       if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       if (y<search_startY-30) {
         drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-        drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+        drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
       }
     }
   }
@@ -1195,9 +1210,9 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     glEnd();
     // show seach string
     if (strcmp(keybuffer,"")!=0) {
-      drawText(keybuffer, 300.0f, 980.0f, 1.3f, 0);
-      float textWidth = radio_getTextWidth(keybuffer, 1.3f);
-      if (cursor) drawText("_", 300.0f+textWidth, 980.0f, 1.3f, 0);
+      drawText(font24, keybuffer, 300.0f, 980.0f, 1.0f, 0);
+      float textWidth = radio_getTextWidth(keybuffer, 1.0f);
+      if (cursor) drawText(font24, "_", 300.0f+textWidth, 980.0f, 1.0f, 0);
     }
     printf("Keybuffer = %s \n",keybuffer);
     // ---- RENDER -----------------------------------------------
@@ -1282,14 +1297,14 @@ void radiostation_class::show_radio_options() {
       }
     }
   }
-  drawText("Sort options.", 410.0f, 770.0f, 0.8f,1);
+  drawText(font12, "Sort options.", 410.0f, 770.0f, 0.8f,1);
   i=0;
   while ((strcmp(radiosortopt[i].radiosortopt,"")!=0) && (i<40)) {
-    if (i!=radiooptionsselect) drawText(radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,1);
-    else drawText(radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,2);
+    if (i!=radiooptionsselect) drawText(font12, radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,1);
+    else drawText(font12, radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,2);
     sprintf(tmptxt,"%5d",radiosortopt[i].antal);
-    if (i!=radiooptionsselect) drawText(tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,1);
-    else drawText(tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,2);
+    if (i!=radiooptionsselect) drawText(font12, tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,1);
+    else drawText(font12, tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,2);
     i++;
   }
 }

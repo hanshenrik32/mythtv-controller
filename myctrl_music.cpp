@@ -29,6 +29,10 @@ using namespace std;
 #include "myth_saver.h"
 #include "myctrl_glprint.h"
 
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
+
 extern GLuint big_search_bar_playlist;                    // big search bar used by sporify search
 extern GLuint big_search_bar_track;                    // big search bar used by sporify search
 extern GLuint big_search_bar_albumm;                    // big search bar used by sporify search
@@ -1545,7 +1549,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     }
     glEnd();
     glPopMatrix();
-    drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 0.4f,18,5,1,true);
+    drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 1.0f,18,5,1,true);
     xof+=210;
     i++;
   }
@@ -1681,7 +1685,7 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
     }
     glEnd();
     glPopMatrix();
-    drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 0.4f,18,5,1,true);
+    drawLinesOfText(musicoversigt[i+sofset].album_name, xof+4, yof, 1.0f,18,5,1,true);
     xof+=210;
     i++;
   }
@@ -1701,7 +1705,7 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
     glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
     glEnd();
     sprintf(temptxt,"Error no music loaded in db");
-    drawText(temptxt, (orgwinsizex/3)+30, 275.0f, 0.4f,1);
+    drawText(font12, temptxt, (orgwinsizex/3)+30, 275.0f, 0.4f,1);
   }
 }
 
@@ -1762,8 +1766,7 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
   GLuint texture;
   Color3 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  float fontsize = float (configdefaultmusicfontsize/100)*2;
-  if (fontsize<0.2f) fontsize = 0.4f;
+  float fontsize=1.0f;
   // Load cover
   gfxfilename = musicoversigt[ii].album_coverfile;
   if (gfxfilename.size() > 0) {
@@ -1782,27 +1785,27 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
       if (musicoversigt[ii].oversigttype!=-1) {
         if (ii == selected_icon_in_view-1) {
           drawcover(x + 18, y + 18, 184+10, 184+10, back_icon , _textureId28, ii+100, highcolor);
-          drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+          drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
         } else {
           drawcover(x + 18, y + 18, 184, 184, back_icon , _textureId28, ii+100, highcolor);
-          drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+          drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
         }
       } else {
         if (ii == selected_icon_in_view-1) {
           drawcover(x + 18, y + 18, 184+10, 184+10, _textureId28 , _textureId28, ii+100, highcolor);
-          drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+          drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
         } else {
           drawcover(x + 18, y + 18, 184, 184, _textureId28 , _textureId28, ii+100, highcolor);
-          drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+          drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
         }
       }
     } else {
       if (ii == selected_icon_in_view-1) {
         drawcover(x + 20, y + 20, 184+10, 184+10, texture , normal_icon, ii+100, normalcolor);
-        drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
+        drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
       } else {
         drawcover(x + 20, y + 20, 184, 184, texture , normal_icon, ii+100, normalcolor);
-        drawText(temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
+        drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
       }
     }
   // }
@@ -1826,7 +1829,10 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
   Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = musicoversigt[ii].album_coverfile;
-  float fontsize = float (configdefaultmusicfontsize/100)*2;
+  
+  //float fontsize = float (configdefaultmusicfontsize/100)*2;
+  float fontsize = 1.0f;
+
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (musicoversigt[ii].textureId == 0) {
@@ -1844,11 +1850,11 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
       if (ii==0) {
         if (musicoversigt[ii].oversigttype!=-1) {
           drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
-          drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+          drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
         } else {
           if (texture==0) texture=normal_icon;
           drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
-          drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+          drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
           // none
         }
       } else {
@@ -1856,19 +1862,19 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
         else glBindTexture(GL_TEXTURE_2D,musicoversigt[ii].textureId);
 
         drawcover(x + 18, y + 18, 164, 164, texture , normal_icon, ii+100, highcolor);
-        drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+        drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
       }
     }
   } else {
     if (ii==0) {
       if (y<search_startY-30) {
         drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
-        drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+        drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
       }
     } else {
       if (y<search_startY-30) {
         drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, normalcolor);
-        drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+        drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
       }
     }
   }

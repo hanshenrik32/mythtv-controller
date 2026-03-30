@@ -28,6 +28,11 @@
 #include "myctrl_glprint.h"
 #include "myth_config.h"
 
+
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
+
 extern config_icons config_menu;
 
 using namespace std;
@@ -1562,7 +1567,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
       strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // movie title     
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
-      drawLinesOfText(temptxt, 14.00f+xpos, 110.0f+ypos, 0.4f,12,2,1,true);
+      drawLinesOfText(temptxt, 14.00f+xpos, 110.0f+ypos, 1.0f,12,2,1,true);
     }
     xpos+=205;
     i++;
@@ -1721,7 +1726,7 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
   Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = filmoversigt[ii].getfilmcoverfile();
-  float fontsize = float (configdefaultmoviefontsize/100)*2;
+  float fontsize = 1.0f;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (filmoversigt[ii].gettextureid() == 0) {
@@ -1736,10 +1741,10 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
   if (filmoversigt[ii].gettextureid() ) texture = filmoversigt[ii].gettextureid(); else texture = normal_icon;
   if (ii == selected_icon_in_view-1) {                                                       // if (ii == film_key_selected-1) {
     movie_drawcover(x + 18, y + 18, 174, 214, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
+    drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
   } else {
     movie_drawcover(x + 20, y + 20, 170, 210, texture ,ii+100,normalcolor);                                         // if (ii == film_key_selected-1) {
-    drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+    drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
   }
 }
 

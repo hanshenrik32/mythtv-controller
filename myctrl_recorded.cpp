@@ -41,6 +41,12 @@ extern int screen_size;
 extern int visvalgtnrtype;
 extern bool do_sqlite;
 
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
+
+
+
 // ****************************************************************************************
 //
 // constructor
@@ -416,8 +422,8 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
       }
       strcat(temptxt," ");
       strcat(temptxt,title);      
-      if (visvalgtnrtype==1) drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,2);
-        else drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,3);
+      if (visvalgtnrtype==1) drawText(font12, temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,2);
+        else drawText(font12, temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,3);
     } else {
       if (strlen(channel)==1) {
         strcpy(temptxt,"0");
@@ -427,7 +433,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
       }
       strcat(temptxt," ");
       strcat(temptxt,title);
-      drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,1);
+      drawText(font12, temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,1);
     }
     i++;
   }
@@ -438,9 +444,9 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     strcpy(temptxt,subtitle);					// get sub title
     if (strcmp(temptxt,"")==0) strcpy(temptxt,desc);                // Hvis der ikke er nogle subtitle bruge description i stedet
     if (i+startofset==subvalgtnr+startofset) {
-      drawText(temptxt, 620.0f, 800.0f-(i*25.0f), 0.4f,2);
+      drawText(font12, temptxt, 620.0f, 800.0f-(i*25.0f), 0.4f,2);
     } else {
-      drawText(temptxt, 620.0f, 800.0f-(i*25.0f), 0.4f,1);
+      drawText(font12, temptxt, 620.0f, 800.0f-(i*25.0f), 0.4f,1);
     }
     i++;
   }
@@ -449,12 +455,12 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   // show prg start date
   strcpy(temptxt,startdato);
   temptxt[10]=0;
-  drawText("Date...:", 220.0f, 310.0f, 0.4f,1);
-  drawText(temptxt, 220.0f+70, 310.0f, 0.4f,1);           // show date
-  drawText("KL : ", 220.0f+190.0f, 310.0f, 0.4f,1);
+  drawText(font12, "Date...:", 220.0f, 310.0f, 0.4f,1);
+  drawText(font12, temptxt, 220.0f+70, 310.0f, 0.4f,1);           // show date
+  drawText(font12, "KL : ", 220.0f+190.0f, 310.0f, 0.4f,1);
   strcpy(temptxt,startdato+11);
   temptxt[5]=0;
-  drawText(temptxt, 220.0f+230.0f, 310.0f, 0.4f,1);       // show kl
+  drawText(font12, temptxt, 220.0f+230.0f, 310.0f, 0.4f,1);       // show kl
   static time_t tm;				// this time (now)
   struct tm *nutid;
   struct tm prgstarttid;
@@ -471,7 +477,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   time_t et=mktime(&prgsluttid);
   if ((tm>st) && (tm<et)) {				// er tiden inden for nu så hvis at vi optager live nu
     flipflop++;
-    if (flipflop<24) drawText("Recording now",  220.0f+290.0f, 310.0f, 0.4f,1);
+    if (flipflop<24) drawText(font12, "Recording now",  220.0f+290.0f, 310.0f, 0.4f,1);
     if (flipflop>48) flipflop=0;  
   }  
   // show desc

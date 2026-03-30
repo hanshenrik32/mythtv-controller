@@ -28,6 +28,10 @@
 #include "myctrl_glprint.h"
 #include "myth_config.h"
 
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
+
 extern config_icons config_menu;
 
 
@@ -4255,7 +4259,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);	    // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
           // glColor3f(0.5f,0.5f, 0.5f);		// rejser
-          drawText(tmptxt, xpos+20,ypos-7, 0.4f,5);  // gray color
+          drawText(font12, tmptxt, xpos+20,ypos-7, 0.4f,5);  // gray color
         }
         // show program name
         glPushMatrix();
@@ -4488,7 +4492,7 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
     default:
             temprgtxt1 = fmt::format("Channel  : {}",tvkanaler[tvvalgtrecordnr].chanel_name);
   }
-  drawText(temprgtxt1.c_str(), 700,575, 0.4f,1);
+  drawText(font12, temprgtxt1.c_str(), 700,575, 0.4f,1);
   // new ver 2
   switch (configland) {
     case 0: temprgtxt1 = fmt::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
@@ -4504,7 +4508,7 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
     default:    
           temprgtxt1 = fmt::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
   }
-  drawText(temprgtxt1.c_str(), 700,525, 0.4f,1);
+  drawText(font12, temprgtxt1.c_str(), 700,525, 0.4f,1);
   // new ver 3
   switch (configland) {
     case 0: temprgtxt1 = fmt::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
@@ -4520,7 +4524,7 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
     default:temprgtxt1 = fmt::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
 
   }
-  drawText(temprgtxt1.c_str(), 700,525, 0.4f,1);
+  drawText(font12, temprgtxt1.c_str(), 700,525, 0.4f,1);
 
   // new ver 4
   switch (configland) {
@@ -4537,7 +4541,7 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
     default:
             temprgtxt1 = fmt::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
   }
-  drawText(temprgtxt1.c_str(), 700,475, 0.4f,1);
+  drawText(font12, temprgtxt1.c_str(), 700,475, 0.4f,1);
 
   // new ver 5
   if (antalrec==-1) antalrec=tvprgrecordedbefore(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn,tvkanaler[tvvalgtrecordnr].chanid);
@@ -4556,12 +4560,12 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
 
   }
   if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].recorded) strcat(temprgtxt," Set to record");
-  drawText(temprgtxt1.c_str(), 700,450, 0.4f,1);
+  drawText(font12, temprgtxt1.c_str(), 700,450, 0.4f,1);
   // new ver 6
   if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type<=10)
   sprintf(temprgtxt,"Type     : %-10s",prgtypee[tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type]);
   else sprintf(temprgtxt,"Type     : %d nr  ",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type);
-  drawText(temprgtxt, 700,425, 0.4f,1);
+  drawText(font12, temprgtxt, 700,425, 0.4f,1);
   // new ver 7
   switch (configland) {
     case 0: temprgtxt1 = fmt::format("Description : ");
@@ -4576,11 +4580,11 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
             break;
     default:temprgtxt1 = fmt::format("Description : ");
   }
-  drawText(temprgtxt1.c_str(), 700,375, 0.4f,1);
+  drawText(font12, temprgtxt1.c_str(), 700,375, 0.4f,1);
 
   // new ver 8
   temprgtxt1 = fmt::format("{}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description);
-  drawText(temprgtxt1.c_str(), 700,350, 0.4f,1);
+  drawText(font12, temprgtxt1.c_str(), 700,350, 0.4f,1);
   if (strptime(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime,"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
       printf("RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
   }

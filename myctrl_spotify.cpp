@@ -20,6 +20,8 @@
 #include <string>
 #include <fmt/format.h>
 
+
+
 // json parser
 #include "json-parser/json.h"
 // global def
@@ -52,6 +54,10 @@ const int feed_url=2000;
 const char *spotify_json_path = "spotify_json/";
 const char *spotify_gfx_path = "spotify_gfx/";
 extern FILE *logfile;
+
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
 
 size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
     data->append((char*) ptr, size * nmemb);
@@ -4301,7 +4307,7 @@ void spotify_class::select_device_to_play() {
   glcRenderString("Select play device");
   glPopMatrix();
   */
-  drawText("Select play device", xof+60,yof+240, 0.4f,1);
+  drawText(font12, "Select play device", xof+60,yof+240, 0.4f,1);
 
   //active_spotify_device
   while(strcmp(spotify_device[i].id,"")!=0) {
@@ -4342,10 +4348,10 @@ void spotify_class::select_device_to_play() {
     else strcpy( temptxt , "None" );
     if ( i == active_spotify_device ) {
       glColor4f( 1.0f, 1.0f, 0.0f, select_device_to_playfader);
-      drawText(temptxt, xof+30,(yof+200)-(i*30), 0.4f,1);
+      drawText(font12, temptxt, xof+30,(yof+200)-(i*30), 0.4f,1);
     } else {
       glColor4f( 1.0f, 1.0f, 0.0f, select_device_to_playfader);
-      drawText(temptxt, xof+30,(yof+200)-(i*30), 0.4f,1);
+      drawText(font12, temptxt, xof+30,(yof+200)-(i*30), 0.4f,1);
     }
 
     /*
@@ -4359,7 +4365,7 @@ void spotify_class::select_device_to_play() {
     */
     strcpy(temptxt," - ");
     strcat(temptxt,spotify_device[i].devtype);
-    drawText(temptxt, xof+180,(yof+200)-(i*30), 0.4f,1);
+    drawText(font12, temptxt, xof+180,(yof+200)-(i*30), 0.4f,1);
 
 
     //draw icon
@@ -4572,7 +4578,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
-      drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+20,yof-10,0.38f,20,2,1,true);
+      drawLinesOfText(stack[i+sofset]->feed_showtxt,xof+20,yof-10,1.0f,20,2,1,true);
       glPopMatrix();
       // next button
       i++;
@@ -5171,10 +5177,10 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
   if (stack[ii]->textureId ) texture = stack[ii]->textureId; else texture = normal_icon;
   if (ii == stream_key_selected-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+    drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+    drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
   }
 }
 
@@ -5330,7 +5336,7 @@ void spotify_class::show_setup_spotify() {
     glEnd();
     glPopMatrix();
     // top text
-    drawText("Spotify Account setup", 550, 750, 0.4f,1);
+    drawText(font12, "Spotify Account setup", 550, 750, 0.4f,1);
 
     // close buttons
     glPushMatrix();
@@ -5399,19 +5405,19 @@ void spotify_class::show_setup_spotify() {
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     glPopMatrix();
-    if (do_show_setup_select_linie==0) drawText("Client ID        ", 520, 650, 0.4f,15); else drawText("Client ID        ", 520, 650, 0.4f,1);
-    drawText(spotify_client_id, 520+140.0f, 650, 0.4f,1);
-    if (do_show_setup_select_linie==1) drawText("Client Secrect   ", 520.0f, 600, 0.4f,15); else drawText("Client Secrect   ", 520.0f, 600, 0.4f,1);
+    if (do_show_setup_select_linie==0) drawText(font12, "Client ID        ", 520, 650, 0.4f,15); else drawText(font12, "Client ID        ", 520, 650, 0.4f,1);
+    drawText(font12, spotify_client_id, 520+140.0f, 650, 0.4f,1);
+    if (do_show_setup_select_linie==1) drawText(font12, "Client Secrect   ", 520.0f, 600, 0.4f,15); else drawText(font12, "Client Secrect   ", 520.0f, 600, 0.4f,1);
     if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));
-    drawText(spotify_secret_id, 520+140.0f, 600, 0.4f,1);
+    drawText(font12, spotify_secret_id, 520+140.0f, 600, 0.4f,1);
     // show(select play use spotify local (start spotify understartup))
-    drawText("Use Spotify client ", 520.0f, 550, 0.4f,15); 
-    if (global_use_spotify_local_player) drawText("Yes ", 520.0f+150.0f, 550, 0.4f,15); else drawText("No ", 520.0f+150.0f, 550, 0.4f,15); 
+    drawText(font12, "Use Spotify client ", 520.0f, 550, 0.4f,15); 
+    if (global_use_spotify_local_player) drawText(font12, "Yes ", 520.0f+150.0f, 550, 0.4f,15); else drawText(font12, "No ", 520.0f+150.0f, 550, 0.4f,15); 
     if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));   
-    drawText("Active play device  ", 520.0f, 500, 0.4f,15); 
+    drawText(font12, "Active play device  ", 520.0f, 500, 0.4f,15); 
     sprintf(temptxt," devid = %d ",active_default_play_device);
-    drawText(temptxt, 520.0f+140.0f, 500, 0.4f,15); 
-    drawText("Device avable ", 520.0f, 460, 0.4f,15); 
+    drawText(font12, temptxt, 520.0f+140.0f, 500, 0.4f,15); 
+    drawText(font12, "Device avable ", 520.0f, 460, 0.4f,15); 
     if (strcmp(spotify_device[0].name,"")!=0) {
       // playerid 1
       glPushMatrix();
@@ -5437,7 +5443,7 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       devname=spotify_device[0].name;
       devname.resize(10);
-      drawText(devname.c_str(), icon_text_posx1, icon_text_posy1, 0.4f,1); 
+      drawText(font12, devname.c_str(), icon_text_posx1, icon_text_posy1, 0.4f,1); 
     }
     if (strcmp(spotify_device[1].name,"")!=0) {
       // playerid 2
@@ -5464,7 +5470,7 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       devname=spotify_device[1].name;
       devname.resize(10);
-      drawText(devname.c_str(), icon_text_posx2, icon_text_posy2, 0.4f,1); 
+      drawText(font12, devname.c_str(), icon_text_posx2, icon_text_posy2, 0.4f,1); 
     }
     if (strcmp(spotify_device[2].name,"")!=0) {
       // playerid 3
@@ -5491,7 +5497,7 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       devname=spotify_device[2].name;
       devname.resize(10);
-      drawText(devname.c_str(), icon_text_posx3, icon_text_posy3, 0.4f,1); 
+      drawText(font12, devname.c_str(), icon_text_posx3, icon_text_posy3, 0.4f,1); 
     }
     if (strcmp(spotify_device[3].name,"")!=0) {
       // playerid 4
@@ -5518,7 +5524,7 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       devname=spotify_device[3].name;
       devname.resize(10);
-      drawText(devname.c_str(), icon_text_posx4, icon_text_posy4, 0.4f,1); 
+      drawText(font12, devname.c_str(), icon_text_posx4, icon_text_posy4, 0.4f,1); 
     }
     // row 2
     if (strcmp(spotify_device[4].name,"")!=0) {
@@ -5546,7 +5552,7 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       devname=spotify_device[4].name;
       devname.resize(10);
-      drawText(devname.c_str(), icon_text_posx5, icon_text_posy5, 0.4f,1); 
+      drawText(font12, devname.c_str(), icon_text_posx5, icon_text_posy5, 0.4f,1); 
     }
     if (strcmp(spotify_device[5].name,"")!=0) {
       // playerid 6
@@ -5573,7 +5579,7 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       devname=spotify_device[5].name;
       devname.resize(10);
-      drawText(devname.c_str(), icon_text_posx6, icon_text_posy6, 0.4f,1); 
+      drawText(font12, devname.c_str(), icon_text_posx6, icon_text_posy6, 0.4f,1); 
     }
 
     if (strcmp(spotify_device[6].name,"")!=0) {
@@ -5601,7 +5607,7 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       devname=spotify_device[6].name;
       devname.resize(10);
-      drawText(devname.c_str(), icon_text_posx7, icon_text_posy7, 0.4f,1); 
+      drawText(font12, devname.c_str(), icon_text_posx7, icon_text_posy7, 0.4f,1); 
     }
     if (strcmp(spotify_device[7].name,"")!=0) {
       // playerid 8
@@ -5628,7 +5634,7 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       devname=spotify_device[7].name;
       devname.resize(10);
-      drawText(devname.c_str(), icon_text_posx8, icon_text_posy8, 0.4f,1); 
+      drawText(font12, devname.c_str(), icon_text_posx8, icon_text_posy8, 0.4f,1); 
     }
 }
 

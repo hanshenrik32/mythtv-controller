@@ -28,6 +28,10 @@
 
 extern config_icons config_menu;
 
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
+
 // web file loader
 #include "myctrl_readwebfile.h"
 
@@ -2485,7 +2489,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color c) {
   if (streamoversigt.get_stream_groupantal(id-100)>1) {
     // show numbers in group
     temptxt = fmt::format("Feeds {}",streamoversigt.get_stream_groupantal(id-100)-1);
-    drawText(temptxt.c_str(), x+8,y+6, 0.3f,1);
+    drawText(font12, temptxt.c_str(), x+8,y+6, 1.0f,1);
   }
 }
 
@@ -2504,7 +2508,7 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   GLuint texture;
   Color highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  float fontsize=float (configdefaultstreamfontsize/100)*2;
+  float fontsize=1.0f;
   // Cover
   gfxfilename = FeedCatalog[ii].feed_gfx_mythtv;
   if (gfxfilename.size() > 0) {
@@ -2521,10 +2525,10 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   if (FeedCatalog[ii].textureId ) texture = FeedCatalog[ii].textureId; else texture=empty_icon; // texture = normal_icon;
   if (ii == selected_icon_in_view-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+    drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+    drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
   }
 }
 
@@ -2542,7 +2546,7 @@ void stream_class::draw_search_stream_item(int x, int y,int ii,GLuint normal_ico
   GLuint texture;
   Color highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  float fontsize=float (configdefaultstreamfontsize/100)*2;
+  float fontsize=1.0f;
   // Cover
   gfxfilename = FeedCatalog_search_view[ii].feed_gfx_mythtv;
   if (gfxfilename.size() > 0) {
@@ -2559,10 +2563,10 @@ void stream_class::draw_search_stream_item(int x, int y,int ii,GLuint normal_ico
   if (FeedCatalog_search_view[ii].textureId ) texture = FeedCatalog_search_view[ii].textureId; else texture = normal_icon;
   if (ii == selected_icon_in_view-1) {
     drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+    drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+    drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
   }
 }
 
@@ -2657,7 +2661,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, i
         glTexCoord2f(1,1); glVertex3f(orgwinsizex/3+400, 350, 0);
         glTexCoord2f(1,0); glVertex3f(orgwinsizex/3+400, 200, 0);
         glEnd();
-        drawText("No streams found ...", 700, 260, 0.4f, 1);
+        drawText(font12, "No streams found ...", 700, 260, 0.4f, 1);
     }
   } else if ((rss_search_podcast_string.empty()) && (FeedCatalog.size() > 0)) {
     // ---- RENDER Normal view ---------------------------------
@@ -2680,7 +2684,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, i
       glTexCoord2f(1,1); glVertex3f(orgwinsizex/3+400, 350, 0);
       glTexCoord2f(1,0); glVertex3f(orgwinsizex/3+400, 200, 0);
       glEnd();
-      drawText("Please wait Loading ...", 700, 260, 0.4f, 1);
+      drawText(font12, "Please wait Loading ...", 700, 260, 0.4f, 1);
     }
   }
 }
