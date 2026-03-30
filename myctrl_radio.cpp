@@ -23,9 +23,6 @@
 #include <iostream>
 #include <jsoncpp/json/json.h>
 #include <fstream>
-
-
-
 #include "myctrl_readwebfile.h"
 #include "myctrl_radio.h"
 #include "utility.h"
@@ -41,12 +38,9 @@ extern GLuint tidal_big_search_bar_artist;
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                  // used by log system
-
 extern Character characters[];
-
 extern int orgwinsizey;                                                         // screen size
 extern int orgwinsizex;
-
 extern char keybuffer[];                                    // keyboard buffer
 extern float configdefaultradiofontsize;
 extern const char *dbname;                                    // db name in mysql
@@ -81,6 +75,10 @@ extern bool radio_oversigt_loaded_done;
 extern bool radio_oversigt_loaded_begin;
 
 
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
+
 extern int radio_oversigt_loaded_nr;
 extern int radio_oversigt_antal;
 extern bool do_sqlite;
@@ -98,7 +96,7 @@ radiostation_class::radiostation_class() : antal(0) {
     radiosortopt[i].antal=0;
   }
   radiooptionsselect=0;							// selected line in radio options
-  playing=false;						// playing radio station  
+  playing=false;        						// playing radio station  
 }
 
 
@@ -144,7 +142,7 @@ static size_t radio_write_data(void *ptr, size_t size, size_t nmemb, void *strea
 
 // *******************************************************************************************
 //
-//
+// download image
 //
 // *******************************************************************************************
 
@@ -196,7 +194,30 @@ int radiostation_class::radio_download_image(char *imgurl,char *filename) {
 }
 
 
+// ******************************************************************************************
+//
+// load show cover image if not loaded
+// 
+// ******************************************************************************************
 
+GLuint radiostation_class::get_texture_r(int nr) {
+  GLuint textureId=0;
+  std::string filename=stack[nr].gfxfilename;
+  std::string onlyname;
+  size_t pos=(filename.find_last_of('.'));
+  onlyname=filename.substr(0, pos);
+  if (!(stack[nr].texture_r_loaded)) {
+    if (onlyname.length()>0) {
+      onlyname = "/opt/mythtv-controller/images/radiostations/" + onlyname;
+      onlyname = onlyname + "_r.png";
+      textureId = loadTexture((char *) onlyname.c_str());
+      stack[nr].textureId_r = textureId;
+      stack[nr].texture_r_loaded=true;
+      return(textureId);
+    }
+  }
+  return(stack[nr].textureId_r);
+}
 
 
 // ******************************************************************************************
@@ -205,13 +226,13 @@ int radiostation_class::radio_download_image(char *imgurl,char *filename) {
 //
 // ******************************************************************************************
 
-
 int radiostation_class::load_radio_stations_from_json_file() {
   MYSQL *conn1;
   MYSQL_RES *res;
   MYSQL_ROW row;
   const char *database = (char *) "mythtvcontroller";
   int ok=0;
+  FILE *f;
   radio_oversigt_type new_radio_record;
   int antal=0;
   int antal_in_db=0;
@@ -224,10 +245,10 @@ int radiostation_class::load_radio_stations_from_json_file() {
   std::string do_cmd;
   std::string sql_update;
   Json::Value cfg_root;
+  std::string downloadfilenamelong3;
   int art=0;
   conn1=mysql_init(NULL);
   if (mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {    
-    std::cout << "Please wait process json file stations-big_all.json " << std::endl;
     std::ifstream cfgfile("stations-big_all.json");
     cfgfile >> cfg_root;
     // Tjek at root er array
@@ -237,7 +258,7 @@ int radiostation_class::load_radio_stations_from_json_file() {
     }
     // loop gemmen array
     int antal_in_json=cfg_root.size();
-
+    std::cout << "Please wait process json file 'stations-big_all.json' Total " << antal_in_json << " Radio stations." << std::endl;
     sql_update  = fmt::format("select count(name) from radio_stations");
     mysql_query(conn1,sql_update.c_str());
     res = mysql_store_result(conn1);
@@ -322,17 +343,35 @@ int radiostation_class::load_radio_stations_from_json_file() {
             char filenamepath[1024];
             std::string popenstring="/usr/bin/convert '";
             popenstring = popenstring + downloadfilenamelong2;
-            popenstring = popenstring + "' -resize 256x256! ";
-            popenstring = popenstring + " -set colorspace RGB -alpha set -bordercolor none -border 1 -fuzz 20%   -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
+            popenstring = popenstring + "' -resize 320x320^ -gravity center -extent 320x320 -crop 320x320+0+0 +repage ";
+            popenstring = popenstring + " -set colorspace RGB -type TrueColorAlpha -alpha set -bordercolor none -fill none -draw 'matte 0,0 floodfill' +repage '";
+            // popenstring = popenstring + " -set colorspace RGB -alpha set -bordercolor none -border 1 -fuzz 20% -fill none -draw 'matte 0,0 floodfill' -shave 1x1  -channel A -blur 0x1  -trim +repage -type TrueColorAlpha '";
             popenstring = popenstring + downloadfilenamelong_out;
             popenstring = popenstring + "' 2> /dev/null";
-            FILE *f = popen(popenstring.c_str(), "r");
+            f = popen(popenstring.c_str(), "r");
             if (f) {
               fgets(filenamepath, 1024, f);
               return_code=pclose(f);
             }
             if (return_code==0) {
-              new_radio_record.gfxfilename=downloadfilename;
+              downloadfilenamelong3 = downloadfilename;
+              popenstring="/usr/bin/convert ";
+              popenstring=popenstring + downloadfilenamelong_out;
+              popenstring=popenstring + R"delim( \( +clone -alpha transparent -fill white -draw "roundrectangle 0,0 320,320 10,10" \) -alpha set -compose DstIn -composite /opt/mythtv-controller/images/radiostations/)delim";
+              size_t pos=(downloadfilenamelong3.find_last_of('.'));
+              std::string onlyname=downloadfilenamelong3.substr(0, pos);
+              if (onlyname.length()>0) {
+                popenstring=popenstring + onlyname;
+                popenstring=popenstring + "_r.png";
+                f = popen(popenstring.c_str(), "r");
+                if (f) {
+                  fgets(filenamepath, 1024, f);
+                  return_code=pclose(f);
+                }
+              }
+            }
+            if (return_code==0) {
+              new_radio_record.gfxfilename=downloadfilenamelong3;
             } else new_radio_record.gfxfilename="";
           }
           new_radio_record.textureId=0;
@@ -341,13 +380,12 @@ int radiostation_class::load_radio_stations_from_json_file() {
             mysql_query(conn1,sql_update.c_str());
             res = mysql_store_result(conn1);
           }
-          // std::cout << sql_update << std::endl;
           antal++;
         }
       }
     }
     std::cout << std::endl;
-    std::cout << "Done parrsing json file." << std::endl;
+    std::cout << "Done parsing json file." << std::endl;
     mysql_close(conn1);
   }
   if (antal>0) return(1); else return(0);
@@ -355,6 +393,10 @@ int radiostation_class::load_radio_stations_from_json_file() {
 
 
 // Next *******************************************************************************************
+//
+//
+//
+// *************************************************************************************************
 
 // select next in radio sort option menu
 void radiostation_class::nextradiooptselect() {
@@ -362,6 +404,10 @@ void radiostation_class::nextradiooptselect() {
 }
 
 // Last *******************************************************************************************
+//
+//
+//
+// *************************************************************************************************
 
 // select last in radio sort option menu
 void radiostation_class::lastradiooptselect() {
@@ -946,11 +992,12 @@ void drawRect(int x, int y, int w, int h, Color2 c) {
 // ****************************************************************************************
 
 void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c) {
-  std::string temptxt;
   glEnable(GL_TEXTURE_2D);
   glColor4f(c.r, c.g, c.b, c.a);
+
   glBindTexture(GL_TEXTURE_2D, textureId2);
   // draw cover frame
+  /*
   glLoadName(id);
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0); glVertex2i(x,     y);
@@ -958,6 +1005,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
   glTexCoord2f(0, 1); glVertex2i(x,     y + h);
   glEnd();
+  */
   // draw actual cover
   glBindTexture(GL_TEXTURE_2D, textureId);
   glLoadName(id);
@@ -967,10 +1015,16 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
   glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
   glEnd();
- 
+  
+  glBindTexture(GL_TEXTURE_2D, textureId2);
+  glLoadName(id);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex2i(x,     y);
+  glTexCoord2f(1, 0); glVertex2i(x + w, y);
+  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
+  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
+  glEnd();
 }
-
-
 
 
 // ****************************************************************************************
@@ -979,9 +1033,9 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
 //
 // ****************************************************************************************
 
-
 void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
   // Baggrund
+  static float sinh=0.0;
   std::string temprgtxt;
   std::string gfxfilename;
   GLuint texture;
@@ -990,6 +1044,7 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
   // Cover
   gfxfilename = "/opt/mythtv-controller/images/radiostations/";
   gfxfilename = gfxfilename + stack[ii].gfxfilename;
+  gfxfilename = gfxfilename + ".png";
   if (stack[ii].gfxfilename.length()>0) {
     // load texture if not loaded
     if (stack[ii].textureId == 0) {
@@ -1005,20 +1060,24 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
   // temprgtxt.resize(20);
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
   if (stack[ii].textureId ) {
-    if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
-      drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
+    if (ii == selected_icon_in_view-1) {
+      drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
+      sinh = sinh + 0.09f;
+      if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
-      drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
+      drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
+      sinh = sinh + 0.08f;
+      if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
     }
   }
 }
@@ -1033,6 +1092,7 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
 
 
 void radiostation_class::draw_radio_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
+  static float sinh=0.0;
   // Baggrund
   std::string temprgtxt;
   std::string gfxfilename;
@@ -1057,30 +1117,39 @@ void radiostation_class::draw_radio_search_item(int x, int y,int ii,GLuint norma
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
-      drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 2, true);
+      drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+      drawLinesOfText(temprgtxt, x + 18, y + 4,   1.0f, 22, 3, 2, true);
+      sinh = sinh + 0.2f;
+      if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
       if (y<search_startY-30) {
-        drawcover(x + 18, y + 18 , 164, 164, texture , onlineradio_selected ,ii+100,highcolor);
-        drawLinesOfText(temprgtxt, x + 18, y + 4 , 0.31f, 22, 3, 2, true);
+        drawcover(x + 18, y + 18 , 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+        drawLinesOfText(temprgtxt, x + 18, y + 4 , 1.0f, 22, 3, 2, true);        
       }
+      sinh = sinh + 0.1f;
+      if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       if (y<search_startY-30) {
         drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-        drawLinesOfText(temprgtxt, x + 18, y + 4, 0.31f, 22, 3, 15, true);
+        drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
       }
     }
   }
 }
 
 
-//      glBindTexture(GL_TEXTURE_2D,onlineradio_selected);
 
+
+// ****************************************************************************************
+//
+// get text width
+//
+// ****************************************************************************************
 
 
 float radio_getTextWidth(const std::string& text, float scale) {
@@ -1141,9 +1210,9 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     glEnd();
     // show seach string
     if (strcmp(keybuffer,"")!=0) {
-      drawText(keybuffer, 300.0f, 980.0f, 1.3f, 0);
-      float textWidth = radio_getTextWidth(keybuffer, 1.3f);
-      if (cursor) drawText("_", 300.0f+textWidth, 980.0f, 1.3f, 0);
+      drawText(font24, keybuffer, 300.0f, 980.0f, 1.0f, 0);
+      float textWidth = radio_getTextWidth(keybuffer, 1.0f);
+      if (cursor) drawText(font24, "_", 300.0f+textWidth, 980.0f, 1.0f, 0);
     }
     printf("Keybuffer = %s \n",keybuffer);
     // ---- RENDER -----------------------------------------------
@@ -1171,17 +1240,11 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
 
 
 
-
-
-
 // ****************************************************************************************
 //
 // skal vi opdatere sort type oversigt første gang
 //
 // ****************************************************************************************
-
-static bool hentradioart=false;
-
 
 void radiostation_class::show_radio_options() {
   int i;  
@@ -1234,14 +1297,14 @@ void radiostation_class::show_radio_options() {
       }
     }
   }
-  drawText("Sort options.", 410.0f, 770.0f, 0.8f,1);
+  drawText(font12, "Sort options.", 410.0f, 770.0f, 0.8f,1);
   i=0;
   while ((strcmp(radiosortopt[i].radiosortopt,"")!=0) && (i<40)) {
-    if (i!=radiooptionsselect) drawText(radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,1);
-    else drawText(radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,2);
+    if (i!=radiooptionsselect) drawText(font12, radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,1);
+    else drawText(font12, radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,2);
     sprintf(tmptxt,"%5d",radiosortopt[i].antal);
-    if (i!=radiooptionsselect) drawText(tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,1);
-    else drawText(tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,2);
+    if (i!=radiooptionsselect) drawText(font12, tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,1);
+    else drawText(font12, tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,2);
     i++;
   }
 }
@@ -1249,9 +1312,11 @@ void radiostation_class::show_radio_options() {
 
 
 
+// ****************************************************************************************
 //
-// *********************************************************************************
 // opdatere list set numbers of aflytninger
+//
+// ****************************************************************************************
 
 int radiostation_class::set_radio_popular(int stationid) {
   char sqlselect[512];
@@ -1366,6 +1431,8 @@ bool radiostation_class::check_radio_online_bool() {
 
 // ****************************************************************************************
 //
+//
+//
 // ****************************************************************************************
 
 int radiostation_class::set_radio_aktiv(int stationid,bool onoff) {
@@ -1375,6 +1442,8 @@ int radiostation_class::set_radio_aktiv(int stationid,bool onoff) {
 }
 
 // ****************************************************************************************
+//
+//
 //
 // ****************************************************************************************
 

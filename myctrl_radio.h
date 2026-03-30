@@ -23,8 +23,11 @@ struct radio_oversigt_type {
     bool noiconloaded;
     bool online;
     bool aktiv;
+    bool texture_r_loaded=false;
+
     unsigned int kbps;
     GLuint textureId;
+    GLuint textureId_r;
     long intnr;
 };
 
@@ -56,6 +59,7 @@ class radiostation_class {
     int opdatere_radiostation_gfx(int nr,char *gfxpath);		                    // update gfx
     bool startup_loaded;			                                         	    // load radio statios list
     bool check_radio_online_bool();                                                 // check and set radio station online flag (DO NOT WORK)
+    bool hentradioart=false;
   public:
     bool search_radio_online_done;
     bool search_loaded;
@@ -135,6 +139,8 @@ class radiostation_class {
     void draw_radio_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected);
     bool show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 
+
+    GLuint get_texture_r(int nr);
     // json parser
     int load_radio_stations_from_json_file();
     int radio_download_image(char *imgurl,char *filename);

@@ -132,6 +132,11 @@ class config_icons {
     int config_stream_main_window_icon_spac;
     int config_stream_main_window_icon_sizex;
     int config_stream_main_window_icon_sizey;
+
+    int config_media_buttonx;
+    int config_media_buttony;
+    std::string config_media_button_icon;
+
     int config_movie_main_windowx;
     int config_movie_main_windowy;
     int config_movie_main_window_sizex;
@@ -208,6 +213,11 @@ class config_icons {
       config_radio1x = 1920;
       config_radio1y = 0;
       config_radio1_icon = "radio_button";
+
+      config_media_buttonx=1920;
+      config_media_buttony=504;
+      config_media_button_icon="media_button";
+
       config_moviex = 1920;
       config_moviey = 504;
       config_movie_icon = "movie_button";

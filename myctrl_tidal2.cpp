@@ -70,6 +70,10 @@ bool tidal_all_type_of_playes = false;
 #include "myctrl_glprint.h"
 #include "myth_config.h"
 
+extern mFont font12;  // 12px font
+extern mFont font18;  // 18px font
+extern mFont font24;  // 24px font
+
 extern int do_show_tidal_search_oversigt;
 
 extern Character characters[];
@@ -4030,12 +4034,14 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   }
   mysql_res = mysql_store_result(conn);
   if (mysql_res) {
+    std::string playpath="";
     while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
-      // if (file_exists(mysql_row[1])) 
-      skip_download_of_files=true;
+      playpath="/home/hans/download/";
+      playpath = playpath + stack[tidalknapnr].playlistid;
+      if (file_exists(playpath.c_str())) skip_download_of_files=true;
     }
   }
-  // if exist in db load the files to play and be happy
+  // if db load the files to play and be happy
   if (skip_download_of_files) {
     sqlstring = "select playlistname,paththumb,playlistid,release_date,artistid from tidalcontentplaylist where playlistid like ";
     sqlstring = sqlstring + stack[tidalknapnr].playlistid;
@@ -5692,7 +5698,11 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
   Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = stack[ii].feed_gfx_url;
-  float fontsize=float (configdefaulttidalfontsize/120)*2;
+  // used
+  // float fontsize=float (configdefaulttidalfontsize/120)*2;
+  // test
+  float fontsize=1.0f;
+
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (stack[ii].textureId == 0) {
@@ -5742,7 +5752,7 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
   Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
   gfxfilename = stack_search[ii].feed_gfx_url;
-  float fontsize=float (configdefaulttidalfontsize/120)*2;
+  float fontsize=1.0f;
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (stack_search[ii].textureId == 0) {
@@ -5791,6 +5801,14 @@ float getTextWidth(const std::string& text, float scale) {
   return width;
 }
 
+float getTextWidth(mFont tfont,const std::string& text, float scale) {
+  float width = 0.0f;
+  for (char c : text){
+    Character ch = tfont.characters[c];
+    width += ch.advance * scale;  // glyph advance
+  }
+  return width;
+}
 
 // ************************************************************************************************************************
 //
@@ -5923,9 +5941,9 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
 
   // show tidal search string
   if (strcmp(searchstring,"")!=0) {
-    drawText(searchstring, 300.0f, 980.0f, 1.2f, 0);
-    float textWidth = getTextWidth(searchstring, 1.2f);
-    if (cursor) drawText("_", 300.0f+textWidth, 980.0f, 1.2f, 0);
+    drawText(font24,searchstring, 300.0f, 980.0f, 1.2f, 0);
+    float textWidth = getTextWidth(font24, searchstring, 1.2f);
+    if (cursor) drawText(font24,"_", 300.0f+textWidth, 980.0f, 1.2f, 0);
   }
   if (search_loaded==false) doneloadsearch=false;
   if ((search_loaded==true) && (doneloadsearch==false)) {
@@ -5941,12 +5959,11 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     int y = screenTop - (row * rowHeight) + subOff - 40;
     draw_tidal_search_item( x, y, index, normal_icon, normal_icon, stream_key_selected);
   }
-  float fontsize = float(configdefaulttidalfontsize/120)*2;
   if (strlen(overview_show_band_name)>0) {
     std::string txt = "Artist : ";
     txt = txt + overview_show_band_name;
-    int aa=getTextWidth(txt,fontsize+0.2f);
-    drawLinesOfText(txt, (1920/2)-(float(aa/2)), 5, fontsize+0.2f, 22, 2, 15, true);
+    int aa=getTextWidth(txt,1.0f);
+    drawLinesOfText(txt, (1920/2)-(float(aa/2)), 5, 1.0f, 22, 2, 15, true);
   }
 }
 
@@ -6212,17 +6229,17 @@ void tidal_class::show_setup_tidal() {
   glRasterPos2f(0.0f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
   glPopMatrix();
-  drawText("email adress        ", 630, 650, 0.4f,15);
-  drawText(tidal_oversigt->client_id, 630+140, 650, 0.4f,15);
-  drawText("Password            ", 650.0f, 600, 0.4f,15);
-  drawText(tidal_oversigt->client_secret.c_str(), 630+140, 600, 0.4f,15);
+  drawText(font12,"email adress        ", 630, 650, 0.4f,15);
+  drawText(font12,tidal_oversigt->client_id, 630+140, 650, 0.4f,15);
+  drawText(font12,"Password            ", 650.0f, 600, 0.4f,15);
+  drawText(font12,tidal_oversigt->client_secret.c_str(), 630+140, 600, 0.4f,15);
   if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(395,500-(do_show_setup_select_linie*50),strlen(keybuffer));
-  drawText("Token ok ", 650, 550, 0.4f,1);
-  if (strlen(tidaltoken)>0) drawText("Yes ", 630+140.0f, 550, 0.4f,1); else drawText("No  ", 630+140.0f, 550, 0.4f,1);
-  drawText("You have to config tidal-dl for now. If not done.", 650, 450, 0.4f,1);
-  drawText("Change this settings.", 650, 400, 0.4f,1);
-  drawText("| Album folder format - {AlbumID}", 650, 350, 0.4f,1);
-  drawText("| Playlist folder format - Playlist/{PlaylistName} [{PlaylistUUID}]", 650, 300, 0.4f,1);   
+  drawText(font12,"Token ok ", 650, 550, 0.4f,1);
+  if (strlen(tidaltoken)>0) drawText(font12,"Yes ", 630+140.0f, 550, 0.4f,1); else drawText(font12,"No  ", 630+140.0f, 550, 0.4f,1);
+  drawText(font12,"You have to config tidal-dl for now. If not done.", 650, 450, 0.4f,1);
+  drawText(font12,"Change this settings.", 650, 400, 0.4f,1);
+  drawText(font12,"| Album folder format - {AlbumID}", 650, 350, 0.4f,1);
+  drawText(font12,"| Playlist folder format - Playlist/{PlaylistName} [{PlaylistUUID}]", 650, 300, 0.4f,1);   
 }
 
 
