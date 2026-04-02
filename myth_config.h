@@ -488,8 +488,8 @@ class config_icons {
 
       config_mediaplayer_infox = 480;
       config_mediaplayer_infoy = 320;
-      config_mediaplayer_sizx = 540;
-      config_mediaplayer_sizy = 275;
+      config_mediaplayer_sizx = 640;
+      config_mediaplayer_sizy = 400;
       config_mediaplayer_coverx = 348;
       config_mediaplayer_covery = 400;
       config_mediaplayer_cover_sizx = 167;
