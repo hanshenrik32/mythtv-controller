@@ -5380,7 +5380,7 @@ void display() {
       }
       // printf("zoom_tidal=%s zoom_spotify=%s zoom_music=%s zoom_radio=%s  zoom_stream=%s \n",do_zoom_tidal_cover ? "true" : "false",do_zoom_spotify_cover ? "true" : "false",do_zoom_music_cover ? "true" : "false",do_zoom_radio ? "true" : "false",do_zoom_stream_cover ? "true" : "false ");
       if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
-        // show tidal player
+        // show player background
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         // window texture
         glEnable(GL_TEXTURE_2D);
@@ -5391,10 +5391,33 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox    ,config_menu.config_tidalplayer_infoy , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox    ,275+config_menu.config_tidalplayer_infoy, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+540,275+config_menu.config_tidalplayer_infoy , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+540,config_menu.config_tidalplayer_infoy, 0.0);
+        if (do_zoom_tidal_cover) {
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox    ,config_menu.config_tidalplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox    ,config_menu.config_tidalplayer_sizy+config_menu.config_tidalplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_sizx,config_menu.config_tidalplayer_sizy+config_menu.config_tidalplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_sizx,config_menu.config_tidalplayer_infoy, 0.0);
+        } else if (do_zoom_spotify_cover) {
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_spotifyplayer_infox    ,config_menu.config_spotifyplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_spotifyplayer_infox    ,config_menu.config_spotifyplayer_sizy+config_menu.config_spotifyplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_spotifyplayer_infox+config_menu.config_spotifyplayer_sizx,config_menu.config_spotifyplayer_sizy+config_menu.config_spotifyplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_spotifyplayer_infox+config_menu.config_spotifyplayer_sizx,config_menu.config_spotifyplayer_infoy, 0.0);
+        } else if (do_zoom_radio) {
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox    ,config_menu.config_radioplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox    ,config_menu.config_radioplayer_sizy+config_menu.config_radioplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+config_menu.config_radioplayer_sizx,config_menu.config_radioplayer_sizy+config_menu.config_radioplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+config_menu.config_radioplayer_sizx,config_menu.config_radioplayer_infoy, 0.0);
+        } else if (do_zoom_music_cover) {
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_musicplayer_infox    ,config_menu.config_musicplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_musicplayer_infox    ,config_menu.config_musicplayer_sizy+config_menu.config_musicplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_musicplayer_infox+config_menu.config_musicplayer_sizx,config_menu.config_musicplayer_sizy+config_menu.config_musicplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_musicplayer_infox+config_menu.config_musicplayer_sizx,config_menu.config_musicplayer_infoy, 0.0);
+        } else {
+          // default show music player
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_musicplayer_infox    ,config_menu.config_musicplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_musicplayer_infox    ,config_menu.config_musicplayer_sizy+config_menu.config_musicplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_musicplayer_infox+config_menu.config_musicplayer_sizx,config_menu.config_musicplayer_sizy+config_menu.config_musicplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_musicplayer_infox+config_menu.config_musicplayer_sizx,config_menu.config_musicplayer_infoy, 0.0);          
+        }
         glEnd();
 
         // play button
@@ -5405,10 +5428,10 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(8);                        // 8 = play
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+50 ,  300 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+50,100+300, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+50+100,100+300 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+50+100,300, 0.0);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_posy, 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,    config_menu.config_radioplayer_play_button_posy, 0.0);
         glEnd();
         // stop button
         glEnable(GL_TEXTURE_2D);
@@ -5418,10 +5441,10 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(9);                        // 9 = stop
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+150 ,  300 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+150,100+300, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+150+100,100+300 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+150+100,300, 0.0);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx,  config_menu.config_radioplayer_stop_button_posy, 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx,  config_menu.config_radioplayer_stop_button_sizy+config_menu.config_radioplayer_stop_button_posy, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx + config_menu.config_radioplayer_stop_button_sizx,config_menu.config_radioplayer_stop_button_sizy+config_menu.config_radioplayer_stop_button_posy, 0.0);
+        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx + config_menu.config_radioplayer_stop_button_sizx,    config_menu.config_radioplayer_stop_button_posy, 0.0);
         glEnd();
         if (!(do_zoom_radio)) {
           // ff button
@@ -5432,10 +5455,10 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(10);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+250 ,  300 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+250,100+300, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+250+100,100+300 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+250+100,300, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx,  config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx,  config_menu.config_radioplayer_ff_button_sizy+config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx + config_menu.config_radioplayer_ff_button_sizx,config_menu.config_radioplayer_ff_button_sizy+config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx + config_menu.config_radioplayer_ff_button_sizx,    config_menu.config_radioplayer_ff_button_posy, 0.0);
           glEnd();
           // back button
           glEnable(GL_TEXTURE_2D);
@@ -5445,10 +5468,10 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(11);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+350 ,  300 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+350,100+300, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+350+100,100+300 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+350+100,300, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx,  config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx,  config_menu.config_radioplayer_bw_button_sizy+config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx + config_menu.config_radioplayer_bw_button_sizx,config_menu.config_radioplayer_bw_button_sizy+config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx + config_menu.config_radioplayer_bw_button_sizx,    config_menu.config_radioplayer_bw_button_posy, 0.0);
           glEnd();
         }
         // play position
@@ -5752,10 +5775,10 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+348 ,   400 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+348,    400+119, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+348+167,400+119 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+348+167,400, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_coverx, config_menu.config_tidalplayer_covery , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_coverx,  config_menu.config_tidalplayer_covery + config_menu.config_tidalplayer_cover_sizy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_coverx + config_menu.config_tidalplayer_cover_sizx,config_menu.config_tidalplayer_covery + config_menu.config_tidalplayer_cover_sizy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_coverx + config_menu.config_tidalplayer_cover_sizx,config_menu.config_tidalplayer_covery , 0.0);
           glEnd();
           do_we_play_check=0;
           if (do_we_play_check==0) {
@@ -17156,26 +17179,125 @@ int team_settings_load() {
     config_menu.config_upy=(iRoot["tema1"]["icons"]["up"].get("y","0").asInt());
     config_menu.config_up_icon=(iRoot["tema1"]["icons"]["up"].get("icon_path","0").asString());
 
+    config_menu.config_musicplayer_coverx=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_musicplayer_covery=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_musicplayer_cover_sizx=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_cover_sizy=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("sizy","0").asInt());
     config_menu.config_musicplayer_infox=(iRoot["tema1"]["icons"]["musicplayer_info"].get("x","0").asInt());
     config_menu.config_musicplayer_infoy=(iRoot["tema1"]["icons"]["musicplayer_info"].get("y","0").asInt());
     config_menu.config_musicplayer_info_icon=(iRoot["tema1"]["icons"]["musicplayer_info"].get("icon_path","0").asString());
+    config_menu.config_musicplayer_ff_button_posx=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_musicplayer_ff_button_posy=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_musicplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_musicplayer_bw_button_posx=(iRoot["tema1"]["icons"]["musicplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_musicplayer_bw_button_posy=(iRoot["tema1"]["icons"]["musicplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_musicplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_musicplayer_play_button_posx=(iRoot["tema1"]["icons"]["musicplayer_play_button"].get("x","0").asInt());
+    config_menu.config_musicplayer_play_button_posy=(iRoot["tema1"]["icons"]["musicplayer_play_button"].get("y","0").asInt());
+    config_menu.config_musicplayer_play_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_play_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_musicplayer_stop_button_posx=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_musicplayer_stop_button_posy=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_musicplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("sizy","0").asInt());
 
     config_menu.config_spotifyplayer_infox=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("x","0").asInt());
     config_menu.config_spotifyplayer_infoy=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_coverx=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_covery=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_cover_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_cover_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("sizy","0").asInt());
     config_menu.config_spotifyplayer_info_icon=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("icon_path","0").asString());
+    config_menu.config_spotifyplayer_ff_button_posx=(iRoot["tema1"]["icons"]["spotifyplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_ff_button_posy=(iRoot["tema1"]["icons"]["spotifyplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_spotifyplayer_bw_button_posx=(iRoot["tema1"]["icons"]["spotifyplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_bw_button_posy=(iRoot["tema1"]["icons"]["spotifyplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_spotifyplayer_play_button_posx=(iRoot["tema1"]["icons"]["spotifyplayer_play_button"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_play_button_posy=(iRoot["tema1"]["icons"]["spotifyplayer_play_button"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_play_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_play_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_spotifyplayer_stop_button_posx=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_stop_button_posy=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("sizy","0").asInt());
 
     config_menu.config_tidalplayer_infox=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("x","0").asInt());
     config_menu.config_tidalplayer_infoy=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("y","0").asInt());
     config_menu.config_tidalplayer_info_icon=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("icon_path","0").asString());
+    config_menu.config_tidalplayer_coverx=(iRoot["tema1"]["icons"]["tidalplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_tidalplayer_covery=(iRoot["tema1"]["icons"]["tidalplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_tidalplayer_cover_sizx=(iRoot["tema1"]["icons"]["tidalplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_cover_sizy=(iRoot["tema1"]["icons"]["tidalplayer_info_cover"].get("sizy","0").asInt());
+    config_menu.config_tidalplayer_ff_button_posx=(iRoot["tema1"]["icons"]["tidalplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_tidalplayer_ff_button_posy=(iRoot["tema1"]["icons"]["tidalplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_tidalplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_tidalplayer_bw_button_posx=(iRoot["tema1"]["icons"]["tidalplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_tidalplayer_bw_button_posy=(iRoot["tema1"]["icons"]["tidalplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_tidalplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_tidalplayer_play_button_posx=(iRoot["tema1"]["icons"]["tidalplayer_play_button"].get("x","0").asInt());
+    config_menu.config_tidalplayer_play_button_posy=(iRoot["tema1"]["icons"]["tidalplayer_play_button"].get("y","0").asInt());
+    config_menu.config_tidalplayer_play_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_play_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_tidalplayer_stop_button_posx=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_tidalplayer_stop_button_posy=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_tidalplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("sizy","0").asInt());
 
     config_menu.config_radioplayer_infox=(iRoot["tema1"]["icons"]["radioplayer_info"].get("x","0").asInt());
     config_menu.config_radioplayer_infoy=(iRoot["tema1"]["icons"]["radioplayer_info"].get("y","0").asInt());
     config_menu.config_radioplayer_info_icon=(iRoot["tema1"]["icons"]["radioplayer_info"].get("icon_path","0").asString());
+    config_menu.config_radioplayer_sizx=(iRoot["tema1"]["icons"]["radioplayer_info"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_sizy=(iRoot["tema1"]["icons"]["radioplayer_info"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_coverx=(iRoot["tema1"]["icons"]["radioplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_radioplayer_covery=(iRoot["tema1"]["icons"]["radioplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_radioplayer_cover_sizx=(iRoot["tema1"]["icons"]["radioplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_cover_sizy=(iRoot["tema1"]["icons"]["radioplayer_info_cover"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_ff_button_posx=(iRoot["tema1"]["icons"]["radioplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_radioplayer_ff_button_posy=(iRoot["tema1"]["icons"]["radioplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_radioplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_bw_button_posx=(iRoot["tema1"]["icons"]["radioplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_radioplayer_bw_button_posy=(iRoot["tema1"]["icons"]["radioplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_radioplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_play_button_posx=(iRoot["tema1"]["icons"]["radioplayer_play_button"].get("x","0").asInt());
+    config_menu.config_radioplayer_play_button_posy=(iRoot["tema1"]["icons"]["radioplayer_play_button"].get("y","0").asInt());
+    config_menu.config_radioplayer_play_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_play_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_stop_button_posx=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_radioplayer_stop_button_posy=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_radioplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("sizy","0").asInt());
 
-    config_menu.config_mediaplayer_infox=(iRoot["tema1"]["icons"]["mediaplayer_info"].get("x","0").asInt());
-    config_menu.config_mediaplayer_infoy=(iRoot["tema1"]["icons"]["mediaplayer_info"].get("y","0").asInt());
     config_menu.config_mediaplayer_info_icon=(iRoot["tema1"]["icons"]["mediaplayer_info"].get("icon_path","0").asString());
-
+    config_menu.config_mediaplayer_coverx=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_mediaplayer_covery=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_mediaplayer_cover_sizx=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_cover_sizy=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("sizy","0").asInt());
+    config_menu.config_mediaplayer_ff_button_posx=(iRoot["tema1"]["icons"]["mediaplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_mediaplayer_ff_button_posy=(iRoot["tema1"]["icons"]["mediaplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_mediaplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["mediaplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["mediaplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_mediaplayer_bw_button_posx=(iRoot["tema1"]["icons"]["mediaplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_mediaplayer_bw_button_posy=(iRoot["tema1"]["icons"]["mediaplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_mediaplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["mediaplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["mediaplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_mediaplayer_play_button_posx=(iRoot["tema1"]["icons"]["mediaplayer_play_button"].get("x","0").asInt());
+    config_menu.config_mediaplayer_play_button_posy=(iRoot["tema1"]["icons"]["mediaplayer_play_button"].get("y","0").asInt());
+    config_menu.config_mediaplayer_play_button_sizx=(iRoot["tema1"]["icons"]["mediaplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_play_button_sizy=(iRoot["tema1"]["icons"]["mediaplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_mediaplayer_stop_button_posx=(iRoot["tema1"]["icons"]["mediaplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_mediaplayer_stop_button_posy=(iRoot["tema1"]["icons"]["mediaplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_mediaplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["mediaplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["mediaplayer_stop_button"].get("sizy","0").asInt());
     config_menu.config_exitx=(iRoot["tema1"]["icons"]["exit"].get("x","0").asInt());
     config_menu.config_exity=(iRoot["tema1"]["icons"]["exit"].get("y","0").asInt());
     config_menu.config_exit_icon=(iRoot["tema1"]["icons"]["exit"].get("icon_path","0").asString());

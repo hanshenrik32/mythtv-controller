@@ -1191,8 +1191,8 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int firstRow   = (int)(scrollPos / rowHeight);
   float subOff   = fmod(scrollPos, rowHeight);
   int ssofset     = firstRow * itemsPerRow;
-  int screenTop = startY;
-  int xof = startX;
+  int screenTop = startY;                                 // start position for first item y 
+  int xof = startX;                                       // start position for first item x
   int visibleItems = (visibleRows + 2) * itemsPerRow;
   if (strlen(keybuffer)>0) {
     screenTop=search_startY;
