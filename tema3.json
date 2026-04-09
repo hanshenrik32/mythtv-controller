@@ -233,7 +233,7 @@
             },
             "musicplayer_stop_button": {
                 "icon_path": "mplaystop",
-                "x": 250,
+                "x": 150,
                 "y": 300,
                 "sizx": 100,
                 "sizy": 100

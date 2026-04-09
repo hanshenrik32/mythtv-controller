@@ -994,18 +994,6 @@ void drawRect(int x, int y, int w, int h, Color2 c) {
 void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c) {
   glEnable(GL_TEXTURE_2D);
   glColor4f(c.r, c.g, c.b, c.a);
-
-  glBindTexture(GL_TEXTURE_2D, textureId2);
-  // draw cover frame
-  /*
-  glLoadName(id);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex2i(x,     y);
-  glTexCoord2f(1, 0); glVertex2i(x + w, y);
-  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
-  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
-  glEnd();
-  */
   // draw actual cover
   glBindTexture(GL_TEXTURE_2D, textureId);
   glLoadName(id);
@@ -1015,7 +1003,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
   glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
   glEnd();
-  
+  // icon  
   glBindTexture(GL_TEXTURE_2D, textureId2);
   glLoadName(id);
   glBegin(GL_QUADS);
