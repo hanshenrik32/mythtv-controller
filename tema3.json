@@ -6,83 +6,83 @@
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
-                "x": 20,
-                "y": 10
+                "x": 1720,
+                "y": 888
             },
             "music": {
                 "icon_path": "music_button",
-                "x": 220,
-                "y": 10
+                "x": 1720,
+                "y": 696
             },
             "music_active": {
                 "icon_path": "music_button1",
-                "x": 220,
-                "y": 10
+                "x": 1720,
+                "y": 696
             },
             "media": {
                 "icon_path": "stream_button",
-                "x": 220,
-                "y": 10
+                "x": 1720,
+                "y": 696
             },
             "media1": {
-                "icon_path": "stream_button",
-                "x": 220,
-                "y": 10
+                "icon_path": "stream_button1",
+                "x": 1720,
+                "y": 696
             },
             "spotify": {
                 "icon_path": "spotify_button",
-                "x": 20,
-                "y": 10
+                "x": 1720,
+                "y": 888
             },
             "spotify1": {
-                "icon_path": "spotify_button",
-                "x": 20,
-                "y": 10
+                "icon_path": "spotify_button1",
+                "x": 1720,
+                "y": 696
             },
             "tidal": {
                 "icon_path": "tidal_button",
-                "x": 220,
-                "y": 10
+                "x": 1720,
+                "y": 696
             },
             "tidal1": {
                 "icon_path": "tidal_button1",
-                "x": 220,
-                "y": 10
+                "x": 1720,
+                "y": 696
             },
             "radio": {
                 "icon_path": "radio_button",
-                "x": 420,
-                "y": 10
+                "x": 1720,
+                "y": 504
             },
             "radio1": {
                 "icon_path": "radio_button1",
-                "x": 220,
-                "y": 10
+                "x": 1720,
+                "y": 696
             },
             "recorded": {
                 "icon_path": "recorded",
-                "x": 620,
-                "y": 10
+                "x": 1720,
+                "y": 312
             },
             "recorded1": {
                 "icon_path": "recorded_selected",
-                "x": 620,
-                "y": 10
+                "x": 1720,
+                "y": 312
             },
             "multimedia": {
                 "icon_path": "media_button",
                 "x": 1720,
                 "y": 504
-            },            
+            },
             "movie": {
                 "icon_path": "movie_button",
-                "x": 420,
-                "y": 10
+                "x": 1720,
+                "y": 504
             },
             "movie1": {
                 "icon_path": "movie_button1",
-                "x": 420,
-                "y": 10
+                "x": 1720,
+                "y": 696
             },
             "closemain": {
                 "icon_path": "closemain",
@@ -91,8 +91,8 @@
             },
             "setup": {
                 "icon_path": "setupmenu",
-                "x": 820,
-                "y": 10
+                "x": 1720,
+                "y": 30
             },
             "exit": {
                 "icon_path": "exit",
@@ -111,23 +111,23 @@
             },
             "playinfo_icon": {
                 "icon_path": "playinfo",
-                "x": 20,
-                "y": 10
+                "x": 1720,
+                "y": 888
             },
             "reset_search": {
                 "icon_path": "reset_search",
-                "x": 1920,
+                "x": 1720,
                 "y": 30
             },
             "down": {
                 "icon_path": "pdown",
-                "x": 620,
-                "y": 10
+                "x": 1720,
+                "y": 312
             },
             "up": {
                 "icon_path": "pup",
-                "x": 420,
-                "y": 10
+                "x": 1720,
+                "y": 504
             },
             "close": {
                 "icon_path": "close",
@@ -147,38 +147,218 @@
             "musicplayer_info": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
-                "y": 200
+                "y": 300,
+                "sizx":540,
+                "sizy":275
             },
             "spotifyplayer_info": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
-                "y": 300
+                "y": 300,
+                "sizx":540,
+                "sizy":275
             },
             "tidalplayer_info": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
-                "y": 300
+                "y": 300,
+                "sizx":540,
+                "sizy":275
             },
             "radioplayer_info": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
-                "y": 320
+                "y": 300,
+                "sizx":540,
+                "sizy":275
             },
             "mediaplayer_info": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
-                "y": 320
+                "y": 300,
+                "sizx":540,
+                "sizy":275
             },
             "radio_or_music": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
                 "y": 320
             },
+            "radioplayer_play_button": {
+                "icon_path": "mplay",
+                "x": 50,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "radioplayer_info_cover": {
+                "x": 348,
+                "y": 400,
+                "sizx": 167,
+                "sizy": 119
+            },
+            "radioplayer_stop_button": {
+                "icon_path": "mplaystop",
+                "x": 150,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "radioplayer_ff_button": {
+                "icon_path": "mplaynext",
+                "x": 250,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "radioplayer_bw_button": {
+                "icon_path": "mplaylast",
+                "x": 350,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "musicplayer_play_button": {
+                "icon_path": "mplay",
+                "x": 50,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "musicplayer_info_cover": {
+                "x": 348,
+                "y": 400,
+                "sizx": 167,
+                "sizy": 119
+            },
+            "musicplayer_stop_button": {
+                "icon_path": "mplaystop",
+                "x": 150,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "musicplayer_ff_button": {
+                "icon_path": "mplaynext",
+                "x": 250,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "musicplayer_bw_button": {
+                "icon_path": "mplaylast",
+                "x": 250,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "tidalplayer_play_button": {
+                "icon_path": "mplay",
+                "x": 50,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "tidalplayer_info_cover": {
+                "x": 348,
+                "y": 400,
+                "sizx": 167,
+                "sizy": 119
+            },
+            "tidalplayer_stop_button": {
+                "icon_path": "mplaystop",
+                "x": 150,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "tidalplayer_ff_button": {
+                "icon_path": "mplaynext",
+                "x": 250,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "tidalplayer_bw_button": {
+                "icon_path": "mplaylast",
+                "x": 250,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "spotifyplayer_play_button": {
+                "icon_path": "mplay",
+                "x": 50,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "spotifyplayer_info_cover": {
+                "x": 348,
+                "y": 400,
+                "sizx": 167,
+                "sizy": 119
+            },
+            "spotifyplayer_stop_button": {
+                "icon_path": "mplaystop",
+                "x": 250,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "spotifyplayer_ff_button": {
+                "icon_path": "mplaynext",
+                "x": 250,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "spotifyplayer_bw_button": {
+                "icon_path": "mplaylast",
+                "x": 250,
+                "y": 300,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "mediaplayer_play_button": {
+                "icon_path": "mplay",
+                "x": 50,
+                "y": 330,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "mediaplayer_info_cover": {
+                "x": 410,
+                "y": 145,
+                "sizx": 200,
+                "sizy": 172
+            },
+            "mediaplayer_stop_button": {
+                "icon_path": "mplaystop",
+                "x": 150,
+                "y": 330,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "mediaplayer_ff_button": {
+                "icon_path": "mplaynext",
+                "x": 250,
+                "y": 330,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "mediaplayer_bw_button": {
+                "icon_path": "mplaylast",
+                "x": 350,
+                "y": 330,
+                "sizx": 100,
+                "sizy": 100
+            },
             "music_main_window": {             
                 "window_x": 0,
                 "window_y": 0,
                 "window_sizex": 1920,
-                "window_sizey": 800,
+                "window_sizey": 1080,
                 "window_icon_sizex": 180,
                 "window_icon_sizey": 180
             },
@@ -186,7 +366,7 @@
                 "window_x": 0,
                 "window_y": 0,
                 "window_sizex": 1920,
-                "window_sizey": 900,
+                "window_sizey": 1080,
                 "window_icon_sizex": 200,
                 "window_icon_sizey": 180
             },
@@ -194,7 +374,7 @@
                 "window_x": 0,
                 "window_y": 0,
                 "window_sizex": 1920,
-                "window_sizey": 900,
+                "window_sizey": 1080,
                 "window_icon_sizex": 200,
                 "window_icon_sizey": 180
             },
@@ -202,7 +382,7 @@
                 "window_x": 20,
                 "window_y": 0,
                 "window_sizex": 1920,
-                "window_sizey": 900,
+                "window_sizey": 1080,
                 "window_icon_sizex": 220,
                 "window_icon_sizey": 240
             },
@@ -210,15 +390,15 @@
                 "window_x": 0,
                 "window_y": 0,
                 "window_sizex": 1920,
-                "window_sizey": 900,
-                "window_icon_sizex": 180,
-                "window_icon_sizey": 180
+                "window_sizey": 1080,
+                "window_icon_sizex": 200,
+                "window_icon_sizey": 220
             },
             "tidal_main_window": {
                 "window_x": 0,
                 "window_y": 0,
                 "window_sizex": 1920,
-                "window_sizey": 900,
+                "window_sizey": 1080,
                 "window_icon_sizex": 180,
                 "window_icon_sizey": 180
             },

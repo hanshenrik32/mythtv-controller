@@ -5184,7 +5184,10 @@ void display() {
   // ********************** Stream stuf *******************************************************************************
   // show stream player control
   // hvis show_stream_oversigt or zoom
+  //
+  // DEN SOM VISES
   if (!(visur)) {
+    
     if ((vis_stream_oversigt) && (do_zoom_stream_cover)) {      
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       // window texture
@@ -5197,16 +5200,11 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
-      /*
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4) ,  300 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),400+300, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
-      */
-      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox ,  config_menu.config_mediaplayer_infoy , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox,400+config_menu.config_mediaplayer_infoy, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox+640,400+config_menu.config_mediaplayer_infoy , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+640,config_menu.config_mediaplayer_infoy, 0.0);
+    
+      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox , config_menu.config_mediaplayer_infoy , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox , config_menu.config_mediaplayer_infoy + config_menu.config_mediaplayer_sizy, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_sizx, config_menu.config_mediaplayer_infoy + config_menu.config_mediaplayer_sizy , 0.0);
+      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+config_menu.config_mediaplayer_sizx,config_menu.config_mediaplayer_infoy, 0.0);
 
       glEnd();
       // play button
@@ -5220,10 +5218,10 @@ void display() {
       if (streamoversigt.stream_is_playing) glLoadName(12);                        // 12 = pause
       else glLoadName(8);                                                          // 8 = play
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox+50 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox+50,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox+50+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+50+100,320, 0.0);
+      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox+ config_menu.config_mediaplayer_play_button_posx , config_menu.config_mediaplayer_play_button_posy , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox+ config_menu.config_mediaplayer_play_button_posx , config_menu.config_mediaplayer_play_button_posy + config_menu.config_mediaplayer_play_button_sizy, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox+config_menu.config_mediaplayer_play_button_posx + config_menu.config_mediaplayer_play_button_sizx, config_menu.config_mediaplayer_play_button_posy + config_menu.config_mediaplayer_play_button_sizy, 0.0);
+      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+config_menu.config_mediaplayer_play_button_posx + config_menu.config_mediaplayer_play_button_sizx, config_menu.config_mediaplayer_play_button_posy, 0.0);
       glEnd();
       // stop button
       glEnable(GL_TEXTURE_2D);
@@ -5233,11 +5231,12 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(9);                        // 9 = stop
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox+150 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox+150,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox+150+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+150+100,320, 0.0);
+      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox+ config_menu.config_mediaplayer_stop_button_posx , config_menu.config_mediaplayer_stop_button_posy , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox+ config_menu.config_mediaplayer_stop_button_posx , config_menu.config_mediaplayer_stop_button_posy + config_menu.config_mediaplayer_stop_button_sizy, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox+config_menu.config_mediaplayer_stop_button_posx + config_menu.config_mediaplayer_stop_button_sizx, config_menu.config_mediaplayer_stop_button_posy + config_menu.config_mediaplayer_stop_button_sizy, 0.0);
+      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+config_menu.config_mediaplayer_stop_button_posx + config_menu.config_mediaplayer_stop_button_sizx, config_menu.config_mediaplayer_stop_button_posy, 0.0);
       glEnd();
+
       // backward button
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
@@ -5246,11 +5245,12 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(10);                        // 10 = forward(10)
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox+250 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox+250,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox+250+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+250+100,320, 0.0);
+      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox+ config_menu.config_mediaplayer_bw_button_posx , config_menu.config_mediaplayer_bw_button_posy , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox+ config_menu.config_mediaplayer_bw_button_posx , config_menu.config_mediaplayer_bw_button_posy + config_menu.config_mediaplayer_bw_button_sizy, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox+config_menu.config_mediaplayer_bw_button_posx + config_menu.config_mediaplayer_bw_button_sizx, config_menu.config_mediaplayer_bw_button_posy + config_menu.config_mediaplayer_bw_button_sizy, 0.0);
+      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+config_menu.config_mediaplayer_bw_button_posx + config_menu.config_mediaplayer_bw_button_sizx, config_menu.config_mediaplayer_bw_button_posy, 0.0);
       glEnd();
+
       // forward button
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
@@ -5259,13 +5259,20 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(11);                        // 10 = forward(10)
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox+350 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox+350,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox+350+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox+350+100,320, 0.0);
+      glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_ff_button_posx , config_menu.config_mediaplayer_ff_button_posy , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_ff_button_posx , config_menu.config_mediaplayer_ff_button_posy + config_menu.config_mediaplayer_ff_button_sizy, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_ff_button_posx + config_menu.config_mediaplayer_ff_button_sizx, config_menu.config_mediaplayer_ff_button_posy + config_menu.config_mediaplayer_ff_button_sizy, 0.0);
+      glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_ff_button_posx + config_menu.config_mediaplayer_ff_button_sizx, config_menu.config_mediaplayer_ff_button_posy, 0.0);
       glEnd();
-      sprintf(temptxt,"Name      %-20s",stream_playing_name);
-      drawText(font12,temptxt,(orgwinsizex/4)+20,(orgwinsizey/2)+96, 1.0f,1);
+      // show stream name
+      sprintf(temptxt,"Name: %-20s",stream_playing_name);
+
+
+      // drawText(font12,temptxt,(orgwinsizex/4)+20,(orgwinsizey/2)+96, 1.0f,1);
+
+      drawText(font12,temptxt,config_menu.config_mediaplayer_infox + 40.0f,config_menu.config_mediaplayer_infoy + 350.0f, 1.0f,1);
+      
+
       // play position
       if (streamoversigt.stream_is_playing) playtime=streamoversigt.getstream_pos()*1000;
       else playtime=0;
@@ -5275,10 +5282,10 @@ void display() {
       if (streamoversigt.stream_is_playing) sprintf(temptxt,"Playing    %02d:%02d:%02d ",playtime_hour,playtime_min,playtime_sec);
       else sprintf(temptxt,"                                        ");
       temptxt[40]=0;
-      drawText(font12,temptxt,(orgwinsizex/4)+20, (orgwinsizey/2)+48+20, 1.0f,1);
+      drawText(font12,temptxt,config_menu.config_mediaplayer_infox + 40.0f,config_menu.config_mediaplayer_infoy + 250.0f, 1.0f,1);
       sprintf(temptxt,"%-30s",stream_playing_desc);
       temptxt[30]='\0';
-      drawText(font12,temptxt,(orgwinsizex/4)+20,(orgwinsizey/2)+0, 1.0f,1);
+      drawText(font12,temptxt,config_menu.config_mediaplayer_infox + 40.0f,config_menu.config_mediaplayer_infoy + 200.0f, 1.0f,1);
       // get stream texture
       if (stream_playing_icon) {
         glEnable(GL_TEXTURE_2D);
@@ -5287,13 +5294,14 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+400 ,  460 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+400 ,  200+460, 0.0);
-        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+400+200 , 200+460 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+400+200 , 460, 0.0);
+        glTexCoord2f(0, 0); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_coverx , config_menu.config_mediaplayer_infoy + config_menu.config_mediaplayer_covery, 0.0);
+        glTexCoord2f(0, 1); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_coverx , config_menu.config_mediaplayer_infoy + config_menu.config_mediaplayer_covery + config_menu.config_mediaplayer_cover_sizy, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_coverx + config_menu.config_mediaplayer_cover_sizx, config_menu.config_mediaplayer_infoy + config_menu.config_mediaplayer_covery + config_menu.config_mediaplayer_cover_sizy, 0.0);
+        glTexCoord2f(1, 0); glVertex3f(config_menu.config_mediaplayer_infox + config_menu.config_mediaplayer_coverx + config_menu.config_mediaplayer_cover_sizx, config_menu.config_mediaplayer_infoy + config_menu.config_mediaplayer_covery, 0.0);
         glEnd();
       }
     }
+    
   }
   // ******************************************************************************************************************
   //
@@ -5348,8 +5356,6 @@ void display() {
   //
   // *********************** Show play stuf ***************************************************************************
   //
-  // show radio player
-
   /*
   if (vis_tidal_oversigt) printf("move %d  gettouchbutton %d lastY = %d lastDY = %d Dragging = %d \n",tidal_oversigt.moved,tidal_oversigt.gettouchbutton,tidal_oversigt.lastY, tidal_oversigt.lastDY ,tidal_oversigt.dragging);
   if (vis_radio_oversigt) printf("move %d  gettouchbutton %d lastY = %d lastDY = %d Dragging = %d \n",radiooversigt.moved,radiooversigt.gettouchbutton,radiooversigt.lastY, radiooversigt.lastDY , radiooversigt.dragging);
@@ -5380,7 +5386,7 @@ void display() {
       }
       // printf("zoom_tidal=%s zoom_spotify=%s zoom_music=%s zoom_radio=%s  zoom_stream=%s \n",do_zoom_tidal_cover ? "true" : "false",do_zoom_spotify_cover ? "true" : "false",do_zoom_music_cover ? "true" : "false",do_zoom_radio ? "true" : "false",do_zoom_stream_cover ? "true" : "false ");
       if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
-        // show tidal player
+        // show player background
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         // window texture
         glEnable(GL_TEXTURE_2D);
@@ -5391,10 +5397,33 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox    ,config_menu.config_tidalplayer_infoy , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox    ,275+config_menu.config_tidalplayer_infoy, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+540,275+config_menu.config_tidalplayer_infoy , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+540,config_menu.config_tidalplayer_infoy, 0.0);
+        if (do_zoom_tidal_cover) {
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox    ,config_menu.config_tidalplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox    ,config_menu.config_tidalplayer_sizy+config_menu.config_tidalplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_sizx,config_menu.config_tidalplayer_sizy+config_menu.config_tidalplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_sizx,config_menu.config_tidalplayer_infoy, 0.0);
+        } else if (do_zoom_spotify_cover) {
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_spotifyplayer_infox    ,config_menu.config_spotifyplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_spotifyplayer_infox    ,config_menu.config_spotifyplayer_sizy+config_menu.config_spotifyplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_spotifyplayer_infox+config_menu.config_spotifyplayer_sizx,config_menu.config_spotifyplayer_sizy+config_menu.config_spotifyplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_spotifyplayer_infox+config_menu.config_spotifyplayer_sizx,config_menu.config_spotifyplayer_infoy, 0.0);
+        } else if (do_zoom_radio) {
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox    ,config_menu.config_radioplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox    ,config_menu.config_radioplayer_sizy+config_menu.config_radioplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+config_menu.config_radioplayer_sizx,config_menu.config_radioplayer_sizy+config_menu.config_radioplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+config_menu.config_radioplayer_sizx,config_menu.config_radioplayer_infoy, 0.0);
+        } else if (do_zoom_music_cover) {
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_musicplayer_infox    ,config_menu.config_musicplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_musicplayer_infox    ,config_menu.config_musicplayer_sizy+config_menu.config_musicplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_musicplayer_infox+config_menu.config_musicplayer_sizx,config_menu.config_musicplayer_sizy+config_menu.config_musicplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_musicplayer_infox+config_menu.config_musicplayer_sizx,config_menu.config_musicplayer_infoy, 0.0);
+        } else {
+          // default show music player
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_musicplayer_infox    ,config_menu.config_musicplayer_infoy , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_musicplayer_infox    ,config_menu.config_musicplayer_sizy+config_menu.config_musicplayer_infoy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_musicplayer_infox+config_menu.config_musicplayer_sizx,config_menu.config_musicplayer_sizy+config_menu.config_musicplayer_infoy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_musicplayer_infox+config_menu.config_musicplayer_sizx,config_menu.config_musicplayer_infoy, 0.0);          
+        }
         glEnd();
 
         // play button
@@ -5404,12 +5433,35 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(8);                        // 8 = play
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+50 ,  300 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+50,100+300, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+50+100,100+300 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+50+100,300, 0.0);
-        glEnd();
+        if (do_zoom_tidal_cover) {
+          glBegin(GL_QUADS);        
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,    config_menu.config_radioplayer_play_button_posy, 0.0);
+          glEnd();
+        } else if (do_zoom_radio) {
+          glBegin(GL_QUADS);        
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,    config_menu.config_radioplayer_play_button_posy, 0.0);
+          glEnd();
+        } else if (do_zoom_spotify_cover) {
+          glBegin(GL_QUADS);        
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,    config_menu.config_radioplayer_play_button_posy, 0.0);
+          glEnd();
+        } else if (do_zoom_music_cover) {
+          glBegin(GL_QUADS);        
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,    config_menu.config_radioplayer_play_button_posy, 0.0);
+          glEnd();
+        }
         // stop button
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
@@ -5417,13 +5469,36 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(9);                        // 9 = stop
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+150 ,  300 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+150,100+300, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+150+100,100+300 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+150+100,300, 0.0);
-        glEnd();
-        if (!(do_zoom_radio)) {
+        if (do_zoom_tidal_cover) {
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_stop_button_posx,  config_menu.config_tidalplayer_stop_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_stop_button_posx,  config_menu.config_tidalplayer_stop_button_sizy+config_menu.config_tidalplayer_stop_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_stop_button_posx + config_menu.config_tidalplayer_stop_button_sizx,config_menu.config_tidalplayer_stop_button_sizy+config_menu.config_tidalplayer_stop_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_stop_button_posx + config_menu.config_tidalplayer_stop_button_sizx,    config_menu.config_tidalplayer_stop_button_posy, 0.0);
+          glEnd();
+        } else if (do_zoom_radio) {
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx,  config_menu.config_radioplayer_stop_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx,  config_menu.config_radioplayer_stop_button_sizy+config_menu.config_radioplayer_stop_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx + config_menu.config_radioplayer_stop_button_sizx,config_menu.config_radioplayer_stop_button_sizy+config_menu.config_radioplayer_stop_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx + config_menu.config_radioplayer_stop_button_sizx,    config_menu.config_radioplayer_stop_button_posy, 0.0);
+          glEnd();
+        } else if (do_zoom_spotify_cover) {
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_spotifyplayer_infox + config_menu.config_spotifyplayer_stop_button_posx,  config_menu.config_spotifyplayer_stop_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_spotifyplayer_infox + config_menu.config_spotifyplayer_stop_button_posx,  config_menu.config_spotifyplayer_stop_button_sizy+config_menu.config_spotifyplayer_stop_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_spotifyplayer_infox + config_menu.config_spotifyplayer_stop_button_posx + config_menu.config_spotifyplayer_stop_button_sizx,config_menu.config_spotifyplayer_stop_button_sizy+config_menu.config_spotifyplayer_stop_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_spotifyplayer_infox + config_menu.config_spotifyplayer_stop_button_posx + config_menu.config_spotifyplayer_stop_button_sizx,    config_menu.config_spotifyplayer_stop_button_posy, 0.0);
+          glEnd();
+        } else if (do_zoom_music_cover) {
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_musicplayer_infox + config_menu.config_musicplayer_stop_button_posx,  config_menu.config_musicplayer_stop_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_musicplayer_infox + config_menu.config_musicplayer_stop_button_posx,  config_menu.config_musicplayer_stop_button_sizy+config_menu.config_musicplayer_stop_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_musicplayer_infox + config_menu.config_musicplayer_stop_button_posx + config_menu.config_musicplayer_stop_button_sizx,config_menu.config_musicplayer_stop_button_sizy+config_menu.config_musicplayer_stop_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_musicplayer_infox + config_menu.config_musicplayer_stop_button_posx + config_menu.config_musicplayer_stop_button_sizx,    config_menu.config_musicplayer_stop_button_posy, 0.0);
+          glEnd();
+        }
+        if (do_zoom_tidal_cover) {
           // ff button
           glEnable(GL_TEXTURE_2D);
           glEnable(GL_BLEND);
@@ -5432,10 +5507,10 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(10);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+250 ,  300 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+250,100+300, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+250+100,100+300 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+250+100,300, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx,  config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx,  config_menu.config_radioplayer_ff_button_sizy+config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx + config_menu.config_radioplayer_ff_button_sizx,config_menu.config_radioplayer_ff_button_sizy+config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx + config_menu.config_radioplayer_ff_button_sizx,    config_menu.config_radioplayer_ff_button_posy, 0.0);
           glEnd();
           // back button
           glEnable(GL_TEXTURE_2D);
@@ -5445,12 +5520,69 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(11);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+350 ,  300 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+350,100+300, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+350+100,100+300 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+350+100,300, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx,  config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx,  config_menu.config_radioplayer_bw_button_sizy+config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx + config_menu.config_radioplayer_bw_button_sizx,config_menu.config_radioplayer_bw_button_sizy+config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx + config_menu.config_radioplayer_bw_button_sizx,    config_menu.config_radioplayer_bw_button_posy, 0.0);
           glEnd();
         }
+        if (do_zoom_music_cover) {
+          // ff button
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBindTexture(GL_TEXTURE_2D,_texturemlast);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(10);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx,  config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx,  config_menu.config_radioplayer_ff_button_sizy+config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx + config_menu.config_radioplayer_ff_button_sizx,config_menu.config_radioplayer_ff_button_sizy+config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx + config_menu.config_radioplayer_ff_button_sizx,    config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glEnd();
+          // back button
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBindTexture(GL_TEXTURE_2D,_texturemnext);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(11);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx,  config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx,  config_menu.config_radioplayer_bw_button_sizy+config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx + config_menu.config_radioplayer_bw_button_sizx,config_menu.config_radioplayer_bw_button_sizy+config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx + config_menu.config_radioplayer_bw_button_sizx,    config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glEnd();
+        }
+        if (do_zoom_spotify_cover) {
+          // ff button
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBindTexture(GL_TEXTURE_2D,_texturemlast);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(10);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx,  config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx,  config_menu.config_radioplayer_ff_button_sizy+config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx + config_menu.config_radioplayer_ff_button_sizx,config_menu.config_radioplayer_ff_button_sizy+config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_ff_button_posx + config_menu.config_radioplayer_ff_button_sizx,    config_menu.config_radioplayer_ff_button_posy, 0.0);
+          glEnd();
+          // back button
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBindTexture(GL_TEXTURE_2D,_texturemnext);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(11);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx,  config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx,  config_menu.config_radioplayer_bw_button_sizy+config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx + config_menu.config_radioplayer_bw_button_sizx,config_menu.config_radioplayer_bw_button_sizy+config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_bw_button_posx + config_menu.config_radioplayer_bw_button_sizx,    config_menu.config_radioplayer_bw_button_posy, 0.0);
+          glEnd();
+        }
+        
         // play position
         unsigned int ms = 0;
         float frequency;
@@ -5611,8 +5743,7 @@ void display() {
       
       // radio player info
       if ((radiooversigt.playing) && (do_zoom_radio)) {
-        GLuint textureId_2;
-        textureId_2=radiooversigt.get_texture_r(aktiv_radio_station);
+        GLuint textureId_2=radiooversigt.get_texture_r(aktiv_radio_station);
         if (textureId_2) {
           // radio icon big size
           glEnable(GL_TEXTURE_2D);
@@ -5621,10 +5752,23 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox+348.0f ,     400.0f, 0.0f);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox+348.0f ,     400.0f+119.0f, 0.0f);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+348.0f+167.0f , 400.0f+119.0f, 0.0f);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox+348.0f+167.0f , 400.0f, 0.0f);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_coverx , config_menu.config_radioplayer_covery, 0.0f);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_coverx , config_menu.config_radioplayer_covery + config_menu.config_radioplayer_cover_sizy, 0.0f);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_coverx + config_menu.config_radioplayer_cover_sizx , config_menu.config_radioplayer_covery + config_menu.config_radioplayer_cover_sizy, 0.0f);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_coverx + config_menu.config_radioplayer_cover_sizx , config_menu.config_radioplayer_covery, 0.0f);
+          glEnd();
+        } else {
+          // show dedault radio icon
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBindTexture(GL_TEXTURE_2D,textureId_2);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_coverx , config_menu.config_radioplayer_covery, 0.0f);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_coverx , config_menu.config_radioplayer_covery + config_menu.config_radioplayer_cover_sizy, 0.0f);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_coverx + config_menu.config_radioplayer_cover_sizx , config_menu.config_radioplayer_covery + config_menu.config_radioplayer_cover_sizy, 0.0f);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_coverx + config_menu.config_radioplayer_cover_sizx , config_menu.config_radioplayer_covery, 0.0f);
           glEnd();
         }
         // play position
@@ -5656,16 +5800,18 @@ void display() {
           radio_playtime_songlength=0;
           radio_playtime=0;
         }
-
-        drawText(font12,"Song Name ",(orgwinsizex/4)+30, (orgwinsizey/2)-0, 1.0f ,1);
+        drawText(font12,"Song Name ",config_menu.config_radioplayer_infox+30, config_menu.config_radioplayer_infoy+240, 1.0f ,1);
         std::string temptxt1;
         temptxt1 = fmt::format("{:38}",aktivsongname);
         temptxt1.resize(38);
-        drawText(font12,temptxt1.c_str(),(orgwinsizex/4)+160, (orgwinsizey/2)-0, 1.0f,1);
-        drawText(font12,"Station ",(orgwinsizex/4)+30, (orgwinsizey/2)-50, 1.0f,1);
+        // drawText(font12,temptxt1.c_str(),(orgwinsizex/4)+160, (orgwinsizey/2)-0, 1.0f,1);
+        drawText(font12,temptxt1.c_str(),config_menu.config_radioplayer_infox+140, config_menu.config_radioplayer_infoy+240, 1.0f,1);
+
+
+        drawText(font12,"Station ",config_menu.config_radioplayer_infox+30, config_menu.config_radioplayer_infoy+190, 1.0f,1);
         temptxt1 = fmt::format(" {:38}",radiooversigt.get_station_name(aktiv_radio_station));
         temptxt1.resize(38);
-        drawText(font12,temptxt1.c_str(),(orgwinsizex/4)+150, (orgwinsizey/2)-50, 1.0f,1);
+        drawText(font12,temptxt1.c_str(),config_menu.config_radioplayer_infox+140, config_menu.config_radioplayer_infoy+190, 1.0f,1);    
         radio_playtime_hour=(radio_playtime/60)/60;
         radio_playtime_min=(radio_playtime/60);
         radio_playtime_sec=radio_playtime-(radio_playtime_min*60);
@@ -5673,14 +5819,14 @@ void display() {
         if (radio_playtime_min>60) radio_playtime_min=0;
         sprintf(temptxt,"%s",music_timename[1]);       // 1 = danish
         temptxt[40]=0;
-        drawText(font12,temptxt,(orgwinsizex/4)+30, (orgwinsizey/2)-70, 1.0f,1);
+        drawText(font12,temptxt,config_menu.config_radioplayer_infox+30, config_menu.config_radioplayer_infoy+170, 1.0f,1);
         temptxt1 = fmt::format(" {:02}:{:02}:{:02}",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
-        drawText(font12,temptxt1.c_str(),(orgwinsizex/4)+150, (orgwinsizey/2)-70, 1.0f,1);
-        drawText(font12,"Bitrate ",(orgwinsizex/4)+30, (orgwinsizey/2)-110, 1.0f,1);
-        drawText(font12," 192 Kbits",(orgwinsizex/4)+150, (orgwinsizey/2)-110, 1.0f,1);
-        drawText(font12,"Status ",(orgwinsizex/4)+30, (orgwinsizey/2)-130, 1.0f,1);
+        drawText(font12,temptxt1.c_str(),config_menu.config_radioplayer_infox+140, config_menu.config_radioplayer_infoy+170, 1.0f,1);
+        drawText(font12,"Bitrate ",config_menu.config_radioplayer_infox+30, config_menu.config_radioplayer_infoy+150, 1.0f,1);
+        drawText(font12," 192 Kbits",config_menu.config_radioplayer_infox+140, config_menu.config_radioplayer_infoy+150, 1.0f,1);
+        drawText(font12,"Status ",config_menu.config_radioplayer_infox+30, config_menu.config_radioplayer_infoy+130, 1.0f,1);
         sprintf(temptxt," %-20s",aktivsongstatus);
-        drawText(font12,temptxt,(orgwinsizex/4)+150, (orgwinsizey/2)-130, 1.0f,1);
+        drawText(font12,temptxt,config_menu.config_radioplayer_infox+140, config_menu.config_radioplayer_infoy+130, 1.0f,1);
 
         #if defined USE_FMOD_MIXER
         if ((channel) && (sound) && (snd)) {
@@ -5752,10 +5898,10 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox+348 ,   400 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox+348,    400+119, 0.0);
-          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox+348+167,400+119 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox+348+167,400, 0.0);
+          glTexCoord2f(0, 0); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_coverx, config_menu.config_tidalplayer_covery , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_coverx, config_menu.config_tidalplayer_covery + config_menu.config_tidalplayer_cover_sizy, 0.0);
+          glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_coverx + config_menu.config_tidalplayer_cover_sizx,config_menu.config_tidalplayer_covery + config_menu.config_tidalplayer_cover_sizy , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_coverx + config_menu.config_tidalplayer_cover_sizx,config_menu.config_tidalplayer_covery , 0.0);
           glEnd();
           do_we_play_check=0;
           if (do_we_play_check==0) {
@@ -5771,10 +5917,10 @@ void display() {
           } else {
             // show value
             drawText(font12,"Artist ",config_menu.config_tidalplayer_infox+40.0f, config_menu.config_tidalplayer_infoy  + 320.0f, 1.0f,1);
-            drawText(font12,tidal_oversigt.get_tidal_artistname(tidalknapnr), config_menu.config_tidalplayer_infox+40.0f+textofset, config_menu.config_tidalplayer_infoy +340.0f, 1.0f,1);
+            drawText(font12,tidal_oversigt.get_tidal_artistname(tidalknapnr), config_menu.config_tidalplayer_infox + 40.0f + textofset, config_menu.config_tidalplayer_infoy + 340.0f, 1.0f,1);
           }
           // show tidal songname
-          drawText(font12,"Songname ", 520.0f, config_menu.config_tidalplayer_infoy + 240.0f, 1.0f,1);
+          drawText(font12,"Songname ", config_menu.config_tidalplayer_infox+40.0f, config_menu.config_tidalplayer_infoy + 240.0f, 1.0f,1); // 520.f is fixed x pos for songname in tidal player info
           // show tidal songname value
           sprintf(temptxt,"%s",(char *) tidal_oversigt.tidal_aktiv_song_name());
           temptxt[40]=0;
@@ -5800,7 +5946,6 @@ void display() {
             else sprintf(temptxt,"1/1");
           drawText(font12,temptxt, config_menu.config_tidalplayer_infox+40.0f+textofset, config_menu.config_tidalplayer_infoy+180.0f, 1.0f,1);
           drawText(font12,"playtime  ", config_menu.config_tidalplayer_infox+40.0f, config_menu.config_tidalplayer_infoy+160.0f, 1.0f,1);
-        
           glPushMatrix();
           glColor3f(1.0f, 1.0f, 1.0f);
           unsigned int ms;
@@ -5855,7 +6000,8 @@ void display() {
           drawText(font12,"No songs in playlist.", config_menu.config_tidalplayer_infox + 40.0f, config_menu.config_tidalplayer_infoy+180.0f, 1.0f,1);
         }
       }
-
+      // show stream info
+      /*
       if (do_zoom_stream_cover) {
         // play position
         if (streamoversigt.stream_is_playing) playtime=streamoversigt.getstream_pos()*1000;
@@ -5886,6 +6032,7 @@ void display() {
           glEnd();
         }
       }
+      */
 
       if (do_zoom_spotify_cover) {
         // play list name or artist name
@@ -6390,6 +6537,16 @@ void display() {
     }
     if (strcmp("internal",configdefaultplayer)!=0) {
       fprintf(stderr,"Start stream nr %d Player is firefox \n",sknapnr);
+
+      if (channel) result = channel->stop();
+      result = sndsystem->createSound(streamoversigt.get_stream_url(sknapnr), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
+      result = sndsystem->playSound(sound,NULL, false, &channel);
+
+      
+      /*
+      //
+      // if use firefox to play stream
+      //
       strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
       strcat(systemcommand,"'");
       if (sknapnr>0) {
@@ -6403,6 +6560,7 @@ void display() {
           vis_error_timeout=60;
         }
       }
+      */
     } else {
       // start play stream or show rss page
       // write to log file
@@ -6459,9 +6617,10 @@ void display() {
       strcpy(stream_playing_name,"");
       strcpy(stream_playing_desc,"");
       stream_playing_icon = 0;
+      if (channel) result = channel->stop();
       if (streamoversigt.stream_is_playing) {
         // write debug log
-        sprintf(debuglogdata,"Stop playing stream");
+        sprintf(debuglogdata,"Stop playing stream.");
         write_logfile(logfile,(char *) debuglogdata);
         // stop playing (active movie)
         //film_oversigt.softstopmovie();
@@ -6518,7 +6677,7 @@ void display() {
     // draw window
     glPushMatrix();
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-    glTranslatef(400,400,0);
+    glTranslatef(config_menu.config_movieplayer_infox,config_menu.config_movieplayer_infoy,0);
     glEnable(GL_TEXTURE_2D);
     //glBlendFunc(GL_DST_COLOR, GL_ZERO);
     glEnable(GL_BLEND);
@@ -6529,9 +6688,9 @@ void display() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( 0, 0+550, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 0+800, 0+550 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 0+800, 0 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( 0, 0 + config_menu.config_movieplayer_sizy, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( 0+config_menu.config_movieplayer_sizx, 0+config_menu.config_movieplayer_sizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( 0+config_menu.config_movieplayer_sizx, 0 , 0.0);
     glEnd();
     glPopMatrix();
     // show play movie icon
@@ -6624,22 +6783,22 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glTranslatef(420,600,0);
+      glTranslatef(config_menu.config_movieplayer_coverx,config_menu.config_movieplayer_covery,0);
       glDisable(GL_DEPTH_TEST);
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_DST_COLOR, GL_ZERO);
       glLoadName(31);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 0+30, 100 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+220-1, 0+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+220-1, 100 , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( 0 + 30, 100 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0 + 30,   0 + config_menu.config_movieplayer_cover_sizy, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0 + config_menu.config_movieplayer_cover_sizx, 0 + config_menu.config_movieplayer_cover_sizy , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0 + config_menu.config_movieplayer_cover_sizx, 100 , 0.0);
       glEnd();
       glPopMatrix();
 
       glPushMatrix();
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glTranslatef(420,600,0);
+      glTranslatef(config_menu.config_movieplayer_coverx,config_menu.config_movieplayer_covery,0);
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D,_defaultdvdcover_mask);
       glEnable(GL_BLEND);
@@ -6648,24 +6807,23 @@ void display() {
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(31);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 0+30, 100 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+220-1, 0+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+220-1, 100 , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( 0 + 30, 100 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0 + 30,   0 + config_menu.config_movieplayer_cover_sizy, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0 + config_menu.config_movieplayer_cover_sizx, 0 + config_menu.config_movieplayer_cover_sizy , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0 + config_menu.config_movieplayer_cover_sizx, 100 , 0.0);
       glEnd();
       glPopMatrix();
     }
 
-    // text genre
-    glDisable(GL_TEXTURE_2D);
-   
     // show genre
-    drawText(font12,movie_genre[configland], 670, 890, 1.0f,1);
+    // drawText(font12,movie_genre[configland],  670, 890, 1.0f, 1);
+    drawText(font12,movie_genre[configland], config_menu.config_movieplayer_coverx + 250, config_menu.config_movieplayer_coverx + 470, 1.0f, 1);
+
     if (film_oversigt.editmode==2) {
-      drawText(font12,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 0.95f,1);
+      drawText(font12,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, config_menu.config_movieplayer_coverx + 470, 0.95f,1);
       if (do_show_film_edit_select_linie==0) showcoursornow(378,740,strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre));
     } else {
-      drawText(font12,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 1.0f,1);
+      drawText(font12,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, config_menu.config_movieplayer_coverx + 470, 1.0f,1);
     }
     // show edit mode
     if (film_oversigt.editmode==2) {
@@ -6677,21 +6835,21 @@ void display() {
     if (strlen(temptxt)>41) {
       temptxt[42]=0;
     }
-    drawText(font12,movie_title[configland], 670, 870, 1.0f,1);
+    drawText(font12,movie_title[configland], 670, config_menu.config_movieplayer_coverx + 450, 1.0f,1);
     if (film_oversigt.editmode==2) {
-      drawText(font12,temptxt, 750, 870, 0.95f,1);
+      drawText(font12,temptxt, 750, config_menu.config_movieplayer_coverx + 450, 0.95f,1);
       if (do_show_film_edit_select_linie==1) showcoursornow(378,720,strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle()));
     } else {
-      drawText(font12,temptxt, 750, 870, 1.0f,1);
+      drawText(font12,temptxt, 750, config_menu.config_movieplayer_coverx + 450, 1.0f,1);
     }
     // show movie length
     temptxt2 = fmt::format("{} min.",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength());
-    drawText(font12,movie_length[configland], 670, 870-20, 1.0f,1);
+    drawText(font12,movie_length[configland], config_menu.config_movieplayer_coverx + 250, 870-20, 1.0f,1);
     drawText(font12,temptxt2.c_str(), 750, 870-20, 1.0f,1);
     
     // show movie year
     temptxt2 = fmt::format("{} ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
-    drawText(font12,movie_year[configland], 670, 870-40, 1.0f,1);
+    drawText(font12,movie_year[configland], config_menu.config_movieplayer_coverx + 250, 870-40, 1.0f,1);
     if (film_oversigt.editmode==2) {
       drawText(font12,temptxt2.c_str(), 750, 870-40, 0.95f,1);
       if (do_show_film_edit_select_linie==2) showcoursornow(378,680,temptxt2.length());
@@ -6702,7 +6860,7 @@ void display() {
     if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
       else strcpy(temptxt,"None");
     temptxt[23]=0;
-    drawText(font12,movie_rating[configland], 670, 870-60, 1.0f,1);
+    drawText(font12,movie_rating[configland], config_menu.config_movieplayer_coverx + 250, 870-60, 1.0f,1);
     if (film_oversigt.editmode==2) {
       drawText(font12,temptxt, 750, 870-60, 0.95f,1);
       if (do_show_film_edit_select_linie==3) showcoursornow(374,660,strlen(temptxt));
@@ -6711,16 +6869,16 @@ void display() {
     }
     
     // show movie format avi/mp4 osv
-    drawText(font12,"Format ", 670, 870-80, 1.0f,1);
+    drawText(font12,"Format ", config_menu.config_movieplayer_coverx + 250, 870-80, 1.0f,1);
     drawText(font12,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(), 750, 870-80, 1.0f,1);
 
     // show movie windows size
-    drawText(font12,"W/H ", 670, 870-100, 1.0f,1);
+    drawText(font12,"W/H ", config_menu.config_movieplayer_coverx + 250, 870-100, 1.0f,1);
     temptxt2 = fmt::format("{}/{}",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getWidth(),film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getHigh());
     drawText(font12,temptxt2.c_str(), 750, 870-100, 1.0f,1);
     
     // show movie size
-    drawText(font12,"Size ", 670, 870-120, 1.0f,1);
+    drawText(font12,"Size ", config_menu.config_movieplayer_coverx + 250, 870-120, 1.0f,1);
     if ((film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024)>1) 
       temptxt2 = fmt::format("{} Gb",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024));
     else
@@ -6731,7 +6889,7 @@ void display() {
     strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer());
     if (strcmp(temptxt,"")!=0) sprintf(temptxt,"%s ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); else strcpy(temptxt,"None");
     temptxt[23]=0;
-    drawText(font12,"Imdb", 670, 870-140, 1.0f,1);
+    drawText(font12,"Imdb", config_menu.config_movieplayer_coverx + 250, 870-140, 1.0f,1);
     if (film_oversigt.editmode==2) {
       drawText(font12,temptxt, 750, 870-140, 0.95f,1);
       if (do_show_film_edit_select_linie==4) showcoursornow(378,580,strlen(temptxt));
@@ -6739,7 +6897,7 @@ void display() {
       drawText(font12,temptxt, 750, 870-140, 1.0f,1);
     }
     // show movie cast
-    drawText(font12,movie_cast[configland], 670, 870-160, 1.0f,1);
+    drawText(font12,movie_cast[configland], config_menu.config_movieplayer_coverx + 250, 870-160, 1.0f,1); // 670 , 870-160
     int ll=0;
     float xof=0;
     float yof=0;
@@ -10264,8 +10422,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           streamoversigt.stream_oversigt_loaded_nr=0;
           printf("Antal efter search in stream  %d  startup_loaded %d \n",streamoversigt.FeedCatalog_search_antalstreams(),streamoversigt.startup_loaded);
 
-
-
           /*
           if ((streamoversigt.rss_search_podcast_string!="") && (strcmp(temptxt,"BACK")==0)) {
             // streamoversigt.clean_stream_search_oversigt();
@@ -10308,7 +10464,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
           }
         }
-        // play stream
+        // set flags for play stream (check url)
         if ((sknapnr-1>=0) && (do_play_stream)) {
           if ((streamoversigt.get_stream_url(sknapnr-1)) && (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash",9)==0)) {
             startstream=true;
@@ -13719,7 +13875,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   do_find_playlist = true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
                 }
                 if ((vis_radio_oversigt) && (show_radio_options==false)) {
-                  rknapnr=radio_select_iconnr;					// hent button
+                  rknapnr=radio_select_iconnr+1;					// hent button
                   fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                   if (rknapnr>0) do_play_radio=1;					// start play
                 }
@@ -17156,26 +17312,125 @@ int team_settings_load() {
     config_menu.config_upy=(iRoot["tema1"]["icons"]["up"].get("y","0").asInt());
     config_menu.config_up_icon=(iRoot["tema1"]["icons"]["up"].get("icon_path","0").asString());
 
+    config_menu.config_musicplayer_coverx=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_musicplayer_covery=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_musicplayer_cover_sizx=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_cover_sizy=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("sizy","0").asInt());
     config_menu.config_musicplayer_infox=(iRoot["tema1"]["icons"]["musicplayer_info"].get("x","0").asInt());
     config_menu.config_musicplayer_infoy=(iRoot["tema1"]["icons"]["musicplayer_info"].get("y","0").asInt());
     config_menu.config_musicplayer_info_icon=(iRoot["tema1"]["icons"]["musicplayer_info"].get("icon_path","0").asString());
+    config_menu.config_musicplayer_ff_button_posx=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_musicplayer_ff_button_posy=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_musicplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_musicplayer_bw_button_posx=(iRoot["tema1"]["icons"]["musicplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_musicplayer_bw_button_posy=(iRoot["tema1"]["icons"]["musicplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_musicplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_musicplayer_play_button_posx=(iRoot["tema1"]["icons"]["musicplayer_play_button"].get("x","0").asInt());
+    config_menu.config_musicplayer_play_button_posy=(iRoot["tema1"]["icons"]["musicplayer_play_button"].get("y","0").asInt());
+    config_menu.config_musicplayer_play_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_play_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_musicplayer_stop_button_posx=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_musicplayer_stop_button_posy=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_musicplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("sizy","0").asInt());
 
     config_menu.config_spotifyplayer_infox=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("x","0").asInt());
     config_menu.config_spotifyplayer_infoy=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_coverx=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_covery=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_cover_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_cover_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("sizy","0").asInt());
     config_menu.config_spotifyplayer_info_icon=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("icon_path","0").asString());
+    config_menu.config_spotifyplayer_ff_button_posx=(iRoot["tema1"]["icons"]["spotifyplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_ff_button_posy=(iRoot["tema1"]["icons"]["spotifyplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_spotifyplayer_bw_button_posx=(iRoot["tema1"]["icons"]["spotifyplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_bw_button_posy=(iRoot["tema1"]["icons"]["spotifyplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_spotifyplayer_play_button_posx=(iRoot["tema1"]["icons"]["spotifyplayer_play_button"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_play_button_posy=(iRoot["tema1"]["icons"]["spotifyplayer_play_button"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_play_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_play_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_spotifyplayer_stop_button_posx=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_spotifyplayer_stop_button_posy=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_spotifyplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_spotifyplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("sizy","0").asInt());
 
     config_menu.config_tidalplayer_infox=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("x","0").asInt());
     config_menu.config_tidalplayer_infoy=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("y","0").asInt());
     config_menu.config_tidalplayer_info_icon=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("icon_path","0").asString());
+    config_menu.config_tidalplayer_coverx=(iRoot["tema1"]["icons"]["tidalplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_tidalplayer_covery=(iRoot["tema1"]["icons"]["tidalplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_tidalplayer_cover_sizx=(iRoot["tema1"]["icons"]["tidalplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_cover_sizy=(iRoot["tema1"]["icons"]["tidalplayer_info_cover"].get("sizy","0").asInt());
+    config_menu.config_tidalplayer_ff_button_posx=(iRoot["tema1"]["icons"]["tidalplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_tidalplayer_ff_button_posy=(iRoot["tema1"]["icons"]["tidalplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_tidalplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_tidalplayer_bw_button_posx=(iRoot["tema1"]["icons"]["tidalplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_tidalplayer_bw_button_posy=(iRoot["tema1"]["icons"]["tidalplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_tidalplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_tidalplayer_play_button_posx=(iRoot["tema1"]["icons"]["tidalplayer_play_button"].get("x","0").asInt());
+    config_menu.config_tidalplayer_play_button_posy=(iRoot["tema1"]["icons"]["tidalplayer_play_button"].get("y","0").asInt());
+    config_menu.config_tidalplayer_play_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_play_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_tidalplayer_stop_button_posx=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_tidalplayer_stop_button_posy=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_tidalplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_tidalplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("sizy","0").asInt());
 
     config_menu.config_radioplayer_infox=(iRoot["tema1"]["icons"]["radioplayer_info"].get("x","0").asInt());
     config_menu.config_radioplayer_infoy=(iRoot["tema1"]["icons"]["radioplayer_info"].get("y","0").asInt());
     config_menu.config_radioplayer_info_icon=(iRoot["tema1"]["icons"]["radioplayer_info"].get("icon_path","0").asString());
+    config_menu.config_radioplayer_sizx=(iRoot["tema1"]["icons"]["radioplayer_info"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_sizy=(iRoot["tema1"]["icons"]["radioplayer_info"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_coverx=(iRoot["tema1"]["icons"]["radioplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_radioplayer_covery=(iRoot["tema1"]["icons"]["radioplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_radioplayer_cover_sizx=(iRoot["tema1"]["icons"]["radioplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_cover_sizy=(iRoot["tema1"]["icons"]["radioplayer_info_cover"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_ff_button_posx=(iRoot["tema1"]["icons"]["radioplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_radioplayer_ff_button_posy=(iRoot["tema1"]["icons"]["radioplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_radioplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_bw_button_posx=(iRoot["tema1"]["icons"]["radioplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_radioplayer_bw_button_posy=(iRoot["tema1"]["icons"]["radioplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_radioplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_play_button_posx=(iRoot["tema1"]["icons"]["radioplayer_play_button"].get("x","0").asInt());
+    config_menu.config_radioplayer_play_button_posy=(iRoot["tema1"]["icons"]["radioplayer_play_button"].get("y","0").asInt());
+    config_menu.config_radioplayer_play_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_play_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_radioplayer_stop_button_posx=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_radioplayer_stop_button_posy=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_radioplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_radioplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("sizy","0").asInt());
 
-    config_menu.config_mediaplayer_infox=(iRoot["tema1"]["icons"]["mediaplayer_info"].get("x","0").asInt());
-    config_menu.config_mediaplayer_infoy=(iRoot["tema1"]["icons"]["mediaplayer_info"].get("y","0").asInt());
     config_menu.config_mediaplayer_info_icon=(iRoot["tema1"]["icons"]["mediaplayer_info"].get("icon_path","0").asString());
-
+    config_menu.config_mediaplayer_coverx=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_mediaplayer_covery=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_mediaplayer_cover_sizx=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_cover_sizy=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("sizy","0").asInt());
+    config_menu.config_mediaplayer_ff_button_posx=(iRoot["tema1"]["icons"]["mediaplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_mediaplayer_ff_button_posy=(iRoot["tema1"]["icons"]["mediaplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_mediaplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["mediaplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["mediaplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_mediaplayer_bw_button_posx=(iRoot["tema1"]["icons"]["mediaplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_mediaplayer_bw_button_posy=(iRoot["tema1"]["icons"]["mediaplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_mediaplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["mediaplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["mediaplayer_bw_button"].get("sizy","0").asInt());
+    config_menu.config_mediaplayer_play_button_posx=(iRoot["tema1"]["icons"]["mediaplayer_play_button"].get("x","0").asInt());
+    config_menu.config_mediaplayer_play_button_posy=(iRoot["tema1"]["icons"]["mediaplayer_play_button"].get("y","0").asInt());
+    config_menu.config_mediaplayer_play_button_sizx=(iRoot["tema1"]["icons"]["mediaplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_play_button_sizy=(iRoot["tema1"]["icons"]["mediaplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_mediaplayer_stop_button_posx=(iRoot["tema1"]["icons"]["mediaplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_mediaplayer_stop_button_posy=(iRoot["tema1"]["icons"]["mediaplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_mediaplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["mediaplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_mediaplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["mediaplayer_stop_button"].get("sizy","0").asInt());
     config_menu.config_exitx=(iRoot["tema1"]["icons"]["exit"].get("x","0").asInt());
     config_menu.config_exity=(iRoot["tema1"]["icons"]["exit"].get("y","0").asInt());
     config_menu.config_exit_icon=(iRoot["tema1"]["icons"]["exit"].get("icon_path","0").asString());

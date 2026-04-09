@@ -994,18 +994,6 @@ void drawRect(int x, int y, int w, int h, Color2 c) {
 void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c) {
   glEnable(GL_TEXTURE_2D);
   glColor4f(c.r, c.g, c.b, c.a);
-
-  glBindTexture(GL_TEXTURE_2D, textureId2);
-  // draw cover frame
-  /*
-  glLoadName(id);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex2i(x,     y);
-  glTexCoord2f(1, 0); glVertex2i(x + w, y);
-  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
-  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
-  glEnd();
-  */
   // draw actual cover
   glBindTexture(GL_TEXTURE_2D, textureId);
   glLoadName(id);
@@ -1015,7 +1003,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
   glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
   glEnd();
-  
+  // icon  
   glBindTexture(GL_TEXTURE_2D, textureId2);
   glLoadName(id);
   glBegin(GL_QUADS);
@@ -1061,9 +1049,9 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {
-      drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+      drawcover(x + 18, y + 18, 164 + sin(sinh)*4, 164 + sin(sinh)*4, texture , onlineradio_selected ,ii+100,highcolor);
       drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
-      sinh = sinh + 0.09f;
+      sinh = sinh + 0.08f;
       if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
@@ -1071,7 +1059,7 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
-      drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+      drawcover(x + 18, y + 18, 164 + sin(sinh)*4, 164 + sin(sinh)*4, texture , onlineradio_selected ,ii+100,highcolor);
       drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
       sinh = sinh + 0.08f;
       if (sinh>(M_PI*2)) sinh=0.0f;
@@ -1191,8 +1179,8 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int firstRow   = (int)(scrollPos / rowHeight);
   float subOff   = fmod(scrollPos, rowHeight);
   int ssofset     = firstRow * itemsPerRow;
-  int screenTop = startY;
-  int xof = startX;
+  int screenTop = startY;                                 // start position for first item y 
+  int xof = startX;                                       // start position for first item x
   int visibleItems = (visibleRows + 2) * itemsPerRow;
   if (strlen(keybuffer)>0) {
     screenTop=search_startY;
