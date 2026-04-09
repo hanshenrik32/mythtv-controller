@@ -1,8 +1,8 @@
 {
     "tema1": {
-        "name": "Tema 2",
-        "icon": "tema2.png",
-        "iconpath": "/opt/mythtv-controller/tema2/",
+        "name": "Tema 8",
+        "icon": "tema8.png",
+        "iconpath": "/opt/mythtv-controller/tema8/",
         "icons" : {
             "tvguide": {
                 "icon_path": "tv",
@@ -267,7 +267,7 @@
             },
             "tidalplayer_stop_button": {
                 "icon_path": "mplaystop",
-                "x": 250,
+                "x": 150,
                 "y": 300,
                 "sizx": 100,
                 "sizy": 100
@@ -323,34 +323,34 @@
             "mediaplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 50,
-                "y": 300,
+                "y": 330,
                 "sizx": 100,
                 "sizy": 100
             },
             "mediaplayer_info_cover": {
-                "x": 348,
-                "y": 400,
-                "sizx": 167,
-                "sizy": 119
+                "x": 410,
+                "y": 145,
+                "sizx": 200,
+                "sizy": 172
             },
             "mediaplayer_stop_button": {
                 "icon_path": "mplaystop",
-                "x": 250,
-                "y": 300,
+                "x": 150,
+                "y": 330,
                 "sizx": 100,
                 "sizy": 100
             },
             "mediaplayer_ff_button": {
                 "icon_path": "mplaynext",
                 "x": 250,
-                "y": 300,
+                "y": 330,
                 "sizx": 100,
                 "sizy": 100
             },
             "mediaplayer_bw_button": {
                 "icon_path": "mplaylast",
-                "x": 250,
-                "y": 300,
+                "x": 350,
+                "y": 330,
                 "sizx": 100,
                 "sizy": 100
             },

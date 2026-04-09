@@ -1061,9 +1061,9 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {
-      drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+      drawcover(x + 18, y + 18, 164 + sin(sinh)*4, 164 + sin(sinh)*4, texture , onlineradio_selected ,ii+100,highcolor);
       drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
-      sinh = sinh + 0.09f;
+      sinh = sinh + 0.08f;
       if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
@@ -1071,7 +1071,7 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
     }
   } else {
     if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
-      drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+      drawcover(x + 18, y + 18, 164 + sin(sinh)*4, 164 + sin(sinh)*4, texture , onlineradio_selected ,ii+100,highcolor);
       drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
       sinh = sinh + 0.08f;
       if (sinh>(M_PI*2)) sinh=0.0f;

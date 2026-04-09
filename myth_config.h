@@ -217,8 +217,19 @@ class config_icons {
     int config_mediaplayer_stop_button_posy;
     int config_mediaplayer_stop_button_sizx;
     int config_mediaplayer_stop_button_sizy;
-
     std::string config_mediaplayer_info_icon;
+
+
+    int config_movieplayer_infox;
+    int config_movieplayer_infoy;
+    int config_movieplayer_sizx;
+    int config_movieplayer_sizy;
+    int config_movieplayer_coverx;
+    int config_movieplayer_covery;
+    int config_movieplayer_cover_sizx;
+    int config_movieplayer_cover_sizy;
+
+
     int config_exitx;
     int config_exity;
     std::string config_exit_icon;
@@ -260,6 +271,7 @@ class config_icons {
     int config_movie_main_window_icon_spac;
     int config_movie_main_window_icon_sizex;
     int config_movie_main_window_icon_sizey;
+
     int config_spotify_main_windowx;
     int config_spotify_main_windowy;
     int config_spotify_main_window_sizex;
@@ -490,28 +502,36 @@ class config_icons {
       config_mediaplayer_infoy = 320;
       config_mediaplayer_sizx = 640;
       config_mediaplayer_sizy = 400;
-      config_mediaplayer_coverx = 348;
-      config_mediaplayer_covery = 400;
-      config_mediaplayer_cover_sizx = 167;
-      config_mediaplayer_cover_sizy = 119;
+      config_mediaplayer_coverx = 410;
+      config_mediaplayer_covery = 145;
+      config_mediaplayer_cover_sizx = 200;
+      config_mediaplayer_cover_sizy = 172;
       config_mediaplayer_ff_button_posx = 250;
-      config_mediaplayer_ff_button_posy = 300;
+      config_mediaplayer_ff_button_posy = 330;
       config_mediaplayer_ff_button_sizx = 100;
       config_mediaplayer_ff_button_sizy = 100;
       config_mediaplayer_bw_button_posx = 350;
-      config_mediaplayer_bw_button_posy = 300;
+      config_mediaplayer_bw_button_posy = 330;
       config_mediaplayer_bw_button_sizx = 100;
       config_mediaplayer_bw_button_sizy = 100;
       config_mediaplayer_play_button_posx = 50;
-      config_mediaplayer_play_button_posy = 300;
+      config_mediaplayer_play_button_posy = 330;
       config_mediaplayer_play_button_sizx = 100;
       config_mediaplayer_play_button_sizy = 100;
       config_mediaplayer_stop_button_posx = 150;
-      config_mediaplayer_stop_button_posy = 300;
+      config_mediaplayer_stop_button_posy = 330;
       config_mediaplayer_stop_button_sizx = 100;
       config_mediaplayer_stop_button_sizy = 100;
 
-
+      config_movieplayer_infox = 400;
+      config_movieplayer_infoy = 400;
+      config_movieplayer_sizx = 800;
+      config_movieplayer_sizy = 550;
+      config_movieplayer_coverx = 420;
+      config_movieplayer_covery = 600;
+      config_movieplayer_cover_sizx = 220;
+      config_movieplayer_cover_sizy = 320;
+      
       config_mediaplayer_info_icon = "musicplayer-info";
       config_exitx = 0;
       config_exity = 1008;
