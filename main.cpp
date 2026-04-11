@@ -484,6 +484,9 @@ int kodiverfound=0;
 const float textcolor[3]={0.8f,0.8f,0.8f};
 const float selecttextcolor[3]={0.4f,0.4f,0.4f};
 
+std::string config_playing_record_icon="images/playing_record.png";          // default playing record icon
+GLuint playing_record_icon_texture=0;                                 // playing record icon texture
+GLuint playing_tidal_icon_texture=0;                                   // playing tidal icon texture
 
 float _fangley=0.0f;					// bruges af vis_film_oversigt glob
 int do_zoom_film_aktiv_nr=0;
@@ -4733,6 +4736,7 @@ void display() {
           if (result==FMOD_OK) {
             do_zoom_radio=true;
           }
+          radiooversigt.playingstationnr=rknapnr-1;
           #endif
           // play online radio by sdl
           #if defined USE_SDL_MIXER
@@ -4755,11 +4759,12 @@ void display() {
           #endif
         }
         radiooversigt.playing=true;			// set playing flag
+        radiooversigt.playingstationnr=rknapnr-1;
 
         tidal_oversigt.set_tidal_playing_flag(false);          // stop tidal playing if active
         musicoversigt.set_music_is_playing(false);              // stop music playing if active
 
-        aktiv_radio_station = rknapnr-1;		                                    // Husk aktiv radio station så vi kan vi den senere
+        aktiv_radio_station = rknapnr-1;		                                    // Husk aktiv radio station så vi kan vise den senere
         radio_key_selected = rknapnr;		                                        // husk den valgte radio station
         rknapnr = 0;
         mknapnr = 0;		                                                  		// reset select fire again
@@ -4921,6 +4926,9 @@ void display() {
         // startplaying
         if (do_play_music_aktiv_table_nr>0) {
           musicoversigt.set_music_is_playing(true);
+          
+          musicoversigt.playingmusicnr = musicoversigt.get_album_id(mknapnr-1);
+
           #if defined USE_FMOD_MIXER
           if (sound) result = sound->release();          		                            // stop last played sound on soundsystem fmod
           if (snd==0) {
@@ -5725,7 +5733,6 @@ void display() {
         strcpy(temptxt,music_songname[configland]);
         drawText(font12,temptxt, 520.0f, 490.0f, 1.0f,1);
         char *pos;
-        
         // show artist name
         aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr-1);
         pos=strrchr(temptxt,'/');
@@ -5738,9 +5745,9 @@ void display() {
           temptxt[pos-temptxt]='\0';
         }
         temptxt[40]=0;
-        drawText(font12,temptxt, 650.0f, 490.0f, 1.0f,1);
-      }
-      
+        // drawText(font12,temptxt, 650.0f, 490.0f, 1.0f,1);
+        drawLinesOfText(temptxt, 650.0f, 490.0f, 1.0f, 21, 3, 1, false);
+      }     
       // radio player info
       if ((radiooversigt.playing) && (do_zoom_radio)) {
         GLuint textureId_2=radiooversigt.get_texture_r(aktiv_radio_station);
@@ -5806,8 +5813,6 @@ void display() {
         temptxt1.resize(38);
         // drawText(font12,temptxt1.c_str(),(orgwinsizex/4)+160, (orgwinsizey/2)-0, 1.0f,1);
         drawText(font12,temptxt1.c_str(),config_menu.config_radioplayer_infox+140, config_menu.config_radioplayer_infoy+240, 1.0f,1);
-
-
         drawText(font12,"Station ",config_menu.config_radioplayer_infox+30, config_menu.config_radioplayer_infoy+190, 1.0f,1);
         temptxt1 = fmt::format(" {:38}",radiooversigt.get_station_name(aktiv_radio_station));
         temptxt1.resize(38);
@@ -5827,7 +5832,6 @@ void display() {
         drawText(font12,"Status ",config_menu.config_radioplayer_infox+30, config_menu.config_radioplayer_infoy+130, 1.0f,1);
         sprintf(temptxt," %-20s",aktivsongstatus);
         drawText(font12,temptxt,config_menu.config_radioplayer_infox+140, config_menu.config_radioplayer_infoy+130, 1.0f,1);
-
         #if defined USE_FMOD_MIXER
         if ((channel) && (sound) && (snd)) {
           //result=sound->getOpenState(&openstate,&percent,&starving,false);
@@ -6155,8 +6159,6 @@ void display() {
         drawText(font12,temptxt, config_menu.config_musicplayer_infox + 240, config_menu.config_musicplayer_infoy + 310.0f, 1.0f,1);
       }
     }
-
-
     // Show setup stuf windows
     if (do_show_setup) {
       do_zoom_tidal_cover = false;
@@ -7024,6 +7026,7 @@ void display() {
     musicoversigt.play_songs(false);                    // set no play flag in musicoversigt class
     show_uv=false;
     vis_uv_meter=false;
+    musicoversigt.playingmusicnr=-1;
   }
 
   if (do_stop_tidal) {
@@ -7038,6 +7041,7 @@ void display() {
     snd=0;                                            // clear sound device
     show_uv=false;
     vis_uv_meter=false;
+    tidal_oversigt.tidal_playingnr=-1;
   }
 
   // stop radio
@@ -7052,6 +7056,7 @@ void display() {
     snd=0;
     do_stop_radio = false;
     do_stop_music_all = true;
+    radiooversigt.playingstationnr=-1;
   }
   // auto play next song
   // is sound system working
@@ -8017,13 +8022,18 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if (names[i*4+3]==PLAYBUTTON) {
               do_stop_music = 0;
               do_shift_song = true;
+              
+              
+              musicoversigt.playingmusicnr = musicoversigt.get_album_id(mknapnr-1);
+
+
               if (do_play_music_aktiv_table_nr>=aktiv_playlist.numbers_in_playlist()) {
-                  if (aktiv_playlist.numbers_in_playlist()==0) {
-                      do_stop_music_all = true;                                   // stop play music
-                      do_shift_song = false;
-                  } else {
-                      do_play_music_aktiv_table_nr = 1;
-                  }
+                if (aktiv_playlist.numbers_in_playlist()==0) {
+                  do_stop_music_all = true;                                   // stop play music
+                  do_shift_song = false;
+                } else {
+                  do_play_music_aktiv_table_nr = 1;
+                }
               }
               fundet = true;
               do_zoom_music_cover=false;
@@ -11661,6 +11671,7 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((_rangley>0) && (radio_key_selected<=fnumbersoficonline) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                         _rangley-=MOVIE_CS;
                         radio_select_iconnr-=rnumbersoficonline;
+                        radiooversigt.onScroll(-11.25);
                       } else radio_select_iconnr-=rnumbersoficonline;
                       if (radio_key_selected>rnumbersoficonline) radio_key_selected-=rnumbersoficonline;
                     }
@@ -11669,6 +11680,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (radiooversigt.selected_icon_in_view-8<1) {
                       radiooversigt.onScroll(-11.25);
                     }
+                    if (radiooversigt.selected_icon_in_view<0) radiooversigt.selected_icon_in_view=1;
                   }
                   if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.lastradiooptselect();
                   //
@@ -16812,6 +16824,9 @@ void loadgfx() {
     pcplayer_icon         = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "pcplayer");
     unknownplayer_icon    = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "unknownplayer");
 
+    playing_record_icon_texture = loadTexture((char *) config_playing_record_icon.c_str());
+    playing_tidal_icon_texture = loadTexture((char *) config_playing_record_icon.c_str());
+
 // ************************* screen shot *******************************
     screenshot1           = loadTexture ((char *) "images/screenshot1.png");
     screenshot2           = loadTexture ((char *) "images/screenshot2.png");
@@ -17226,6 +17241,7 @@ int team_settings_load() {
   std::string temapath=fmt::format("/opt/mythtv-controller/tema{}/", tema);
   reader.parse(temasettingsfile, iRoot);
   try {
+
     config_menu.config_tema_path=(iRoot["tema1"].get("iconpath","0").asString());
 
     config_menu.config_tvguidex=(iRoot["tema1"]["icons"]["tvguide"].get("x","0").asInt());

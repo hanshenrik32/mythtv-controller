@@ -27,11 +27,8 @@
 #include <fmt/format.h>
 #include <sqlite3.h>                    // sqlite interface to xbmc
 #include <unistd.h>
-
-
 #include <experimental/filesystem>
 #include <iostream>
-
 #include <spawn.h>
 #include <string>
 #include <unistd.h>
@@ -40,7 +37,6 @@
 #include <sys/wait.h>
 #include <cerrno>
 #include <cstring>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -74,6 +70,8 @@ extern mFont font12;  // 12px font
 extern mFont font18;  // 18px font
 extern mFont font24;  // 24px font
 
+extern GLuint playing_tidal_icon_texture;
+
 extern int do_show_tidal_search_oversigt;
 
 extern Character characters[];
@@ -82,8 +80,6 @@ extern config_icons config_menu;
 
 extern unsigned int do_show_editor_select_linie;
 extern GLuint _textureupdatetidalview; 	        // update icon tidal playlist in editor
-
-extern GLuint tidal_playing_icon;                // icon for active playlist/songs
 
 const char *tidal_gfx_path = "tidal_gfx/";
 
@@ -97,7 +93,7 @@ const int feed_url=2000;
 extern FILE *logfile;
 extern char localuserhomedir[4096];                                                         // get in main
 extern int debugmode;
-extern tidal_class *tidal_oversigt;
+extern tidal_class tidal_oversigt;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
@@ -2714,8 +2710,8 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
             system("cat tidal_users_playlist.json | grep total | tail -1 | awk {'print $3'} > tidal_users_playlist_antal.txt");
             json_file = fopen("spotify_users_playlist_antal.txt", "r");
             fscanf(json_file, "%s", temptxt);
-            if (strcmp(temptxt,"")!=0) tidal_oversigt->tidal_playlist_antal = atoi(temptxt);
-            else tidal_oversigt->tidal_playlist_antal = 0;
+            if (strcmp(temptxt,"")!=0) tidal_oversigt.tidal_playlist_antal = atoi(temptxt);
+            else tidal_oversigt.tidal_playlist_antal = 0;
              fclose(json_file);
           }
           stat("spotify_users_playlist.txt", &filestatus);                              // get file info
@@ -2727,8 +2723,8 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
               while(!(feof(json_file))) {
                 fscanf(json_file, "%s", file_contents);
                 // process playlist id
-                tidal_oversigt->tidal_get_playlist(file_contents,force,1);
-                tidal_oversigt->clean_tidal_oversigt();
+                tidal_oversigt.tidal_get_playlist(file_contents,force,1);
+                tidal_oversigt.clean_tidal_oversigt();
                 loaded_antal++;
               }
               fclose(json_file);
@@ -2738,12 +2734,12 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
           tidal_playlistantal_loaded+=startoffset;
           // next loop
           // 50 is loaded on each loop until end
-          if ((startoffset+50)<tidal_oversigt->tidal_playlist_antal) {
+          if ((startoffset+50)<tidal_oversigt.tidal_playlist_antal) {
             startoffset+=50;
           } else {
-            startoffset=tidal_oversigt->tidal_playlist_antal-startoffset;
+            startoffset=tidal_oversigt.tidal_playlist_antal-startoffset;
           }
-          if (tidal_playlistantal_loaded>=tidal_oversigt->tidal_playlist_antal) tidalplaylistloader_done=true;
+          if (tidal_playlistantal_loaded>=tidal_oversigt.tidal_playlist_antal) tidalplaylistloader_done=true;
         }
         if (remove("tidal_users_playlist.txt")!=0) write_logfile(logfile,(char *) "Error remove user playlist file tidal_users_playlist.txt");
         // save data to mysql db
@@ -2758,7 +2754,7 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
           fprintf(stdout,"playlist %-60s Tidalid %-20s \n",row[0],row[1]);
-          if (tidal_oversigt->tidal_get_playlist(row[1],force,0)==1) {
+          if (tidal_oversigt.tidal_get_playlist(row[1],force,0)==1) {
             fprintf(stderr,"Error create playlist %s \n",row[1]);
           }
         }
@@ -2805,19 +2801,19 @@ sqlite3 *sqlitedb_obj_tidal;
 int tidal_sqldb_callback(void *data, int argc, char **argv, char **azColName) {
   for(int i=0; i<argc; i++){
     if (strcmp(azColName[i],"playlistname")==0) {
-      tidal_oversigt->set_tidal_feed_showtxt(argv[i],i);
+      tidal_oversigt.set_tidal_feed_showtxt(argv[i],i);
     }
     if (strcmp(azColName[i],"paththumb")==0) {
-      tidal_oversigt->set_tidal_feed_gfx_url(argv[i],i);
+      tidal_oversigt.set_tidal_feed_gfx_url(argv[i],i);
     }
     if (strcmp(azColName[i],"playlistid")==0) {
-      tidal_oversigt->set_tidal_playlistid(argv[i],i);
+      tidal_oversigt.set_tidal_playlistid(argv[i],i);
     }
     if (strcmp(azColName[i],"release_date")==0) {
-      tidal_oversigt->set_tidal_feed_release_date(argv[i],i);
+      tidal_oversigt.set_tidal_feed_release_date(argv[i],i);
     }
     if (strcmp(azColName[i],"artistid")==0) {
-      tidal_oversigt->set_tidal_feed_artistname(argv[i],i);
+      tidal_oversigt.set_tidal_feed_artistname(argv[i],i);
     }
     printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
   }
@@ -5373,7 +5369,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
             glTexCoord2f(1, 1); glVertex3f( buttonsize-12-(buttonsize/2), buttonsizey-22 , 0.0);
             glTexCoord2f(1, 0); glVertex3f( buttonsize-12-(buttonsize/2), 12 , 0.0);
             glEnd();
-            glBindTexture(GL_TEXTURE_2D,tidal_playing_icon);
+            glBindTexture(GL_TEXTURE_2D,tidal_aktiv_playing_icon);
             glLoadName(100+i+sofset);
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f( 46-(buttonsize/2), 46, 0.0);
@@ -5680,6 +5676,19 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color4 c) {
   glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
   glTexCoord2f(0, 1); glVertex2i(x,     y + h);
   glEnd();
+
+  if ((id-100)==tidal_oversigt.tidal_playingnr) {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,playing_tidal_icon_texture);
+    glLoadName(id);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex2i(x + w - 40, y + h - 40);
+    glTexCoord2f(1, 0); glVertex2i(x + w - 10, y + h - 40);
+    glTexCoord2f(1, 1); glVertex2i(x + w - 10, y + h - 10);
+    glTexCoord2f(0, 1); glVertex2i(x + w - 40, y + h - 10);
+    glEnd();
+  }
 }
 
 // ****************************************************************************************
@@ -6230,9 +6239,9 @@ void tidal_class::show_setup_tidal() {
   glColor3f(1.0f,1.0f,1.0f);
   glPopMatrix();
   drawText(font12,"email adress        ", 630, 650, 0.4f,15);
-  drawText(font12,tidal_oversigt->client_id, 630+140, 650, 0.4f,15);
+  drawText(font12,tidal_oversigt.client_id, 630+140, 650, 0.4f,15);
   drawText(font12,"Password            ", 650.0f, 600, 0.4f,15);
-  drawText(font12,tidal_oversigt->client_secret.c_str(), 630+140, 600, 0.4f,15);
+  drawText(font12,tidal_oversigt.client_secret.c_str(), 630+140, 600, 0.4f,15);
   if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(395,500-(do_show_setup_select_linie*50),strlen(keybuffer));
   drawText(font12,"Token ok ", 650, 550, 0.4f,1);
   if (strlen(tidaltoken)>0) drawText(font12,"Yes ", 630+140.0f, 550, 0.4f,1); else drawText(font12,"No  ", 630+140.0f, 550, 0.4f,1);

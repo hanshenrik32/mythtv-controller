@@ -40,6 +40,7 @@ class musicoversigt_class {
     bool do_play;
     bool music_is_playing;                                                // do we play ?   
   public:
+    int playingmusicnr=-1;
     int selected_icon_in_view=1;
     char overview_show_band_name[256];                                  // show band name in overview
     bool search_loaded;
@@ -118,7 +119,9 @@ class musicoversigt_class {
     bool get_music_is_playing() { return(music_is_playing); }
     int antal() { return(musicoversigt.size()); }
 
+    int get_album_id(int nr);
 
+    void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint icon, int id, Color3 c);
     // new version 2 with kinetic scroll
     void onScroll(float delta) { scrollVel += delta * accel; }
     void draw_music_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon, int stream_key_selected);

@@ -58,6 +58,8 @@ extern float configdefaultmusicfontsize;                        // default font
 extern char music_db_update_loader[256];                       //
 extern int music_oversigt_loaded_nr;
 
+extern musicoversigt_class musicoversigt;              // Music class
+
 extern char *dbname;                                          // internal database name in mysql (music,movie,radio)
 extern int debug;
 extern bool global_use_internal_music_loader_system;
@@ -93,6 +95,8 @@ extern int orgwinsizex;
 extern char localuserhomedir[4096];
 extern bool do_sqlite;
 extern config_icons config_menu;
+
+extern GLuint playing_record_icon_texture;
 
 // ****************************************************************************************
 //
@@ -535,6 +539,12 @@ char *musicoversigt_class::get_album_name(int nr) {
   if (nr<=antal_music_oversigt) {
     return(musicoversigt[nr].album_name);
   } else return {};
+}
+
+int musicoversigt_class::get_album_id(int nr) {
+  if (nr<=antal_music_oversigt) {
+    return(musicoversigt[nr].directory_id);
+  } else return -1;
 }
 
 char musicoversigt_class::get_album_type(int nr) {
@@ -1718,7 +1728,7 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
 // ****************************************************************************************
 
 
-void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint icon, int id, Color3 c) {
+void musicoversigt_class::drawcover(int x, int y, int w, int h, GLuint textureId, GLuint icon, int id, Color3 c) {
   glEnable(GL_TEXTURE_2D);
   glColor4f(c.r, c.g, c.b, c.a);
   if (textureId!=_textureId_dir) {
@@ -1748,6 +1758,15 @@ void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint icon, int id
     glTexCoord2f(1, 0); glVertex2i(x + 10 + w - 20, y + 10);
     glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
     glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
+    glEnd();
+  }
+  if ((playingmusicnr>0) && (musicoversigt[id-100].directory_id == playingmusicnr)) {
+    glBindTexture(GL_TEXTURE_2D, playing_record_icon_texture);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex2i(x + w - 40, y + h - 40);
+    glTexCoord2f(1, 0); glVertex2i(x + w - 10, y + h - 40);
+    glTexCoord2f(1, 1); glVertex2i(x + w - 10, y + h - 10);
+    glTexCoord2f(0, 1); glVertex2i(x + w - 40, y + h - 10);
     glEnd();
   }
 }

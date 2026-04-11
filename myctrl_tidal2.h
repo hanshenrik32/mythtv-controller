@@ -97,7 +97,7 @@ class tidal_class {
     
     int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
     int tidal_aktiv_song_nr;
-    int tidal_playingnr;
+    
     bool tidal_update_loaded_begin;    
     //
     // char tidaltoken[512];                                                 // access_token
@@ -131,6 +131,7 @@ class tidal_class {
     int update_song_playcount(const char *playpath);
     
   public:
+    int tidal_playingnr=-1;                            // make it private later
     int selected_icon_in_view=1;
     char tidaltoken[512];                                                 // access_token
     bool do_setup_tidal_start_entry;                                            // show tidal start id entrys

@@ -61,6 +61,7 @@ class radiostation_class {
     bool check_radio_online_bool();                                                 // check and set radio station online flag (DO NOT WORK)
     bool hentradioart=false;
   public:
+    int playingstationnr=-1;		                                                // nr in stack of playing radio station
     bool search_radio_online_done;
     bool search_loaded;
     int selected_icon_in_view=1;

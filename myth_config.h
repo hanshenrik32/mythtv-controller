@@ -292,6 +292,8 @@ class config_icons {
     int config_tv_main_window_sizey;
     int config_tv_main_window_icon_spac;
 
+    std::string config_playing_record_icon="playing_record.png";
+
     config_icons() {
       config_tema_path="/opt/mythtv-controller/tema3/";
       config_tvguidex = 1920;

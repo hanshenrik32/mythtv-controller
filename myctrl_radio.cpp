@@ -74,6 +74,8 @@ extern bool radio_oversigt_loaded;
 extern bool radio_oversigt_loaded_done;
 extern bool radio_oversigt_loaded_begin;
 
+extern GLint playing_record_icon_texture;
+
 
 extern mFont font12;  // 12px font
 extern mFont font18;  // 18px font
@@ -1012,6 +1014,16 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
   glTexCoord2f(0, 1); glVertex2i(x,     y + h);
   glEnd();
+
+  if (id-100==radiooversigt.playingstationnr) {
+    glBindTexture(GL_TEXTURE_2D, playing_record_icon_texture);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex2i(x + w - 40, y + h - 40);
+    glTexCoord2f(1, 0); glVertex2i(x + w - 10, y + h - 40);
+    glTexCoord2f(1, 1); glVertex2i(x + w - 10, y + h - 10);
+    glTexCoord2f(0, 1); glVertex2i(x + w - 40, y + h - 10);
+    glEnd();
+  }
 }
 
 
