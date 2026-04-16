@@ -346,7 +346,10 @@ std::vector<std::string> sql_podcast_array={
   "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Go Morgen P3',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Go Morgen P3',NULL,NULL,'Go Morgen P3',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/gomorgenp3.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
   "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Anmelderne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Anmelderne',NULL,NULL,'Anmelderne',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/anmelderne.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
   "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Orientering Udsyn',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Orientering Udsyn',NULL,NULL,'Orientering Udsyn',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/orientering.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
-  "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Joshua Bardwell',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Joshua Bardwell',NULL,NULL,'Joshua Bardwell',0,0,NULL,'https://www.patreon.com/rss/thedroneracingengineer?auth=JS4Yb-OaQVI2Q_LsIGb9jX9imuA8eGbx&show=931863',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)"
+  "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Joshua Bardwell',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Joshua Bardwell',NULL,NULL,'Joshua Bardwell',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UChpbytrxf-Aj9qe7Gp7sECg',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
+  "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Genstart',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Genstart',NULL,NULL,'Genstart',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/genstart',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
+  "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Sara & Monopolet - podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Sara & Monopolet - podcast',NULL,NULL,'Sara & Monopolet - podcast',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/mads-monopolet-podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)",
+  "REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,active,host) VALUES ('Enter - Internettets skygge',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,NULL)","REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Enter - Internettets skygge',NULL,NULL,'Enter - Internettets skygge',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/enter-internettets-skygge',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)"
 };
 
 
@@ -531,11 +534,11 @@ int stream_class::pausestream(int pause) {
 
 char *stream_class::get_stream_url(int nr) {
   if (FeedCatalog_search_view.size()==0) {
-    if (nr<antal) {
+    if (nr<=antal) {
       return (const_cast<char*>(FeedCatalog[nr].feed_streamurl.c_str()));
     }
   } else {
-    if (nr<FeedCatalog_search_view.size()) {
+    if (nr<=FeedCatalog_search_view.size()) {
       return (const_cast<char*>(FeedCatalog_search_view[nr].feed_streamurl.c_str()));
     }
   }
@@ -550,11 +553,10 @@ char *stream_class::get_stream_url(int nr) {
 // ****************************************************************************************
 
 int stream_class::playstream(int nr) {
-    char path[PATH_MAX];                                  // max path length from os
-    strcpy(path,"");
-    strcat(path,get_stream_url(nr));
+    std::string url;
+    url=get_stream_url(nr);
     stream_is_playing=true;
-    vlc_controller::playmedia(path);
+    vlc_controller::playmedia((char *) url.c_str());
     return(1);
 }
 
@@ -654,6 +656,9 @@ int stream_class::loadrssfile(bool updaterssfile) {
   }
 
   if (updaterssfile==true) set_update_rss=true; // force update
+
+  // set_update_rss=true;
+
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
   if (conn) {
     // create db
@@ -701,7 +706,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         stream_rssparse_nowloading++;
-        printf("Get rss file %10s \n",row[0]);
+        printf("#%d Get rss file %10s \n",stream_rssparse_nowloading,row[0]);
         snprintf(temptxt,sizeof(temptxt),"Get rss feed title %10s ",row[0]);
         write_logfile(logfile,temptxt);
         if ((row[3]) && (strcmp(row[3],"")!=0)) {
@@ -1323,7 +1328,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       res = mysql_store_result(conn);
       // Create records
       i=0;
-      int array_size=sql_podcast_array.size()/2;
+      int array_size=sql_podcast_array.size();
       while(i<array_size) {
         if (mysql_query(conn,sql_podcast_array.at(i).c_str())!=0) {
           printf("mysql insert error. %s \n",sql_podcast_array[i].c_str());
@@ -1336,7 +1341,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res); 
         i+=2;
-      }      
+      }
     }    
     if (conn) mysql_close(conn);
     // download new rrs files we just insert in db
@@ -1404,7 +1409,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
           new_stream_recrord.textureId=0;				//
           new_stream_recrord.intnr=0;					//
           new_stream_recrord.nyt=false;					// New podcast ?
-
           // top level
           if (getart==0) {
             if (row[9]) strcpy(tmpfilename,row[9]);
@@ -2503,6 +2507,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color c) {
 
 void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   // Baggrund
+  static float sinh=0.0;
   std::string temprgtxt;
   std::string gfxfilename;
   GLuint texture;
@@ -2524,8 +2529,10 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   temprgtxt.resize(20);
   if (FeedCatalog[ii].textureId ) texture = FeedCatalog[ii].textureId; else texture=empty_icon; // texture = normal_icon;
   if (ii == selected_icon_in_view-1) {
-    drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+    drawcover(x + 18, y + 18, 164+sin(sinh)*4, 164+sin(sinh)*4, texture ,ii+100,highcolor);
     drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+    sinh = sinh + 0.08f;
+    if (sinh>(M_PI*2)) sinh=0.0f;
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
     drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);

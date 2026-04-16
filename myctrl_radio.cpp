@@ -593,7 +593,7 @@ int radiostation_class::opdatere_radio_oversigt() {
 // ****************************************************************************************
 //
 // search radio station in db after searchtxt
-// OVERLOAD
+// OVERLOADED
 //
 // ****************************************************************************************
 
@@ -657,7 +657,7 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
 // ****************************************************************************************
 //
 // Opdatere liste efter sort order (radiosortorder)
-// OVERLOAD
+// OVERLOADED
 //
 // ****************************************************************************************
 
@@ -738,236 +738,6 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 }
 
 
-// ****************************************************************************************
-//
-// show radio stations overview
-//
-// ****************************************************************************************
-
-/*
-bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
-  static bool show_all_kode_errors=false;
-  int buttonsizex = config_menu.config_radio_main_window_icon_sizex;
-  int buttonsizey = config_menu.config_radio_main_window_icon_sizey;
-  int xof=config_menu.config_radio_main_windowx;
-  int yof=orgwinsizey-(buttonsizey);
-  // yof=config_menu.config_radio_main_window_sizey-(buttonsizey);
-  int boffset=154;
-  int bonline=8;                        // numbers of icons pr line
-  int i=0;
-  int sofset=0;
-  int lradiooversigt_antal=(bonline*5);
-  
-  int xx=(float) (config_menu.config_radio_main_window_sizex/config_menu.config_radio_main_window_icon_sizex)-1;
-  int yy=(float) (config_menu.config_radio_main_window_sizey/config_menu.config_radio_main_window_icon_sizey)-1;
-  lradiooversigt_antal = xx*yy;        // 
-
-  int buttonzoom;
-  char tmpfilename[200];
-  char gfxfilename[200];
-  char temptxt[200];
-  char *lastslash;
-  bool radio_pictureloaded=true;
-  const char *radiostation_iconsgfx="/opt/mythtv-controller/images/radiostations/";
-  char *base,*right_margin;
-  int length,width;
-  int pline=0;
-  sofset=(_mangley/40)*8;
-  GLuint texture;
-  if (screen_size==2) {
-    bonline=6;
-  }
-  if (screen_size==4) {
-    bonline=7;
-    buttonsizex=160;
-    buttonsizey=140;
-  }
-  // er gfx loaded
-  // if no load 1 at eatch run
-  // loader
-  if ((radio_oversigt_loaded==false) && (radio_oversigt_loaded_nr<radiooversigt.radioantal())) {
-    radio_oversigt_loaded_begin=true;
-    radio_pictureloaded=false;
-    strcpy(tmpfilename,radiostation_iconsgfx);      		                                    // hent path
-    strcpy(gfxfilename,radiooversigt.get_station_gfxfile(radio_oversigt_loaded_nr));        // hent radio icon gfx filename
-    strcat(tmpfilename,gfxfilename);        						// add filename to path
-    if ((strcmp(gfxfilename,"")!=0) && (file_exists(tmpfilename))) {			// den har et navn samt gfx filen findes.
-      texture=loadTexture ((char *) tmpfilename);						// load texture
-      set_texture(radio_oversigt_loaded_nr,texture);					// save it in radio station struct to show
-    } else if (strcmp(gfxfilename,"")==0) {
-      // check hvis ikke noget navn om der findes en fil med radio station navnet *.png/jpg
-      // hvis der gør load denne fil.
-      strcpy(tmpfilename,radiostation_iconsgfx);
-      strcat(tmpfilename,radiooversigt.get_station_name(radio_oversigt_loaded_nr));
-      strcat(tmpfilename,".png");
-      if (file_exists(tmpfilename)) {
-        texture=loadTexture ((char *) tmpfilename);                      						           // load texture
-        set_texture(radio_oversigt_loaded_nr,texture);                  				       		            // save it in radio station struct
-        strncpy(stack[radio_oversigt_loaded_nr].gfxfilename,get_station_name(radio_oversigt_loaded_nr),stationamelength-1);      // update station gfxfilename to station name
-        strcat(stack[radio_oversigt_loaded_nr].gfxfilename,".png");
-        opdatere_radiostation_gfx(stack[radio_oversigt_loaded_nr].intnr,stack[radio_oversigt_loaded_nr].gfxfilename);           // and update db filename
-      } else {
-        strcpy(tmpfilename,radiostation_iconsgfx);
-        strcat(tmpfilename,radiooversigt.get_station_name(radio_oversigt_loaded_nr));
-        strcat(tmpfilename,".jpg");
-        if (file_exists(tmpfilename)) {
-          texture=loadTexture ((char *) tmpfilename);                                 // load texture
-          set_texture(radio_oversigt_loaded_nr,texture);     		                                // save it in radio station struct
-          strncpy(stack[radio_oversigt_loaded_nr].gfxfilename,get_station_name(radio_oversigt_loaded_nr),stationamelength-1);      // update station gfxfilename to station name
-          strcat(stack[radio_oversigt_loaded_nr].gfxfilename,".png");
-          opdatere_radiostation_gfx(stack[radio_oversigt_loaded_nr].intnr,stack[radio_oversigt_loaded_nr].gfxfilename);           // and update db filename
-        }
-      }
-    }
-    if (radio_oversigt_loaded_nr>=radiooversigt.radioantal()-1) {
-      radio_oversigt_loaded=true;
-      radio_oversigt_loaded_done=true;
-    } else radio_oversigt_loaded_nr++;
-  } 
-  glPushMatrix();
-  while((i<lradiooversigt_antal) && ((int) i+(int) sofset<(int) antal)) {
-    if (((i % bonline)==0) && (i>0)) {
-      xof=config_menu.config_radio_main_windowx;	// reset xof
-      yof=yof-(config_menu.config_radio_main_window_icon_sizey+20); // old buttonsizey
-    }
-    if (i+1==(int) radio_key_selected) {
-      buttonsizex=config_menu.config_radio_main_window_icon_sizex;
-      buttonsizey=config_menu.config_radio_main_window_icon_sizey;
-    } else {
-      buttonsizex=config_menu.config_radio_main_window_icon_sizex-5;
-      buttonsizey=config_menu.config_radio_main_window_icon_sizey-5;
-    }
-    if (stack[i+sofset].textureId) {
-      // radio default icon
-      glPushMatrix();
-      // is the radio station online
-      // if NOT show faded colors
-      if (stack[i+sofset].online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL); 
-      if ((i+1==(int) radio_key_selected)) {
-        glBindTexture(GL_TEXTURE_2D,onlineradio_selected);
-      } else {
-        glBindTexture(GL_TEXTURE_2D,onlineradio_empty);
-      }
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex, yof+buttonsizey , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex,yof , 0.0);
-      glEnd();
-      glPopMatrix();
-      glPushMatrix();
-      // is the radio station online
-      // if NOT show faded colors
-      if (stack[i+sofset].online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
-      // indside draw radio station icon
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glBlendEquation(GL_FUNC_ADD);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,stack[i+sofset].textureId);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(100+i+sofset);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-      glEnd();
-      glPopMatrix();
-    } else {
-      // default icon
-      glPushMatrix();
-      if (stack[i+sofset].online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      if ((i+1==(int) radio_key_selected)) {
-        glBindTexture(GL_TEXTURE_2D,onlineradio_selected);
-      } else {
-        glBindTexture(GL_TEXTURE_2D,onlineradio);
-      }
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(100+i+sofset);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex, yof+buttonsizey , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex,yof , 0.0);
-      glEnd();
-      glPopMatrix();
-    }
-    // draw radio station contry flags
-    if (stack[i+sofset].land>0) {
-      // gfxlandemask mask
-      if (gfxlande[stack[i+sofset].land]) {
-        glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset].land]);       //
-
-        //glBindTexture(GL_TEXTURE_2D,gfxlande[i+sofset]);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(10+ xof, yof+10 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(10+ xof,yof+30+10, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(10+ xof+40, yof+30+10 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(10+ xof+40,yof +10, 0.0);
-        glEnd();
-      } else {
-        //if (debugmode & 1024) printf("Contry kode %d missing flag, File name %s\n",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
-        // write debug log
-        sprintf(debuglogdata,"Contry code %d missing flag, File name %d",stack[i+sofset].land,gfxlande[stack[i+sofset].land]);
-        if (gfxlande[stack[i+sofset].land]==0) {
-          if (show_all_kode_errors==false) write_logfile(logfile,(char *) debuglogdata);
-        } else if (show_all_kode_errors==false) write_logfile(logfile,(char *) debuglogdata);
-      }
-    }
-    // print radios station name
-    // strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
-    std::string temptxt1;
-    temptxt1 = fmt::format("{:^24}",stack[i+sofset].station_name);
-    temptxt1.resize(24);
-    drawText(temptxt1.c_str(), xof+2, yof-18, 0.4f,1);
-    xof=xof+buttonsizex+6;
-    i++;
-  }
-  radio_oversigt_antal=radiooversigt.radioantal();
-  if (i==0) {
-    // show error message
-    glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_ONE, GL_ONE);
-    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    glBindTexture(GL_TEXTURE_2D,_textureIdloading);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
-    glEnd();
-    drawText("Error no radio stations load", (orgwinsizex/3)+30, 275.0f, 0.4f,15);
-    write_logfile(logfile,(char *) "Error no radio stations load.");
-  }
-  glPopMatrix();
-  show_all_kode_errors=true;                                                  // stop loging.
-  return(radio_pictureloaded);
-}
-
-
-*/
-
-
-
-
-
-// All new ********************************************************************************************************************************************
-//
-//
-
 
 // ****************************************************************************************
 //
@@ -993,17 +763,17 @@ void drawRect(int x, int y, int w, int h, Color2 c) {
 //
 // ****************************************************************************************
 
-void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c) {
+void radiostation_class::drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c) {
   glEnable(GL_TEXTURE_2D);
   glColor4f(c.r, c.g, c.b, c.a);
   // draw actual cover
   glBindTexture(GL_TEXTURE_2D, textureId);
   glLoadName(id);
   glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex2i(x + 10,          y + 10);
-  glTexCoord2f(1, 0); glVertex2i(x + 10 + w - 20, y + 10);
-  glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
-  glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
+  glTexCoord2f(0, 0); glVertex2i(x + 5,          y + 5);
+  glTexCoord2f(1, 0); glVertex2i(x + 5 + w - 10, y + 5);
+  glTexCoord2f(1, 1); glVertex2i(x + 5 + w - 10 ,y + h - 5);
+  glTexCoord2f(0, 1); glVertex2i(x + 5,          y + h - 5);
   glEnd();
   // icon  
   glBindTexture(GL_TEXTURE_2D, textureId2);
@@ -1014,7 +784,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2
   glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
   glTexCoord2f(0, 1); glVertex2i(x,     y + h);
   glEnd();
-
+  // playing flag
   if (id-100==radiooversigt.playingstationnr) {
     glBindTexture(GL_TEXTURE_2D, playing_record_icon_texture);
     glBegin(GL_QUADS);
@@ -1113,7 +883,6 @@ void radiostation_class::draw_radio_search_item(int x, int y,int ii,GLuint norma
   // Titel
   // temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
   temprgtxt = stack[ii].station_name;
-  // temprgtxt.resize(20);
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
   if (stack[ii].textureId ) {
     if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
@@ -1164,10 +933,9 @@ float radio_getTextWidth(const std::string& text, float scale) {
 
 // ****************************************************************************************
 //
-// show radio stations overview new version 2
+// show radio stations overview
 //
 // ****************************************************************************************
-
 
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
   static bool cursor;

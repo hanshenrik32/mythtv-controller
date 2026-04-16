@@ -72,6 +72,8 @@ extern mFont font24;  // 24px font
 
 extern GLuint playing_tidal_icon_texture;
 
+extern GLuint onlineradio_empty;
+
 extern int do_show_tidal_search_oversigt;
 
 extern Character characters[];
@@ -5656,7 +5658,6 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
 // new code ************************************************************************************************************************
 
 
-
 // ****************************************************************************************
 //
 // Draw cover with new icon overlay
@@ -5664,19 +5665,29 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
 // ****************************************************************************************
 
 
-void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color4 c) {
-  std::string temptxt;
+void tidal_class::drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id,Color4 c,int stream_key_selected) {
   glEnable(GL_TEXTURE_2D);
   glColor4f(c.r, c.g, c.b, c.a);
+  if ((id-100)!=stream_key_selected-1) {
+    // box  
+    glBindTexture(GL_TEXTURE_2D, textureId2);
+    glLoadName(id);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex2i(x,     y);
+    glTexCoord2f(1, 0); glVertex2i(x + w, y);
+    glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
+    glTexCoord2f(0, 1); glVertex2i(x,     y + h);
+    glEnd();
+  }
+  // cover
   glBindTexture(GL_TEXTURE_2D, textureId);
   glLoadName(id);
   glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex2i(x,     y);
-  glTexCoord2f(1, 0); glVertex2i(x + w, y);
-  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
-  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
+  glTexCoord2f(0, 0); glVertex2i(x + 5,          y + 5);
+  glTexCoord2f(1, 0); glVertex2i(x + 5 + w - 10, y + 5);
+  glTexCoord2f(1, 1); glVertex2i(x + 5 + w - 10 ,y + h - 5);
+  glTexCoord2f(0, 1); glVertex2i(x + 5,          y + h - 5);
   glEnd();
-
   if ((id-100)==tidal_oversigt.tidal_playingnr) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -5700,6 +5711,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color4 c) {
 
 void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   // Baggrund
+  static float sinh=0.0;
   std::string temprgtxt;
   std::string gfxfilename;
   GLuint texture;
@@ -5711,7 +5723,6 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
   // float fontsize=float (configdefaulttidalfontsize/120)*2;
   // test
   float fontsize=1.0f;
-
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (stack[ii].textureId == 0) {
@@ -5723,16 +5734,19 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
   // Titel
   temprgtxt = fmt::format("{:^20}",stack[ii].feed_showtxt);
   // temprgtxt.resize(20);
-  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = normal_icon;
+  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = onlineradio_empty;
   if (ii == stream_key_selected-1) {
-    drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+    drawcover(x + 18, y + 18, 164  + sin(sinh)*4, 164  + sin(sinh)*4, texture , onlineradio_empty,ii+100,highcolor,stream_key_selected);
     drawLinesOfText(temprgtxt, x + 18, y + 4, fontsize, 22, 2, 2, true);
+    // if room shpw artist name
     if (stack[ii].feed_showtxt.length()<21) {
       temprgtxt = fmt::format("{:^20}",stack[ii].feed_artist);                           // feed_artist);
       drawLinesOfText(temprgtxt, x + 18, y - 8, fontsize, 22, 2, 2, true);
     }
+    sinh = sinh + 0.08f;
+    if (sinh>(M_PI*2)) sinh=0.0f;
   } else {
-    drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);    
+    drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty,ii+100,normalcolor,stream_key_selected);
     drawLinesOfText(temprgtxt, x + 18, y + 4, fontsize, 22, 2, 15, true);
     if (stack[ii].feed_showtxt.length()<21) {
       temprgtxt = fmt::format("{:^20}",stack[ii].feed_artist);                           // feed_artist);
@@ -5776,7 +5790,7 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
   if (stack_search[ii].textureId ) texture = stack_search[ii].textureId; else texture = normal_icon;
   if (ii == stream_key_selected-1) {
     if (y<search_startY-30) {
-      drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+      drawcover(x + 18, y + 18, 164, 164, texture , onlineradio_empty,ii+100,highcolor,stream_key_selected);
       // drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
       drawLinesOfText(temprgtxt, x + 18, y + 2, fontsize, 22, 2, 2, true);
       if (stack_search[ii].feed_showtxt.length()<21) {
@@ -5786,7 +5800,7 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
     }
   } else {
     if (y<search_startY-30) {
-      drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
+      drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty,ii+100,normalcolor,stream_key_selected);
       // drawText(temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
       drawLinesOfText(temprgtxt, x + 18, y + 2, fontsize, 22, 2, 15, true);
       if (stack_search[ii].feed_showtxt.length()<21) {

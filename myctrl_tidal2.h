@@ -129,7 +129,7 @@ class tidal_class {
 
     int tidal_get_artists_all_albums(char *artistid,bool force);    
     int update_song_playcount(const char *playpath);
-    
+    void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id,Color4 c,int stream_key_selected);
   public:
     int tidal_playingnr=-1;                            // make it private later
     int selected_icon_in_view=1;

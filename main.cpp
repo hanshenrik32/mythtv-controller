@@ -1389,11 +1389,11 @@ int parse_config(char *filename) {
                   urtype=SAVER3D;
               } else if (strncmp(configaktivescreensavername,"PICTURE3D",9)==0) {
                   urtype=PICTURE3D;
-              } else if (strncmp(configaktivescreensavername,"MUSICMETER2",10)==0) {
+              } else if (strncmp(configaktivescreensavername,"MUSICMETER2",11)==0) {
                   urtype=MUSICMETER2;
-              } else if (strncmp(configaktivescreensavername,"MUSICMETER",9)==0) {
+              } else if (strncmp(configaktivescreensavername,"MUSICMETER",10)==0) {
                   urtype=MUSICMETER;
-              } else if (strncmp(configaktivescreensavername,"UV-METER",7)==0) {
+              } else if (strncmp(configaktivescreensavername,"UV-METER",8)==0) {
                   urtype=UV_METER;
               }else urtype=ANALOG;
             }
@@ -2951,6 +2951,7 @@ void display() {
       case ANALOG:          
       case MUSICMETER:
           // create one display list
+          // No music is playing show clock
           if ((streamoversigt.stream_is_playing==false) && (radiooversigt.playing==false) && (tidal_oversigt.get_tidal_playing_flag()== false) && (musicoversigt.play()==false) && (film_oversigt.film_is_playing==false)) {
             if (firsttime) {
               index = glGenLists(1);
@@ -3204,13 +3205,13 @@ void display() {
           _angle++;
           glPushMatrix();
           start = clock();
-          drawPlasma(1920, 1080);   // your window size
+          // drawPlasma(1920, 1080);   // your window size
           // mybox.show_music_3d(_angle,screensaverbox,screensaverbox,screensaverbox1);
           if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
           glPopMatrix();
           break;
       case UV_METER:
-          drawPlasma(1920, 1080);   // your window size
+          // drawPlasma(1920, 1080);   // your window size
           if (snd) render_uv();
           break;
       case SAVER3D2:
@@ -3234,6 +3235,12 @@ void display() {
           glPushMatrix();
           if (psaver) psaver->show_pictures();
           glPopMatrix();
+          break;
+      case PLASMA:
+          // plasma screen saver
+          start = clock();
+          drawPlasma(1920, 1080);   // your window size
+          if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
           break;
     }
     glPopMatrix();
@@ -4393,7 +4400,7 @@ void display() {
   // tidal ask play or open playlist
   //
   #ifdef ENABLE_TIDAL
-  if ((vis_tidal_oversigt) && (!(visur)) && (ask_open_dir_or_play_tidal) && (tidalknapnr>0)) {
+  if ((vis_tidal_oversigt) && (!(visur)) && (do_zoom_tidal_cover==false) && (ask_open_dir_or_play_tidal) && (tidalknapnr>0)) {
     xof = 550;
     yof = 500;
     buttonsize = 200;
@@ -5248,7 +5255,7 @@ void display() {
       // backward button
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
-      glBindTexture(GL_TEXTURE_2D,_texturemlast);
+      glBindTexture(GL_TEXTURE_2D,_texturemnext);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(10);                        // 10 = forward(10)
@@ -5262,7 +5269,7 @@ void display() {
       // forward button
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
-      glBindTexture(GL_TEXTURE_2D,_texturemnext);
+      glBindTexture(GL_TEXTURE_2D,_texturemlast);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(11);                        // 10 = forward(10)
@@ -5275,11 +5282,7 @@ void display() {
       // show stream name
       sprintf(temptxt,"Name: %-20s",stream_playing_name);
 
-
-      // drawText(font12,temptxt,(orgwinsizex/4)+20,(orgwinsizey/2)+96, 1.0f,1);
-
       drawText(font12,temptxt,config_menu.config_mediaplayer_infox + 40.0f,config_menu.config_mediaplayer_infoy + 350.0f, 1.0f,1);
-      
 
       // play position
       if (streamoversigt.stream_is_playing) playtime=streamoversigt.getstream_pos()*1000;
@@ -6538,31 +6541,30 @@ void display() {
       stream_playing_icon=streamoversigt.get_texture(stream_playnr-1);
     }
     if (strcmp("internal",configdefaultplayer)!=0) {
-      fprintf(stderr,"Start stream nr %d Player is firefox \n",sknapnr);
-
+      fprintf(stderr,"Start stream nr %d Player is firefox if needed.\n",sknapnr);
       if (channel) result = channel->stop();
-      result = sndsystem->createSound(streamoversigt.get_stream_url(sknapnr), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
-      result = sndsystem->playSound(sound,NULL, false, &channel);
-
-      
-      /*
-      //
-      // if use firefox to play stream
-      //
-      strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
-      strcat(systemcommand,"'");
-      if (sknapnr>0) {
-        if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash:",10)==0) {
-          strcat(systemcommand,"http://");
-          strcat(systemcommand,streamoversigt.get_stream_url(sknapnr)+10);
-        } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
-        strcat(systemcommand,"' &");
-        if (do_system_call(systemcommand)==0) {
-          vis_error=true;
-          vis_error_timeout=60;
+      std::string surl;
+      if (streamoversigt.get_stream_url(sknapnr-1)) {
+        surl = streamoversigt.get_stream_url(sknapnr-1);
+      } else surl = "";
+      if (surl.find("youtube") != std::string::npos) {
+        strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
+        strcat(systemcommand,"'");
+        if (sknapnr>0) {
+          if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash:",10)==0) {
+            strcat(systemcommand,"http://");
+            strcat(systemcommand,streamoversigt.get_stream_url(sknapnr)+10);
+          } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
+          strcat(systemcommand,"' &");
+          if (do_system_call(systemcommand)==0) {
+            vis_error=true;
+            vis_error_timeout=60;
+          }
         }
+      } else {
+        result = sndsystem->createSound(streamoversigt.get_stream_url(sknapnr-1), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
+        result = sndsystem->playSound(sound,NULL, false, &channel);
       }
-      */
     } else {
       // start play stream or show rss page
       // write to log file
@@ -9701,25 +9703,42 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 ask_open_dir_or_play=false;				// flag luk vindue igen
                 if (do_zoom_music_cover) do_zoom_music_cover=false;
               }
+              if (tidal_oversigt.get_tidal_playing_flag()) {
+                if (ask_open_dir_or_play_tidal) {
+                  ask_open_dir_or_play_tidal=false;				// flag luk vindue igen
+                } else {
+                  if (ask_save_playlist) ask_save_playlist=false;
+                  else do_zoom_tidal_cover=!do_zoom_tidal_cover;
+                }
+              }
+              if (radiooversigt.playing) {
+                do_zoom_radio=!do_zoom_radio;
+              }
             }
+            /*
             if ((vis_film_oversigt==false) && (radiooversigt.playing) && (state==GLUT_UP)) {
-              do_zoom_radio=!do_zoom_radio;
+              if (do_zoom_radio) do_zoom_radio=false;
             }
+            */
             if ((vis_film_oversigt==false) && (spotify_oversigt.do_we_play()) && (state==GLUT_UP)) {
-              do_zoom_spotify_cover=!do_zoom_spotify_cover;              
+              if (do_zoom_spotify_cover) do_zoom_spotify_cover=false;
             }
             if (vis_tidal_oversigt) {
-              ask_open_dir_or_play_tidal=!ask_open_dir_or_play_tidal;
-              do_zoom_tidal_cover=!do_zoom_tidal_cover;
-              tidalknapnr=0;
-            }
-            if (vis_music_oversigt) {
-              do_zoom_music_cover=!do_zoom_music_cover;
-              mknapnr=0;
+              if (ask_open_dir_or_play_tidal) {
+                ask_open_dir_or_play_spotify=false;
+                do_zoom_spotify_cover=false;
+              } else {
+                if (ask_save_playlist) ask_save_playlist=false;
+                else do_zoom_tidal_cover=!do_zoom_tidal_cover;
+              }
+              // ask_open_dir_or_play_tidal=!ask_open_dir_or_play_tidal;
+              // do_zoom_tidal_cover=!do_zoom_tidal_cover;
+              // do_zoom_tidal=!do_zoom_tidal;
+              // tidalknapnr=0;
             }
             if (vis_spotify_oversigt) {
               do_zoom_spotify_cover=!do_zoom_spotify_cover;
-              spotifyknapnr=0;
+              // spotifyknapnr=0;
               // close ask play window again no selected icon right click
               /*
               if ((ask_open_dir_or_play_spotify) && (state==GLUT_UP)) {
@@ -9734,7 +9753,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
             if (vis_radio_oversigt) {
               do_zoom_radio=!do_zoom_radio;
-              rknapnr=0;
+              // rknapnr=0;
             }
 
             /*
@@ -12385,7 +12404,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                   keybufferindex=strlen(keybuffer);
         }
       }
-
 
       if ((do_show_setup_tidal) && (tidal_oversigt.do_setup_tidal_start_entry)) {
         if (do_show_editor_select_linie<tidal_oversigt.tidal_start_playlist_array.size()) {

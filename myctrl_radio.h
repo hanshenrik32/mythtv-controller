@@ -60,7 +60,8 @@ class radiostation_class {
     bool startup_loaded;			                                         	    // load radio statios list
     bool check_radio_online_bool();                                                 // check and set radio station online flag (DO NOT WORK)
     bool hentradioart=false;
-  public:
+    void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c);
+    public:
     int playingstationnr=-1;		                                                // nr in stack of playing radio station
     bool search_radio_online_done;
     bool search_loaded;
