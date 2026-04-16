@@ -1,7 +1,7 @@
 C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wno-format-truncation -pthread -m64  -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2
+CFLAGS = -Wformat-truncation -pthread -O0 -ggdb -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2
 LDFLAGS= 
 
 PROG       = mythtv-controller
@@ -13,9 +13,9 @@ DESTIMG    = /opt/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi20307linux
+FMODFILE   = fmodstudioapi20307linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
-FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
+FREETYPELIB= /usr/lib/aarch64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
 
 BUILD_NUMBER_FILE=build-number.txt
@@ -25,46 +25,38 @@ BUILD_NUMBER_FILE=build-number.txt
 
 LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 
-LIBICAL := $(shell find /usr/lib/ -name 'libical.so')
-
-
-ifeq ($(LBITS),64)
-	LIBFMT := $(shell find /usr/lib/x86_64-linux-gnu/ -name 'libfmt.so')
-else 
-	LIBFMT := $(shell find /usr/lib/i386-linux-gnu/ -name 'libfmt.so')
-endif
-
+LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86_64/ -name 'libfmod.so')
-	CFLAGS = -pthread -m64
-	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
+        LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/arm64/ -name 'libfmod.so')
+        CFLAGS = -pthread 
+        FREETYPELIB = /usr/lib/aarch64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86/ -name 'libfmod.so')
-    CFLAGS = -pthread -m32
-	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
+        LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/arm64/ -name 'libfmod.so')
+        CFLAGS = -pthread 
+        FREETYPELIB = /usr/lib/aarch64-linux-gnu/libfreetype.so
 endif
 
 
 ifeq ($(LBITS),64)
-	STDCLIB = /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
-	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
+        STDCLIB = /usr/lib/aarch64-linux-gnu/libstdc++.so.6
+        LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
+        LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 else
-	STDCLIB = /usr/lib/i386-linux-gnu/libstdc++.so.6
-	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
-	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
+        STDCLIB = /usr/lib/aarch32-linux-gnu/libstdc++.so.6
+        LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
+        LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
 
-OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2 -I/usr/include/freetype2 -lmediainfo -lfmt -ltorrent-rasterbar 
 
+OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2 -I/usr/include/freetype2 -lmediainfo -lfmt -ltorrent-rasterbar
 
 SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl_mplaylist.cpp myctrl_radio.cpp myth_setupsql.cpp  myctrl_recorded.cpp myctrl_movie.cpp myctrl_tvprg.cpp myth_setup.cpp utility.cpp readjpg.cpp loadpng.cpp myth_saver.cpp myth_picture.cpp myth_ttffont.cpp checknet.cpp dds_loader.cpp myctrl_xbmc.cpp myctrl_torrent.cpp myth_vlcplayer.cpp myctrl_spotify.cpp myctrl_tidal2.cpp myctrl_glprint.cpp myctrl_tmdb.cpp  mongoose-master/mongoose.c json-parser/json.c 
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL  `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl -lfreetype -ljsoncpp `pkg-config --cflags --libs gtk+-3.0` 
+	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl -lfreetype -ljsoncpp  `pkg-config --cflags --libs gtk+-3.0`
 endif
 
 all:
@@ -79,8 +71,7 @@ all:
 
 
 compile: $(PROG)
-	@if [ -f build-number.txt ]; then touch build-number.txt; fi
-	# @if test -e build-number.txt; then touch build-number.txt; fi
+	@if ! test -f build-number.txt; then touch build-number.txt; fi
 	#tar -zxvf json-parser.tar.gz
 	cd json-parser \
 	./configure \
@@ -90,9 +81,9 @@ compile: $(PROG)
 		cp lirc/* ~/.config/lirc/; \
 		mkdir -p ~/.xmltv/; \
 	fi
-	cd ..
 	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
+
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
 
@@ -118,15 +109,15 @@ installsound:
 	@echo "Install fmod sound system ver 4.44.41"
 	#@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	mkdir -p $(DESTDIR)
-	cp -r $(FMODFILE) $(DESTDIR)
+	cp $(FMODFILE) $(DESTDIR)
 	cd $(DESTDIR)
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
+	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
 	#remove old link
 	if test -e /usr/lib/libfmod.so.12; then rm /usr/lib/libfmod.so.12; fi
-	if test -e /usr/lib/libfmod.so.13; then rm /usr/lib/libfmod.so.13; fi
-	ln -s /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86_64/libfmod.so /usr/lib/libfmod.so.14
-	@echo "Done installing fmod32/64 bit version 4.44.41"
+	ln -s /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/arm64/libfmod.so /usr/lib/libfmod.so.14
+	@echo "Done installing arm64 fmod32/64 bit version 4.44.41"
 	@echo "Sound system installed."
 
 
@@ -137,12 +128,12 @@ installtidal-dl:
 
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
-	@mkdir -p /opt/mythtv-controller/images/radiostations
+	@mkdir -p /opt/mythtv-controller/images/radiostations	
 	@mkdir -p /opt/mythtv-controller/convert/hires
-	@mkdir -p /opt/mythtv-controller/images/mythnetvision
+	@mkdir -p /opt/mythtv-controller/images/mythnetvision	
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
-	@cp -r -p images tema1 tema1.json tema2 tema2.json tema3 tema3.json tema4 tema4.json tema5 tema5.json tema6 tema6.json tema7 tema7.json tema8 tema8.json tema9 tema9.json tema10 tema10.json $(DESTDIR)
+	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
 	#@cp -r xmltv_config $(DESTDIR)	
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
@@ -175,6 +166,5 @@ install:
 	#    mysql -uroot -p${rootpasswd} -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
 	#    mysql -uroot -p${rootpasswd} -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
 	#    mysql -uroot -p${rootpasswd} -e "FLUSH PRIVILEGES;"
-	#    "GRANT ALL PRIVILEGES ON mythtvcontroller.* to 'mythtv'@'%' WITH GRANT OPTION;"
 	#fi
 
