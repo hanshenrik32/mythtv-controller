@@ -423,7 +423,7 @@ bool do_show_rss = false;                                 // show rss config
 bool use3deffect = false;                                 // use 3d scroll effect default no
 bool do_zoom_music_cover = false;                         // show music conver
 bool do_zoom_tidal = false;                               //
-bool do_zoom_radio = false;                               //
+bool do_zoom_radio_cover = false;                               //
 bool do_zoom_spotify_cover = false;                       // show spotify cover
 bool do_zoom_tidal_cover = false;                         // show tidal play cover
 bool do_zoom_stream = false;                              //
@@ -1037,7 +1037,7 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr) {
     vis_error = true;			// set vis error flag
     vis_error_songnr=songnr;		// gem fil navn som ikke kan spilles
     vis_error_timeout=ERROR_TIMEOUT;
-    do_zoom_radio = false;		// close play info
+    do_zoom_radio_cover = false;		// close play info
     if ((result!=23) && (result!=37) && (result!=27) && (result!=20)) {
       // fprintf(stderr,"FMOD ERROR %d %s ",result,FMOD_ErrorString(result));
 //          exit(-1);
@@ -1067,7 +1067,7 @@ void ERRCHECK_SDL(char *text,unsigned int songnr) {
   vis_error=1;			// vis error
   if (strcmp(text,"music parameter was NULL")==0) vis_error_flag=36;
   vis_error = true;			            // set vis error falg
-  do_zoom_radio = false;            // close play info
+  do_zoom_radio_cover = false;            // close play info
   vis_error_songnr=songnr;          // gem fil navn som ikke kan spilles
   vis_error_timeout=ERROR_TIMEOUT;
 }
@@ -4741,7 +4741,7 @@ void display() {
             radiooversigt.set_radio_aktiv(rknapnr-1,false);			  //
           }
           if (result==FMOD_OK) {
-            do_zoom_radio=true;
+            do_zoom_radio_cover=true;
           }
           radiooversigt.playingstationnr=rknapnr-1;
           #endif
@@ -4762,11 +4762,15 @@ void display() {
             radiooversigt.set_radio_online(rknapnr-1,false);	// close if down
             radiooversigt.set_radio_aktiv(rknapnr-1,false);			//
           }
-          if (sdlmusicplayer) do_zoom_radio=true;
+          if (sdlmusicplayer) do_zoom_radio_cover=true;
           #endif
         }
         radiooversigt.playing=true;			// set playing flag
         radiooversigt.playingstationnr=rknapnr-1;
+        if (do_zoom_tidal_cover) do_zoom_tidal_cover=false;
+        if (do_zoom_spotify_cover) do_zoom_spotify_cover=false;
+        if (do_zoom_music_cover) do_zoom_music_cover=false;
+        do_zoom_radio_cover=true;                                       // show we play
 
         tidal_oversigt.set_tidal_playing_flag(false);          // stop tidal playing if active
         musicoversigt.set_music_is_playing(false);              // stop music playing if active
@@ -5381,22 +5385,22 @@ void display() {
       int textofset=140;
       if (radiooversigt.playing) {
       }
-      if (do_zoom_radio) {
+      if (do_zoom_radio_cover) {
       }
       if (do_zoom_stream_cover) {
-        do_zoom_radio=false;
+        do_zoom_stream_cover=false;
       }
       if (do_zoom_tidal_cover) {
-        do_zoom_radio=false;
+        do_zoom_radio_cover=false;
       }
       if (do_zoom_spotify_cover) {
-        do_zoom_radio=false;
+        do_zoom_radio_cover=false;
       }
       if (do_zoom_music_cover) {
-        do_zoom_radio=false;
+        do_zoom_radio_cover=false;
       }
-      // printf("zoom_tidal=%s zoom_spotify=%s zoom_music=%s zoom_radio=%s  zoom_stream=%s \n",do_zoom_tidal_cover ? "true" : "false",do_zoom_spotify_cover ? "true" : "false",do_zoom_music_cover ? "true" : "false",do_zoom_radio ? "true" : "false",do_zoom_stream_cover ? "true" : "false ");
-      if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
+      // printf("zoom_tidal=%s zoom_spotify=%s zoom_music=%s zoom_radio=%s  zoom_stream=%s \n",do_zoom_tidal_cover ? "true" : "false",do_zoom_spotify_cover ? "true" : "false",do_zoom_music_cover ? "true" : "false",do_zoom_radio_cover ? "true" : "false",do_zoom_stream_cover ? "true" : "false ");
+      if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio_cover)) {
         // show player background
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         // window texture
@@ -5418,7 +5422,7 @@ void display() {
           glTexCoord2f(0, 1); glVertex3f(config_menu.config_spotifyplayer_infox    ,config_menu.config_spotifyplayer_sizy+config_menu.config_spotifyplayer_infoy, 0.0);
           glTexCoord2f(1, 1); glVertex3f(config_menu.config_spotifyplayer_infox+config_menu.config_spotifyplayer_sizx,config_menu.config_spotifyplayer_sizy+config_menu.config_spotifyplayer_infoy , 0.0);
           glTexCoord2f(1, 0); glVertex3f(config_menu.config_spotifyplayer_infox+config_menu.config_spotifyplayer_sizx,config_menu.config_spotifyplayer_infoy, 0.0);
-        } else if (do_zoom_radio) {
+        } else if (do_zoom_radio_cover) {
           glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox    ,config_menu.config_radioplayer_infoy , 0.0);
           glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox    ,config_menu.config_radioplayer_sizy+config_menu.config_radioplayer_infoy, 0.0);
           glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox+config_menu.config_radioplayer_sizx,config_menu.config_radioplayer_sizy+config_menu.config_radioplayer_infoy , 0.0);
@@ -5451,7 +5455,7 @@ void display() {
           glTexCoord2f(1, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
           glTexCoord2f(1, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx + config_menu.config_radioplayer_play_button_sizx,    config_menu.config_radioplayer_play_button_posy, 0.0);
           glEnd();
-        } else if (do_zoom_radio) {
+        } else if (do_zoom_radio_cover) {
           glBegin(GL_QUADS);        
           glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_posy, 0.0);
           glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_play_button_posx,  config_menu.config_radioplayer_play_button_sizy+config_menu.config_radioplayer_play_button_posy, 0.0);
@@ -5487,7 +5491,7 @@ void display() {
           glTexCoord2f(1, 1); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_stop_button_posx + config_menu.config_tidalplayer_stop_button_sizx,config_menu.config_tidalplayer_stop_button_sizy+config_menu.config_tidalplayer_stop_button_posy, 0.0);
           glTexCoord2f(1, 0); glVertex3f(config_menu.config_tidalplayer_infox + config_menu.config_tidalplayer_stop_button_posx + config_menu.config_tidalplayer_stop_button_sizx,    config_menu.config_tidalplayer_stop_button_posy, 0.0);
           glEnd();
-        } else if (do_zoom_radio) {
+        } else if (do_zoom_radio_cover) {
           glBegin(GL_QUADS);
           glTexCoord2f(0, 0); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx,  config_menu.config_radioplayer_stop_button_posy, 0.0);
           glTexCoord2f(0, 1); glVertex3f(config_menu.config_radioplayer_infox + config_menu.config_radioplayer_stop_button_posx,  config_menu.config_radioplayer_stop_button_sizy+config_menu.config_radioplayer_stop_button_posy, 0.0);
@@ -5752,7 +5756,7 @@ void display() {
         drawLinesOfText(temptxt, 650.0f, 490.0f, 1.0f, 21, 3, 1, false);
       }     
       // radio player info
-      if ((radiooversigt.playing) && (do_zoom_radio)) {
+      if ((radiooversigt.playing) && (do_zoom_radio_cover)) {
         GLuint textureId_2=radiooversigt.get_texture_r(aktiv_radio_station);
         if (textureId_2) {
           // radio icon big size
@@ -6167,7 +6171,7 @@ void display() {
       do_zoom_tidal_cover = false;
       do_zoom_film_cover = false;
       do_zoom_music_cover = false;
-      do_zoom_radio = false;
+      do_zoom_radio_cover = false;
       do_zoom_stream_cover = false;
       // reset color to nomal after uv
       glColor4f(1.0,1.0,1.0,1.0);
@@ -8321,11 +8325,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 } else if (tidal_oversigt.type==1) {
                   ask_open_dir_or_play_tidal=true;
                 }
-                if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio)) {
+                if ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio_cover)) {
                   do_zoom_tidal_cover = false;
                   do_zoom_spotify_cover=false;
                   do_zoom_music_cover=false;
-                  do_zoom_radio=false;
+                  do_zoom_radio_cover=false;
                 }
               }
               // works ok
@@ -8737,7 +8741,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // show close radio info (27 need to move) 27 now is global exit
           if (names[i*4+3]==CLOSE) {
             if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
-            do_zoom_radio =! do_zoom_radio;
+            do_zoom_radio_cover =! do_zoom_radio_cover;
             fundet = true;
           }
         }
@@ -9627,7 +9631,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 do_swing_movie_cover = 1;
                 do_zoom_tidal_cover=false;
                 do_zoom_music_cover=false;
-                do_zoom_radio=false;
+                do_zoom_radio_cover=false;
               }
               // ved vis tv oversigt
               if ((vis_tv_oversigt) && (retfunc==0)) {
@@ -9665,7 +9669,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               do_zoom_spotify_cover=false;
               do_zoom_tidal_cover=false;
               do_zoom_music_cover=false;
-              do_zoom_radio=false;
+              do_zoom_radio_cover=false;
               do_zoom_stream_cover=false;
             }
             // close ask tv again
@@ -9712,12 +9716,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 }
               }
               if (radiooversigt.playing) {
-                do_zoom_radio=!do_zoom_radio;
+                do_zoom_radio_cover=!do_zoom_radio_cover;
               }
             }
             /*
             if ((vis_film_oversigt==false) && (radiooversigt.playing) && (state==GLUT_UP)) {
-              if (do_zoom_radio) do_zoom_radio=false;
+              if (do_zoom_radio_cover) do_zoom_radio_cover=false;
             }
             */
             if ((vis_film_oversigt==false) && (spotify_oversigt.do_we_play()) && (state==GLUT_UP)) {
@@ -9751,10 +9755,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               }
               */
             }
+            
+            /*
             if (vis_radio_oversigt) {
-              do_zoom_radio=!do_zoom_radio;
+              do_zoom_radio_cover=!do_zoom_radio_cover;
               // rknapnr=0;
             }
+            */
 
             /*
             if (vis_music_oversigt) {
@@ -13483,7 +13490,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               #endif
               if (vis_radio_oversigt) {
-                if (do_zoom_radio) do_zoom_radio=false;                           // show/hide music player info
+                if (do_zoom_radio_cover) do_zoom_radio_cover=false;                           // show/hide music player info
                 else {
                   // opdate radiooverview (reset view)
                   write_logfile(logfile,(char *) "Load radioo overview.");
@@ -13511,7 +13518,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_old_recorded=!vis_old_recorded;	                        	    // show old recorded programs
               } else if (vis_radio_oversigt) {
                 show_radio_options=!show_radio_options;			                    	// show radio options
-                if (do_zoom_radio) do_zoom_radio=false;
+                if (do_zoom_radio_cover) do_zoom_radio_cover=false;
               }
               break;
             case 'g':
@@ -15180,7 +15187,7 @@ printf("LIRC-DOWN  ask_open_dir_or_play = %d stream antal %d \n",ask_open_dir_or
             do_zoom_spotify_cover=!do_zoom_spotify_cover;                        // show/hide spotify info
           }
           if (vis_radio_oversigt) {
-            do_zoom_radio=!do_zoom_radio;
+            do_zoom_radio_cover=!do_zoom_radio_cover;
           }
           if (vis_stream_oversigt) {
             do_zoom_stream_cover=false;
