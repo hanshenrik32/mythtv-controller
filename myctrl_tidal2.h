@@ -127,7 +127,7 @@ class tidal_class {
     void process_value(json_value* value, int depth);
     void process_array(json_value* value, int depth);
 
-    int tidal_get_artists_all_albums(char *artistid,bool force);    
+    int tidal_get_artists_all_albums(char *artistid,bool force,bool create_db_records);
     int update_song_playcount(const char *playpath);
     void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id,Color4 c,int stream_key_selected);
   public:
@@ -265,7 +265,7 @@ class tidal_class {
     int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr].type); else return(0); }
     // GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
     const char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr].feed_gfx_url.c_str()); else return(0); }
-    const char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr].feed_showtxt.c_str()); else return(0); }
+    const char *get_tidal_feed_showtxt(int nr) { if ( nr < stack.size()) return(stack[nr].feed_showtxt.c_str()); else return(0); }
     const char *get_tidal_feed_artistname(int nr) { if ( nr < antal ) return(stack[nr].feed_artist.c_str()); else return(0); }
 
     int get_tidal_feed_nr_of_songs(int nr) { if ( nr < antal ) return(stack[nr].numberOfTracks); else return(-1); }
@@ -296,7 +296,7 @@ class tidal_class {
     int get_users_playlist_plus_favorite(bool cleandb);
     void set_tidal_playing_flag(bool flag);    
     bool get_tidal_playing_flag();
-    int get_artist_from_file(char *filename, bool update_start_playlist);                                                       // load artis playlists in db
+    int get_artist_from_file(char *filename, bool update_start_playlist,bool updatedb);                                                       // load artis playlists in db
     int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
     int tidal_play_now_search_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
     int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
