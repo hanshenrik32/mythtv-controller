@@ -17,9 +17,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <curl/curl.h>
-#include <string>
 #include <fmt/format.h>
-
+#include <math.h>
 
 
 // json parser
@@ -5155,6 +5154,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color5 c) {
 
 void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   // Baggrund
+  static float sinh=0.0;
   std::string temprgtxt;
   std::string gfxfilename;
   GLuint texture;
@@ -5176,8 +5176,10 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
   temprgtxt.resize(20);
   if (stack[ii]->textureId ) texture = stack[ii]->textureId; else texture = normal_icon;
   if (ii == stream_key_selected-1) {
-    drawcover(x + 18, y + 18, 164, 164, texture ,ii+100,highcolor);
+    drawcover(x + 18, y + 18, 164.0f + sin(sinh)*4, 164.0f + sin(sinh)*4, texture ,ii+100,highcolor);
     drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+    sinh = sinh + 0.08f;
+    if (sinh>(M_PI*2)) sinh=0.0f;
   } else {
     drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
     drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
@@ -5597,7 +5599,7 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[5].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[5].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glLoadName(16);                                                             // update button name
+      glLoadName(16);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
       glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
