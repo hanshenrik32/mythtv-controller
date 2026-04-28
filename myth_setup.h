@@ -22,7 +22,7 @@ struct tv_graber_config {
 
 
 struct configkeytype {
-    std::string cmdname="";
+    char cmdname[8192]="";
     unsigned int scrnr=0;
 };
 

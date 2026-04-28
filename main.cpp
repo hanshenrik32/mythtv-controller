@@ -1609,12 +1609,10 @@ int save_config(char * filename) {
     fputs(temp,file);
     fclose(file);
   } else error = true;
-  file = fopen("mythtv-controller.keys", "w");
-  if (file) {
-    for(int i=0;i<12;i++) {
-      fwrite(&configkeyslayout[i],sizeof(configkeytype),1,file);
-    }
-    fclose(file);
+  std::ofstream keyfile("mythtv-controller.keys", std::ios::binary);
+  if (keyfile) {
+    keyfile.write(reinterpret_cast<const char*>(configkeyslayout),sizeof(configkeytype)*12);
+    keyfile.close();
   }
   return(!(error));
 }
@@ -1668,15 +1666,15 @@ void load_config(char * filename) {
   configsoundvolume=1.0f;
   configuvmeter=1;                                          // default uv meter type 1
   for(int t=0;t<12;t++) {
-    configkeyslayout[t].cmdname="";
+    strcpy(configkeyslayout[t].cmdname,"");
     configkeyslayout[t].scrnr=0;
   }
   // set default keys
-  configkeyslayout[0].cmdname="spotify";
+  strcpy(configkeyslayout[0].cmdname,"spotify");
   configkeyslayout[0].scrnr=0;
-  configkeyslayout[1].cmdname="kodi";
+  strcpy(configkeyslayout[1].cmdname,"kodi");
   configkeyslayout[1].scrnr=1;
-  configkeyslayout[2].cmdname="tidal";
+  strcpy(configkeyslayout[2].cmdname,"tidal");
   configkeyslayout[2].scrnr=1;
   // load/parse config file in to globals ver
   if (!(parse_config(filename))) {
@@ -1890,16 +1888,14 @@ void load_config(char * filename) {
     fprintf(stderr,"No access to mysql database... Can not read config infomations.\n\nUse setup (F1) to config mythtv sql access.\n");
   }
   // read key file setup
-  /*
-  if ((file = fopen("mythtv-controller.keys", "r"))) {
-    if (!(feof(file))) {
-      for(int i=0;i<12;i++) {
-        fread(&configkeyslayout[i],sizeof(configkeytype),1,file);
-      }
-      fclose(file);
-    }
+  std::ifstream keyfile("mythtv-controller.keys", std::ios::binary);
+  if (keyfile) {
+    keyfile.read(reinterpret_cast<char *>(configkeyslayout),sizeof(configkeytype)*12);
+    keyfile.close();
+  } else {
+    fprintf(stderr,"No key file found. Use setup (F1) to config keys.\n");
+    write_logfile(logfile,"No key file found. Use setup (F1) to config keys.");
   }
-  */
   #ifdef ENABLE_SPOTIFY
   // get/set default play device on spotify
   if (strcmp(spotify_oversigt.active_default_play_device_name,"")!=0) {
@@ -2383,7 +2379,7 @@ int saveexitcommand(configkeytype command) {
   FILE *file;
   file=fopen("mythtv-controller.cmd","w");
   if (file) {
-    fputs(command.cmdname.c_str(),file);
+    fputs(command.cmdname,file);
     fputs(";",file);
     fprintf(file,"%d",command.scrnr);
     fputs("\n",file);
@@ -10550,6 +10546,7 @@ void handlespeckeypress(int key,int x,int y) {
     int rnumbersoficonline;
     int snumbersoficonline;
     int tnumbersoficonline;
+    std::string output;
     saver_irq=true;                                     // stop screen saver
     mnumbersoficonline=8;		                            // antal i music oversigt
     fnumbersoficonline=8;	                              // antal i film oversigt
@@ -10591,7 +10588,7 @@ void handlespeckeypress(int key,int x,int y) {
                 } else if (vis_music_oversigt) {
                   if (findtype==0) findtype=1;
                   else if (findtype==1) findtype=0;
-                } else if ((!(do_show_setup_keys)) && (!(vis_radio_oversigt)) && (!(vis_radio_or_music_oversigt)) && (!(vis_tidal_oversigt)) && (configkeyslayout[1].cmdname.length()==0)) {
+                } else if ((!(do_show_setup_keys)) && (!(vis_radio_oversigt)) && (!(vis_radio_or_music_oversigt)) && (!(vis_tidal_oversigt)) && (strlen(configkeyslayout[1].cmdname)==0)) {
                   // if (do_show_setup) do_save_config = true;		                   // set save config file flag
                   do_save_config = true;		                   // set save config file flag
                   do_save_setup_rss = true;                                      // save rss setup
@@ -10624,9 +10621,10 @@ void handlespeckeypress(int key,int x,int y) {
                 exit(2);
                 break;
         case 3: // F3
-                if ((configkeyslayout[3].cmdname.length() > 0) && (configkeyslayout[3].cmdname != "none")) {
-                  saveexitcommand(configkeyslayout[3]);
-                  doexitcommand();
+                if ((strlen(configkeyslayout[0].cmdname) > 0) && (strcmp(configkeyslayout[0].cmdname,"none") != 0)) {
+                  // saveexitcommand(configkeyslayout[0]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[0].cmdname, output, 2);
                 } else {
                   do_show_torrent =! do_show_torrent;
                   tidal_oversigt.do_setup_tidal_start_entry = false;
@@ -10651,100 +10649,102 @@ void handlespeckeypress(int key,int x,int y) {
                 */
                 break;
         case 4: // F4
-                if (configkeyslayout[3].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[3]);
-                  doexitcommand();
+                if (strlen(configkeyslayout[1].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[1]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[1].cmdname, output, 2);
                 } else {
                   tidal_oversigt.do_setup_tidal_start_entry = ! tidal_oversigt.do_setup_tidal_start_entry;
                   do_show_torrent = false;
                 }
                 break;
         case 5: // F5
-                if (configkeyslayout[4].cmdname == "playlistbackup") {
+                if (strcmp(configkeyslayout[5].cmdname,"playlistbackup") == 0) {
                   do_playlist_backup_playlist();
-                } else if (configkeyslayout[4].cmdname == "playlistrestore") {
+                } else if (strcmp(configkeyslayout[2].cmdname,"playlistrestore") == 0) {
                   do_playlist_restore_playlist();
-                } else if (configkeyslayout[4].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[4]);
-                  doexitcommand();
-                  //exit(100);
+                } else if (strlen(configkeyslayout[2].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[2]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[2].cmdname, output, 2);
                 }
                 break;
         case 6: // F6
-                if (configkeyslayout[5].cmdname == "playlistbackup") {
+                if (strcmp(configkeyslayout[3].cmdname,"playlistbackup") == 0) {
                   do_playlist_backup_playlist();
-                } else if (configkeyslayout[5].cmdname == "playlistrestore") {
+                } else if (strcmp(configkeyslayout[3].cmdname,"playlistrestore") == 0) {
                   do_playlist_restore_playlist();
-                } else  if (configkeyslayout[5].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[5]);
-                  doexitcommand();
-                  //exit(100);
+                } else  if (strlen(configkeyslayout[3].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[3]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[3].cmdname, output, 2);
                 }
                 break;
         case 7: // F7
-                if (configkeyslayout[6].cmdname == "playlistbackup") {
+                if (strcmp(configkeyslayout[4].cmdname,"playlistbackup") == 0) {
                   do_playlist_backup_playlist();
-                } else if (configkeyslayout[6].cmdname == "playlistrestore") {
+                } else if (strcmp(configkeyslayout[4].cmdname,"playlistrestore") == 0) {
                   do_playlist_restore_playlist();
-                } else  if (configkeyslayout[6].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[6]);
-                  doexitcommand();
-                  //exit(100);
+                } else  if (strlen(configkeyslayout[4].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[4]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[4].cmdname, output, 2);
                 }
                 break;
         case 8: // F8
-                if (configkeyslayout[7].cmdname == "playlistbackup") {
+                if (strcmp(configkeyslayout[5].cmdname,"playlistbackup") == 0) {
                   do_playlist_backup_playlist();
-                } else if (configkeyslayout[7].cmdname == "playlistrestore") {
+                } else if (strcmp(configkeyslayout[5].cmdname,"playlistrestore") == 0) {
                   do_playlist_restore_playlist();
-                } else  if (configkeyslayout[7].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[7]);
-                  doexitcommand();
-                  //exit(100);
+                } else  if (strlen(configkeyslayout[5].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[5]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[5].cmdname, output, 2);
                 }
                 break;
         case 9: // F9
-                if (configkeyslayout[8].cmdname == "playlistbackup") {
+                if (strcmp(configkeyslayout[6].cmdname,"playlistbackup") == 0) {
                   do_playlist_backup_playlist();
-                } else if (configkeyslayout[8].cmdname == "playlistrestore") {
+                } else if (strcmp(configkeyslayout[6].cmdname,"playlistrestore") == 0) {
                   do_playlist_restore_playlist();
-                } else  if (configkeyslayout[8].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[8]);
-                  doexitcommand();
-                  //exit(100);
+                } else  if (strlen(configkeyslayout[6].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[6]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[6].cmdname, output, 2);
                 }
                 break;
         case 10: // F10
-                if (configkeyslayout[9].cmdname == "playlistbackup") {
+                if (strcmp(configkeyslayout[7].cmdname,"playlistbackup") == 0) {
                   do_playlist_backup_playlist();
-                } else if (configkeyslayout[9].cmdname == "playlistrestore") {
+                } else if (strcmp(configkeyslayout[7].cmdname,"playlistrestore") == 0) {
                   do_playlist_restore_playlist();
-                } else  if (configkeyslayout[9].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[9]);
-                  doexitcommand();
-                  //exit(100);
+                } else  if (strlen(configkeyslayout[7].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[7]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[7].cmdname, output, 2);
                 }
                 break;
         case 11: // F11
-                if (configkeyslayout[10].cmdname == "playlistbackup") {
+                if (strcmp(configkeyslayout[8].cmdname,"playlistbackup") == 0) {
                   do_playlist_backup_playlist();
-                } else if (configkeyslayout[10].cmdname == "playlistrestore") {
+                } else if (strcmp(configkeyslayout[8].cmdname,"playlistrestore") == 0) {
                   do_playlist_restore_playlist();
-                } else  if (configkeyslayout[10].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[10]);
-                  doexitcommand();
-                  //exit(100);
+                } else if (strlen(configkeyslayout[8].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[8]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[8].cmdname, output, 2);
                 }
+
                 break;
         case 12: // F12
-                if (configkeyslayout[11].cmdname == "playlistbackup") {
+                if (strcmp(configkeyslayout[9].cmdname,"playlistbackup") == 0) {
                   do_playlist_backup_playlist();
-                } else if (configkeyslayout[11].cmdname == "playlistrestore") {
+                } else if (strcmp(configkeyslayout[9].cmdname,"playlistrestore") == 0) {
                   do_playlist_restore_playlist();
-                } else  if (configkeyslayout[11].cmdname.length() > 0) {
-                  saveexitcommand(configkeyslayout[11]);
-                  doexitcommand();
-                  //exit(100);
+                } else if (strlen(configkeyslayout[9].cmdname) > 0) {
+                  // saveexitcommand(configkeyslayout[9]);
+                  // doexitcommand();
+                  do_system_call_with_timeout(configkeyslayout[9].cmdname, output, 2);
                 }
                 break;
         case 100: // left key
@@ -12270,7 +12270,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         vis_volume_timeout=120;
       }
     }
-    if ((key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!=127) && (key!='S') && (key!='*') && (key!='U') && (key!=117) && (key!=optionmenukey) && (key!=13) && (key!=27) || ((vis_spotify_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_tidal_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_film_oversigt) && (key!=13) && (key!=27) && (key!=117)) || ((tidal_oversigt.do_setup_tidal_start_entry) && (key!=13) && (key!=27) && (key!=117)) || ((vis_radio_oversigt) && (key!='u') && (key!=optionmenukey) && (key!=27 && (key!=13))) || ((vis_tv_oversigt) && (key!='u') && (key!=27))) {
+    if (((do_show_setup_keys) && (key!=27)) || (key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!=127) && (key!='S') && (key!='*') && (key!='U') && (key!=117) && (key!=optionmenukey) && (key!=13) && (key!=27) || ((vis_spotify_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_tidal_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_film_oversigt) && (key!=13) && (key!=27) && (key!=117)) || ((tidal_oversigt.do_setup_tidal_start_entry) && (key!=13) && (key!=27) && (key!=117)) || ((vis_radio_oversigt) && (key!='u') && (key!=optionmenukey) && (key!=27 && (key!=13))) || ((vis_tv_oversigt) && (key!='u') && (key!=27))) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(rssstreamoversigt.setup_select_linie) {
@@ -12467,6 +12467,46 @@ void handleKeypress(unsigned char key, int x, int y) {
                   break;
         }
       }
+
+      if (do_show_setup_keys) {
+        switch (do_show_setup_select_linie) {
+          case 0: keybufferindex=strlen(configkeyslayout[0].cmdname);
+                  strcpy(keybuffer,configkeyslayout[0].cmdname);
+                  break;
+          case 1: break;
+          case 2: keybufferindex=strlen(configkeyslayout[1].cmdname);
+                  strcpy(keybuffer,configkeyslayout[1].cmdname);
+                  break;
+          case 3: break;                  
+          case 4: keybufferindex=strlen(configkeyslayout[2].cmdname);
+                  strcpy(keybuffer,configkeyslayout[2].cmdname);                  
+                  break;
+          case 5: break;
+          case 6: keybufferindex=strlen(configkeyslayout[3].cmdname);
+                  strcpy(keybuffer,configkeyslayout[3].cmdname);
+                  break;
+          case 7: break;
+          case 8: keybufferindex=strlen(configkeyslayout[4].cmdname);
+                  strcpy(keybuffer,configkeyslayout[4].cmdname);
+                  break;
+          case 9: break;                  
+          case 10: keybufferindex=strlen(configkeyslayout[5].cmdname);
+                   strcpy(keybuffer,configkeyslayout[5].cmdname);
+                   break;
+          case 11: break;
+          case 12: keybufferindex=strlen(configkeyslayout[6].cmdname);
+                   strcpy(keybuffer,configkeyslayout[6].cmdname);
+                   break;
+          case 13: break;
+          case 14: keybufferindex=strlen(configkeyslayout[7].cmdname);
+                   strcpy(keybuffer,configkeyslayout[7].cmdname);
+          case 15: break;                  
+          case 16: keybufferindex=strlen(configkeyslayout[8].cmdname);
+                   strcpy(keybuffer,configkeyslayout[8].cmdname);
+                   break;
+          case 17: break;                   
+        }
+      }
       // gem key pressed in buffer
       if (keybufferindex<80) {
         // backspace key
@@ -12512,6 +12552,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }            
           }
           if (do_show_setup_keys) {
+            /*
             switch (do_show_setup_select_linie) {
               case 0: if (keybufferindex>=0) configkeyslayout[0].cmdname=keybuffer;
                       break;
@@ -12536,6 +12577,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               case 10: if (keybufferindex>=0) configkeyslayout[10].cmdname=keybuffer;
                       break;                      
             }
+            */
           }
         } else {
           // delete key 127
@@ -13211,43 +13253,43 @@ void handleKeypress(unsigned char key, int x, int y) {
          }
          if (do_show_setup_keys) {
             switch(do_show_setup_select_linie) {
-              case 0: configkeyslayout[0].cmdname=keybuffer;
+              case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
                       break;
               case 1: configkeyslayout[0].scrnr=atoi(keybuffer);
                       break;
-              case 2: configkeyslayout[1].cmdname=keybuffer;
+              case 2: strcpy(configkeyslayout[1].cmdname,keybuffer);
                       break;
               case 3: configkeyslayout[1].scrnr=atoi(keybuffer);
                       break;
-              case 4: configkeyslayout[2].cmdname=keybuffer;
+              case 4: strcpy(configkeyslayout[2].cmdname,keybuffer);
                       break;
               case 5: configkeyslayout[2].scrnr=atoi(keybuffer);
                       break;
-              case 6: configkeyslayout[3].cmdname=keybuffer;
+              case 6: strcpy(configkeyslayout[3].cmdname,keybuffer);
                       break;
               case 7: configkeyslayout[3].scrnr=atoi(keybuffer);
                       break;
-              case 8: configkeyslayout[4].cmdname=keybuffer;
+              case 8: strcpy(configkeyslayout[4].cmdname,keybuffer);
                       break;
               case 9: configkeyslayout[4].scrnr=atoi(keybuffer);
                       break;
-              case 10: configkeyslayout[5].cmdname=keybuffer;
+              case 10: strcpy(configkeyslayout[5].cmdname,keybuffer);
                       break;
               case 11: configkeyslayout[5].scrnr=atoi(keybuffer);
                       break;
-              case 12: configkeyslayout[6].cmdname=keybuffer;
+              case 12: strcpy(configkeyslayout[6].cmdname,keybuffer);
                       break;
               case 13: configkeyslayout[6].scrnr=atoi(keybuffer);
                       break;
-              case 14: configkeyslayout[7].cmdname=keybuffer;
+              case 14: strcpy(configkeyslayout[7].cmdname,keybuffer);
                       break;
               case 15: configkeyslayout[7].scrnr=atoi(keybuffer);
                       break;
-              case 16: configkeyslayout[8].cmdname=keybuffer;
+              case 16: strcpy(configkeyslayout[8].cmdname,keybuffer);
                       break;
               case 17: configkeyslayout[8].scrnr=atoi(keybuffer);
                       break;
-              case 18: configkeyslayout[9].cmdname=keybuffer;
+              case 18: strcpy(configkeyslayout[9].cmdname,keybuffer);
                       break;
               case 19: configkeyslayout[9].scrnr=atoi(keybuffer);
                       break;

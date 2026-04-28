@@ -2390,27 +2390,27 @@ void select_exe_functions_keys_name() {
     filename = filenamepath;
     filename.erase(std::remove(filename.begin(), filename.end(), '\n'), filename.cend());
     switch (do_show_setup_select_linie) {
-      case 0: configkeyslayout[0].cmdname = filename;
+      case 0: strcpy(configkeyslayout[0].cmdname, filename.c_str());
               break;
-      case 2: configkeyslayout[1].cmdname = filename;
+      case 2: strcpy(configkeyslayout[1].cmdname, filename.c_str());
               break;
-      case 4: configkeyslayout[2].cmdname = filename;
+      case 4: strcpy(configkeyslayout[2].cmdname, filename.c_str());
               break;
-      case 6: configkeyslayout[3].cmdname = filename;
+      case 6: strcpy(configkeyslayout[3].cmdname, filename.c_str());
               break;
-      case 8: configkeyslayout[4].cmdname = filename;
+      case 8: strcpy(configkeyslayout[4].cmdname, filename.c_str());
               break;
-      case 10:configkeyslayout[5].cmdname = filename;
+      case 10: strcpy(configkeyslayout[5].cmdname, filename.c_str());
               break;
-      case 12:configkeyslayout[6].cmdname = filename;
+      case 12: strcpy(configkeyslayout[6].cmdname, filename.c_str());
               break;
-      case 14:configkeyslayout[7].cmdname = filename;
+      case 14: strcpy(configkeyslayout[7].cmdname, filename.c_str());
               break;
-      case 16:configkeyslayout[8].cmdname = filename;
+      case 16: strcpy(configkeyslayout[8].cmdname, filename.c_str());
               break;
-      case 18:configkeyslayout[9].cmdname = filename;
+      case 18: strcpy(configkeyslayout[9].cmdname, filename.c_str());
               break;
-      case 20:configkeyslayout[10].cmdname = filename;
+      case 20: strcpy(configkeyslayout[10].cmdname, filename.c_str());
               break;
     }
   }
@@ -2764,8 +2764,11 @@ void show_setup_keys() {
   glTranslatef(680 , 650 , 0.0f);
   glRasterPos2f(0.0f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[0].cmdname).filename();          // return filename with extension.
-  if ((onlyfname.length() > 0) && (!(fs::path(configkeyslayout[0].cmdname).empty()))) onlyfname = "/.../" + onlyfname;
+
+  std::string tmpstr=configkeyslayout[0].cmdname;
+
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  if ((onlyfname.length() > 0) && (!(fs::path(tmpstr).empty()))) onlyfname = "/.../" + onlyfname;
   strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==0) {
     if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
@@ -2795,13 +2798,16 @@ void show_setup_keys() {
   glTranslatef(680 , 600 , 0.0f);
   glRasterPos2f(0.0f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[1].cmdname).filename();          // return filename with extension.
-  if ((onlyfname.length() > 0) && (!(fs::path(configkeyslayout[1].cmdname).empty()))) onlyfname = "/.../" + onlyfname;
+
+  tmpstr=configkeyslayout[1].cmdname;
+
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  if ((onlyfname.length() > 0) && (!(fs::path(tmpstr).empty()))) onlyfname = "/.../" + onlyfname;
   strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==2) {
-    if (configkeyslayout[1].cmdname.length() > 0) myglprint4((char *) onlyfname.c_str());
+    if (strlen(configkeyslayout[1].cmdname) > 0) myglprint4((char *) onlyfname.c_str());
   } else {
-    if (configkeyslayout[1].cmdname.length() > 0) myglprint4((char *) onlyfname.c_str());
+    if (strlen(configkeyslayout[1].cmdname) > 0) myglprint4((char *) onlyfname.c_str());
   }
   glPopMatrix();
   if (do_show_setup_select_linie==2) showcoursornow(311,450,strlen(keybuffer));
@@ -2824,8 +2830,10 @@ void show_setup_keys() {
   glTranslatef(680 , 550 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[2].cmdname).filename();          // return filename with extension.
-  if ((onlyfname.length() > 0) && (!(fs::path(configkeyslayout[2].cmdname).empty()))) onlyfname = "/.../" + onlyfname;
+
+  tmpstr=configkeyslayout[2].cmdname;
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  if ((onlyfname.length() > 0) && (!(fs::path(tmpstr).empty()))) onlyfname = "/.../" + onlyfname;
   strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==4) {
     if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
@@ -2853,8 +2861,9 @@ void show_setup_keys() {
   glTranslatef(680 , 500 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[3].cmdname).filename();          // return filename with extension.
-  if (fs::path(configkeyslayout[3].cmdname).has_parent_path()) onlyfname = "/.../" + onlyfname;
+  tmpstr=configkeyslayout[3].cmdname;
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  if (fs::path(tmpstr).has_parent_path()) onlyfname = "/.../" + onlyfname;
   strcpy(keybuffer, onlyfname.c_str());
   keybufferindex=onlyfname.length();
   if (do_show_setup_select_linie==6) {
@@ -2883,8 +2892,9 @@ void show_setup_keys() {
   glTranslatef(680 , 450 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[4].cmdname).filename();          // return filename with extension.
-  onlypname=fs::path(configkeyslayout[4].cmdname).parent_path();      // return path without filename.
+  tmpstr=configkeyslayout[4].cmdname;
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
   if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;
   strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==8) {
@@ -2914,8 +2924,9 @@ void show_setup_keys() {
   glTranslatef(680 , 400 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[5].cmdname).filename();          // return filename with extension.
-  onlypname=fs::path(configkeyslayout[5].cmdname).parent_path();      // return path without filename.
+  tmpstr=configkeyslayout[5].cmdname;
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
   if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==10) {
     if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
@@ -2944,8 +2955,9 @@ void show_setup_keys() {
   glTranslatef(680 , 350 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[6].cmdname).filename();          // return filename with extension.
-  onlypname=fs::path(configkeyslayout[6].cmdname).parent_path();      // return path without filename.
+  tmpstr=configkeyslayout[6].cmdname;
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
   if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
   strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==12) {
@@ -2975,8 +2987,9 @@ void show_setup_keys() {
   glTranslatef(680 , 300 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[7].cmdname).filename();          // return filename with extension.
-  onlypname=fs::path(configkeyslayout[7].cmdname).parent_path();      // return path without filename.
+  tmpstr=configkeyslayout[7].cmdname;
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
   if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
   strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==14) {
@@ -3006,8 +3019,9 @@ void show_setup_keys() {
   glTranslatef(680 , 250 , 0.0f);
   glRasterPos2f(0.8f, 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
-  onlyfname=fs::path(configkeyslayout[8].cmdname).filename();          // return filename with extension.
-  onlypname=fs::path(configkeyslayout[8].cmdname).parent_path();      // return path without filename.
+  tmpstr=configkeyslayout[8].cmdname;
+  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
+  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
   if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
   strcpy(keybuffer, onlyfname.c_str());
   if (do_show_setup_select_linie==16) {
