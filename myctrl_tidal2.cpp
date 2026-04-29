@@ -4828,98 +4828,105 @@ int tidal_class::tidal_play_now_search_album(char *playlist_song,int tidalknapnr
       // sort playlist files
       std::sort(dir_file_array.begin(), dir_file_array.end());
       temptxt1 = tidal_download_home;
-      temptxt1 = temptxt1 + stack_search[tidalknapnr].playlistid;
-      temptxt1 = temptxt1 + "/";
-      temptxt1 = temptxt1 + dir_file_array[0];                    // add song nr 1
-      // create wav file if not exist by ffmpeg
-      if ( file_exists(temptxt1.c_str()) == true ) {
-        convcommand = fmt::format("/usr/bin/ffmpeg -y -i '{}' '{}.flac'",temptxt1,temptxt1);
-        error=system(convcommand.c_str());
-      }
-      // build file path to play.
-      playfile = fmt::format("{}{}/{}",tidal_download_home ,stack_search[tidalknapnr].playlistid ,dir_file_array[0]);
-      if ( file_exists(playfile.c_str()) == true ) {
-        result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
-        // start play first song
-        result = sndsystem->createSound(playfile.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
-        if ( result == FMOD_OK ) {
-          if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
-          if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
+      if (dir_file_array.empty()==false) {
+        temptxt1 = temptxt1 + stack_search[tidalknapnr].playlistid;
+        temptxt1 = temptxt1 + "/";
+        temptxt1 = temptxt1 + dir_file_array[0];                    // add song nr 1
+        // create wav file if not exist by ffmpeg
+        if ( file_exists(temptxt1.c_str()) == true ) {
+          convcommand = fmt::format("/usr/bin/ffmpeg -y -i '{}' '{}.flac'",temptxt1,temptxt1);
+          error=system(convcommand.c_str());
         }
-        sqlstring = fmt::format("update tidalcontentplaylist set play_count=play_count+1 where playlistid={}",stack_search[tidalknapnr].playlistid);
-        mysql_query(conn,sqlstring.c_str());
-
-        // convert the rest of the m4a files we have downloed to be able to play it in fmod
-        // no thread version
-        convert_m4a_to_flac((char *) stack_search[tidalknapnr].playlistid.c_str(), tidalknapnr);
-
-        // update play count in db
-        sqlstring = fmt::format("update mythtvcontroller.tidalcontent set play_count=play_count+1 where playlistid={}",stack_search[tidalknapnr].playlistid);
-        mysql_query(conn,sqlstring.c_str());
-
-        // hent song names from db
-        std::string sql1;
-        sql1 = fmt::format("select name, playpath from mythtvcontroller.tidalcontent where playlistid like '{}' order by name",stack_search[tidalknapnr].playlistid);
-        if (mysql_query(conn,sql1.c_str()) != 0) {
-          write_logfile(logfile,(char *) "mysql select table error.");
-          fprintf(stdout,"ERROR SQL : %s\n",sql);
-        }
-        // get antal record and update song name + play url
-        recnr=0;
-        tidal_aktiv_song_antal = 0;
-        mysql_res = mysql_store_result(conn);
-        if (mysql_res) {
-          while ((( mysql_row = mysql_fetch_row(mysql_res)) != NULL )) {
-            // strcpy( tidal_aktiv_song[recnr].song_name, mysql_row[0] );
-            // strcpy( tidal_aktiv_song[recnr].playurl, mysql_row[1] );
-            new_playlist_element.song_name=std::string(mysql_row[0]);
-            new_playlist_element.playurl=std::string(mysql_row[1]);
-            new_playlist_element.cover_image_url=stack_search[tidalknapnr].feed_gfx_url;
-            tidal_aktiv_song.push_back(new_playlist_element);
-            // printf("recnr %d add tidal playlist song to list %s \n",recnr,mysql_row[0]);
-            recnr++;
+        // build file path to play.
+        playfile = fmt::format("{}{}/{}",tidal_download_home ,stack_search[tidalknapnr].playlistid ,dir_file_array[0]);
+        if ( file_exists(playfile.c_str()) == true ) {
+          result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
+          // start play first song
+          result = sndsystem->createSound(playfile.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
+          if ( result == FMOD_OK ) {
+            if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
+            if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
           }
-          if (recnr>0) tidal_aktiv_song_antal = recnr-1;                                                   // set antal songs in playlist
-        }
-        // hent playlistname + artist name + release date from db
-        sql1 = fmt::format("select playlistname,tidalcontentartist.artistname,release_date from tidalcontentplaylist left join tidalcontentartist on tidalcontentplaylist.artistid=tidalcontentartist.artistid where playlistid like '{}'",stack_search[tidalknapnr].playlistid);
-        if (mysql_query(conn,sql1.c_str())!=0) {
-          write_logfile(logfile,(char *) "mysql select table error.");
-          fprintf(stdout,"ERROR SQL : %s\n",sql);
-        }
-        mysql_res = mysql_store_result(conn);
-        if (mysql_res) {
-          while ((( mysql_row = mysql_fetch_row(mysql_res)) != NULL )) {
-            if (strlen(mysql_row[0])>0) tidal_aktiv_song[0].album_name=std::string(mysql_row[0]);
-            // if (strlen(mysql_row[1])>0) strcpy( tidal_aktiv_song[0].artist_name,mysql_row[1] ); // crash
-            tidal_aktiv_song[0].release_date=std::string(mysql_row[2]);
+          sqlstring = fmt::format("update tidalcontentplaylist set play_count=play_count+1 where playlistid={}",stack_search[tidalknapnr].playlistid);
+          mysql_query(conn,sqlstring.c_str());
 
-            new_playlist_element.release_date=std::string(mysql_row[2]);
-            strcpy( tidal_playlistname,mysql_row[0] );                                            // set playlist name to show
+          // convert the rest of the m4a files we have downloed to be able to play it in fmod
+          // no thread version
+          convert_m4a_to_flac((char *) stack_search[tidalknapnr].playlistid.c_str(), tidalknapnr);
+
+          // update play count in db
+          sqlstring = fmt::format("update mythtvcontroller.tidalcontent set play_count=play_count+1 where playlistid={}",stack_search[tidalknapnr].playlistid);
+          mysql_query(conn,sqlstring.c_str());
+
+          // hent song names from db
+          std::string sql1;
+          sql1 = fmt::format("select name, playpath from mythtvcontroller.tidalcontent where playlistid like '{}' order by name",stack_search[tidalknapnr].playlistid);
+          if (mysql_query(conn,sql1.c_str()) != 0) {
+            write_logfile(logfile,(char *) "mysql select table error.");
+            fprintf(stdout,"ERROR SQL : %s\n",sql);
           }
-          // set the rest of the songs artist/album info
-          recnr=1;
-          while(recnr<tidal_aktiv_song_antal) {
-            if (recnr<=tidal_aktiv_song.size()) {
-              tidal_aktiv_song[recnr].album_name=new_playlist_element.album_name;
-              tidal_aktiv_song[recnr].artist_name=new_playlist_element.artist_name;
-              tidal_aktiv_song[recnr].release_date=new_playlist_element.release_date;
+          // get antal record and update song name + play url
+          recnr=0;
+          tidal_aktiv_song_antal = 0;
+          mysql_res = mysql_store_result(conn);
+          if (mysql_res) {
+            while ((( mysql_row = mysql_fetch_row(mysql_res)) != NULL )) {
+              // strcpy( tidal_aktiv_song[recnr].song_name, mysql_row[0] );
+              // strcpy( tidal_aktiv_song[recnr].playurl, mysql_row[1] );
+              new_playlist_element.song_name=std::string(mysql_row[0]);
+              new_playlist_element.playurl=std::string(mysql_row[1]);
+              new_playlist_element.cover_image_url=stack_search[tidalknapnr].feed_gfx_url;
+              tidal_aktiv_song.push_back(new_playlist_element);
+              // printf("recnr %d add tidal playlist song to list %s \n",recnr,mysql_row[0]);
+              recnr++;
             }
-            recnr++;
+            if (recnr>0) tidal_aktiv_song_antal = recnr-1;                                                   // set antal songs in playlist
           }
-          // set icon texture
-          if ( stack_search[tidalknapnr].textureId ) {
-            tidal_aktiv_song[0].cover_image = stack_search[tidalknapnr].textureId;
-            if (tidal_aktiv_song.size()>0) tidal_aktiv_song[0].cover_image = stack_search[tidalknapnr].textureId;
-            aktiv_song_tidal_icon = stack_search[tidalknapnr].textureId;
+          // hent playlistname + artist name + release date from db
+          sql1 = fmt::format("select playlistname,tidalcontentartist.artistname,release_date from tidalcontentplaylist left join tidalcontentartist on tidalcontentplaylist.artistid=tidalcontentartist.artistid where playlistid like '{}'",stack_search[tidalknapnr].playlistid);
+          if (mysql_query(conn,sql1.c_str())!=0) {
+            write_logfile(logfile,(char *) "mysql select table error.");
+            fprintf(stdout,"ERROR SQL : %s\n",sql);
           }
-          tidal_aktiv_song_nr=0;
-        }  
+          mysql_res = mysql_store_result(conn);
+          if (mysql_res) {
+            while ((( mysql_row = mysql_fetch_row(mysql_res)) != NULL )) {
+              if (strlen(mysql_row[0])>0) tidal_aktiv_song[0].album_name=std::string(mysql_row[0]);
+              // if (strlen(mysql_row[1])>0) strcpy( tidal_aktiv_song[0].artist_name,mysql_row[1] ); // crash
+              tidal_aktiv_song[0].release_date=std::string(mysql_row[2]);
+
+              new_playlist_element.release_date=std::string(mysql_row[2]);
+              strcpy( tidal_playlistname,mysql_row[0] );                                            // set playlist name to show
+            }
+            // set the rest of the songs artist/album info
+            recnr=1;
+            while(recnr<tidal_aktiv_song_antal) {
+              if (recnr<=tidal_aktiv_song.size()) {
+                tidal_aktiv_song[recnr].album_name=new_playlist_element.album_name;
+                tidal_aktiv_song[recnr].artist_name=new_playlist_element.artist_name;
+                tidal_aktiv_song[recnr].release_date=new_playlist_element.release_date;
+              }
+              recnr++;
+            }
+            // set icon texture
+            if ( stack_search[tidalknapnr].textureId ) {
+              tidal_aktiv_song[0].cover_image = stack_search[tidalknapnr].textureId;
+              if (tidal_aktiv_song.size()>0) tidal_aktiv_song[0].cover_image = stack_search[tidalknapnr].textureId;
+              aktiv_song_tidal_icon = stack_search[tidalknapnr].textureId;
+            }
+            tidal_aktiv_song_nr=0;
+          }  
+        } else {
+          printf("Error play file %s does not exist. \n",playfile.c_str());
+        }
       } else {
-        printf("Error play file %s does not exist. \n",playfile.c_str());
+        printf("Error empty playlist \n");
+        if (conn) mysql_close(conn);
+        return(0);
       }
     } else {
       printf("Error convert files download do not exist. \n");
+      if (conn) mysql_close(conn);
       exit(0);
     }
   }

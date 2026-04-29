@@ -6,21 +6,15 @@
 #include <sys/stat.h>
 #include <string>
 #include <gtk/gtk.h>
-
 // system_call_timeout.cpp
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
 #include <fcntl.h>
-
 #include <string>
 #include <vector>
 #include <chrono>
 #include <thread>
-
-
-// used to get home dir
-// #include <unistd.h>
 #include <pwd.h>
 #include <unistd.h>
 #include "utility.h"
@@ -36,6 +30,7 @@ unsigned int hourtounixtime(int hour) {
   tid->tm_hour=hour;
   return(mktime(tid));
 }
+
 
 // ****************************************************************************************
 //
@@ -63,57 +58,57 @@ bool do_system_call(std::string cmd) {
 
 
 bool do_system_call_with_timeout(const std::string& cmd, std::string& output, int timeout_seconds) {
-    int pipefd[2];
-    if (pipe(pipefd) == -1) {
-      return false;
-    }
-    pid_t pid = fork();
-    if (pid == -1) {
-      close(pipefd[0]);
-	  close(pipefd[1]);
-	  return false;
-    }
-    if (pid == 0) {
-      dup2(pipefd[1], STDOUT_FILENO);
-      dup2(pipefd[1], STDERR_FILENO);
-      close(pipefd[0]);
-      close(pipefd[1]);
-      execl("/bin/sh", "sh", "-c", cmd.c_str(), nullptr);
-      _exit(127);
-    }
-    close(pipefd[1]);
-    fcntl(pipefd[0], F_SETFL, O_NONBLOCK);
-    output.clear();
-    char buffer[1024];
-    auto start = std::chrono::steady_clock::now();
-    bool timed_out = false;
-    while (true) {
-      ssize_t count = read(pipefd[0], buffer, sizeof(buffer) - 1);
-      if (count > 0) {
-        buffer[count] = '\0';
-        output += buffer;
-      }
-      int status = 0;
-      pid_t result = waitpid(pid, &status, WNOHANG);
-      if (result == pid) {
-        close(pipefd[0]);
-        return WIFEXITED(status) && WEXITSTATUS(status) == 0;
-      }
-      auto now = std::chrono::steady_clock::now();
-      auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start);
-      if (elapsed.count() >= timeout_seconds) {
-        timed_out = true;
-        kill(pid, SIGKILL);
-        waitpid(pid, nullptr, 0);
-        break;
-      }
-      std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-    close(pipefd[0]);
-    if (timed_out) {
-      output += "\n[Process terminated due to timeout]";
-    }
+  int pipefd[2];
+  if (pipe(pipefd) == -1) {
     return false;
+  }
+  pid_t pid = fork();
+  if (pid == -1) {
+    close(pipefd[0]);
+  close(pipefd[1]);
+  return false;
+  }
+  if (pid == 0) {
+    dup2(pipefd[1], STDOUT_FILENO);
+    dup2(pipefd[1], STDERR_FILENO);
+    close(pipefd[0]);
+    close(pipefd[1]);
+    execl("/bin/sh", "sh", "-c", cmd.c_str(), nullptr);
+    _exit(127);
+  }
+  close(pipefd[1]);
+  fcntl(pipefd[0], F_SETFL, O_NONBLOCK);
+  output.clear();
+  char buffer[1024];
+  auto start = std::chrono::steady_clock::now();
+  bool timed_out = false;
+  while (true) {
+    ssize_t count = read(pipefd[0], buffer, sizeof(buffer) - 1);
+    if (count > 0) {
+      buffer[count] = '\0';
+      output += buffer;
+    }
+    int status = 0;
+    pid_t result = waitpid(pid, &status, WNOHANG);
+    if (result == pid) {
+      close(pipefd[0]);
+      return WIFEXITED(status) && WEXITSTATUS(status) == 0;
+    }
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start);
+    if (elapsed.count() >= timeout_seconds) {
+      timed_out = true;
+      kill(pid, SIGKILL);
+      waitpid(pid, nullptr, 0);
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  }
+  close(pipefd[0]);
+  if (timed_out) {
+    output += "\n[Process terminated due to timeout]";
+  }
+  return false;
 }
 
 // ****************************************************************************************
@@ -240,6 +235,11 @@ int check_zerro_bytes_file(char *filename) {
 }
 
 
+// ****************************************************************************************
+//
+// clear screen text mode
+//
+// ****************************************************************************************
 
 int clearscreen() {
     gotoxy(1,1);
@@ -331,7 +331,7 @@ size_t b64_encoded_size(size_t inlen) {
 
 // ****************************************************************************************
 //
-// 64bits incoder
+// 64bits encoder
 //
 // ****************************************************************************************
 
