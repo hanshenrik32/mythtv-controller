@@ -252,7 +252,12 @@ int radiostation_class::load_radio_stations_from_json_file() {
   conn1=mysql_init(NULL);
   if (mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {    
     std::ifstream cfgfile("stations-big_all.json");
-    cfgfile >> cfg_root;
+    if (cfgfile.is_open()) {
+      cfgfile >> cfg_root;
+    } else {
+      std::cout << "Could not open json file!\n";
+      return 0;
+    }
     // Tjek at root er array
     if (!cfg_root.isArray()) {
       std::cout << "Root er ikke et array!\n";
@@ -386,11 +391,12 @@ int radiostation_class::load_radio_stations_from_json_file() {
         }
       }
     }
+    cfgfile.close();
     std::cout << std::endl;
     std::cout << "Done parsing json file." << std::endl;
     mysql_close(conn1);
   }
-  if (antal>0) return(1); else return(0);
+  if (antal>0) return(antal); else return(0);
 }
 
 

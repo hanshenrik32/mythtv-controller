@@ -4166,7 +4166,7 @@ void display() {
         glRotatef(0.0f, 0.0f, 0.5f, 0.1f);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         if (dirmusic.textureId) {
-          glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		// cover
+          glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		              // cover
         } else {
           glBindTexture(GL_TEXTURE_2D, _texture_nocdcover);                	// box no cd cover
         }
@@ -5901,7 +5901,8 @@ void display() {
         } else {
           glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
         }
-        if (tidal_oversigt.total_aktiv_songs()>0) {
+        // if (tidal_oversigt.total_aktiv_songs()>0) {
+        if (tidal_oversigt.antal_in_playlist()>0) {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS);
@@ -5918,7 +5919,8 @@ void display() {
           // check again ?
           if (do_we_play_check>50) do_we_play_check=0;
         }
-        if (tidal_oversigt.total_aktiv_songs()>0) {
+        // if (tidal_oversigt.total_aktiv_songs()>0) {
+        if (tidal_oversigt.antal_in_playlist()>0) {
           if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
             drawText(font12,"         ",config_menu.config_tidalplayer_infox+40.0f, config_menu.config_tidalplayer_infoy + 340.0f, 1.0f,1);
           } else {
@@ -17970,11 +17972,13 @@ int main(int argc, char** argv) {
 
     // Create radio database if not exist (db is created)
     if (create_radio_oversigt()) {
-      radiooversigt.load_radio_stations_from_json_file();
+      int json_load_status=radiooversigt.load_radio_stations_from_json_file();
       radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
       strcpy(configbackend_tvgraber_old,"");
     } else {
       write_logfile(logfile,(char *) "Exit program, Not posible to load radio overview.");
+      std::cout << "Exit program, Not posible to load radio overview." << endl;
+      std::cout << "Check stations-big_all.json file exist." << endl;
       exit(1);
     }
 
