@@ -86,8 +86,8 @@ FILE *logfile=NULL;                   // global logfile
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod.hpp"
-#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod_errors.h"
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod_errors.h"
 #endif
 
 #include "mongoose-master/mongoose.h"
@@ -2219,6 +2219,16 @@ unsigned int hent_antal_dir_songs(int dirid) {
           huskpath = imgpath;
           imgpath = imgpath + "cover.jpg";
           cout << "Path " << imgpath << "\n";
+          if (!(file_exists(imgpath.c_str()))) {
+            imgpath=tmpfilename; // start path
+            while(iii) { 
+              imgpath = imgpath + pathlist[iii-1];
+              imgpath = imgpath + "/";
+              iii--;
+            }
+            imgpath = imgpath + "cover.png";
+            cout << "Path " << imgpath << "\n";
+          }
           if (file_exists(imgpath.c_str())) {
             dirmusic.textureId=loadTexture((char *) imgpath.c_str());
           } else {
@@ -4831,7 +4841,7 @@ void display() {
     if (rc) {
       fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc);
       exit(-1);
-    }      
+    }
   }
   */
   // stop music

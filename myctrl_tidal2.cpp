@@ -44,8 +44,8 @@
 
 // sound system include fmod
 
-#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod.hpp"
-#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod_errors.h"
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod_errors.h"
 
 // # show all playlist from tidal even if they only have 1 song. Default is to hide playlist with only 1 song. Set to true to show all playlist.
 bool tidal_all_type_of_playes = false;
