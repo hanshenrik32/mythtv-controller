@@ -2313,11 +2313,13 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
   curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
   if ((curl) && (strlen(auth_kode.c_str())>0)) {
-    
-    header = curl_slist_append(header, "accept: application/vnd.api+json");
-    header = curl_slist_append(header, "Content-Type: application/json");
-    header = curl_slist_append(header, "charsets: utf-8");
     header = curl_slist_append(header, auth_kode.c_str());
+    header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
+
+    url="https://openapi.tidal.com/v2/albums/";
+    url=url + albumid;
+    url=url + "/relationships/coverArt?countryCode=US&include=coverArt";
+
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     // ask libcurl to use TLS version 1.3 or later
     curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
@@ -2325,18 +2327,20 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);                                    // enable stdio echo
     curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
     curl_easy_setopt(curl, CURLOPT_POST, 0);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+    
     userfile=fopen("tidal_album_cover.txt","w");
     if (userfile) {
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
       res = curl_easy_perform(curl);
       fclose(userfile);
     }
+    
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
   }
   // always cleanup
@@ -3503,7 +3507,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
     curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);                                        // GET
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
     // we tell libcurl to follow redirection
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -3757,8 +3761,6 @@ bool tidal_class::get_tidal_playing_flag() {
 void tidal_class::set_tidal_playing_flag(bool flag) {
   tidal_is_playing=flag;  
 }
-
-
 
 
 // *********************************************************************************************************
@@ -4114,6 +4116,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   MYSQL_ROW mysql_row;
   bool skip_download_of_files = false;
   bool swap=true;
+  std::string output;
   // download stuf to be played if not downloaded before
   // check if exist
   clear_tidal_aktiv_songlist();
@@ -4234,9 +4237,9 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         sysstring="/home/hans/.local/bin/tidal-dl-ng dl https://listen.tidal.com/album/";
         sysstring = sysstring + playlist_song;
       }
-      error = system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
+      error=do_system_call_with_timeout(sysstring,output, 3600); // wait max 1 hour for download to finish
+      // error = system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
       printf("Do tidal-dl-ng : %s \n ",sysstring.c_str());
-      
       // error=run_tidal_dl(playlist_song);
     }
     error=0;
