@@ -18082,6 +18082,7 @@ int main(int argc, char** argv) {
   sprintf(debuglogdata,"Screen mode %d",screen_size);
   write_logfile(logfile,(char *) debuglogdata);
   // get first monitor screen size (pixel)
+  /*
   dpy = XOpenDisplay(":1");
   if (dpy) {
     rootxwindow = RootWindow(dpy, 0);
@@ -18095,6 +18096,7 @@ int main(int argc, char** argv) {
     }
     int nrofscreens=XScreenCount(dpy);
   }
+  */
 
   //printf("Nr of screens found : %d\n",nrofscreens);
   // create loader xorg window

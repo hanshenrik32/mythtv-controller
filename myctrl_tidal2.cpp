@@ -1157,11 +1157,53 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
 
 int tidal_class::get_access_token(char *loginbase64) {
   // lib curl stuf
+  char curlstring[8192];
   FILE *tokenfil=NULL;
   int error=0;
-  char curlstring[8192];
-  sprintf(curlstring,"/bin/curl -X POST -H 'Authorization: Basic %s' -d 'grant_type=client_credentials' -d 'client_id=%s' https://auth.tidal.com/v1/oauth2/token > tidal_token.json",loginbase64,"Nq5WQmVhv2L7QWQO");
+  struct curl_slist *header = NULL;
+  struct curl_slist *chunk = NULL;
+  int httpCode=0;
+  std::string auth_kode="Authorization: Basic ";
+  auth_kode=auth_kode + loginbase64;
+  std::string tmp;
+  std::string response_string;
+  CURLcode res;  
+  std::string userfilename="tidal_token.json";
+  std::string base64;
+  FILE *userfile;
+  CURL *curl = curl_easy_init();
+  printf("Tidal token read\n");
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2/token");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+    header = curl_slist_append(header, auth_kode.c_str());
+    std::string postfields = "grant_type=client_credentials&client_id=Nq5WQmVhv2L7QWQO";
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postfields.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE,strlen(postfields.c_str()));
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    res = curl_easy_perform(curl);
+    userfile=fopen(userfilename.c_str(),"w");
+    if (userfile) {
+      // curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+      // res = curl_easy_perform(curl);
+      fwrite(response_string.c_str(), 1, response_string.length(), userfile);
+      fclose(userfile);
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) error=0; else error=1;
+  }
+  /*
+  sprintf(curlstring,"/bin/curl -v -X POST -H 'Authorization: Basic %s' -d 'grant_type=client_credentials' -d 'client_id=%s' https://auth.tidal.com/v1/oauth2/token > tidal_token.json",loginbase64,"Nq5WQmVhv2L7QWQO");
   error=system(curlstring);
+  */
   if (error) {
     printf("System call error.\n");    
     write_logfile(logfile,(char *) "Tidal token read fault.");
@@ -1797,7 +1839,7 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
 
 // ****************************************************************************************
 //
-// Update (load) user collections
+// Update (load) user collections NOT IN USE
 //
 // ****************************************************************************************
 // ID 131776836
@@ -3391,7 +3433,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
 
 int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type) {
   char *database = (char *) "mythtvcontroller";
-  std::string userfilename;
+  std::string userfilename="tidal_search_result.json";
   FILE *userfile;
   std::string auth_kode;
   std::string response_string;
@@ -3415,33 +3457,46 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
   MYSQL_ROW mysql_row;
   search_loaded=false;
   int n=0;
-  /*
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://openapi.tidal.com/v2/searchResults/";
   searchbuffer="";
-  int n=0;
   while(n<strlen(keybuffer)) {
     if ((keybuffer[n]!=' ') && (keybuffer[n]!='\n')) searchbuffer=searchbuffer+keybuffer[n];
     else searchbuffer=searchbuffer+"%20";
     n++;
   }
-  url=url + searchbuffer;
   // 1 = artist, 2 = track
-  if (type==1) url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums";
-  else if (type==2) url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists";
-  else url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=tracks";
-  userfilename = "tidal_search_result.json";
+  switch (type) {
+    case 0:
+      url="https://openapi.tidal.com/v2/searchResults/";
+      url = url + searchbuffer;
+      url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums";
+      break;
+    case 1:
+      url="https://openapi.tidal.com/v2/searchResults/";
+      url = url + searchbuffer;
+      url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists";
+      break;
+    case 2:
+      url="https://openapi.tidal.com/v2/searchResults/";
+      url = url + searchbuffer;
+      url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=tracks";
+      break;
+    default:
+      url="https://openapi.tidal.com/v2/searchResults/";
+      url = url + searchbuffer;
+      url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists";
+      break;
+  }
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
   if ((curl) && (strlen(auth_kode.c_str())>0)) {
-    // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
     header = curl_slist_append(header, auth_kode.c_str());
     header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     // ask libcurl to use TLS version 1.3 or later
-    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
+    // curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
@@ -3462,37 +3517,12 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     if (res != CURLE_OK) {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
     }
+    std::cout << "libcurl Response: " << response_string << std::endl;
     // always cleanup
     curl_easy_cleanup(curl);
     curl_global_cleanup();
-  }
-  */  
-  searchbuffer="";
-  n=0;
-  while(n<strlen(keybuffer)) {
-    if ((keybuffer[n]!=' ') && (keybuffer[n]!='\n')) searchbuffer=searchbuffer+keybuffer[n];
-    else searchbuffer=searchbuffer+"%20";
-    n++;
-  }
-  url="curl -s -X 'GET' 'https://openapi.tidal.com/v2/searchResults/";
-  url = url + searchbuffer;
-  switch (type) {
-            // albums
-    case 0: url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
-            //url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
-            break;
-            // artist
-    case 1: url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
-            break;
-            // tracks
-    case 2: url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=tracks' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
-            break;
-            // default albums
-    default: 
-            url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums' -H 'accept: application/vnd.api+json' -H 'accept: application/vnd.api+json' -H 'Content-Type: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' > tidal_search_result.json";
-            break;            
-  }
-  error=system(url.c_str());
+    error=0;
+  } else error=1;
   // if no error we have json file have the search result
   if (error==0) {
     stat("tidal_search_result.json", &filestatus);                                  // get file info
@@ -3532,7 +3562,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
         write_logfile(logfile,(char *) "error process json file.");
       }
     }
-  } else write_logfile(logfile,(char *) "Curl error : https://openapi.tidal.com/search");
+  } else write_logfile(logfile,(char *) "Libcurl error : https://openapi.tidal.com/search");
   search_loaded=true;
   if (antal==-1) return(-1); else return(httpCode);
 }
