@@ -1,7 +1,7 @@
 C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wno-format-truncation -pthread -m64  -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2
+CFLAGS = -Wno-format-truncation -pthread -m64 -std=c++17 -O0 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2
 LDFLAGS= 
 
 PROG       = mythtv-controller
@@ -13,7 +13,7 @@ DESTIMG    = /opt/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi20307linux
+FMODFILE   = fmodstudioapi20311linux
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -36,11 +36,11 @@ endif
 
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86_64/ -name 'libfmod.so')
+	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20311linux/api/core/lib/x86_64/ -name 'libfmod.so')
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86/ -name 'libfmod.so')
+	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20311linux/api/core/lib/x86/ -name 'libfmod.so')
     CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -125,7 +125,7 @@ installsound:
 	#remove old link
 	if test -e /usr/lib/libfmod.so.12; then rm /usr/lib/libfmod.so.12; fi
 	if test -e /usr/lib/libfmod.so.13; then rm /usr/lib/libfmod.so.13; fi
-	ln -s /opt/mythtv-controller/fmodstudioapi20307linux/api/core/lib/x86_64/libfmod.so /usr/lib/libfmod.so.14
+	ln -s /opt/mythtv-controller/fmodstudioapi20311linux/api/core/lib/x86_64/libfmod.so /usr/lib/libfmod.so.14
 	@echo "Done installing fmod32/64 bit version 4.44.41"
 	@echo "Sound system installed."
 

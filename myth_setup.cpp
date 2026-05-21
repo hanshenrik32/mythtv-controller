@@ -26,8 +26,8 @@ namespace fs = std::filesystem;
 #include <mysql.h>
 
 // sound system
-#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod.hpp"
-#include "/opt/mythtv-controller/fmodstudioapi20307linux/api/core/inc/fmod_errors.h"
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod_errors.h"
 
 // program include
 #include "text3d.h"
@@ -4345,8 +4345,12 @@ void show_setup_torrent() {
   glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
   glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
   glEnd();
+  
+  glTranslatef(winsizx + 250 , winsizy + 10 , 0.0f);
+  glColor3f(1.0f,1.0f,1.0f);
+ 
   glPopMatrix();
-
+  /*
   glPushMatrix();
   glTranslatef(winsizx + 250 , winsizy + 10 , 0.0f);
   glColor3f(1.0f,1.0f,1.0f);
@@ -4371,7 +4375,9 @@ void show_setup_torrent() {
             break;
   }
   glPopMatrix();
+  
   glPushMatrix();
+  
   glTranslatef(winsizx + 318 , 660  , 0.0f); // 438
   glRasterPos2f(164.0f, 0.0f);
   myglprint4((char *) torrent_downloader.downloadpath.c_str());
@@ -4379,7 +4385,9 @@ void show_setup_torrent() {
   if (torrent_downloader.automove_to_movie_path) myglprint4((char *) "Y"); else myglprint4((char *) "N");
   glRasterPos2f(120.0f, 80.0f);
   if (torrent_downloader.trash_torrent==true) myglprint4((char *) "Y"); else myglprint4((char *) "N");
+  
   glPopMatrix();
+  */
 }
 
 // ****************************************************************************************

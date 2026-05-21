@@ -332,6 +332,9 @@ class tidal_class {
 
     int update_playlist_playcount(const char *playid);
     void convert_m4a_to_flac(char *path,int tidalknapnr);
+
+
+    int antal_in_playlist() { return tidal_aktiv_song.size(); }
 };
 
 #endif
