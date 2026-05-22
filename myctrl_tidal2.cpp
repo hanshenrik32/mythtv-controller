@@ -181,26 +181,18 @@ static int antalplaylists_temp=0;
 
 namespace fs = std::filesystem;
 
+//
+// tidal defines for urls
+//
 
-/*
-define('TIDAL_RESOURCES_URL','https://resources.tidal.com/images/');
-define('TIDAL_ALBUM_URL','https://listen.tidal.com/album/');
-define('TIDAL_ALBUM_URL_2','https://tidal.com/browse/album/');
-define('TIDAL_ARTIST_URL','https://listen.tidal.com/artist/');
-define('TIDAL_TRACK_URL','https://tidal.com/browse/track/');
-define('TIDAL_TRACK_STREAM_URL','audio.tidal.com');
-define('TIDAL_APP_ALBUM_URL','https://tidal.com/album/');
-define('TIDAL_APP_TRACK_URL','https://tidal.com/track/');
-define('TIDAL_MAX_CACHE_TIME', 21600); //6h in [s]
-define('TIDAL_TOKEN_VERIFY_URL', 'api.tidal.com');
-define('MPD_TIDAL_URL','tidal://track/');
-*/
-
-
-// #define TIDAL_ALBUM_URL 'https://openapi.tidal.com/v2/albums/';
-
-
-
+const char *TIDAL_TOKEN_URL = "https://auth.tidal.com/v1/oauth2/token";
+const char *TIDAL_ARTIST_URL = "https://openapi.tidal.com/v2/artists/";
+const char *TIDAL_USER_COLLECTIONS_URL = "https://openapi.tidal.com/v2/userCollections/";
+const char *TIDAL_ALBUM_URL = "https://openapi.tidal.com/v2/albums/";
+const char *TIDAL_ME_URL = "https://api.tidal.com/v1/me";
+const char *TIDAL_SEARCHRESULTS_URL = "https://openapi.tidal.com/v2/searchResults/";
+// func that use it do not work for now.
+const char *TIDAL_ME_PLAYLISTS_ITEMS_URL = "https://openapi.tidal.com/v2/playlists/me?include=items";
 
 
 
@@ -1174,7 +1166,7 @@ int tidal_class::get_access_token(char *loginbase64) {
   CURL *curl = curl_easy_init();
   printf("Tidal token read\n");
   if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2/token");
+    curl_easy_setopt(curl, CURLOPT_URL, TIDAL_TOKEN_URL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
@@ -1785,7 +1777,7 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   // old url="https://openapi.tidal.com/artists/"; // old ver
-  url="https://openapi.tidal.com/v2/artists/";
+  url=TIDAL_ARTIST_URL;
   url= url + artistid;
   // old url= url + "/albums?countryCode=US&offset=0&limit=100";
   url= url + "?countryCode=US&offset=0&limit=100&include=albums";
@@ -1854,7 +1846,7 @@ int tidal_class::opdatere_tidal_userCollections2(char *uid) {
   int error;
   std::string localuserhomedir;
   localuserhomedir = getenv("HOME");
-  url="curl -X GET 'https://openapi.tidal.com/v2/userCollections/";
+  url="curl -X GET " + std::string(TIDAL_USER_COLLECTIONS_URL);
   url = url + "131776836";
   url = url + "/relationships/albums?countryCode=US&locale=en-US&include=albums' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'accept: application/vnd.api+json' -H 'Authorization: Bearer ";
   url = url + + tidaltoken;
@@ -1894,7 +1886,7 @@ int tidal_class::opdatere_tidal_userCollections(char *uid) {
   char *devid=NULL;
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url ="https://openapi.tidal.com/v2/userCollections/";
+  url = TIDAL_USER_COLLECTIONS_URL;
   url = url + uid;
   url = url + "?countryCode=US&offset=0&limit=100&include=albums";
   userfilename = localuserhomedir;
@@ -1975,7 +1967,7 @@ int tidal_class::tidal_get_album_items(char *albumid) {
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   // url="https://openapi.tidal.com/albums/";
-  url="https://openapi.tidal.com/v2/albums/";
+  url=TIDAL_ALBUM_URL;
   // url=TIDAL_ALBUM_URL;
   url=url + albumid;
   url=url + "/items?countryCode=US&offset=0&limit=100";
@@ -2425,7 +2417,7 @@ int tidal_class::tidal_get_user_id() {
   if (devid) {
     auth_kode="Authorization: Bearer ";
     auth_kode=auth_kode + tidaltoken;
-    url="https://api.tidal.com/v1/me";
+    url=TIDAL_ME_URL;
     url=url + devid;
     printf("Get user info.\n");
     // use libcurl
@@ -3472,22 +3464,22 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
   // 1 = artist, 2 = track
   switch (type) {
     case 0:
-      url="https://openapi.tidal.com/v2/searchResults/";
+      url=TIDAL_SEARCHRESULTS_URL;
       url = url + searchbuffer;
       url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums";
       break;
     case 1:
-      url="https://openapi.tidal.com/v2/searchResults/";
+      url=TIDAL_SEARCHRESULTS_URL;
       url = url + searchbuffer;
       url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists";
       break;
     case 2:
-      url="https://openapi.tidal.com/v2/searchResults/";
+      url=TIDAL_SEARCHRESULTS_URL;
       url = url + searchbuffer;
       url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=tracks";
       break;
     default:
-      url="https://openapi.tidal.com/v2/searchResults/";
+      url=TIDAL_SEARCHRESULTS_URL;
       url = url + searchbuffer;
       url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists";
       break;
@@ -5143,9 +5135,8 @@ int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {
   strcpy(auth_kode,"Authorization: Bearer ");
   strcat(auth_kode,tidaltoken);
   CURL *curl = curl_easy_init();
-
   // userid="12";
-  url = "ttps://openapi.tidal.com/v2/playlists/me?include=items";
+  url = TIDAL_ME_PLAYLISTS_ITEMS_URL;
   /*
   url = "https://api.tidal.com/v1/users/";
   url = url + userid;
@@ -5225,7 +5216,7 @@ int tidal_class::tidal_refresh_token() {
     //chunk = curl_slist_append(chunk, "Accept: application/json");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //
-    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2/token");
+    curl_easy_setopt(curl, CURLOPT_URL, TIDAL_TOKEN_URL);
     // ask libcurl to use TLS version 1.3 or later
     curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);    
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
