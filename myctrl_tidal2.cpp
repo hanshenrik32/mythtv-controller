@@ -181,27 +181,22 @@ static int antalplaylists_temp=0;
 
 namespace fs = std::filesystem;
 
+//
+// tidal defines for urls
+//
 
-/*
-define('TIDAL_RESOURCES_URL','https://resources.tidal.com/images/');
-define('TIDAL_ALBUM_URL','https://listen.tidal.com/album/');
-define('TIDAL_ALBUM_URL_2','https://tidal.com/browse/album/');
-define('TIDAL_ARTIST_URL','https://listen.tidal.com/artist/');
-define('TIDAL_TRACK_URL','https://tidal.com/browse/track/');
-define('TIDAL_TRACK_STREAM_URL','audio.tidal.com');
-define('TIDAL_APP_ALBUM_URL','https://tidal.com/album/');
-define('TIDAL_APP_TRACK_URL','https://tidal.com/track/');
-define('TIDAL_MAX_CACHE_TIME', 21600); //6h in [s]
-define('TIDAL_TOKEN_VERIFY_URL', 'api.tidal.com');
-define('MPD_TIDAL_URL','tidal://track/');
-*/
+static const char *TIDAL_TOKEN_URL = "https://auth.tidal.com/v1/oauth2/token";
+static const char *TIDAL_ARTIST_URL = "https://openapi.tidal.com/v2/artists/";
+static const char *TIDAL_USER_COLLECTIONS_URL = "https://openapi.tidal.com/v2/userCollections/";
+static const char *TIDAL_ALBUM_URL = "https://openapi.tidal.com/v2/albums/";
+static const char *TIDAL_ME_URL = "https://api.tidal.com/v1/me";
+static const char *TIDAL_SEARCHRESULTS_URL = "https://openapi.tidal.com/v2/searchResults/";
+// func that use it do not work for now.
+static const char *TIDAL_ME_PLAYLISTS_ITEMS_URL = "https://openapi.tidal.com/v2/playlists/me?include=items";
 
-
-// #define TIDAL_ALBUM_URL 'https://openapi.tidal.com/v2/albums/';
-
-
-
-
+// Web port
+static const char *s_http_port = "8100";
+static struct mg_serve_http_opts s_http_server_opts;
 
 
 // ****************************************************************************************
@@ -224,9 +219,6 @@ void myglprint18_1(char *string) {
 
 
 
-// web port
-static const char *s_http_port = "8100";
-static struct mg_serve_http_opts s_http_server_opts;
 
 size_t tidal_curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
     data->append((char*) ptr, size * nmemb);
@@ -433,7 +425,7 @@ tidal_class::tidal_class() : antal(0) {
   antal_search = 0;
   antalplaylists_search = 0;
   type = 0;
-  searchtype = 0;
+  searchtype = 1;
   search_loaded = false;                                                        // load icobn gfx afload search is loaded done by thread.
   tidal_aktiv_song_antal = 0;                                                   //
   gfx_loaded = false;			                                                      // gfx loaded default false
@@ -457,12 +449,12 @@ tidal_class::tidal_class() : antal(0) {
   active_tidal_device = -1;                                                   // active tidal device -1 = no dev is active
   active_default_play_device = active_tidal_device;                           //
   aktiv_song_tidal_icon = 0;                                                  //
-  strcpy(tidal_client_id,"");                                               //
-  strcpy(tidal_secret_id,"");                                               //
+  tidal_client_id="client_id";
+  tidal_secret_id="secret_id";
   strcpy(tidaltoken,"");                                                    //
   strcpy(tidaltoken_refresh,"");                                            //
-  strcpy(tidal_client_id,"client_id");
-  strcpy(tidal_secret_id,"secret_id");
+  // strcpy(tidal_client_id,"client_id");
+  // strcpy(tidal_secret_id,"secret_id");
   strcpy(active_default_play_device_name,"");
   strcpy(overview_show_band_name,"");                                         //
   strcpy(overview_show_cd_name,"");                                           //
@@ -808,7 +800,7 @@ void tidal_class::process_value(json_value* value, int depth) {
             stack_search.push_back(cnew_tidal_record);
             antalplaylists++;
             antal++;
-            printf("add album named : %s\n",cnew_tidal_record.feed_showtxt.c_str());
+            printf("Tidal add album : %s\n",cnew_tidal_record.feed_showtxt.c_str());
           }
         }
         if (depth==9) {
@@ -1174,7 +1166,7 @@ int tidal_class::get_access_token(char *loginbase64) {
   CURL *curl = curl_easy_init();
   printf("Tidal token read\n");
   if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2/token");
+    curl_easy_setopt(curl, CURLOPT_URL, TIDAL_TOKEN_URL);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
@@ -1785,7 +1777,7 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   // old url="https://openapi.tidal.com/artists/"; // old ver
-  url="https://openapi.tidal.com/v2/artists/";
+  url=TIDAL_ARTIST_URL;
   url= url + artistid;
   // old url= url + "/albums?countryCode=US&offset=0&limit=100";
   url= url + "?countryCode=US&offset=0&limit=100&include=albums";
@@ -1854,7 +1846,7 @@ int tidal_class::opdatere_tidal_userCollections2(char *uid) {
   int error;
   std::string localuserhomedir;
   localuserhomedir = getenv("HOME");
-  url="curl -X GET 'https://openapi.tidal.com/v2/userCollections/";
+  url="curl -X GET " + std::string(TIDAL_USER_COLLECTIONS_URL);
   url = url + "131776836";
   url = url + "/relationships/albums?countryCode=US&locale=en-US&include=albums' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'accept: application/vnd.api+json' -H 'Authorization: Bearer ";
   url = url + + tidaltoken;
@@ -1894,7 +1886,7 @@ int tidal_class::opdatere_tidal_userCollections(char *uid) {
   char *devid=NULL;
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url ="https://openapi.tidal.com/v2/userCollections/";
+  url = TIDAL_USER_COLLECTIONS_URL;
   url = url + uid;
   url = url + "?countryCode=US&offset=0&limit=100&include=albums";
   userfilename = localuserhomedir;
@@ -1975,7 +1967,7 @@ int tidal_class::tidal_get_album_items(char *albumid) {
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   // url="https://openapi.tidal.com/albums/";
-  url="https://openapi.tidal.com/v2/albums/";
+  url=TIDAL_ALBUM_URL;
   // url=TIDAL_ALBUM_URL;
   url=url + albumid;
   url=url + "/items?countryCode=US&offset=0&limit=100";
@@ -2306,7 +2298,7 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
   CURLcode res;
   struct curl_slist *header = NULL;
   char *devid=NULL;
-  /*
+  usleep(600000); // sleep 0,6 seconds to avoid api limit error
   // test code with libcurl
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
@@ -2325,9 +2317,9 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
     curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
     curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
     curl_easy_setopt(curl, CURLOPT_POST, 0);
@@ -2346,9 +2338,8 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
   // always cleanup
   curl_easy_cleanup(curl);
   curl_global_cleanup();
-  // end test code
-  */
-
+   
+  
   auth_kode = " -H 'Authorization: Bearer ";
   auth_kode = auth_kode + tidaltoken;
   auth_kode = auth_kode + "'";
@@ -2356,7 +2347,7 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
   url=url + albumid;
   url=url + "/relationships/coverArt?countryCode=US&include=coverArt'";
   userfilename = localuserhomedir;
-  userfilename = userfilename + "/";
+  // userfilename = userfilename + "/";
   userfilename = userfilename + "/tidal_gfx/";
   userfilename = userfilename + "tidal_album_cover_";
   userfilename = userfilename + albumid;
@@ -2369,6 +2360,14 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
   if (!(file_exists(userfilename))) {
     error=system(curlstr.c_str());
   }
+    
+  userfilename = localuserhomedir;
+  // userfilename = userfilename + "/";
+  userfilename = userfilename + "/tidal_gfx/";
+  userfilename = userfilename + "tidal_album_cover_";
+  userfilename = userfilename + albumid;
+  userfilename = userfilename + ".json";
+  
   curlstr="grep -o 'https://[^\"]*' ";
   curlstr = curlstr + userfilename;
   // get filename for cover image in 320*320 there is multi sizes you can select to use.
@@ -2425,7 +2424,7 @@ int tidal_class::tidal_get_user_id() {
   if (devid) {
     auth_kode="Authorization: Bearer ";
     auth_kode=auth_kode + tidaltoken;
-    url="https://api.tidal.com/v1/me";
+    url=TIDAL_ME_URL;
     url=url + devid;
     printf("Get user info.\n");
     // use libcurl
@@ -3472,22 +3471,22 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
   // 1 = artist, 2 = track
   switch (type) {
     case 0:
-      url="https://openapi.tidal.com/v2/searchResults/";
+      url=TIDAL_SEARCHRESULTS_URL;
       url = url + searchbuffer;
       url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=albums";
       break;
     case 1:
-      url="https://openapi.tidal.com/v2/searchResults/";
+      url=TIDAL_SEARCHRESULTS_URL;
       url = url + searchbuffer;
       url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists";
       break;
     case 2:
-      url="https://openapi.tidal.com/v2/searchResults/";
+      url=TIDAL_SEARCHRESULTS_URL;
       url = url + searchbuffer;
       url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=tracks";
       break;
     default:
-      url="https://openapi.tidal.com/v2/searchResults/";
+      url=TIDAL_SEARCHRESULTS_URL;
       url = url + searchbuffer;
       url=url + "?countryCode=US&explicitFilter=include%2C%20exclude&include=artists";
       break;
@@ -4674,8 +4673,8 @@ int tidal_class::tidal_play_now_search_album(char *playlist_song,int tidalknapnr
         sysstring = sysstring + playlist_song;
         sysstring = sysstring + "'";  
       }
-      // error = system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
-      bool status=do_system_call_with_timeout(sysstring,output, 3600); // wait max 1 hour for download to finish
+      bool status = system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
+      // bool status=do_system_call_with_timeout(sysstring,output, 3600); // wait max 1 hour for download to finish
       if (status==true) {
         printf("Do tidal-dl-ng : %s \n ",sysstring.c_str());
       } else {
@@ -4948,7 +4947,7 @@ int tidal_class::tidal_play_now_search_album(char *playlist_song,int tidalknapnr
               aktiv_song_tidal_icon = stack_search[tidalknapnr].textureId;
             }
             tidal_aktiv_song_nr=0;
-          }  
+          }
         } else {
           printf("Error play file %s does not exist. \n",playfile.c_str());
         }
@@ -5143,9 +5142,8 @@ int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {
   strcpy(auth_kode,"Authorization: Bearer ");
   strcat(auth_kode,tidaltoken);
   CURL *curl = curl_easy_init();
-
   // userid="12";
-  url = "ttps://openapi.tidal.com/v2/playlists/me?include=items";
+  url = TIDAL_ME_PLAYLISTS_ITEMS_URL;
   /*
   url = "https://api.tidal.com/v1/users/";
   url = url + userid;
@@ -5219,13 +5217,13 @@ int tidal_class::tidal_refresh_token() {
   if ((curl) && (strcmp(tidaltoken_refresh,"")!=0)) {
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id);
-    curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id);
+    curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id.c_str());
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id.c_str());
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "Accept: application/json");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //
-    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2/token");
+    curl_easy_setopt(curl, CURLOPT_URL, TIDAL_TOKEN_URL);
     // ask libcurl to use TLS version 1.3 or later
     curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);    
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);

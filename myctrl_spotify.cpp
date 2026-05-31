@@ -1260,6 +1260,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
       case json_string:
         //printf("x = %d deep = %d string value: %s\n",x ,depth, value->u.string.ptr);
         if ((process_description) && (depth==11) && (x==7)) {
+          stack_vector.resize(antal+1);
           if (!(stack[antal])) {
             antal++;
             stack[antal]=new (struct spotify_oversigt_type);
@@ -1269,6 +1270,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         }
         if ( process_release_date ) {
           //printf("antal %d process_release_date %s \n",antal,value->u.string.ptr);
+          strcpy(stack_vector[antal].feed_release_date , value->u.string.ptr );
           strcpy( stack[antal]->feed_release_date , value->u.string.ptr );
           process_release_date=false;
         }
@@ -1290,7 +1292,8 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           // get song cover
           if (( depth == 14 ) && ( x == 1 )) {
             if (stack[antal]) {
-              strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
+              strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //                            
+              strcpy(stack_vector[antal].feed_gfx_url , value->u.string.ptr );
               strcpy(playlistgfx,value->u.string.ptr);
             }
           }
@@ -1327,11 +1330,13 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
             if ( antalplaylists<maxantal ) {
               if (antalplaylists==0) {
                 stack[antal]=new (spotify_oversigt_type);
+                stack_vector.resize(antal+1);                
                 antalplaylists++;
               } else {
                 antal++;
                 antalplaylists++;
                 stack[antal]=new (spotify_oversigt_type);
+                stack_vector.resize(antal+1);
               }
             }
           }
@@ -1359,6 +1364,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           if ((x==14) && (depth==9 )) {
             if (stack[antal]) {
               strcpy(stack[antal]->feed_name,value->u.string.ptr);
+              strcpy(stack_vector[antal].feed_name,value->u.string.ptr);
             }
             process_name=false;
           }
@@ -1366,6 +1372,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           if ((x==15) && (depth==9 )) {
             if (stack[antal]) {
               strcpy(stack[antal]->feed_name,value->u.string.ptr);
+              strcpy(stack_vector[antal].feed_name,value->u.string.ptr);
             }
             process_name=false;
           }
@@ -3125,6 +3132,7 @@ void spotify_class::clean_spotify_oversigt() {
 
 void spotify_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
+    stack_vector[nr].textureId=idtexture;
 }
 
 // ****************************************************************************************
@@ -3234,6 +3242,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
         while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
           if (antal<maxantal) {
             stack[antal]=new (struct spotify_oversigt_type);
+            stack_vector.resize(antal+1);
             if (stack[antal]) {
               strcpy(stack[antal]->feed_showtxt,"");          	            // show name
               strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
@@ -3247,6 +3256,20 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
               stack[antal]->intnr=atoi(row[3]);
               stack[antal]->nyt=false;
               stack[antal]->type=0;
+
+              strcpy(stack_vector[antal].feed_showtxt,"");
+              strcpy(stack_vector[antal].feed_name,"");
+              strcpy(stack_vector[antal].feed_desc,"");
+              strcpy(stack_vector[antal].feed_gfx_url,"");
+              strcpy(stack_vector[antal].feed_release_date,"");
+              strcpy(stack_vector[antal].playlisturl,"");
+              stack_vector[antal].feed_group_antal = 0;
+              stack_vector[antal].feed_path_antal = 0;
+              stack_vector[antal].textureId = 0;
+              stack_vector[antal].intnr = atoi(row[3]);
+              stack_vector[antal].nyt = false;
+              stack_vector[antal].type = 0;
+
               // top level (load playlist)
               if (getart == playlisttype ) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
@@ -3326,13 +3349,25 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
                 strcpy(stack[antal]->playlisturl,row[2]);   // get trackid
                 stack[antal]->type=1;
+
+
+                strncpy(stack_vector[antal].feed_showtxt,row[0],spotify_pathlength);
+                strncpy(stack_vector[antal].feed_name,row[0],spotify_namelength);
+                strncpy(stack_vector[antal].feed_gfx_url,row[1],spotify_namelength);
+                strcpy(stack_vector[antal].playlisturl,row[2]);   // get trackid
+                stack_vector[antal].type=1;
+
                 //songstrpointer=strstr(row[2],"https://api.spotify.com/v1/tracks/");
                 songstrpointer=strstr(row[2],"spotify:track:");
                 // get track id from string
                 if (songstrpointer) {
                   strcpy(temptxt2,row[2]+14);
                   strcpy(stack[antal]->playlistid,temptxt2);
-                } else strcpy(stack[antal]->playlistid,row[2]);
+                  strcpy(stack_vector[antal].playlistid,temptxt2);
+                } else {
+                  strcpy(stack[antal]->playlistid,row[2]);
+                  strcpy(stack_vector[antal].playlistid,row[2]);
+                }
                 antal++;
               }
             }
@@ -3434,6 +3469,20 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
             stack[antal]->feed_path_antal=0;
             stack[antal]->textureId=0;
             stack[antal]->nyt=false;
+
+            stack_vector.resize(antal+1);
+            strcpy(stack_vector[antal].feed_showtxt,"");
+            strcpy(stack_vector[antal].feed_name,"");
+            strcpy(stack_vector[antal].feed_desc,"");
+            strcpy(stack_vector[antal].feed_gfx_url,"");
+            strcpy(stack_vector[antal].feed_release_date,"");
+            strcpy(stack_vector[antal].playlisturl,"");
+            stack_vector[antal].feed_group_antal = 0;
+            stack_vector[antal].feed_path_antal = 0;
+            stack_vector[antal].textureId = 0;
+            stack_vector[antal].nyt = false;
+
+
             if (getart == playlisttype ) {
               stack[antal]->type=0;
               if (antal == 0) {
@@ -3655,6 +3704,8 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
                 strcat(downloadfilenamelong,".jpg");
                 // save name to db to next time
                 strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
+                strncpy(stack_vector[antal].feed_gfx_url,downloadfilenamelong,1024);
+
                 if (!(file_exists(downloadfilenamelong))) {
                   // download icon image
                   download_image(value->u.string.ptr,downloadfilenamelong);
@@ -3669,6 +3720,8 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
           if (antalplaylists<maxantal) {
             if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
             stack[antal]->textureId=0;
+            stack_vector[antal].textureId=0;
+
             strcpy(downloadfilenamelong,"");
             if (debugmode & 4) printf("# %d cd cover icon url found  : %s \n",antal,value->u.string.ptr);
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
@@ -3682,6 +3735,8 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
                 strcat(downloadfilenamelong,".jpg");
                 // save name to db to next time
                 strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
+                strncpy(stack_vector[antal].feed_gfx_url,downloadfilenamelong,1024);
+
                 if (!(file_exists(downloadfilenamelong))) {
                   // download icon image
                   download_image(value->u.string.ptr,downloadfilenamelong);
@@ -3709,6 +3764,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
           if (strlen(value->u.string.ptr)>16) {
             strcpy(artisid,value->u.string.ptr+15);
             strcpy(stack[antal-1]->playlistid,artisid);
+            strcpy(stack_vector[antal-1].playlistid,artisid);
           }
         }
       }
@@ -3724,10 +3780,15 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
             }
+            if (stack_vector.size()>0) {
+              strncpy(stack_vector[antal].feed_name,value->u.string.ptr,80);
+              strncpy(stack_vector[antal].feed_showtxt,value->u.string.ptr,80);
+            }
 
             //if (debugmode) fprintf(stderr,"# %d Artist name found : %s gfx url found %s \n",antal,stack[antal]->feed_name,stack[antal]->feed_gfx_url);
 
             stack[antal]->type=2;                                            // set type artist
+            stack_vector[antal].type=2;
             antal++;
             antalplaylists++;
           }
@@ -3743,12 +3804,20 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             strcpy(stack[antal]->feed_showtxt,"Back");
             stack[antal]->textureId=0;
             stack[antal]->intnr=0;                                            // back button
+
+            stack_vector.resize(antal+1);
+            strcpy(stack_vector[antal].feed_name,"Back");
+            strcpy(stack_vector[antal].feed_showtxt,"Back");
+            stack_vector[antal].textureId=0;
+            stack_vector[antal].intnr=0;                                            // back button
+
             strcpy(playlistid,"");                                            // no play id
             antal++;
           }
           if (antalplaylists<maxantal) {
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
+              stack_vector.resize(antal+1);
             }
             // get album playid
             if (value->u.string.ptr) {
@@ -3757,6 +3826,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
                 printf("******************************************* NO STACK error.\n");
               }
               strcpy(stack[antal]->playlistid,value->u.string.ptr);
+              strcpy(stack_vector[antal].playlistid,value->u.string.ptr);
             }
           }
         }
@@ -3772,7 +3842,12 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
           if (antalplaylists<maxantal) {
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
-              strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
+              strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);             
+            }
+            if (stack_vector.size()>0) {
+              strncpy(stack_vector[antal].feed_name,value->u.string.ptr,80);
+              strncpy(stack_vector[antal].feed_showtxt,value->u.string.ptr,80);             
+              stack_vector[antal].type=3;
             }
             stack[antal]->type=3;                                            // set type artist
             antal++;
@@ -3782,6 +3857,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
         // artist name
         if ((search_process_name) && (depth==10) && (x==3)) {
           strcpy(stack[antal-1]->feed_artist,value->u.string.ptr);
+          strcpy(stack_vector[antal-1].feed_artist,value->u.string.ptr);
         }
       }
       search_process_name=false;
@@ -4194,7 +4270,10 @@ int LoadImage(char *filename) {
 // ****************************************************************************************
 
 void spotify_class::settextureidfile(int nr,char *filename) {
-    if (stack[nr]->textureId==0) stack[nr]->textureId=loadTexture ((char *) filename);
+    if (stack[nr]->textureId==0) {
+      stack[nr]->textureId=loadTexture ((char *) filename);
+      stack_vector[nr].textureId=loadTexture ((char *) filename);
+    }
 }
 
 
@@ -5161,28 +5240,30 @@ void spotify_class::draw_spotify_item(int x, int y,int ii,GLuint normal_icon,GLu
   Color5 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color5 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   // Cover
-  gfxfilename = stack[ii]->feed_gfx_url;
-  float fontsize = float (configdefaultspotifyfontsize/100)*2;
-  if (gfxfilename.size() > 0) {
-    // load texture if not loaded
-    if (stack[ii]->textureId == 0) {
-      if (file_exists(gfxfilename.c_str())) {
-        stack[ii]->textureId = loadTexture((char *) gfxfilename.c_str());
-      } else strcpy(stack[ii]->feed_gfx_url, "");
+  if (stack_vector.size()>0) {
+    gfxfilename = stack[ii]->feed_gfx_url;
+    float fontsize = float (configdefaultspotifyfontsize/100)*2;
+    if (gfxfilename.size() > 0) {
+      // load texture if not loaded
+      if (stack[ii]->textureId == 0) {
+        if (file_exists(gfxfilename.c_str())) {
+          stack[ii]->textureId = loadTexture((char *) gfxfilename.c_str());
+        } else strcpy(stack[ii]->feed_gfx_url, "");
+      }
     }
-  }
-  // Titel
-  temprgtxt = fmt::format("{:^20}",stack[ii]->feed_showtxt);
-  temprgtxt.resize(20);
-  if (stack[ii]->textureId ) texture = stack[ii]->textureId; else texture = normal_icon;
-  if (ii == stream_key_selected-1) {
-    drawcover(x + 18, y + 18, 164.0f + sin(sinh)*4, 164.0f + sin(sinh)*4, texture ,ii+100,highcolor);
-    drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
-    sinh = sinh + 0.08f;
-    if (sinh>(M_PI*2)) sinh=0.0f;
-  } else {
-    drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
-    drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+    // Titel
+    temprgtxt = fmt::format("{:^20}",stack[ii]->feed_showtxt);
+    temprgtxt.resize(20);
+    if (stack[ii]->textureId ) texture = stack[ii]->textureId; else texture = normal_icon;
+    if (ii == stream_key_selected-1) {
+      drawcover(x + 18, y + 18, 164.0f + sin(sinh)*4, 164.0f + sin(sinh)*4, texture ,ii+100,highcolor);
+      drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+      sinh = sinh + 0.08f;
+      if (sinh>(M_PI*2)) sinh=0.0f;
+    } else {
+      drawcover(x + 20, y + 20, 160, 160, texture ,ii+100,normalcolor);
+      drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+    }
   }
 }
 

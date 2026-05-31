@@ -159,8 +159,8 @@ class tidal_class {
     bool search_tidal_online_done;
     bool show_search_result;                                                // are ew showing search result in tidal view ?
     bool search_playlist_song;                                              // search type 1 for song 0 for playlist
-    char tidal_client_id[255];                                              // Client id
-    char tidal_secret_id[255];                                              // Secret id
+    std::string tidal_client_id;
+    std::string tidal_secret_id;
     GLuint aktiv_song_tidal_icon;                                           // loaded gfx info for playing
     int active_tidal_device;                                                // active device then get tidal devices or -1
     int active_default_play_device;                                         // active device or -1
