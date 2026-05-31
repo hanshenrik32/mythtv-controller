@@ -30,7 +30,7 @@ class film_oversigt_type {
     unsigned int Width;
     unsigned int High;
     unsigned long Flesize;
-
+    time_t insertdatetime;              // date added to db
     char *format;
     char *rating;			                  // imdb rating size = 100
     char *film_imdbnr;                  // movie imdb nr if any size = 20
@@ -95,7 +95,7 @@ public:
     void setfilmsubtitle(char *value) { strcpy(film_subtitle,value); }
     char *getfilmsubtitle() { return(film_subtitle); }
     void resetfilm();
-
+    void setins_date(struct tm *dato) { insertdatetime=mktime(dato); }
     bool get_media_info_from_file(char *moviepath);
 
 };
@@ -116,6 +116,7 @@ class film_oversigt_typem : vlc_controller {
 //      libvlc_media_player_t *vlc_mp;            //
     float getmovieposition();
     bool show_search_view;
+    
   public:
     int selected_icon_in_view=1;
 
@@ -148,6 +149,11 @@ class film_oversigt_typem : vlc_controller {
     int startX = 20;
     int startY = 882;
     int viewHeight = 780;
+
+    int search_startX = 20;
+    int search_startY = 762;
+    int search_viewHeight = 660;
+
     // end new scroll vars
     bool film_is_playing;                                                     // playing ?
     std::vector<film_oversigt_type> filmoversigt;                             // vector of movies
@@ -186,7 +192,9 @@ class film_oversigt_typem : vlc_controller {
     //
     void onScroll(float delta) { scrollVel += delta * accel; }
     void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+    void draw_stream_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
     void show_film_oversigt(float _mangley,int filmnr);
+    void show_film_search_oversigt(float _mangley,int filmnr);
 };
 
 #endif

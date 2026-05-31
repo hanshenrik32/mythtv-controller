@@ -66,6 +66,7 @@ extern unsigned int filmoversigt_antal;
 extern bool vis_uv_meter;                                 // uv meter er igang med at blive vist
 extern int movie_oversigt_loaded_nr;
 extern bool movie_oversigt_gfx_loading;
+extern char keybuffer[];                                    // keyboard buffer
 
 // window info
 extern int orgwinsizey;
@@ -75,6 +76,10 @@ extern GLuint _textureId9_askbox;
 
 extern bool do_sqlite;
 
+
+extern Character characters[];
+
+extern GLuint tidal_big_search_bar_artist; // need change name to more generic name when used in movie search overview
 
 // ****************************************************************************************
 //
@@ -96,6 +101,7 @@ film_oversigt_type::film_oversigt_type() {
   length=0;	                    			// film length
   year=0;				                      // aar som den udkom
   userrating=0;			                  // bruger rating
+  insertdatetime=0;			              // date added to db
   film_imdbnr=new char[20];           //
   category_name=new char[128];	      // from mythtv film type (tal = database)
   genre=new char[200];		            //
@@ -238,6 +244,7 @@ void film_oversigt_type::resetfilm() {
   Flesize=0;
   cover3d=false;
   film_id=0;
+  insertdatetime=0;			              // date added to db
   textureId=0;                    // texture id for 3D cover hvis der findes en cover til filmen
 }
 
@@ -993,7 +1000,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
   // mysql stuf
   int checkdirexist=0;
   write_logfile(logfile,(char *) "Opdatere Film oversigt fra db :");
-  mainsqlselect = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid order by insertdate desc,title");
+  mainsqlselect = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle,insertdate from videometadata left join videocategory on videometadata.category=videocategory.intid order by insertdate desc,title");
   conn=mysql_init(NULL);
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
@@ -1317,6 +1324,11 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
           if (strlen(row[15])>0) new_movie.setFormat(row[15]);
         }
         if (row[16]) new_movie.setfilmsubtitle(row[16]);
+        if (row[17]) {
+          struct tm tidpunkt;
+          strptime((char *) row[17], "%Y-%m-%d %H:%M:%S", &tidpunkt); 
+          new_movie.setins_date(&tidpunkt);
+        }
         if (strcmp(new_movie.getFormat(),"")==0) {
           if (new_movie.get_media_info_from_file((char *) row[2])) {
             sql_update = fmt::format("update videometadata set length={},bitrate={},width={},high={},fsize={},fformat='{}' where filename like '{}'",new_movie.getfilmlength(),new_movie.getBitrate(), new_movie.getWidth() ,new_movie.getHigh(), new_movie.getSize(), new_movie.getFormat() ,row[2]);
@@ -1688,6 +1700,21 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
 
 // All new versions 2 *****************************************************************************************************************
 
+// ****************************************************************************************
+//
+// get text width
+//
+// ****************************************************************************************
+
+
+float film_getTextWidth(const std::string& text, float scale) {
+  float width = 0.0f;
+  for (char c : text){
+    Character ch = characters[c];
+    width += ch.advance * scale;  // glyph advance
+  }
+  return width;
+}
 
 
 // ****************************************************************************************
@@ -1710,6 +1737,51 @@ void movie_drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color3 
   glTexCoord2f(0, 1); glVertex2i(x,     y + h);
   glEnd();
 }
+
+
+// ****************************************************************************************
+//
+// Draw stream item
+//
+// ****************************************************************************************
+
+
+void film_oversigt_typem::draw_stream_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
+  // Baggrund
+  std::string temprgtxt;
+  std::string gfxfilename;
+  GLuint texture;
+  Color3 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
+  Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  // Cover
+  gfxfilename = filmoversigt[ii].getfilmcoverfile();
+  float fontsize = 1.0f;
+  if (gfxfilename.size() > 0) {
+    // load texture if not loaded
+    if (filmoversigt[ii].gettextureid() == 0) {
+      if (file_exists(gfxfilename.c_str())) {
+        filmoversigt[ii].settextureid(loadTexture((char *) gfxfilename.c_str()));
+      }
+    }
+  }
+  // Titel
+  temprgtxt = fmt::format("{:^20}",filmoversigt[ii].getfilmtitle());
+  temprgtxt.resize(20);
+  if (filmoversigt[ii].gettextureid() ) texture = filmoversigt[ii].gettextureid(); else texture = normal_icon;
+  if (ii == selected_icon_in_view-1) {                                                       // if (ii == film_key_selected-1) {
+    if (y<search_startY-50) {
+      movie_drawcover(x + 18, y + 18, 174, 214, texture ,ii+100,highcolor);
+      drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
+    }
+  } else {
+    if (y<search_startY-50) {
+      movie_drawcover(x + 20, y + 20, 170, 210, texture ,ii+100,normalcolor);                                         // if (ii == film_key_selected-1) {
+      drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+    }
+  }
+}
+
+
 
 // ****************************************************************************************
 //
@@ -1751,6 +1823,67 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
 
 
 
+// **************************************************************************************************
+//
+// new film oversigt with kinetic scroll
+//
+// **************************************************************************************************
+
+void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
+  static bool cursor;
+  float yof_top=orgwinsizey-150;                               // start ypos
+  float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
+  // ---- KINETIC SCROLL ---------------------------------------
+  scrollVel *= friction;
+  scrollPos += scrollVel;
+  if (fabs(scrollVel) < 0.01f) scrollVel = 0;
+  int totalRows   = (int)ceil((float)filmoversigt.size() / itemsPerRow);
+  int visibleRows = viewHeight / rowHeight;
+  float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
+  // scrollPos = std::clamp(scrollPos, 0.0f, maxScroll);
+  if (scrollPos < 0) {
+      scrollPos = 0;
+      scrollVel = 0;
+  } else if (scrollPos > maxScroll) {
+      scrollPos = maxScroll;
+      scrollVel = 0;
+  }
+  // ---- CALC --------------------------------------------------
+  int firstRow   = (int)(scrollPos / rowHeight);
+  float subOff   = fmod(scrollPos, rowHeight);
+  int sofset     = firstRow * itemsPerRow;
+  int screenTop = startY+75;
+  int xof = startX;
+  int visibleItems = (visibleRows + 3) * itemsPerRow;
+  // show search box
+  glEnable(GL_TEXTURE_2D);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glLoadName(0);
+  glBegin(GL_QUADS); 
+  glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+  glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+(rowHeight/2)-20, 0.0);
+  glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+(rowHeight/2)-20 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+  glEnd();
+  // ---- RENDER -----------------------------------------------
+  // show seach string
+  if (strcmp(keybuffer,"")!=0) {
+    drawText(font24, keybuffer, 300.0f, 980.0f, 1.0f, 0);
+    float textWidth = film_getTextWidth(keybuffer, 1.0f);
+    if (cursor) drawText(font24, "_", 300.0f+textWidth, 980.0f, 1.0f, 0);
+  }
+  for (int i = 0; i < visibleItems && (sofset + i) < filmoversigt.size(); ++i) {
+    int index = sofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    int x = xof + col * itemWidth + 40;
+    int y = screenTop - (row * rowHeight) + subOff - 40;
+    draw_stream_search_item( x, y, index, _defaultdvdcover, _defaultdvdcover, film_select_iconnr );
+  }
+}
 
 
 
@@ -1759,8 +1892,6 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
 // new film oversigt with kinetic scroll
 //
 // **************************************************************************************************
-
-
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   // ---- KINETIC SCROLL ---------------------------------------
@@ -1788,7 +1919,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int sofset     = firstRow * itemsPerRow;
   int screenTop = startY;
   int xof = startX;
-  int visibleItems = (visibleRows + 2) * itemsPerRow;
+  int visibleItems = (visibleRows + 3) * itemsPerRow;
   // ---- RENDER -----------------------------------------------
   for (int i = 0; i < visibleItems && (sofset + i) < filmoversigt.size(); ++i) {
     int index = sofset + i;

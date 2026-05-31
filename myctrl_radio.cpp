@@ -875,7 +875,7 @@ void radiostation_class::draw_radio_search_item(int x, int y,int ii,GLuint norma
   GLuint texture;
   Color2 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color2 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  // Cover
+  // Cover path
   gfxfilename = "/opt/mythtv-controller/images/radiostations/";
   gfxfilename = gfxfilename + stack[ii].gfxfilename;
   if (stack[ii].gfxfilename.length()>0) {
@@ -891,17 +891,19 @@ void radiostation_class::draw_radio_search_item(int x, int y,int ii,GLuint norma
   temprgtxt = stack[ii].station_name;
   if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
   if (stack[ii].textureId ) {
-    if (ii == selected_icon_in_view-1) {                                                                           // old if (ii == radio_key_selected-1) {
-      drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4,   1.0f, 22, 3, 2, true);
-      sinh = sinh + 0.2f;
-      if (sinh>(M_PI*2)) sinh=0.0f;
+    if (ii == selected_icon_in_view-1) {
+      if (y<search_startY-30) {
+        drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
+        drawLinesOfText(temprgtxt, x + 18, y + 4,   1.0f, 22, 3, 2, true);
+        sinh = sinh + 0.2f;
+        if (sinh>(M_PI*2)) sinh=0.0f;
+      }
     } else {
       drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
       drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
     }
   } else {
-    if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
+    if (ii == selected_icon_in_view-1) {
       if (y<search_startY-30) {
         drawcover(x + 18, y + 18 , 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
         drawLinesOfText(temprgtxt, x + 18, y + 4 , 1.0f, 22, 3, 2, true);        
@@ -968,50 +970,81 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int screenTop = startY;                                 // start position for first item y 
   int xof = startX;                                       // start position for first item x
   int visibleItems = (visibleRows + 2) * itemsPerRow;
-  if (strlen(keybuffer)>0) {
-    screenTop=search_startY;
-    glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glLoadName(0);
-    glBegin(GL_QUADS); 
-    glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
-    glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+rowHeight-20, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+rowHeight-20 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
-    glEnd();
-    // show seach string
-    if (strcmp(keybuffer,"")!=0) {
-      drawText(font24, keybuffer, 300.0f, 980.0f, 1.0f, 0);
-      float textWidth = radio_getTextWidth(keybuffer, 1.0f);
-      if (cursor) drawText(font24, "_", 300.0f+textWidth, 980.0f, 1.0f, 0);
-    }
-    printf("Keybuffer = %s \n",keybuffer);
-    // ---- RENDER -----------------------------------------------
-    for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
-      int index = ssofset + i;
-      int col = i % itemsPerRow;
-      int row = i / itemsPerRow;
-      int x = xof + col * itemWidth + 40;
-      int y = screenTop - (row * rowHeight) + subOff - 40;    
-      draw_radio_search_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
-    }
-  } else {
-    // ---- RENDER -----------------------------------------------
-    for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
-      int index = ssofset + i;
-      int col = i % itemsPerRow;
-      int row = i / itemsPerRow;
-      int x = xof + col * itemWidth + 40;
-      int y = screenTop - (row * rowHeight) + subOff - 40;
-      draw_radio_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
-    }
+  // ---- RENDER -----------------------------------------------
+  for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
+    int index = ssofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    int x = xof + col * itemWidth + 40;
+    int y = screenTop - (row * rowHeight) + subOff - 40;
+    draw_radio_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
   }
   return(true);
 }
 
+
+// ****************************************************************************************
+//
+// show radio stations overview
+//
+// ****************************************************************************************
+
+bool radiostation_class::show_radio_search_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+  static bool cursor;
+  float yof_top=orgwinsizey-(rowHeight*1)+20;                               // start ypos
+  float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
+  // ---- KINETIC SCROLL ---------------------------------------
+  scrollVel *= friction;
+  scrollPos += scrollVel;
+  if (fabs(scrollVel) < 0.01f) scrollVel = 0;
+  int totalRows   = (int)ceil((float)stack.size() / itemsPerRow);
+  int visibleRows = viewHeight / rowHeight;
+  float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
+  if (scrollPos < 0) {
+      scrollPos = 0;
+      scrollVel = 0;
+  } else if (scrollPos > maxScroll) {
+      scrollPos = maxScroll;
+      scrollVel = 0;
+  }
+  // ---- CALC --------------------------------------------------
+  int firstRow   = (int)(scrollPos / rowHeight);
+  float subOff   = fmod(scrollPos, rowHeight);
+  int ssofset     = firstRow * itemsPerRow;
+  int screenTop = startY;                                 // start position for first item y 
+  int xof = startX;                                       // start position for first item x
+  int visibleItems = (visibleRows + 2) * itemsPerRow;
+  screenTop=search_startY;
+  glEnable(GL_TEXTURE_2D);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glLoadName(0);
+  glBegin(GL_QUADS); 
+  glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+  glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+rowHeight-20, 0.0);
+  glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+rowHeight-20 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+  glEnd();
+  // show seach string
+  if (strcmp(keybuffer,"")!=0) {
+    drawText(font24, keybuffer, 300.0f, 980.0f, 1.0f, 0);
+    float textWidth = radio_getTextWidth(keybuffer, 1.0f);
+    if (cursor) drawText(font24, "_", 300.0f+textWidth, 980.0f, 1.0f, 0);
+  }
+  printf("Keybuffer = %s \n",keybuffer);
+  // ---- RENDER -----------------------------------------------
+  for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
+    int index = ssofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    int x = xof + col * itemWidth + 40;
+    int y = screenTop - (row * rowHeight) + subOff - 40;    
+    draw_radio_search_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
+  }
+  return(true);
+}
 
 
 // ****************************************************************************************
