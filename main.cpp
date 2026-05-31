@@ -829,6 +829,7 @@ GLuint big_search_bar_artist;             // big search bar used by sporify sear
 GLuint tidal_big_search_bar_artist;       // big search bar used by tidal search
 GLuint tidal_big_search_bar_track;         // big search bar used by tidal search
 GLuint tidal_big_search_bar_album;
+GLuint big_search_bar;
 
 
 GLuint music_big_search_bar_artist;       // big search bar used by tidal search
@@ -16951,6 +16952,7 @@ void loadgfx() {
   tidal_big_search_bar_artist = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_artist");
   tidal_big_search_bar_album = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_album");
   tidal_big_search_bar_track = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_track");
+  big_search_bar        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "big_search_bar");
 
   music_big_search_bar_artist = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_artist");
   music_big_search_bar_album = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_album");
@@ -17152,6 +17154,7 @@ void freegfx() {
   glDeleteTextures( 1, &tidal_big_search_bar_artist);   // Tidal stuf
   glDeleteTextures( 1, &tidal_big_search_bar_album);    //
   glDeleteTextures( 1, &tidal_big_search_bar_track);    //
+  glDeleteTextures( 1, &big_search_bar);                //
   glDeleteTextures( 1, &music_big_search_bar_artist);   // Tidal stuf
   glDeleteTextures( 1, &music_big_search_bar_album);    //
   glDeleteTextures( 1, &music_big_search_bar_track);    //

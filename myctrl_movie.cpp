@@ -79,7 +79,7 @@ extern bool do_sqlite;
 
 extern Character characters[];
 
-extern GLuint tidal_big_search_bar_artist; // need change name to more generic name when used in movie search overview
+extern GLuint big_search_bar; // need change name to more generic name when used in movie search overview
 
 // ****************************************************************************************
 //
@@ -1858,7 +1858,7 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
   // show search box
   glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+  glBindTexture(GL_TEXTURE_2D,big_search_bar);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glLoadName(0);
