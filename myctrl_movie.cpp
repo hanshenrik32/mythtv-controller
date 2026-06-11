@@ -79,7 +79,7 @@ extern bool do_sqlite;
 
 extern Character characters[];
 
-extern GLuint tidal_big_search_bar_artist; // need change name to more generic name when used in movie search overview
+extern GLuint big_search_bar; // need change name to more generic name when used in movie search overview
 
 // ****************************************************************************************
 //
@@ -1009,13 +1009,13 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        if (atoi(row[1])>=33) dbexist=true; else dbexist=false;
+        if (atoi(row[1])>=31) dbexist=true; else dbexist=false;
       }
     } else dbexist=false;
     if (!(dbexist)) {
       dbexist=createdb(conn);                                                               // create db if not exist
       firsttime=true;
-    }
+    } else dbexist=false;
     if (firsttime) {
       dirp=opendir(configmoviepath);
       if (dirp==NULL) {
@@ -1419,7 +1419,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
   strcpy(database,dbname);
   strcpy(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref from videometadata where title like '%");
   strcat(mainsqlselect,movietitle);
-  strcat(mainsqlselect,"%' order by category,title limit 100"); // ,FILM_OVERSIGT_TYPE_SIZE-1);
+  strcat(mainsqlselect,"%' order by category,title"); // ,FILM_OVERSIGT_TYPE_SIZE-1);
   conn=mysql_init(NULL);
   if (conn) {
     filmoversigt.clear();
@@ -1453,7 +1453,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
           new_movie.setfilmid(atoi(row[0]));
           new_movie.setfilmtitle(row[1]);
           // hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
-          hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
+          // if (filmoversigt.size() > 0) hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
           if (row[8]) {							                                 // hent film beskrivelse
             new_movie.setfilmsubtitle(row[8]);
           } else new_movie.setfilmsubtitle((char *) "");
@@ -1542,7 +1542,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
       if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (((i+sofset)<filmoversigt_antal) && (filmoversigt[i+sofset].gettextureid())) {
         // print cover dvd
-        //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
@@ -1851,14 +1850,14 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
   // ---- CALC --------------------------------------------------
   int firstRow   = (int)(scrollPos / rowHeight);
   float subOff   = fmod(scrollPos, rowHeight);
-  int sofset     = firstRow * itemsPerRow;
+  int sofset     = (firstRow * itemsPerRow);
   int screenTop = startY+75;
   int xof = startX;
   int visibleItems = (visibleRows + 3) * itemsPerRow;
   // show search box
   glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
+  glBindTexture(GL_TEXTURE_2D,big_search_bar);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glLoadName(0);
@@ -1881,7 +1880,9 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
     int row = i / itemsPerRow;
     int x = xof + col * itemWidth + 40;
     int y = screenTop - (row * rowHeight) + subOff - 40;
-    draw_stream_search_item( x, y, index, _defaultdvdcover, _defaultdvdcover, film_select_iconnr );
+    if (index>7) { 
+      draw_stream_search_item( x, y, index-8, _defaultdvdcover, _defaultdvdcover, film_select_iconnr );
+    }
   }
 }
 

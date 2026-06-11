@@ -408,7 +408,7 @@ float torrent_loader::get_progress(int nr) {
 //
 // ****************************************************************************************
 
-void torrent_loader::opdate_progress() {
+void torrent_loader::update_progress() {
   int tnr=0;
   static int checkit=0;
   checkit++;
