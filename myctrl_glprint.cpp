@@ -99,6 +99,8 @@ mFont loadFont(FT_Face face, int pixelSize) {
 // ****************************************************************************************/*
 
 void drawText(mFont& font, const char* text, float x, float y, float scale, int color) {
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   for (size_t i = 0; i < strlen(text); i++) {
     unsigned char c = (unsigned char)text[i];
     if (font.characters.find(c) == font.characters.end())

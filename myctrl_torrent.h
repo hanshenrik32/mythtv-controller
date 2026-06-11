@@ -69,7 +69,7 @@ class torrent_loader {
         void set_torrent_active(int n,bool activ) { torrent_list[n].active=activ; }
         void set_torrent_paused(int n,bool pause) { torrent_list[n].paused=pause; }
         torrent_loader();
-        void opdate_progress();
+        void update_progress();
         void show_torrent_oversigt(int sofset,int key_selected);
         void show_torrent_options();                                                            // show pause/move/delete optios in opengl
         void show_move_options();                                                               // show options in opengl
