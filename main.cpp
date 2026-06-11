@@ -3315,7 +3315,7 @@ void display() {
     }
 
     if (urtype == MUSICMETER) {
-      // show music meter            
+      // show music meter if music is playing
       // create one display list
       // No music is playing show clock
       if ((streamoversigt.stream_is_playing==false) && (radiooversigt.playing==false) && (tidal_oversigt.get_tidal_playing_flag()== false) && (musicoversigt.play()==false) && (film_oversigt.film_is_playing==false)) {
@@ -3540,7 +3540,7 @@ void display() {
           glRotatef(angle, 0.0f, 0.0f, 1.0f);
           glTranslatef(0.0f, radius, 0.0f);
           // Ekstra musikrotation
-          glRotatef(barRotation[xp][0], 0.0f, 0.0f, 1.0f);
+          // glRotatef(barRotation[xp][0], 0.0f, 0.0f, 1.0f);
           float ypos = 0.0f;
           for (int yp = 0; yp < high; yp++) {
             glPushMatrix();
