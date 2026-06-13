@@ -180,7 +180,8 @@ class film_oversigt_typem : vlc_controller {
     film_oversigt_typem(unsigned int antal);
     ~film_oversigt_typem();
     // overload func
-    int opdatere_film_oversigt(void);
+    int opdatere_film_oversigt();
+    int opdatere_film_oversigt(bool forceupdate);
     int opdatere_film_oversigt(char *movietitle);
     bool createdb(MYSQL *conn);
 

@@ -985,6 +985,7 @@ void update_spotify_phread_loader_v2();
 void webupdate_loader_spotify_v2();
 void webupdate_loader_tidal_v2();
 void datainfoloader_movie_v2();
+void *datainfoloader_movie_v2_force(void *arg);
 void datainfoloader_xmltv_v2();
 
 bool spotify_update_loaded_begin=false;
@@ -13990,14 +13991,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                 } else {
                   if (configmythtvver>=0) {
-                    datainfoloader_movie_v2();                                // load movie info
-                    /*
-                    int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
+                    // datainfoloader_movie_v2();                                // load movie info
+                    int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie_v2_force,NULL);
                     if (rc1) {
                       fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
                       exit(-1);
                     }
-                    */
                   }
                 }
               }
@@ -14045,7 +14044,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                 } else {
                   if (configmythtvver>=0) {
-                    datainfoloader_movie_v2();                                // load movie info
+                    // datainfoloader_movie_v2();                                // load movie info
+                    int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie_v2_force,NULL);
+                    if (rc1) {
+                      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
+                      exit(-1);
+                    }
                     /*
                     int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
                     if (rc1) {
@@ -16212,7 +16216,7 @@ void datainfoloader_movie_v2() {
   if (strcmp(configbackend,"mythtv")==0) {
     // write debug log
     write_logfile(logfile,(char *) "loader thread starting - Loading movie info from mythtv.");
-    film_oversigt.opdatere_film_oversigt();     	              // gen covers 3d hvis de ikke findes.
+    film_oversigt.opdatere_film_oversigt(false);     	              // gen covers 3d hvis de ikke findes.
     do_update_moviedb=false;                                    // set done
   } else {
     if (debugmode & 16) fprintf(stderr,"Load movie from xbmc/kodi\n");
@@ -16222,6 +16226,29 @@ void datainfoloader_movie_v2() {
   write_logfile(logfile,(char *) debuglogdata);
 }
 
+
+
+// ****************************************************************************************
+//
+// in use
+// Dataload Film
+//
+// ****************************************************************************************
+
+void *datainfoloader_movie_v2_force(void *arg) {
+  if (strcmp(configbackend,"mythtv")==0) {
+    // write debug log
+    write_logfile(logfile,(char *) "loader thread starting - Loading movie info from mythtv.");
+    film_oversigt.opdatere_film_oversigt(true);     	              // gen covers 3d hvis de ikke findes.
+    do_update_moviedb=false;                                    // set done
+  } else {
+    if (debugmode & 16) fprintf(stderr,"Load movie from xbmc/kodi\n");
+  }
+  // write debug log
+  sprintf(debuglogdata,"loader thread done loaded %d movie.",film_oversigt.get_film_antal());
+  write_logfile(logfile,(char *) debuglogdata);
+  return nullptr;
+}
 
 
 // ****************************************************************************************
@@ -16238,7 +16265,7 @@ void *datainfoloader_movie(void *data) {
   if (strcmp(configbackend,"mythtv")==0) {
     // write debug log
     write_logfile(logfile,(char *) "loader thread starting - Loading movie info from mythtv.");
-    film_oversigt.opdatere_film_oversigt();     	              // gen covers 3d hvis de ikke findes.
+    film_oversigt.opdatere_film_oversigt(false);     	              // gen covers 3d hvis de ikke findes.
     do_update_moviedb=false;                                    // set done
   } else {
     if (debugmode & 16) fprintf(stderr,"Load movie from xbmc/kodi\n");
@@ -17021,7 +17048,7 @@ void *xbmcdatainfoloader_movie(void *data) {
       if (debugmode & 16) fprintf(stderr,"XBMC - loader done.\n");
       // load movies in from db
       xbmcSQL->getxmlfilepath();                   // get path info from xml file
-      film_oversigt.opdatere_film_oversigt();     // gen covers 3d hvis de ikke findes.
+      film_oversigt.opdatere_film_oversigt(false);     // gen covers 3d hvis de ikke findes.
     }
   }
   // write debug log
