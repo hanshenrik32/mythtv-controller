@@ -48,6 +48,24 @@ class boxarray {
     void roll_array();
 };
 
-void drawPlasma(int width, int height);
 
+class meter2 {
+  private:
+    float rot;
+    float spectrum2[128];
+    void drawPlasma(int width, int height);
+    void drawEnergyCore();
+    void drawOrbitParticles();
+    void drawSpectrumRing();
+    public:
+    meter2() : rot(0) {}
+    void renderScene();
+};
+
+
+void drawPlasma(int width, int height);
+void renderScene();
+void drawEnergyCore();
+void drawOrbitParticles();
+void drawSpectrumRing();
 #endif

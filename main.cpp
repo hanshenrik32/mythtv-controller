@@ -2855,7 +2855,9 @@ void display() {
   static bool clock_gluptimetime = false;
   static GLuint index;
   static int lastohur;
-  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  if ((urtype == MUSICMETER3) && ((!visur))) {
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  } else glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   static int xrand=0;
   static int yrand=0;
   static int do_we_play_check=0;
@@ -3529,34 +3531,8 @@ void display() {
     }
 
 
-    if (urtype == MUSICMETER) {
-      float centerX = 400.0f;
-      float centerY = 300.0f;
-      float radius  = 150.0f;
-      glPushMatrix();
-      for (int xp = 0; xp < barantal; xp++) {
-          float angle = xp * (360.0f / barantal);
-          int high = barHeights[xp] * 2;
-          glTranslatef(centerX, centerY, 0.0f);
-          glRotatef(angle, 0.0f, 0.0f, 1.0f);
-          glTranslatef(0.0f, radius, 0.0f);
-          // Ekstra musikrotation
-          // glRotatef(barRotation[xp][0], 0.0f, 0.0f, 1.0f);
-          float ypos = 0.0f;
-          for (int yp = 0; yp < high; yp++) {
-            glPushMatrix();
-            glTranslatef(0.0f, ypos, 0.0f);
-            glBegin(GL_QUADS);
-            glVertex3f(-siz_x, 0.0f, 0.0f);
-            glVertex3f(-siz_x, siz_y * 2.0f, 0.0f);
-            glVertex3f( siz_x, siz_y * 2.0f, 0.0f);
-            glVertex3f( siz_x, 0.0f, 0.0f);
-            glEnd();
-            glPopMatrix();
-            ypos += (siz_y * 2.0f) + 2.0f;
-        }
-      }
-      glPopMatrix();
+    if (urtype == MUSICMETER3) {
+      renderScene();
     }
 
 
@@ -3982,8 +3958,8 @@ void display() {
           film_oversigt.opdatere_film_oversigt(keybuffer);
           film_oversigt.set_search_view(true);
         }
-        keybuffer[0] = 0;
-        keybufferindex = 0;
+        // keybuffer[0] = 0;
+        // keybufferindex = 0;
         film_select_iconnr = 0;
         film_key_selected = 0;
       }
@@ -4125,11 +4101,16 @@ void display() {
       } else {
         musicoversigt.show_search_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
-      }  
+      }
     } else if (vis_film_oversigt) {
       glPushMatrix();
       //aktivfont.selectfont("DejaVu Sans");
-      film_oversigt.show_film_oversigt(_fangley,film_select_iconnr);
+      if (do_show_movie_search_oversigt==false) {
+        film_oversigt.show_film_oversigt(_fangley,film_select_iconnr);
+      } else {
+        film_oversigt.show_film_search_oversigt(_fangley,film_select_iconnr);
+      }
+
        // printf("film_key_selected = %d film_select_iconnr = %d fknapnr = %d \n",film_key_selected,film_select_iconnr,fknapnr);
       glPopMatrix();
       if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
@@ -13080,8 +13061,9 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
           }
-          // is ask movie totle fill buffer from keyboard
-          if (vis_film_oversigt) {
+          // is ask movie title fill buffer from keyboard
+        
+          if ((vis_film_oversigt) && (do_show_movie_search_oversigt==false)) {
             if (key!=13) {
               if ((key>31) && (key<127)) {
                 keybuffer[keybufferindex]=key;
@@ -13091,7 +13073,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               fprintf(stderr,"Keybuffer=%s\n",keybuffer);
             }
           }
-
+          
           // 
           // Editor for start id file in tidal overview (only numbers)
           if (tidal_oversigt.do_setup_tidal_start_entry) {
@@ -13975,6 +13957,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               //
               // Movie
               //
+              
               if ((vis_film_oversigt) && (!(do_update_moviedb))) {
                 do_update_moviedb = true;                                           // set update flag
                                                                                     // bliver sikket cleared in thread
@@ -14000,7 +13983,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                 }
               }
-
               break;
             case 'U':
               //
@@ -14050,13 +14032,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                       fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
                       exit(-1);
                     }
-                    /*
-                    int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
-                    if (rc1) {
-                      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
-                      exit(-1);
-                    }
-                    */
                   }
                 }
               }
@@ -14129,8 +14104,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                     }
                   } else {
                     hent_film_search = true;			  	// start movie title search
-                    strcpy(keybuffer,"");
-                    fknapnr=0;
+                    // strcpy(keybuffer,"");
+                    // fknapnr=0;
                   }
                 }
                 // search podcast
@@ -16247,7 +16222,8 @@ void *datainfoloader_movie_v2_force(void *arg) {
   // write debug log
   sprintf(debuglogdata,"loader thread done loaded %d movie.",film_oversigt.get_film_antal());
   write_logfile(logfile,(char *) debuglogdata);
-  return nullptr;
+  // return nullptr;
+  pthread_exit(NULL);
 }
 
 
@@ -18329,7 +18305,7 @@ int main(int argc, char** argv) {
     #endif
 
     recordoversigt.opdatere_recorded_oversigt();
-    // film_oversigt.opdatere_film_oversigt1();
+    film_oversigt.opdatere_film_oversigt(false);
 
     if (configbackend_openspotify_player) {
       // check if running do not start new.

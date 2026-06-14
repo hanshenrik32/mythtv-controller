@@ -1525,7 +1525,6 @@ int film_oversigt_typem::opdatere_film_oversigt() {
                   if (strcmp(ext,".ogv")==0) film_ok=true;
                   if (strcmp(ext,".iso")==0) film_ok=true;
                   if (strcmp(ext,".ISO")==0) film_ok=true;
-                  if (strcmp(ext,".ISO")==0) film_ok=true;
                   if (film_ok) {
                     // name title
                     strcpy(movietitle,submoviefil->d_name);
@@ -1868,7 +1867,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
 int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
   // char sqlselect[4000];
   std::string sqlselect;
-  char mainsqlselect[2000];
+  std::string mainsqlselect1;
   unsigned int i;
   int filmantal=0;
   char database[200];
@@ -1879,9 +1878,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
   MYSQL_ROW row;
   // mysql stuf
   strcpy(database,dbname);
-  strcpy(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref from videometadata where title like '%");
-  strcat(mainsqlselect,movietitle);
-  strcat(mainsqlselect,"%' order by category,title"); // ,FILM_OVERSIGT_TYPE_SIZE-1);
+  mainsqlselect1 = fmt::format("SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref from videometadata where title like '%{}%' order by category,title",movietitle);
   conn=mysql_init(NULL);
   if (conn) {
     filmoversigt.clear();
@@ -1905,7 +1902,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
     if (dbexist) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      mysql_query(conn,mainsqlselect);
+      mysql_query(conn,mainsqlselect1.c_str());
       res = mysql_store_result(conn);
       i=0;
       if (res) {
@@ -1956,7 +1953,6 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
 void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int lfilmoversigt_antal=6;
   int i=0;
-//  int txtbrede;
   bool cover3d=false;
   char *lastslash;
   float xvgaz=0.0f;
@@ -1972,7 +1968,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int winsizx,winsizy;
   int xpos,ypos;
   static int load_rec=0;
-  
   // load dvd covers dynamic one pr frame
   if ((filmoversigt.size() > 0) && (movie_oversigt_loaded==false) && (load_rec<6)) {
     if (load_rec<filmoversigt_antal) {
