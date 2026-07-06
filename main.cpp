@@ -135,9 +135,9 @@ FMOD::DSP* dsp = 0;                   // fmod Sound device
 #endif
 
 // screen saver uv stuf
-float spectrum[2000];                                                           // used for spectium
-float spectrum_left[2000];                                                      // used for spectium
-float spectrum_right[2000];                                                     // used for spectium
+float spectrum[5000];                                                           // used for spectium
+float spectrum_left[4000];                                                      // used for spectium
+float spectrum_right[4000];                                                     // used for spectium
 float uvmax_values[1024];
 int frequencyOctaves[15];                                                       // 15 octaver
 
@@ -608,6 +608,8 @@ void freegfx();
 
 
 class config_icons config_menu; // config icons used in menu
+
+musicmeter_class saver_musicmeter;
 
 // class to playlist gfx *****************************************************************************
 
@@ -3532,7 +3534,7 @@ void display() {
 
 
     if (urtype == MUSICMETER3) {
-      renderScene();
+      saver_musicmeter.renderScene();
     }
 
 
@@ -6556,7 +6558,7 @@ void display() {
   #if defined USE_FMOD_MIXER
   if (snd) {
     // getSpectrum() performs the frequency analysis, see explanation below
-    sampleSize = 1024;                // nr of samples default 64
+    sampleSize = 2048;                // nr of samples default 64
     // uv works only on fmod for now
     FMOD_DSP_PARAMETER_FFT *fft = 0;
     int chan;
@@ -6586,21 +6588,37 @@ void display() {
     if (result!=FMOD_OK) fprintf(stderr,"Error DSP %s\n",FMOD_ErrorString(result));
     int length = fft->length/2;
     int numChannels = fft->numchannels;
-    int gangefaktor=8;
+    int gangefaktor=16;
     // crash if only 1 channel
     if ((fft) && (result==FMOD_OK)) {
-      // new ver 4
-      for (int i=0; i<fft->length; i++) {
-        float spectum_value;
-        if (numChannels==1) 
-          spectum_value=(fft->spectrum[0][i]*gangefaktor);
-        else spectum_value=(fft->spectrum[0][i]*gangefaktor)+(fft->spectrum[1][i]*gangefaktor);
-        spectrum[i] = spectum_value;
-        spectrum_left[i] = spectum_value;
-        spectrum_right[i] = spectum_value;
-        if (spectum_value > uvmax_values[i]) uvmax_values[i] = spectum_value;
-        else if (uvmax_values[i] > 0.0f) uvmax_values[i] = uvmax_values[i] - 1.00f;
-        else uvmax_values[i] = spectum_value;
+      // new ver 5
+      for (int x = 0; x < 128; x++) {
+        int startBin = (x * fft->length) / 128;
+        int endBin   = ((x + 1) * fft->length) / 128;
+        float sum = 0.0f;
+        float sum_left=0.0f;
+        float sum_right=0.0f;
+        int count = 0;
+        for (int i = startBin; i < endBin; i++) {
+            float spectum_value;
+            float spectum_left;
+            float spectum_right;
+            if (numChannels == 1)
+                spectum_value = fft->spectrum[0][i];
+            else
+                spectum_value = (fft->spectrum[0][i] + fft->spectrum[1][i]) * 0.5f;
+                spectum_left=fft->spectrum[0][i]*0.5f;
+                spectum_right=fft->spectrum[1][i]*0.5f;
+            sum += spectum_value;
+            sum_left += spectum_left;
+            sum_right += spectum_right;
+            count++;
+        }
+        float spec_value=(count > 0) ? (sum / count) * gangefaktor : 0.0f;
+        spectrum[x] = (count > 0) ? (sum / count) * 200.0f : 0.0f;
+        spectrum_left[x]=(count > 0) ? (sum_left / count) * 200.0f : 0.0f;
+        spectrum_right[x]=(count > 0) ? (sum_right / count) * 200.0f : 0.0f;
+        saver_musicmeter.music_spectrum[x] = spec_value;
       }
     }
   }

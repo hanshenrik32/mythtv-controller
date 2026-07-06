@@ -24,7 +24,7 @@ extern musicoversigt_class musicoversigt;
 #define PI 3.14159265358979323846
 
 float rot = 0.0f;
-float spectrum2[128];
+// float spectrum2[128];
 
 #define NUM_BARS 128
 #define NUM_PARTICLES 5000
@@ -45,7 +45,7 @@ float rot3=0;
 
 
 
-extern float spectrum[];                                                           // used for spectium
+
 
 float sinofsetz[]={
 
@@ -2790,7 +2790,7 @@ void boxarray::show_music_3d_2(float aangle,GLuint textureId) {
 //
 // ************************************************************************************************************************
 
-void SpawnParticle() {
+void musicmeter_class::SpawnParticle() {
   int p=rand()%NUM_PARTICLES;
   float a= (rand()%360)*PI/180.0f;
   particles[p].x=0;
@@ -2802,7 +2802,7 @@ void SpawnParticle() {
 
 
 
-void UpdateParticles() {
+void musicmeter_class::UpdateParticles() {
   for(int i=0;i<NUM_PARTICLES;i++) {
     if(particles[i].life>0) {
       particles[i].x+=particles[i].dx;
@@ -2816,7 +2816,13 @@ void UpdateParticles() {
 
 
 
-void DrawParticles() {
+// ****************************************************************************************
+//
+// star field
+//
+// ****************************************************************************************
+
+void musicmeter_class::DrawParticles() {
   glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
   glPointSize(2);
   glBegin(GL_POINTS);
@@ -2831,8 +2837,8 @@ void DrawParticles() {
 
 
 
-void DrawCore() {
-  float bass=spectrum[1]+spectrum[2]+spectrum[3];
+void musicmeter_class::DrawCore() {
+  float bass=music_spectrum[1]+music_spectrum[2]+music_spectrum[3]/3.0f;
   float radius=40+bass*50;
   for(float s=1;s<2.5;s+=0.15f) {
     glPushMatrix();
@@ -2850,14 +2856,21 @@ void DrawCore() {
   }
 }
 
-void DrawLightning() {
+// ****************************************************************************************
+//
+// lightning bolts
+//
+// ****************************************************************************************
+
+
+void musicmeter_class::DrawLightning() {
   glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
   glLineWidth(8);
-  // glBegin(GL_LINES);
-  glBegin(GL_QUADS);
+  glBegin(GL_LINES);
+  // glBegin(GL_QUADS);
   for(int i=0;i<64;i++) {
     float a=i*(360.0f/64.0f);
-    float len=100+spectrum[i*3]*200;
+    float len=100+music_spectrum[i]*200;
     float x=cos(a*PI/180.0f)*len;
     float y=sin(a*PI/180.0f)*len;
     glColor4f(1.0f,0.5f,0.2f,0.4f);
@@ -2870,7 +2883,8 @@ void DrawLightning() {
   glBegin(GL_QUADS);
   for(int i=0;i<64;i++) {
     float a=i*(360.0f/64.0f);
-    float len=100+spectrum[i*3]*200;
+    float len=100+music_spectrum[i]*200;
+    if (len>150) len=150;
     float x=cos(a*PI/180.0f)*len;
     float y=sin(a*PI/180.0f)*len;
     glColor4f(1,0.5,0.2,0.08);
@@ -2883,7 +2897,7 @@ void DrawLightning() {
   glBegin(GL_QUADS);
   for(int i=0;i<64;i++) {
     float a=i*(360.0f/64.0f);
-    float len=100+spectrum[i*3]*200;
+    float len=100+music_spectrum[i]*200;
     float x=cos(a*PI/180.0f)*len;
     float y=sin(a*PI/180.0f)*len;
     glColor4f(1,1,1,1);
@@ -2894,13 +2908,20 @@ void DrawLightning() {
 }
 
 
+// ****************************************************************************************
+//
+// audio spectrum ring
+//
+// ****************************************************************************************
 
-void DrawAudioRing(float radius,float rotation,float scale) {
+
+void musicmeter_class::DrawAudioRing(float radius,float rotation,float scale) {
   glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
+  glRotatef(rotation,0,0,1);
   glBegin(GL_LINE_STRIP);
   for(int i=0;i<NUM_BARS;i++) {
     float a =(2.0f*M_PI/256.0f)* i;
-    float r =250.0f + spectrum[i*3] * 200.0f;
+    float r =250.0f + music_spectrum[i/2] * 200.0f;
     float x =cos(a) * r;
     float y =sin(a) * r;
     glVertex2f(x,y);
@@ -2910,32 +2931,35 @@ void DrawAudioRing(float radius,float rotation,float scale) {
 
 
 
-void UpdateSpectrum() {
+void musicmeter_class::UpdateSpectrum() {
   static float t=0;
   t+=0.05f;
   for(int i=0;i<NUM_BARS;i++) {
-    spectrum[i*2]=
+    music_spectrum[i]=
         0.2f+
         0.15f*sin(t+i*0.1f)+
         0.1f*sin(t*2+i*0.3f)+
         0.1f*sin(t*4+i*0.7f);
-    if(spectrum[i*3]<0) spectrum[i*3]=0;
+    if(music_spectrum[i]<0) music_spectrum[i]=0;
   }
-  float bass=spectrum[1*3]+ spectrum[2*3];
+  float bass=music_spectrum[1]+ music_spectrum[2]+ music_spectrum[3]/3.0f;
   if(bass>0.5f) {
     for(int i=0;i<10;i++) SpawnParticle();
   }
 }
 
 
-void energikerne() {
-  glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
+// ****************************************************************************************
+//
+// render the music visualizer scene
+//
+// ****************************************************************************************
+
+
+void musicmeter_class::energikerne() {
+  // glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
   for(float r=5;r<80;r+=2) {
-    glColor4f(
-        1.0f,
-        1.0f,
-        1.0f,
-        0.02f);
+    glColor4f(1.0f,1.0f,1.0f,0.2f);
     glBegin(GL_LINE_LOOP);
     for(int a=0;a<360;a+=5) {
       float x=cos(a*M_PI/180.0f)*r;
@@ -2949,59 +2973,50 @@ void energikerne() {
 
 
 
-void DrawEnergyThreads() {
+
+// ****************************************************************************************
+//
+// energy threads
+//
+// ****************************************************************************************
+
+void musicmeter_class::DrawEnergyThreads() {
   glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
-  float bass=spectrum[1]+spectrum[2]+spectrum[3];
+  float bass=music_spectrum[1]+music_spectrum[2]+music_spectrum[3]/3.0f;
   float t =glutGet(GLUT_ELAPSED_TIME) * 0.001f;
-    glLineWidth(1);
-    for(int strand=0; strand<250; strand++) {
-      float startAngle = ((float)strand / 250.0f) * PI * 2.0f;
-      float offset = strand * 0.2f;
-      glColor4f(1.0f,0.3f + 0.7f*sin(offset+t), 0.0f, 0.03f);
-      glBegin(GL_LINE_STRIP);
-      for(int p=0; p<60; p++) {
-        float k =(float)p / 60.0f;
-        float radius = 10.0f + k * (80.0f + bass*150.0f);
-        float wobble = sin(t*4.0f + offset + k*12.0f) * 12.0f;
-        float spiral = k * 6.0f;
-        float angle = startAngle + spiral + wobble * 0.02f;
-        float x = cos(angle) * radius;
-        float y = sin(angle) * radius;
-        glVertex2f(x,y);
-      }
-      glEnd();
+  glLineWidth(2);
+  for(int strand=0; strand<250; strand++) {
+    float startAngle = ((float)strand / 250.0f) * PI * 2.0f;
+    float offset = strand * 0.2f;
+    glColor4f(1.0f,0.3f + 0.7f*sin(offset+t), 0.0f, 0.03f);
+    glBegin(GL_LINE_STRIP);
+    for(int p=0; p<60; p++) {
+      float k =(float)p / 60.0f;
+      float radius = 10.0f + k * (80.0f + bass*150.0f);
+      float wobble = sin(t*4.0f + offset + k*12.0f) * 12.0f;
+      float spiral = k * 6.0f;
+      float angle = startAngle + spiral + wobble * 0.02f;
+      float x = cos(angle) * radius;
+      float y = sin(angle) * radius;
+      glVertex2f(x,y);
     }
+    glEnd();
+  }
 }
 
 
+// ****************************************************************************************
+//
+// glow
+//
+// ****************************************************************************************
 
 
-void DrawEnergyThreads_old() {
-  glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
-  float bass=spectrum[1]+spectrum[2]+spectrum[3];
-    for(int t=0;t<100;t++) {
-      float phase=glutGet(GLUT_ELAPSED_TIME)*0.001f;
-      glBegin(GL_LINE_STRIP);
-      for(int p=0;p<20;p++) {
-        float angle=t*0.1f+p*0.2f+phase;
-        float radius=20+p*5+sin(angle*4)*10+bass*10;
-        float x=cos(angle)*radius;
-        float y=sin(angle)*radius;
-        glVertex2f(x,y);
-      }
-      glEnd();
-    }
-}
-
-void DrawGlow() {
-  glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
-  float bass=spectrum[1]+spectrum[2]+spectrum[3];
+void musicmeter_class::DrawGlow() {
+  // glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
+  float bass=music_spectrum[1]+music_spectrum[2]+music_spectrum[3]/3.0f;
   for(float r=20;r<120;r+=5) {
-    glColor4f(
-        1.0f,
-        0.3f,
-        0.0f,
-        0.03f);
+    glColor4f(1.0f,0.3f,0.0f,0.03f);
     glBegin(GL_LINE_LOOP);
     for(int a=0;a<360;a+=4) {
         float x=cos(a*PI/180.0f)*(r+bass*20);
@@ -3015,8 +3030,8 @@ void DrawGlow() {
 
 
 
-void DrawCoreCenter() {
-  glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
+void musicmeter_class::DrawCoreCenter() {
+  // glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
   glColor4f(1,1,1,1);
   glBegin(GL_TRIANGLE_FAN);
   glVertex2f(0,0);
@@ -3030,13 +3045,19 @@ void DrawCoreCenter() {
 
 
 
-void renderScene() {
+// *********************************************************************************
+//
+// Render main call
+//
+// *********************************************************************************
+
+void musicmeter_class::renderScene() {
   // Motion blur
   // glLoadIdentity();
   glColor4f(0,0,0,0.02f);
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_BLEND);  
-  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  // glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glDisable(GL_DEPTH_TEST);
   glBlendFunc(GL_SRC_ALPHA,GL_ONE);
   glTranslatef(orgwinsizex/2,orgwinsizey/2,0);
@@ -3048,42 +3069,60 @@ void renderScene() {
   glEnd();
   glBlendFunc(GL_SRC_ALPHA,GL_ONE);
   static float masterrot = 0.0f;
-  masterrot += 0.02f;
+  // masterrot += 0.02f;
   glRotatef(masterrot,0,0,1);
+  
   glPushMatrix();
   DrawGlow();
   glPopMatrix();
+  // cirkel i midten
   glPushMatrix();
   energikerne();
   glPopMatrix();
+  //
   glPushMatrix();
   DrawCore();
   glPopMatrix();
+  
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // cirkel med tråde ud fra
   glPushMatrix();
   DrawLightning();
   glPopMatrix();
+  
+  // cirkel med bars
   glPushMatrix();
   DrawAudioRing(150,rot1,350);
   glPopMatrix();
+
+  
   glPushMatrix();
   DrawAudioRing(260,-rot2,220);
   glPopMatrix();
+  
   glPushMatrix();
   DrawAudioRing(380,rot3,120);
   glPopMatrix();
+  
+  // star field
   glPushMatrix();
   DrawParticles();
   glPopMatrix();
+  
+  // back cirkel
   glPushMatrix();
   DrawEnergyThreads();
   glPopMatrix();
+  
   glPushMatrix();
   DrawCoreCenter();
   glPopMatrix();
+
   rot += 0.3f;
-  rot1+=0.15f;
-  rot2+=0.07f;
-  rot3+=0.03f;
+  // rot1+=0.15f;
+  // rot2+=0.07f;
+  // rot3+=0.03f;
   UpdateParticles();
   UpdateSpectrum();
 }

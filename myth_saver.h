@@ -49,6 +49,14 @@ class boxarray {
 };
 
 
+
+class spectrum_class {
+  public:
+    float music_spectrum[128] = {0};
+ };
+
+
+
 class meter2 {
   private:
     float rot;
@@ -63,9 +71,29 @@ class meter2 {
 };
 
 
+
+class musicmeter_class : public spectrum_class {
+  private:
+    float rot;    
+    void SpawnParticle();
+    void UpdateParticles();
+    void DrawParticles();
+    void DrawLightning();
+    void DrawAudioRing(float radius,float rotation,float scale);
+    void UpdateSpectrum();
+    void energikerne();
+    void DrawEnergyThreads();
+    void DrawGlow();
+    void DrawCoreCenter();
+    void DrawCore();
+  public:    
+    void renderScene();
+};
+
 void drawPlasma(int width, int height);
 void renderScene();
 void drawEnergyCore();
 void drawOrbitParticles();
 void drawSpectrumRing();
+
 #endif
