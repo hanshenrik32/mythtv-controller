@@ -5,7 +5,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <string>
-#include <gtk/gtk.h>
+// #include <gtk/gtk.h>
 // system_call_timeout.cpp
 #include <unistd.h>
 #include <sys/wait.h>
@@ -110,26 +110,6 @@ bool do_system_call_with_timeout(const std::string& cmd, std::string& output, in
   }
   return false;
 }
-
-// ****************************************************************************************
-//
-// get clipboard text
-//
-// ****************************************************************************************
-
-std::string getClipboardText() {
-  gtk_init(nullptr, nullptr);
-  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
-  gchar* text = gtk_clipboard_wait_for_text(clipboard);
-  std::string result;
-  if (text) {
-    result = text;
-    g_free(text);
-  }
-  return result;
-}
-
-
 
 
 // ****************************************************************************************

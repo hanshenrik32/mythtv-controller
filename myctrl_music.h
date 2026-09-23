@@ -1,9 +1,7 @@
 #ifndef MYCTRL_MUSIC
 #define MYCTRL_MUSIC
 
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+
 #include <vector>
 #include <string>
 
@@ -76,12 +74,12 @@ class musicoversigt_class {
     int itemWidth   = 198;
 
     int startX = 20;
-    int startY = 895;
+    int startY = 60;               // 895;
     int viewHeight = 780;
     // end new scroll vars
 
     int search_startX = 20;
-    int search_startY = 762;
+    int search_startY = 60+180; //  762;
     int search_viewHeight = 660;
     // end new scroll vars
     bool search_music_online_done;

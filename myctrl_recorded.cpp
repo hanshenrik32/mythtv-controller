@@ -3,24 +3,28 @@
 #include <ctime>
 #include <string.h>
 #include <stdarg.h>
+#include <GL/glew.h>
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <X11/Intrinsic.h>    /* Display, Window */
-#include <GL/glx.h>           /* GLXContext */
-#include <GL/glc.h>       		// danish ttf support
+// #include <X11/Intrinsic.h>    /* Display, Window */
+// #include <GL/glx.h>           /* GLXContext */
+// #include <GL/glc.h>       		// danish ttf support
 // mysql support
 #include <mysql.h>
 #include <sstream>
 #include <iostream>
 #include <fmt/format.h>
-#include <sqlite3.h>                    // sqlite interface to xbmc
-#include "text3d.h"
+
+using namespace std;
+
+#include "renderer.h"
+// #include "text3d.h"
 #include "readjpg.h"
 #include "utility.h"
 #include "myctrl_recorded.h"
 #include "myctrl_storagedef.h"
-#include "myctrl_glprint.h"
+// #include "myctrl_glprint.h"
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                  // used by log system
@@ -31,9 +35,9 @@ extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
 extern char configmusicpath[256];
 extern char configrecordpath[256];
-extern recorded_overigt recordoversigt;
+extern recorded_overigt_class recorded_oversigt;
 extern bool reset_recorded_texture;
-extern storagedef configstoragerecord[];      // storage array (for recorded programs)
+// extern storagedef configstoragerecord[];      // storage array (for recorded programs)
 extern GLuint _textureId22;    // movie open info box1
 extern GLuint _textureId23;    // movie open info box2
 extern GLuint _textureId24;    // movie open info box3
@@ -41,11 +45,12 @@ extern int screen_size;
 extern int visvalgtnrtype;
 extern bool do_sqlite;
 
-extern mFont font12;  // 12px font
-extern mFont font18;  // 18px font
-extern mFont font24;  // 24px font
+extern Font myfont;
+extern Font myfont2;
 
 
+
+extern Renderer renderer;
 
 // ****************************************************************************************
 //
@@ -127,27 +132,13 @@ void recorded_top_type::get_recorded_top(char *title) {
     strcpy(title,this->title);
 }
 
-// ****************************************************************************************
-//
-// ****************************************************************************************
-
-void draw_ccover() {
-  int zofset=0;
-  int xofset=0;
-  glBegin(GL_QUADS); //Begin quadrilateral coordinates
-  glTexCoord2f(0.0, 0.0); glVertex3f(-3.5+xofset, -3.5, 0.0-zofset);
-  glTexCoord2f(0.0, 1.0); glVertex3f(-3.5+xofset, 3.5, 0.0-zofset);
-  glTexCoord2f(1.0, 1.0); glVertex3f(3.5+xofset, 3.5, 0.0-zofset);
-  glTexCoord2f(1.0, 0.0); glVertex3f(3.5+xofset, -3.5, 0.0-zofset);
-  glEnd(); //End quadrilateral coordinates
-}
 
 
 // ****************************************************************************************
 //
 // ****************************************************************************************
 
-void recorded_overigt::get_recorded_filepath(char *filepath,int valgtnr,int subvalgtnr) {
+void recorded_overigt_class::get_recorded_filepath(char *filepath,int valgtnr,int subvalgtnr) {
   char temptxt[255];
   programs[valgtnr].recorded_programs[subvalgtnr].get_recorded_filepath(temptxt);
   strcpy(filepath,temptxt);
@@ -163,7 +154,7 @@ int find_storagegroupfile(char *filename) {
     char filepath[512];
     int storagegrpnr=0;
     while((!(fundet)) && (storagegrpnr<storagegroupantal)) {
-      strcpy(filepath,configstoragerecord[storagegrpnr].path);
+      // strcpy(filepath,configstoragerecord[storagegrpnr].path);
       strcat(filepath,filename);
       if (file_exists(filepath)) {
         fundet=true;
@@ -174,7 +165,6 @@ int find_storagegroupfile(char *filename) {
     if (fundet) return(1); else return(0);
 }
 
-sqlite3 *sqlitedb_obj_recorded;
 
 // ****************************************************************************************
 //
@@ -189,7 +179,7 @@ int sql_recorded_sqldb_callback(void *data, int argc, char **argv, char **azColN
 }
 
 
-int recorded_overigt::opdatere_recorded_oversigt() {
+int recorded_overigt_class::opdatere_recorded_oversigt() {
   std::string sqlselect;
   char title[128];
   int n,nn;
@@ -207,21 +197,6 @@ int recorded_overigt::opdatere_recorded_oversigt() {
   //gotoxy(10,17);
   // Connect to database
   n=0;
-  if (do_sqlite) {
-    try {
-      sqlselect = "create table recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int,stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)";
-      sqlite3_open("mythtvcontroller.db", &sqlitedb_obj_recorded);
-      rc = sqlite3_exec(sqlitedb_obj_recorded, sqlselect.c_str() , sql_recorded_sqldb_callback, (void*)data, &zErrMsg);
-      if (rc != SQLITE_OK) {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
-      }
-      if (sqlitedb_obj_recorded) sqlite3_close(sqlitedb_obj_recorded);
-    }
-    catch (...) {
-      write_logfile(logfile,(char *) "Error connect to sqlite..");
-    }
-  } else {
     try {
       conn=mysql_init(NULL);
       if (conn) {
@@ -257,9 +232,9 @@ int recorded_overigt::opdatere_recorded_oversigt() {
               storagegroupused=find_storagegroupfile((char *) filename1.c_str());						// hent storage group info
               if ((storagegroupused==0) && (row[4])) strcpy(filename,row[4]);
               if ((n<40) && (nn<200)) {
-                recordoversigt.programs[n].put_recorded_top(title);
-                recordoversigt.programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],(char *) filename1.c_str(),row[5],row[6]);
-                recordoversigt.programs[n].prg_antal++;
+                programs[n].put_recorded_top(title);
+                programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],(char *) filename1.c_str(),row[5],row[6]);
+                programs[n].prg_antal++;
               }
             }
           }        	// end while
@@ -277,7 +252,6 @@ int recorded_overigt::opdatere_recorded_oversigt() {
     catch (...) {
       write_logfile(logfile,(char *) "Error connect to mysql..");
     }
-  }
   return(n);
 }
 
@@ -328,7 +302,7 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
 //
 // ****************************************************************************************
 
-void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
+void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   static GLuint texture=0;
   unsigned int i=0;
   int ii,iii;
@@ -340,7 +314,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   char subtitle[128];
   char startdato[40];
   char slutdato[40];
-  char desc[200];			// desc
+  char desc[2000];			// desc
   std::string desc1;            // desc
   char channel[100];			// channel
   float yofset=0.5f;
@@ -353,77 +327,28 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     startofset=valgtnr-10;
     valgtnr=10;
   } else startofset=0;
-  // box2 mask
-  glTranslatef(0.0f, 0.0f,0);
-  xpos=100;
-  ypos=250;
-  // box2
-  glEnable(GL_TEXTURE_2D);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_textureId23);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
-  glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+600, 0.0);
-  glTexCoord2f(1.0, 1.0); glVertex3f(xpos+500, ypos+600, 0.0);
-  glTexCoord2f(1.0, 0.0); glVertex3f(xpos+500, ypos+100, 0.0);
-  glEnd();
-  xpos=510;
-  ypos=250;
-  // box2
-  glEnable(GL_TEXTURE_2D);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_textureId24);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
-  glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+600, 0.0);
-  glTexCoord2f(1.0, 1.0); glVertex3f(xpos+800, ypos+600, 0.0);
-  glTexCoord2f(1.0, 0.0); glVertex3f(xpos+800, ypos+100, 0.0);
-  glEnd();
-  //box3 mask
-  xpos=100;
-  ypos=40;
-  glEnable(GL_BLEND);
-  glDisable(GL_DEPTH_TEST);
-  glBlendFunc(GL_DST_COLOR, GL_ZERO);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
-  glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+300, 0.0);
-  glTexCoord2f(1.0, 1.0); glVertex3f(xpos+1210, ypos+300, 0.0);
-  glTexCoord2f(1.0, 0.0); glVertex3f(xpos+1210, ypos+100, 0.0);
-  glEnd();
-  // box3
-  glEnable(GL_TEXTURE_2D);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,_textureId22);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
-  glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+300, 0.0);
-  glTexCoord2f(1.0, 1.0); glVertex3f(xpos+1210, ypos+300, 0.0);
-  glTexCoord2f(1.0, 0.0); glVertex3f(xpos+1210, ypos+100, 0.0);
-  glEnd();
+  // boxes
+  renderer.AddTextureRect(0,_textureId23, 200, 200, 400, 600,1,1,1,1);
+  renderer.AddTextureRect(0,_textureId24, 610, 200, 800, 600,1,1,1,1);
+  renderer.AddTextureRect(0,_textureId22, 200, 810, 1210, 200,1,1,1,1);
   // main start off text in window
-  while ((i<=recordoversigt.top_antal()) && (i<11)) { 				// vis max
-    recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc,channel);
+  while ((i<=top_antal()) && (i<11)) {
+    programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc,channel);
     // hvis valgte
     if (i+startofset==valgtnr+startofset) {
       if (strlen(channel)==1) {
         strcpy(temptxt,"0");
         strcat(temptxt,channel);
       } else {
-        strcpy(temptxt,channel);  
+        strcpy(temptxt,channel);
       }
       strcat(temptxt," ");
-      strcat(temptxt,title);      
-      if (visvalgtnrtype==1) drawText(font12, temptxt, 220.0f, 800.0f-(i*25.0f), 1.0f,2);
-        else drawText(font12, temptxt, 220.0f, 800.0f-(i*25.0f), 1.0f,3);
+      strcat(temptxt,title);
+      if (visvalgtnrtype==1) {
+        renderer.AddText(&myfont,220,282.0f+(i*18.0f),temptxt,1,1,0,1);
+      } else {
+        renderer.AddText(&myfont,220,282.0f+(i*18.0f),temptxt,1,1,1,1);
+      }
     } else {
       if (strlen(channel)==1) {
         strcpy(temptxt,"0");
@@ -433,34 +358,34 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
       }
       strcat(temptxt," ");
       strcat(temptxt,title);
-      drawText(font12, temptxt, 220.0f, 800.0f-(i*25.0f), 1.0f,1);
+      renderer.AddText(&myfont, 220 ,282.0f+(i*18.0f),temptxt,1,1,1,1);
     }
     i++;
   }
   i=0;
   // show sub (epsiode)
-  while ((i<recordoversigt.programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max
-    recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc,channel);
+  while ((i<programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max
+    programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc,channel);
     strcpy(temptxt,subtitle);					// get sub title
     if (strcmp(temptxt,"")==0) strcpy(temptxt,desc);                // Hvis der ikke er nogle subtitle bruge description i stedet
     if (i+startofset==subvalgtnr+startofset) {
-      drawText(font12, temptxt, 620.0f, 800.0f-(i*25.0f), 1.0f,2);
+      renderer.AddText(&myfont, 620 ,282.0f+(i*18.0f),temptxt,1,1,0,1);
     } else {
-      drawText(font12, temptxt, 620.0f, 800.0f-(i*25.0f), 1.0f,1);
+      renderer.AddText(&myfont, 620 ,282.0f+(i*18.0f),temptxt,1,1,1,1);
     }
     i++;
   }
-  recordoversigt.programs[valgtnr+startofset].recorded_programs[subvalgtnr+substartofset].get_recorded(subvalgtnr,title,subtitle,startdato,slutdato,desc,channel);
+  programs[valgtnr+startofset].recorded_programs[subvalgtnr+substartofset].get_recorded(subvalgtnr,title,subtitle,startdato,slutdato,desc,channel);
   desc1=desc;
   // show prg start date
   strcpy(temptxt,startdato);
   temptxt[10]=0;
-  drawText(font12, "Date...:", 220.0f, 310.0f, 1.0f,1);
-  drawText(font12, temptxt, 220.0f+70, 310.0f, 1.0f,1);           // show date
-  drawText(font12, "KL : ", 220.0f+190.0f, 310.0f, 1.0f,1);
+  renderer.AddText(&myfont, 220 ,840.0f,"Date...:",1,1,1,1);
+  renderer.AddText(&myfont, 220+70 ,840.0f,temptxt,1,1,1,1);
+  renderer.AddText(&myfont, 220+190 ,840.0f,"KL : ",1,1,1,1);
   strcpy(temptxt,startdato+11);
   temptxt[5]=0;
-  drawText(font12, temptxt, 220.0f+230.0f, 310.0f, 1.0f,1);       // show kl
+  renderer.AddText(&myfont, 220+230 ,840.0f,temptxt,1,1,1,1);
   static time_t tm;				// this time (now)
   struct tm *nutid;
   struct tm prgstarttid;
@@ -477,23 +402,15 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   time_t et=mktime(&prgsluttid);
   if ((tm>st) && (tm<et)) {				// er tiden inden for nu så hvis at vi optager live nu
     flipflop++;
-    if (flipflop<24) drawText(font12, "Recording now",  220.0f+290.0f, 310.0f, 1.0f,1);
+    if (flipflop<24) renderer.AddText(&myfont, 220 +290 ,840.0f,"Recording now",1,1,1,1);   
     if (flipflop>48) flipflop=0;  
   }  
   // show desc
-  drawLinesOfText(desc1.c_str(), 700.0f, 290.0f, 1.0f,68,5,1,false);
+  renderer.AddText(&myfont, 750 ,840.0f+(i*18.0f),desc1,1,1,1,1);
+  // drawLinesOfText(desc1.c_str(), 700.0f, 290.0f, 1.0f,68,5,1,false);
+  
   // show image from recorded if exist
   if (programs[valgtnr].recorded_programs->start_prg_image.length()>0) {
-    glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBindTexture(GL_TEXTURE_2D,_textureId23);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(xpos+120, ypos+120, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(xpos+120, ypos+260, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+310, ypos+260, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+310, ypos+120, 0.0);
-    glEnd();
-  }
+    renderer.AddTextureRect(0,_textureId23, 220.0f ,860.0f, 260, 140,1,1,1,1);
+  }  
 }

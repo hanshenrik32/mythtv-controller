@@ -1,12 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <algorithm>
 #include <string.h>
 #include <mysql.h>
-#include <GL/glc.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -16,13 +12,13 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <fmt/format.h>
-#include <sqlite3.h>                    // sqlite interface to xbmc
 #include <curl/curl.h>                  // lib curl
-
 // json parser
 #include <iostream>
 #include <jsoncpp/json/json.h>
 #include <fstream>
+
+#include "renderer.h"
 #include "myctrl_readwebfile.h"
 #include "myctrl_radio.h"
 #include "utility.h"
@@ -30,60 +26,29 @@
 #include "utility.h"
 #include "readjpg.h"
 #include "loadpng.h"
-#include "myctrl_glprint.h"
 #include "myth_config.h"
 
-extern config_icons config_menu;
-extern GLuint tidal_big_search_bar_artist;
 
-extern FILE *logfile;
-extern char debuglogdata[1024];                                  // used by log system
-extern Character characters[];
-extern int orgwinsizey;                                                         // screen size
-extern int orgwinsizex;
-extern char keybuffer[];                                    // keyboard buffer
-extern float configdefaultradiofontsize;
-extern const char *dbname;                                    // db name in mysql
-extern char configmysqluser[];                             //
-extern char configmysqlpass[];                             //
-extern char configmysqlhost[];                             //
-extern char configmusicpath[];
-extern int configmythtvver;
-extern int screen_size;                                       //
-extern int screensizey;                                       //
-extern int screeny;                                           //
-extern unsigned int musicoversigt_antal;                      //
-extern int radio_key_selected;                                //
-extern int music_select_iconnr;                               //
-extern int do_music_icon_anim_icon_ofset;                     //
-extern GLuint _textureIdback1;                                //
-extern GLuint onlineradio;					                          //
-extern GLuint onlineradio_empty;				                      //
-extern GLuint onlineradio_selected;				                    //
-extern GLuint onlineradio192;					                        //
-extern GLuint onlineradio320;					                        //
-extern GLuint radiooptions;                                   //
-extern int fonttype;
-extern fontctrl aktivfont;
-extern GLuint _textureIdloading;
-extern GLuint gfxlande[45];
-extern GLuint gfxlandemask;
-extern radiostation_class radiooversigt;
-extern GLint cur_avail_mem_kb;
-extern bool radio_oversigt_loaded;
-extern bool radio_oversigt_loaded_done;
-extern bool radio_oversigt_loaded_begin;
+extern char configmysqluser[256];                              //
+extern char configmysqlpass[256];                              //
+extern char configmysqlhost[256];                              //
+extern char configmusicpath[256];
+extern char localuserhomedir[4096];                                    // user homedir set in main
 
-extern GLint playing_record_icon_texture;
+extern Font myfont;
+extern Font myfont2;
 
+extern int radiooversigt_antal;
+extern bool do_zoom_radio_cover;
+extern Renderer renderer;
+extern bool do_zoom_tidal_cover;
+extern bool do_zoom_spotify_cover;
+extern bool do_zoom_music_cover;
+extern GLuint _textureradioplayer;
+extern GLuint onlineradio_empty;
+extern GLuint playing_tidal_icon_texture;
 
-extern mFont font12;  // 12px font
-extern mFont font18;  // 18px font
-extern mFont font24;  // 24px font
-
-extern int radio_oversigt_loaded_nr;
-extern int radio_oversigt_antal;
-extern bool do_sqlite;
+extern class config_icons config_menu; // config icons used in menu
 
 // ****************************************************************************************
 //
@@ -112,7 +77,6 @@ radiostation_class::~radiostation_class() {
   clean_radio_oversigt();
 }
 
-
 // ****************************************************************************************
 //
 // clean up number of created
@@ -128,6 +92,251 @@ void radiostation_class::clean_radio_oversigt() {
   antal=0;
 }
 
+// set en radio icon image
+
+void radiostation_class::set_texture(int nr,GLuint idtexture) {
+  stack[nr].textureId=idtexture;
+}
+
+
+// ****************************************************************************************
+//
+// update radio stations gfx link
+//
+// ****************************************************************************************
+
+int radiostation_class::opdatere_radiostation_gfx(int nr,char *gfxpath) {
+  const char *database = (char *) "mythtvcontroller";
+  char sqlselect[512];
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  sprintf(sqlselect,"update radio_stations set gfx_link='%s' where intnr=%d",gfxpath,nr);
+  conn=mysql_init(NULL);
+  // Connect to database
+  try {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+    }
+    if (conn) mysql_close(conn);
+  }
+  catch (...) {
+    fprintf(stdout,"Error update radio station db.\n");
+    // write_logfile(logfile,(char *) "Error update radio station db.");
+  }
+  return(1);
+}
+
+
+
+// ****************************************************************************************
+//
+// load all radio stations gfx
+//
+// ****************************************************************************************
+
+int radiostation_class::load_radio_stations_gfx() {
+  int i=0;
+  GLuint texture;  
+  std::string tmpfilename;
+  std::string gfxfilename;
+  char resl[200];
+  FILE *filhandle;
+  try {
+    filhandle=fopen("radio_gfx.log","w");
+    if (startup_loaded) return(0);
+    startup_loaded=true;
+    while(i<radioantal()) {
+      tmpfilename = "/opt/mythtv-controller/images/radiostations/";	// hent path
+      gfxfilename = get_station_gfxfile(i);
+      tmpfilename = tmpfilename + gfxfilename;			// add filename to path
+      if ((gfxfilename.length() > 0) && (file_exists(tmpfilename.c_str()))) {	// den har et navn samt gfx filen findes.
+        texture=loadTexture ((char *) tmpfilename.c_str());					// load texture
+        set_texture(i,texture);							// save it in radio station struct to show
+      } else if (gfxfilename.length() == 0) {
+        // check hvis ikke noget navn om der findes en fil med radio station navnet *.png/jpg
+        // hvis der gør load denne fil.
+        tmpfilename = "/opt/mythtv-controller/images/radiostations/";
+        tmpfilename = tmpfilename + get_station_name(i);
+        tmpfilename = tmpfilename + ".png";      
+        if (file_exists(tmpfilename.c_str())) {		// den har et navn samt gfx filen findes.
+          texture=loadTexture ((char *) tmpfilename.c_str());                                 // load texture
+          set_texture(i,texture);                         		            // save it in radio station struct
+          stack[i].gfxfilename=(char *) get_station_name(i);      // update station gfxfilename to station name
+          stack[i].gfxfilename = stack[i].gfxfilename + ".png";
+          opdatere_radiostation_gfx(stack[i].intnr,(char *) stack[i].gfxfilename.c_str());           // and update db filename
+        } else {
+          tmpfilename = "/opt/mythtv-controller/images/radiostations/";
+          tmpfilename = tmpfilename + get_station_name(i);
+          tmpfilename = tmpfilename + ".jpg";
+          if (file_exists(tmpfilename.c_str())) {
+            texture=loadTexture ((char *) tmpfilename.c_str());                                        // load texture
+            set_texture(i,texture);     		                                                           // save it in radio station struct
+            stack[i].gfxfilename=get_station_name(i);                                                  // update station gfxfilename to station name
+            stack[i].gfxfilename = stack[i].gfxfilename +".png";
+            opdatere_radiostation_gfx(stack[i].intnr,(char *) stack[i].gfxfilename.c_str());           // and update db filename
+          }
+        }
+      } else {
+        sprintf(resl,"Radio station gfx file %s for %s is missing.\n",get_station_gfxfile(i),get_station_name(i));
+        fputs(resl,filhandle);
+      }      
+      i++;
+    }
+    if (filhandle) fclose(filhandle);
+  }
+  catch (...) {
+    fprintf(stdout,"Error loading radio station graphic icons.\nWriting to radio_gfx.log fault.\n");
+    // write_logfile(logfile,(char *) "Error loading radio station graphic icons.");
+  }
+  return(1);
+}
+
+
+
+// ******************************************************************************************
+//
+// load show cover image if not loaded
+// 
+// ******************************************************************************************
+
+GLuint radiostation_class::get_texture_r(int nr) {
+  GLuint textureId=0;
+  std::string filename=stack[nr].gfxfilename;
+  std::string onlyname;
+  size_t pos=(filename.find_last_of('.'));
+  onlyname=filename.substr(0, pos);
+  if (!(stack[nr].texture_r_loaded)) {
+    if (onlyname.length()>0) {
+      onlyname = "/opt/mythtv-controller/images/radiostations/" + onlyname;
+      onlyname = onlyname + "_r.png";
+      textureId = loadTexture((char *) onlyname.c_str());
+      stack[nr].textureId_r = textureId;
+      stack[nr].texture_r_loaded=true;
+      return(textureId);
+    }
+  }
+  return(stack[nr].textureId_r);
+}
+
+// ****************************************************************************************
+//
+// opdatere list set numbers of aflytninger
+//
+// ****************************************************************************************
+
+int radiostation_class::set_radio_popular(int stationid) {
+  char sqlselect[512];
+  MYSQL *conn;
+  MYSQL_RES *res;
+  // write debug log
+  // write_logfile(logfile,(char *) "Update played radio station.");
+  sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid].intnr);  
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0)) {
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    mysql_close(conn);
+    return(1);
+  } else {
+    // write_logfile(logfile,(char *) "Error update radiostation lastplayed in db.");
+  }
+  return(0);
+}
+
+// ****************************************************************************************
+//
+// set online/offline status on radio station (stationid)
+//
+// ****************************************************************************************
+
+int radiostation_class::set_radio_online(int stationid,bool onoff) {
+  char sqlselect[512];
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  // write_logfile(logfile,(char *) "Update played radio station online.");
+  if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid].intnr);
+    else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid].intnr);
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0)) {
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        ;
+      }
+    }
+    mysql_close(conn);
+    return(1);
+  }
+  stack.at(stationid).online=onoff;
+  return(0);
+}
+
+
+// ****************************************************************************************
+//
+// get radio online flag
+//
+// ****************************************************************************************
+
+int radiostation_class::get_radio_online(int stationid) {
+  if (((unsigned int) stationid<(unsigned int) antal)) {
+      return(stack[stationid].online);
+  } else {
+      return(-1);
+  }
+}
+
+// ****************************************************************************************
+//
+// set radio station online flag internal use
+//
+// ****************************************************************************************
+
+int radiostation_class::set_radio_intonline(int arraynr) {
+  if (((unsigned int) arraynr<(unsigned int) antal)) stack[arraynr].online=true; else return(0);
+  return(1);
+}
+
+// ****************************************************************************************
+//
+// check if radio station is ofline in database and return true if redio station exist in db
+//
+// ****************************************************************************************
+
+bool radiostation_class::check_radio_online_bool() {
+  char sqlselect[512];
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  try {
+    conn=mysql_init(NULL);
+    strcpy(sqlselect,"select intnr from radio_stations where online=0 order by intnr limit 100");
+    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0)) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      mysql_close(conn);
+      return(1);
+    } else return(0);		// we are done check all radio stations in database
+  }
+  catch (...) {
+    fprintf(stdout,"Error connect to mysql db.\n");
+    // write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
+  }
+  return(0);
+}
 
 
 // ****************************************************************************************
@@ -195,31 +404,6 @@ int radiostation_class::radio_download_image(char *imgurl,char *filename) {
   return(1);
 }
 
-
-// ******************************************************************************************
-//
-// load show cover image if not loaded
-// 
-// ******************************************************************************************
-
-GLuint radiostation_class::get_texture_r(int nr) {
-  GLuint textureId=0;
-  std::string filename=stack[nr].gfxfilename;
-  std::string onlyname;
-  size_t pos=(filename.find_last_of('.'));
-  onlyname=filename.substr(0, pos);
-  if (!(stack[nr].texture_r_loaded)) {
-    if (onlyname.length()>0) {
-      onlyname = "/opt/mythtv-controller/images/radiostations/" + onlyname;
-      onlyname = onlyname + "_r.png";
-      textureId = loadTexture((char *) onlyname.c_str());
-      stack[nr].textureId_r = textureId;
-      stack[nr].texture_r_loaded=true;
-      return(textureId);
-    }
-  }
-  return(stack[nr].textureId_r);
-}
 
 
 // ******************************************************************************************
@@ -379,7 +563,10 @@ int radiostation_class::load_radio_stations_from_json_file() {
             }
             if (return_code==0) {
               new_radio_record.gfxfilename=downloadfilenamelong3;
-            } else new_radio_record.gfxfilename="";
+            } else {
+              // new_radio_record.gfxfilename="";
+              new_radio_record.gfxfilename=downloadfilenamelong2;
+            }
           }
           new_radio_record.textureId=0;
           if (conn1) {
@@ -400,133 +587,6 @@ int radiostation_class::load_radio_stations_from_json_file() {
 }
 
 
-// Next *******************************************************************************************
-//
-//
-//
-// *************************************************************************************************
-
-// select next in radio sort option menu
-void radiostation_class::nextradiooptselect() {
-  if ((radiooptionsselect<40) && (strcmp(radiosortopt[radiooptionsselect+1].radiosortopt,"")!=0)) radiooptionsselect++;
-}
-
-// Last *******************************************************************************************
-//
-//
-//
-// *************************************************************************************************
-
-// select last in radio sort option menu
-void radiostation_class::lastradiooptselect() {
-  if (radiooptionsselect>0) radiooptionsselect--;
-}
-
-
-// set en radio icon image
-
-void radiostation_class::set_texture(int nr,GLuint idtexture) {
-  stack[nr].textureId=idtexture;
-}
-
-// ****************************************************************************************
-//
-// update radio stations gfx link
-//
-// ****************************************************************************************
-
-int radiostation_class::opdatere_radiostation_gfx(int nr,char *gfxpath) {
-  char sqlselect[512];
-  // mysql vars
-  MYSQL *conn;
-  MYSQL_RES *res;
-  sprintf(sqlselect,"update radio_stations set gfx_link='%s' where intnr=%d",gfxpath,nr);
-  conn=mysql_init(NULL);
-  // Connect to database
-  try {
-    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-    }
-    if (conn) mysql_close(conn);
-  }
-  catch (...) {
-    fprintf(stdout,"Error update radio station db.\n");
-    write_logfile(logfile,(char *) "Error update radio station db.");
-  }
-  return(1);
-}
-
-// ****************************************************************************************
-//
-// load all radio stations gfx
-//
-// ****************************************************************************************
-
-int radiostation_class::load_radio_stations_gfx() {
-  int i=0;
-  GLuint texture;  
-  std::string tmpfilename;
-  std::string gfxfilename;
-  char resl[200];
-  FILE *filhandle;
-  try {
-    filhandle=fopen("radio_gfx.log","w");
-    if (startup_loaded) return(0);
-    startup_loaded=true;
-    while(i<radiooversigt.radioantal()) {
-      tmpfilename = "/opt/mythtv-controller/images/radiostations/";	// hent path
-      gfxfilename = radiooversigt.get_station_gfxfile(i);
-      tmpfilename = tmpfilename + gfxfilename;			// add filename to path
-      if ((gfxfilename.length() > 0) && (file_exists(tmpfilename.c_str()))) {	// den har et navn samt gfx filen findes.
-        texture=loadTexture ((char *) tmpfilename.c_str());					// load texture
-        set_texture(i,texture);							// save it in radio station struct to show
-      } else if (gfxfilename.length() == 0) {
-        // check hvis ikke noget navn om der findes en fil med radio station navnet *.png/jpg
-        // hvis der gør load denne fil.
-        tmpfilename = "/opt/mythtv-controller/images/radiostations/";
-        tmpfilename = tmpfilename + radiooversigt.get_station_name(i);
-        tmpfilename = tmpfilename + ".png";      
-        if (file_exists(tmpfilename.c_str())) {		// den har et navn samt gfx filen findes.
-          texture=loadTexture ((char *) tmpfilename.c_str());                                 // load texture
-          set_texture(i,texture);                         		            // save it in radio station struct
-          stack[i].gfxfilename=(char *) get_station_name(i);      // update station gfxfilename to station name
-          stack[i].gfxfilename = stack[i].gfxfilename + ".png";
-          opdatere_radiostation_gfx(stack[i].intnr,(char *) stack[i].gfxfilename.c_str());           // and update db filename
-        } else {
-          tmpfilename = "/opt/mythtv-controller/images/radiostations/";
-          tmpfilename = tmpfilename + radiooversigt.get_station_name(i);
-          tmpfilename = tmpfilename + ".jpg";
-          if (file_exists(tmpfilename.c_str())) {
-            texture=loadTexture ((char *) tmpfilename.c_str());                                        // load texture
-            set_texture(i,texture);     		                                                           // save it in radio station struct
-            stack[i].gfxfilename=get_station_name(i);                                                  // update station gfxfilename to station name
-            stack[i].gfxfilename = stack[i].gfxfilename +".png";
-            opdatere_radiostation_gfx(stack[i].intnr,(char *) stack[i].gfxfilename.c_str());           // and update db filename
-          }
-        }
-      } else {
-        sprintf(resl,"Radio station gfx file %s for %s is missing.\n",get_station_gfxfile(i),get_station_name(i));
-        fputs(resl,filhandle);
-      }      
-      i++;
-    }
-    if (filhandle) fclose(filhandle);
-  }
-  catch (...) {
-    fprintf(stdout,"Error loading radio station graphic icons.\nWriting to radio_gfx.log fault.\n");
-    write_logfile(logfile,(char *) "Error loading radio station graphic icons.");
-  }
-  return(1);
-}
-
-
-
-
-
-
 // ****************************************************************************************
 //
 // OVERLOAD opdatere_radio_oversigt
@@ -534,6 +594,7 @@ int radiostation_class::load_radio_stations_gfx() {
 // ****************************************************************************************
 
 int radiostation_class::opdatere_radio_oversigt() {
+  const char *database = (char *) "mythtvcontroller";  
   std::string sqlselect_str;
   // mysql vars
   MYSQL *conn;
@@ -548,7 +609,7 @@ int radiostation_class::opdatere_radio_oversigt() {
   try {
     conn=mysql_init(NULL);
     // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       mysql_query(conn,sqlselect_str.c_str());
@@ -580,7 +641,7 @@ int radiostation_class::opdatere_radio_oversigt() {
       } else {
         fprintf(stderr,"\nFailed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
       }
-      //load_radio_stations_gfx();
+      load_radio_stations_gfx();
       return(antal-1);
     } else {
       fprintf(stderr,"\nFailed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
@@ -590,7 +651,7 @@ int radiostation_class::opdatere_radio_oversigt() {
   }
   catch (...) {
     fprintf(stdout,"Error connect to radio station db.\n");
-    write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
+    // write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
   }
   return(0);
 }
@@ -604,6 +665,7 @@ int radiostation_class::opdatere_radio_oversigt() {
 // ****************************************************************************************
 
 int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
+    const char *database = (char *) "mythtvcontroller";  
     std::string sqlselect_str;
     // mysql vars
     MYSQL *conn;
@@ -618,7 +680,7 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
     try {
       conn=mysql_init(NULL);
       // Connect to database
-      if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
+      if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect_str.c_str());
@@ -653,7 +715,7 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
     }
     catch (...) {
       fprintf(stdout,"Error connect to mysql radio station db.\n");
-      write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
+      // write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
     }
     return(0);
 }
@@ -668,6 +730,7 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
 // ****************************************************************************************
 
 int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
+    const char *database = (char *) "mythtvcontroller";  
     // char sqlselect[512];
     std::string sqlselect_str;
     // mysql vars
@@ -679,276 +742,136 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
     bool online;
     //gotoxy(10,13);
     //printf("Opdatere radio oversigt fra database. type %d \n",radiosortorder);
-    if (do_sqlite) {
-
-    } else {
-      if (radiosortorder==0)			// start order default
-        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by popular desc,name";
-      else if (radiosortorder==28)		// bit rate
-        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name";
-      else if (radiosortorder==27)		// land kode
-        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by landekode desc,popular desc,name";
-      else if (radiosortorder==19)		// mest hørt
-        sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by lastplayed desc,popular desc,name";
-      else 					// ellers efter art
-        sqlselect_str = fmt::format("select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 and art={} order by popular desc,name",radiosortorder);
-      try {
-        conn=mysql_init(NULL);
-        // Connect to database
-        if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
-          mysql_query(conn,"set NAMES 'utf8'");
-          res = mysql_store_result(conn);
-          mysql_query(conn,sqlselect_str.c_str());
-          res = mysql_store_result(conn);
-          if (res) {
-            while (((row = mysql_fetch_row(res)) != NULL)) {
-              radio_oversigt_type new_station;
-              art=atoi(row[3]);
-              intnr=atoi(row[6]);
-              kbps=atoi(row[7]);
-              online=atoi(row[8]);
-              land=atoi(row[9]);
-              strncpy(new_station.station_name,row[0],stationamelength);
-              new_station.desc=std::string(row[4]);
-              new_station.streamurl=std::string(row[1]);
-              new_station.homepage=std::string(row[2]);
-              new_station.gfxfilename=std::string(row[5]);
-              new_station.art=art;
-              new_station.kbps=kbps;
-              new_station.online=online;
-              new_station.land=land;
-              new_station.textureId=0;
-              new_station.intnr=intnr;
-              new_station.noiconloaded=false;
-              stack.push_back(new_station);
-              antal++;
-            }
-            if (antal==0) printf("No Radio station loaded");
-          } else {
-            fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
+    bool do_sqlite=false;
+    if (radiosortorder==0)			// start order default
+      sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by popular desc,name";
+    else if (radiosortorder==28)		// bit rate
+      sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name";
+    else if (radiosortorder==27)		// land kode
+      sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by landekode desc,popular desc,name";
+    else if (radiosortorder==19)		// mest hørt
+      sqlselect_str = "select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by lastplayed desc,popular desc,name";
+    else 					// ellers efter art
+      sqlselect_str = fmt::format("select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 and art={} order by popular desc,name",radiosortorder);
+    try {
+      conn=mysql_init(NULL);
+      // Connect to database
+      if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+        mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);
+        mysql_query(conn,sqlselect_str.c_str());
+        res = mysql_store_result(conn);
+        if (res) {
+          while (((row = mysql_fetch_row(res)) != NULL)) {
+            radio_oversigt_type new_station;
+            art=atoi(row[3]);
+            intnr=atoi(row[6]);
+            kbps=atoi(row[7]);
+            online=atoi(row[8]);
+            land=atoi(row[9]);
+            strncpy(new_station.station_name,row[0],stationamelength);
+            new_station.desc=std::string(row[4]);
+            new_station.streamurl=std::string(row[1]);
+            new_station.homepage=std::string(row[2]);
+            new_station.gfxfilename=std::string(row[5]);
+            new_station.art=art;
+            new_station.kbps=kbps;
+            new_station.online=online;
+            new_station.land=land;
+            new_station.textureId=0;
+            new_station.intnr=intnr;
+            new_station.noiconloaded=false;
+            stack.push_back(new_station);
+            antal++;
           }
-          if (conn) mysql_close(conn);
-          //load_radio_stations_gfx();
-          return(antal-1);
+          if (antal==0) printf("No Radio station loaded");
         } else {
           fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
         }
         if (conn) mysql_close(conn);
+        load_radio_stations_gfx();
+        return(antal-1);
+      } else {
+        fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
       }
-      catch (...) {
-        fprintf(stdout,"Error connect to mysql radio station db.\n");
-        write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
-      }
+      if (conn) mysql_close(conn);
     }
+    catch (...) {
+      fprintf(stdout,"Error connect to mysql radio station db.\n");
+      // write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
+    }    
     return(0);
 }
 
 
 
-// ****************************************************************************************
+// *************************************************************************************
 //
-// draw rectangle outline
+// draw cover
 //
-// ****************************************************************************************
+// *************************************************************************************
 
-void drawRect(int x, int y, int w, int h, Color2 c) {
-  glColor4f(c.r, c.g, c.b, c.a);
-  glBegin(GL_LINE_LOOP);
-  glVertex2i(x,     y);
-  glVertex2i(x + w, y);
-  glVertex2i(x + w, y + h);
-  glVertex2i(x,     y + h);
-  glEnd();
-}
-
-
-
-// ****************************************************************************************
-//
-// draw cover gfx
-//
-// ****************************************************************************************
-
-void radiostation_class::drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c) {
-  glEnable(GL_TEXTURE_2D);
-  glColor4f(c.r, c.g, c.b, c.a);
-  // draw actual cover
-  glBindTexture(GL_TEXTURE_2D, textureId);
-  glLoadName(id);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex2i(x + 5,          y + 5);
-  glTexCoord2f(1, 0); glVertex2i(x + 5 + w - 10, y + 5);
-  glTexCoord2f(1, 1); glVertex2i(x + 5 + w - 10 ,y + h - 5);
-  glTexCoord2f(0, 1); glVertex2i(x + 5,          y + h - 5);
-  glEnd();
-  // icon  
-  glBindTexture(GL_TEXTURE_2D, textureId2);
-  glLoadName(id);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex2i(x,     y);
-  glTexCoord2f(1, 0); glVertex2i(x + w, y);
-  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
-  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
-  glEnd();
-  // playing flag
-  if (id-100==radiooversigt.playingstationnr) {
-    glBindTexture(GL_TEXTURE_2D, playing_record_icon_texture);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex2i(x + w - 40, y + h - 40);
-    glTexCoord2f(1, 0); glVertex2i(x + w - 10, y + h - 40);
-    glTexCoord2f(1, 1); glVertex2i(x + w - 10, y + h - 10);
-    glTexCoord2f(0, 1); glVertex2i(x + w - 40, y + h - 10);
-    glEnd();
+void radiostation_class::drawcover(int x, int y, int w, int h, GLuint textureId,int id) {
+  renderer.AddTextureRect(id,onlineradio_empty, x, y, w, h,1,1,1,1);
+  renderer.AddTextureRect(id,textureId,x+5, y+5, w-10, h-10,1,1,1,1);
+  if ((id-99)==playingstationnr) {
+    renderer.AddTextureRect(id,playing_tidal_icon_texture, x+w-40, y+h-40, 40, 40,1,1,1,1);
   }
-}
+};
 
-
-// ****************************************************************************************
+// *************************************************************************************
 //
-// draw single radio item
+// draw all items for radio
 //
-// ****************************************************************************************
+// *************************************************************************************
 
-void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
-  // Baggrund
-  static float sinh=0.0;
+
+void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   std::string temprgtxt;
-  std::string gfxfilename;
   GLuint texture;
-  Color2 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
-  Color2 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  // Cover
-  gfxfilename = "/opt/mythtv-controller/images/radiostations/";
-  gfxfilename = gfxfilename + stack[ii].gfxfilename;
-  gfxfilename = gfxfilename + ".png";
-  if (stack[ii].gfxfilename.length()>0) {
-    // load texture if not loaded
-    if (stack[ii].textureId == 0) {
-      if ((file_exists(gfxfilename.c_str())) && (stack[ii].noiconloaded==false)) {
-        stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
-        if (stack[ii].textureId==0) stack[ii].noiconloaded=true; else stack[ii].noiconloaded=false;
-      } else stack[ii].gfxfilename="";
-    }
-  }
-  // Titel
-  // temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
-  temprgtxt = stack[ii].station_name;
-  // temprgtxt.resize(20);
-  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
-  if (stack[ii].textureId ) {
-    if (ii == selected_icon_in_view-1) {
-      drawcover(x + 18, y + 18, 164 + sin(sinh)*4, 164 + sin(sinh)*4, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
-      sinh = sinh + 0.08f;
-      if (sinh>(M_PI*2)) sinh=0.0f;
-    } else {
-      drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
-    }
-  } else {
-    if (ii == selected_icon_in_view-1) {                                                                       // old if (ii == radio_key_selected-1) {
-      drawcover(x + 18, y + 18, 164 + sin(sinh)*4, 164 + sin(sinh)*4, texture , onlineradio_selected ,ii+100,highcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 2, true);
-      sinh = sinh + 0.08f;
-      if (sinh>(M_PI*2)) sinh=0.0f;
-    } else {
-      drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
-    }
-  }
-}
-
-
-
-// ****************************************************************************************
-//
-// draw single search radio item
-//
-// ****************************************************************************************
-
-
-void radiostation_class::draw_radio_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int radio_key_selected) {
-  static float sinh=0.0;
-  // Baggrund
-  std::string temprgtxt;
-  std::string gfxfilename;
-  GLuint texture;
-  Color2 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
-  Color2 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  // Cover path
-  gfxfilename = "/opt/mythtv-controller/images/radiostations/";
-  gfxfilename = gfxfilename + stack[ii].gfxfilename;
-  if (stack[ii].gfxfilename.length()>0) {
-    // load texture if not loaded
-    if (stack[ii].textureId == 0) {
+  int yof_top=850;
+  int xof_top=250;
+  int buttonsizex=170;
+  int buttonsizey=170;
+  int totalRows   = (int)ceil((float)stack.size() / itemsPerRow);
+  int visibleRows = viewHeight / rowHeight;
+  int visibleItems = (visibleRows + 2) * itemsPerRow;
+  std::string gfxfilename = stack[ii].gfxfilename;
+  if (gfxfilename.size() > 0) {
+    // load texture if not loaded before
+    if ((stack[ii].textureId == 0) && (stack[ii].gfx_loaded==false)) {
       if (file_exists(gfxfilename.c_str())) {
         stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
-      } else stack[ii].gfxfilename="";
+        stack[ii].gfx_loaded=true;
+        printf("Loading texture \n");
+      }
     }
   }
-  // Titel
-  // temprgtxt = fmt::format("{:^38}",stack[ii].station_name);
-  temprgtxt = stack[ii].station_name;
-  if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = empty_icon;
-  if (stack[ii].textureId ) {
-    if (ii == selected_icon_in_view-1) {
-      if (y<search_startY-30) {
-        drawcover(x + 18, y + 18, 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
-        drawLinesOfText(temprgtxt, x + 18, y + 4,   1.0f, 22, 3, 2, true);
-        sinh = sinh + 0.2f;
-        if (sinh>(M_PI*2)) sinh=0.0f;
-      }
-    } else {
-      drawcover(x + 20, y + 20, 160, 160, texture , onlineradio_empty ,ii+100,normalcolor);
-      drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
-    }
+  if (stack[ii].textureId)
+    texture=stack[ii].textureId;
+  else 
+    texture=normal_icon;
+  temprgtxt = fmt::format("{:^20}",stack[ii].station_name);
+  if (ii == selected_icon_in_view) {
+    drawcover(x+20, y+20, buttonsizex+10, buttonsizey+10, texture,ii+100);
+    renderer.AddText(&myfont,x + 20,y+(buttonsizey+30) ,temprgtxt,1,1,1,1);
   } else {
-    if (ii == selected_icon_in_view-1) {
-      if (y<search_startY-30) {
-        drawcover(x + 18, y + 18 , 164 + sin(sinh)*2, 164 + sin(sinh)*2, texture , onlineradio_selected ,ii+100,highcolor);
-        drawLinesOfText(temprgtxt, x + 18, y + 4 , 1.0f, 22, 3, 2, true);        
-      }
-      sinh = sinh + 0.1f;
-      if (sinh>(M_PI*2)) sinh=0.0f;
-    } else {
-      if (y<search_startY-30) {
-        drawcover(x + 20, y + 20, 160, 160, texture , onlineradio ,ii+100,normalcolor);
-        drawLinesOfText(temprgtxt, x + 18, y + 4, 1.0f, 22, 3, 15, true);
-      }
-    }
+    drawcover(x+20, y+20, buttonsizex, buttonsizey, texture,ii+100);
+    renderer.AddText(&myfont,x + 20 ,y+(buttonsizey+40) ,temprgtxt,1,1,1,1);
   }
 }
 
 
-
-
-// ****************************************************************************************
+// *********************************************************************************************
 //
-// get text width
+// Show radio overview
 //
-// ****************************************************************************************
+// *********************************************************************************************
 
-
-float radio_getTextWidth(const std::string& text, float scale) {
-  float width = 0.0f;
-  for (char c : text){
-    Character ch = characters[c];
-    width += ch.advance * scale;  // glyph advance
-  }
-  return width;
-}
-
-
-// ****************************************************************************************
-//
-// show radio stations overview
-//
-// ****************************************************************************************
 
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
-  static bool cursor;
-  float yof_top=orgwinsizey-(rowHeight*1)+20;                               // start ypos
-  float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
+  int buttonsizex=164;  
+  int buttonsizey=164;  
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;
@@ -956,462 +879,31 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
   int totalRows   = (int)ceil((float)stack.size() / itemsPerRow);
   int visibleRows = viewHeight / rowHeight;
   float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
-  if (scrollPos < 0) {
-      scrollPos = 0;
-      scrollVel = 0;
-  } else if (scrollPos > maxScroll) {
-      scrollPos = maxScroll;
-      scrollVel = 0;
-  }
+  scrollPos = std::clamp(scrollPos, 0.0f, maxScroll);
   // ---- CALC --------------------------------------------------
   int firstRow   = (int)(scrollPos / rowHeight);
   float subOff   = fmod(scrollPos, rowHeight);
-  int ssofset     = firstRow * itemsPerRow;
-  int screenTop = startY;                                 // start position for first item y 
-  int xof = startX;                                       // start position for first item x
+  int sofset     = firstRow * itemsPerRow;
+  int screenTop = startY;
+  int screenTop_search = startY_search_view;
+  int xof = startX;
   int visibleItems = (visibleRows + 2) * itemsPerRow;
-  // ---- RENDER -----------------------------------------------
-  for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
-    int index = ssofset + i;
+  int yof=0;
+  int searchtype=0; // 0 album, 1 artist, 2 track
+  int yof_top=950;
+  int xof_top=250;
+  int ii=0;
+  std::string gfxfilename;
+  for (int i = 0; i < visibleItems && (sofset+i) < stack.size();i++) {
+    int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = xof + col * itemWidth + 40;
-    int y = screenTop - (row * rowHeight) + subOff - 40;
-    draw_radio_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
+    int x = startX + col * itemWidth + 40;
+    int y = startY + row * rowHeight - subOff - 20;
+    draw_radio_item(x, y, index , normal_icon, normal_icon, playingstationnr);
   }
-  return(true);
-}
-
-
-// ****************************************************************************************
-//
-// show radio stations overview
-//
-// ****************************************************************************************
-
-bool radiostation_class::show_radio_search_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
-  static bool cursor;
-  float yof_top=orgwinsizey-(rowHeight*1)+20;                               // start ypos
-  float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
-  // ---- KINETIC SCROLL ---------------------------------------
-  scrollVel *= friction;
-  scrollPos += scrollVel;
-  if (fabs(scrollVel) < 0.01f) scrollVel = 0;
-  int totalRows   = (int)ceil((float)stack.size() / itemsPerRow);
-  int visibleRows = viewHeight / rowHeight;
-  float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
-  if (scrollPos < 0) {
-      scrollPos = 0;
-      scrollVel = 0;
-  } else if (scrollPos > maxScroll) {
-      scrollPos = maxScroll;
-      scrollVel = 0;
+  if (stack.empty()) {
+    renderer.AddTextureRect(0,normal_icon, 400, 400, 800, 200,1,1,1,1);
   }
-  // ---- CALC --------------------------------------------------
-  int firstRow   = (int)(scrollPos / rowHeight);
-  float subOff   = fmod(scrollPos, rowHeight);
-  int ssofset     = firstRow * itemsPerRow;
-  int screenTop = startY;                                 // start position for first item y 
-  int xof = startX;                                       // start position for first item x
-  int visibleItems = (visibleRows + 2) * itemsPerRow;
-  screenTop=search_startY;
-  glEnable(GL_TEXTURE_2D);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glLoadName(0);
-  glBegin(GL_QUADS); 
-  glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
-  glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+rowHeight-20, 0.0);
-  glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+rowHeight-20 , 0.0);
-  glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
-  glEnd();
-  // show seach string
-  if (strcmp(keybuffer,"")!=0) {
-    drawText(font24, keybuffer, 300.0f, 980.0f, 1.0f, 0);
-    float textWidth = radio_getTextWidth(keybuffer, 1.0f);
-    if (cursor) drawText(font24, "_", 300.0f+textWidth, 980.0f, 1.0f, 0);
-  }
-  printf("Keybuffer = %s \n",keybuffer);
-  // ---- RENDER -----------------------------------------------
-  for (int i = 0; i < visibleItems && (ssofset + i) < stack.size(); ++i) {
-    int index = ssofset + i;
-    int col = i % itemsPerRow;
-    int row = i / itemsPerRow;
-    int x = xof + col * itemWidth + 40;
-    int y = screenTop - (row * rowHeight) + subOff - 40;    
-    draw_radio_search_item( x, y, index, normal_icon, dirplaylist_icon, radio_key_selected);
-  }
-  return(true);
-}
-
-
-// ****************************************************************************************
-//
-// skal vi opdatere sort type oversigt første gang
-//
-// ****************************************************************************************
-
-void radiostation_class::show_radio_options() {
-  int i;  
-  std::string sqlselect_str;
-  // mysql vars
-  MYSQL *conn;
-  MYSQL_RES *res;
-  MYSQL_ROW row;
-  char tmptxt[80];
-  float sizex=4.0f;
-  float sizey=3.0f;
-  int winsizx=1200;
-  int winsizy=800;
-  int xpos=0;
-  int ypos=0;
-  // background
-  glPushMatrix();
-  glEnable(GL_TEXTURE_2D);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  glBindTexture(GL_TEXTURE_2D, radiooptions);					// _textureId18);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glBegin(GL_QUADS); //Begin quadrilateral coordinates
-  // draw  front box
-  glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
-  glEnd();
-  glPopMatrix();
-  i=0;
-  if (hentradioart==false) {
-    hentradioart=true;
-    sqlselect_str ="SELECT typename,radiotypes.art,count(radio_stations.art) FROM `radiotypes`,radio_stations where radiotypes.art=radio_stations.art or radiotypes.art=0 and radio_stations.online=1 group by (radiotypes.art)";
-    conn=mysql_init(NULL);
-    // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-      mysql_query(conn,sqlselect_str.c_str());
-      res = mysql_store_result(conn);
-      while (((row = mysql_fetch_row(res)) != NULL) && (i<radiooptionsmax)) {
-        strcpy(radiosortopt[i].radiosortopt,row[0]);
-        radiosortopt[i].radiosortoptart=atoi(row[1]);
-        radiosortopt[i].antal=atoi(row[2]);
-        i++;
-      }
-    }
-  }
-  drawText(font12, "Sort options.", 410.0f, 770.0f, 0.8f,1);
-  i=0;
-  while ((strcmp(radiosortopt[i].radiosortopt,"")!=0) && (i<40)) {
-    if (i!=radiooptionsselect) drawText(font12, radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,1);
-    else drawText(font12, radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,2);
-    sprintf(tmptxt,"%5d",radiosortopt[i].antal);
-    if (i!=radiooptionsselect) drawText(font12, tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,1);
-    else drawText(font12, tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,2);
-    i++;
-  }
-}
-
-
-
-
-// ****************************************************************************************
-//
-// opdatere list set numbers of aflytninger
-//
-// ****************************************************************************************
-
-int radiostation_class::set_radio_popular(int stationid) {
-  char sqlselect[512];
-  MYSQL *conn;
-  MYSQL_RES *res;
-  // write debug log
-  write_logfile(logfile,(char *) "Update played radio station.");
-  sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid].intnr);  
-  conn=mysql_init(NULL);
-  // Connect to database
-  if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    mysql_close(conn);
-    return(1);
-  } else write_logfile(logfile,(char *) "Error update radiostation lastplayed in db.");
-  return(0);
-}
-
-
-
-
-// ****************************************************************************************
-//
-// set online/offline status on radio station (stationid)
-//
-// ****************************************************************************************
-
-int radiostation_class::set_radio_online(int stationid,bool onoff) {
-  char sqlselect[512];
-  MYSQL *conn;
-  MYSQL_RES *res;
-  MYSQL_ROW row;
-  write_logfile(logfile,(char *) "Update played radio station online.");
-  if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid].intnr);
-    else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid].intnr);
-  conn=mysql_init(NULL);
-  // Connect to database
-  if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        ;
-      }
-    }
-    mysql_close(conn);
-    return(1);
-  }
-  stack[stationid].online=onoff;
-  return(0);
-}
-
-// ****************************************************************************************
-//
-// get radio online flag
-//
-// ****************************************************************************************
-
-int radiostation_class::get_radio_online(int stationid) {
-  if (((unsigned int) stationid<(unsigned int) antal)) {
-      return(stack[stationid].online);
-  } else {
-      return(-1);
-  }
-}
-
-// ****************************************************************************************
-//
-// set radio station online flag internal use
-//
-// ****************************************************************************************
-
-int radiostation_class::set_radio_intonline(int arraynr) {
-  if (((unsigned int) arraynr<(unsigned int) antal)) stack[arraynr].online=true; else return(0);
   return(1);
 }
-
-// ****************************************************************************************
-//
-// check if radio station is ofline in database and return true if redio station exist in db
-//
-// ****************************************************************************************
-
-bool radiostation_class::check_radio_online_bool() {
-  char sqlselect[512];
-  MYSQL *conn;
-  MYSQL_RES *res;
-  MYSQL_ROW row;
-  try {
-    conn=mysql_init(NULL);
-    strcpy(sqlselect,"select intnr from radio_stations where online=0 order by intnr limit 100");
-    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
-      mysql_query(conn,"set NAMES 'utf8'");
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      mysql_close(conn);
-      return(1);
-    } else return(0);		// we are done check all radio stations in database
-  }
-  catch (...) {
-    fprintf(stdout,"Error connect to mysql db.\n");
-    write_logfile(logfile,(char *) "Error connect to mysql radio station db.");
-  }
-  return(0);
-}
-
-
-// ****************************************************************************************
-//
-//
-//
-// ****************************************************************************************
-
-int radiostation_class::set_radio_aktiv(int stationid,bool onoff) {
-//    stack[stationid]->intnr;
-  stack[stationid].aktiv=onoff;
-  return(0);
-}
-
-// ****************************************************************************************
-//
-//
-//
-// ****************************************************************************************
-
-
-int init_sockaddr (struct sockaddr_in *name,const char *hostname,uint16_t port) {
-  int error=0;
-  struct hostent *hostinfo;
-  name->sin_family = AF_INET;
-  name->sin_port = htons (port);
-  hostinfo = gethostbyname (hostname);
-  if (hostinfo == NULL) {
-    fprintf (stderr, "Unknown host %s.\n", hostname);
-    error=1;
-  }
-  if (error==0) name->sin_addr = *(struct in_addr *) hostinfo->h_addr;
-  return(error);
-}
-
-// ****************************************************************************************
-//
-// returm port nr from url if exist in url or 0
-//
-// ****************************************************************************************
-
-int get_url_data(char *url,char *ipadd) {
-  char *sted;
-  char *langurl=NULL;
-  int destport=0;
-  sted=(char*) strrchr(url, ':');		               // find : fra start af url
-  if (sted) {
-    if (strncmp(sted,"://",3)!=0) {		             // er vi fra start af url
-      destport=atoi(sted+1);		                   // hent port nr
-      if (strncmp(url,"http",4)==0) {
-        *sted='\0';
-        strcpy(ipadd,url+7); 		                   // get rest of url
-      } else if (strncmp(url,"mms",3)==0) {
-        *sted='\0';
-        strcpy(ipadd,url+6); 		                   // get rest of url
-      }
-      langurl=strchr(ipadd, '/');		               // find first /
-      if  (langurl) *langurl='\0';
-    } else {
-      if (strncmp(url,"http",4)==0) {
-        strcpy(ipadd,url+7);		                   // get rest of url
-      }
-      if (strncmp(url,"mms",3)==0) {
-        strcpy(ipadd,url+6);                       // get rest of url
-      }
-      langurl=strchr(ipadd, '/');		               // find first /
-      if  (langurl) *langurl='\0';
-    }
-  }
-  return(destport);
-}
-
-
-
-// ****************************************************************************************
-//
-// check if radio station is ofline in database and set it online again if it is back online
-// return where we are ind the database
-// if start recordnr>0 do it
-//
-// ****************************************************************************************
-
-bool check_radio_online_switch=true;
-
-unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) {
-  short int port=0;
-  int sock;
-  struct sockaddr_in servername;
-  char hostname[1024];
-  char ipadresse[1024];
-  char st_name[1024];
-  int error=0;
-  unsigned long radiostation=0;
-  char sqlselect[512];
-  char sqlselect1[512];
-  MYSQL *conn;
-  MYSQL_RES *res;
-  MYSQL_ROW row;
-  int nn;
-  bool nfundet;
-  bool radiook=false;
-  bool cerror;
-  struct timeval tv;
-  std::string debuglogdata;
-  fd_set myset;
-  if (check_radio_online_switch) {
-    conn=mysql_init(NULL);
-    strcpy(sqlselect,"select name,aktiv,intnr,stream_url from radio_stations where online=1 and aktiv=1 order by popular desc,name limit 1");
-    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
-      mysql_query(conn,"set NAMES 'utf8'");
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          write_logfile(logfile,(char *) "Checking radio stations.");
-          // port=80;
-          strncpy(hostname,row[3],1000);
-          strncpy(st_name,row[0],1000);
-          if (strcmp(hostname,"")!=0) {
-            // get port and ip
-            port=get_url_data(hostname,ipadresse);
-            // write debug log
-            debuglogdata=fmt::format("Checking Station : {} - hostname : {} port {}",row[0],hostname,port);
-            write_logfile(logfile,(char *) debuglogdata.c_str());
-            sock=socket(PF_INET, SOCK_STREAM, 0);
-            if (sock) {
-              //fcntl(sock, F_SETFL, O_NONBLOCK);
-              tv.tv_sec = 5;
-              tv.tv_usec = 0;
-              FD_ZERO(&myset);
-              FD_SET(sock, &myset);
-              error=(init_sockaddr(&servername,ipadresse,port));
-              if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
-                if (cerror==0) {
-                  write_logfile(logfile,(char *) "Station OK.");
-                  radiook=true;
-                } else radiook=false;
-              } else {
-                write_logfile(logfile,(char *) "Station BAD.");
-                radiook=false;
-              }
-              close (sock);
-            }
-            radiostation=atol(row[2]);
-            // find radio station og disable
-            nn=0;
-            // find radio station
-            nfundet=false;
-            while ((nn<antal) && (nfundet==false)) {
-              if  (stack[nn].station_name) {
-                // if found set active again
-                if (strcmp(stack[nn].station_name,st_name)==0) {
-                  if (radiook) stack[nn].online=1; else stack[nn].online=0;
-                  nfundet=true;
-                } else nn++;
-              } else nn++;
-            }
-          }
-        }
-      }
-      if (nfundet) printf("***** Radio station %ld fundet.\n",radiostation); else printf("***** Radio station not fundet.\n");
-      if ((conn) && (radiostation)) {
-        if ((radiook) && (nfundet)) {
-          sprintf(sqlselect1,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
-        } else {
-          sprintf(sqlselect1,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
-        }
-        if (conn) {
-          mysql_query(conn,sqlselect1);
-          res = mysql_store_result(conn);
-          write_logfile(logfile,(char *) "Set acive flag for radio station.");
-          write_logfile(logfile,(char *) sqlselect1);
-        }
-      }
-    }
-    if (conn) mysql_close(conn);
-  }
-  printf("radiostation=%ld\n",radiostation);
-  return(radiostation);		// we are done check all radio stations in database
-}
-

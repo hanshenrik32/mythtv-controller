@@ -3,10 +3,6 @@
 //
 #include <stdlib.h>
 #include <stdio.h>
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glc.h>                     // glc true type font system
 #include <mysql.h>                      // mysql stuf
 #include <dirent.h>                     // dir functions
 #include <linux/limits.h>
@@ -18,20 +14,26 @@
 #include <MediaInfo/MediaInfo.h>
 #include <sstream>
 #include <fmt/format.h>
-#include <sqlite3.h>                    // sqlite interface to xbmc
 
+
+#include "renderer.h"
 #include "utility.h"
 #include "myctrl_movie.h"
 #include "readjpg.h"
 #include "myth_vlcplayer.h"
 #include "myctrl_music.h"
-#include "myctrl_glprint.h"
 #include "myth_config.h"
 
 
-extern mFont font12;  // 12px font
-extern mFont font18;  // 18px font
-extern mFont font24;  // 24px font
+extern Renderer renderer;
+
+extern Font myfont;
+extern Font myfont2;
+
+
+//extern mFont font12;  // 12px font
+//extern mFont font18;  // 18px font
+// extern mFont font24;  // 24px font
 
 extern config_icons config_menu;
 
@@ -74,10 +76,7 @@ extern int orgwinsizex;
 
 extern GLuint _textureId9_askbox;
 
-extern bool do_sqlite;
-
-
-extern Character characters[];
+// extern Character characters[];
 
 extern GLuint big_search_bar; // need change name to more generic name when used in movie search overview
 
@@ -330,6 +329,42 @@ void film_oversigt_typem::resetallefilm() {
 }
 
 
+// back 10 sec playing movie
+
+void film_oversigt_typem::tilbage10sec() {
+  vlc_controller::tilbage10sec();
+}
+
+void film_oversigt_typem::tilbage60sec() {
+  vlc_controller::tilbage60sec();
+}
+
+
+// ff 10 sec playing movie
+
+void film_oversigt_typem::frem10sec() {
+  vlc_controller::frem10sec();
+}
+
+void film_oversigt_typem::frem60sec() {
+  vlc_controller::frem60sec();
+}
+
+
+
+
+
+long film_oversigt_typem::get_movie_length_ms() {
+  return(vlc_controller::get_length_in_ms());
+}
+
+
+long film_oversigt_typem::get_movie_pos() {
+  return(vlc_controller::get_position());
+}
+
+
+
 // ****************************************************************************************
 //
 // default player
@@ -339,7 +374,10 @@ void film_oversigt_typem::resetallefilm() {
 
 void film_oversigt_typem::stopmovie() {
   std::string systemplayer;
-  if ((vlc_in_playing()) && (film_is_playing)) vlc_controller::stopmedia();
+  if (vlc_in_playing()) {
+    vlc_controller::stopmedia();
+    film_is_playing=false;
+  }
   if (film_is_playing) {
     //write to debug log
     if (strcmp("internal",configdefaultplayer)!=0) {
@@ -355,11 +393,107 @@ void film_oversigt_typem::stopmovie() {
 
 
 
+// ****************************************************************************************
+//
+// After start play get subtitle info (called from main after movie start)
+//
+// ****************************************************************************************
+
+bool film_oversigt_typem::GetSubtitleTracks() {
+  // show subtitle tracks
+  vlc_controller::GetSubtitleTracks();
+  return(true);
+}
+
+
+// ****************************************************************************************
+//
+// Return antal sub tracks
+//
+// ****************************************************************************************
+
+
+int film_oversigt_typem::antal_sub_tracks() {
+  int antal=vlc_controller::antal_sub_tracks();
+  return(antal);
+}
+
+
+// ****************************************************************************************
+//
+// Return active audio track name
+//
+// ****************************************************************************************
+
+std::string film_oversigt_typem::active_audiotrack_name() {
+  return(vlc_controller::active_audiotrack_name());
+}
+
+// ****************************************************************************************
+//
+// Return active audio track id
+//
+// ****************************************************************************************
+
+int film_oversigt_typem::active_audiotrack_id() {
+  return(vlc_controller::active_audiotrack_id());
+}
+
+// ****************************************************************************************
+//
+// Return antal audio tracks
+//
+// ****************************************************************************************
+
+int film_oversigt_typem::antal_audio_tracks() {
+  int antal=vlc_controller::antal_audio_tracks();
+  return(antal);
+}
+
+
+// ****************************************************************************************
+//
+// select subtitle active by name
+//
+// ****************************************************************************************
+
+bool film_oversigt_typem::SelectSubtitle(const std::string& search) {
+  vlc_controller::SelectSubtitle(search);
+}
+
+
+
+// ****************************************************************************************
+//
+// Get antal lydspor
+//
+// ****************************************************************************************
+
+
+int film_oversigt_typem::GetAudioTracks() {
+  int ok=vlc_controller::GetAudioTracks();
+  return(1);
+}
+
+
+// ****************************************************************************************
+//
+// Return true if movie is playing
+//
+// ****************************************************************************************
+
+
+bool film_oversigt_typem::libvlc_player_play() {
+ if (vlc_mp != nullptr && libvlc_media_player_is_playing(vlc_mp)) {
+    return(1);
+  }  
+  return(0);
+}
+
 
 // ****************************************************************************************
 //
 // Play streams from path and update db abount nr of play
-// 
 //
 // ****************************************************************************************
 
@@ -396,9 +530,10 @@ int film_oversigt_typem::playmovie(int nr) {
     // stop playing (active movie) before start new
     if (vlc_in_playing()) vlc_controller::stopmedia();
   }
-  film_is_playing=true;                                       // set play flag
+  film_is_playing=true;                                       // set playing flag
   if (strncmp(configdefaultplayer,"Internal",8)==0) {
     vlc_controller::playmedia(this->filmoversigt[nr].getfilmfilename());
+    getsubs_timer=1;
   } else {
     if (useconfigdefaultplayer=="/usr/bin/mpv") useconfigdefaultplayer=useconfigdefaultplayer + " --fs";
     else if (useconfigdefaultplayer=="/snap/bin/vlc") useconfigdefaultplayer=useconfigdefaultplayer + " --fullscreen";
@@ -409,10 +544,40 @@ int film_oversigt_typem::playmovie(int nr) {
   if ((err==-1) || (err==127)) {
     sprintf(debuglogdata,"Error start default player cmd: %s ",systemcmd.c_str());
     write_logfile(logfile,(char *) debuglogdata);
+    film_is_playing=false;
     return(0);
   }
   return(1);
 }
+
+// *******************************************************************
+//
+// call to vlc class
+//
+// *******************************************************************
+
+void film_oversigt_typem::vlc_initOpenGL() {
+  initOpenGL();
+}
+
+// *******************************************************************
+//
+// call to vlc class
+//
+// *******************************************************************
+
+
+void film_oversigt_typem::vlsupdateTexture() {
+  updateTexture();
+}
+
+
+// show video frams (playback texture)
+
+void film_oversigt_typem::show_vlc_frame() {
+  renderer.AddVideoTextureRect( 0, getVideoTexture(), 0, 0,1920, 1080, 1,1,1,1);
+}
+
 
 // ****************************************************************************************
 //
@@ -747,7 +912,12 @@ bool film_oversigt_typem::update_movierec_in_db(int recnr) {
 // updatedb all
 //
 // ****************************************************************************************
-
+std::string escapeSql(MYSQL* db, const std::string& text) {
+    std::string result(text.size() * 2 + 1, '\0');
+    unsigned long length = mysql_real_escape_string(db,result.data(),text.c_str(),text.size());
+    result.resize(length);
+    return result;
+}
 
 bool film_oversigt_typem::update_movierec_in_db_all(int recnr) {
   std::string sql_update;
@@ -790,6 +960,11 @@ bool film_oversigt_typem::update_movierec_in_db_all(int recnr) {
     if (strcmp(filmoversigt[recnr].getfilmgenre(),"Crime")==0) sql_update = sql_update + "19"; else
     if (strcmp(filmoversigt[recnr].getfilmgenre(),"War")==0) sql_update = sql_update + "20";
     else sql_update = sql_update + "0";
+
+    sql_update = sql_update + ", subtitle='";
+    sql_update = sql_update + escapeSql(conn, filmoversigt[recnr].getfilmsubtitle());
+    sql_update = sql_update + "'";
+
     sql_update = sql_update + " where filename='"; 
     sql_update = sql_update + filmoversigt[recnr].getfilmfilename();
     sql_update = sql_update + "'";
@@ -803,25 +978,11 @@ bool film_oversigt_typem::update_movierec_in_db_all(int recnr) {
 
 
 
-
-sqlite3 *sqlitedb_obj_movie;
-
-int sql_movie_sqldb_callback(void *data, int argc, char **argv, char **azColName) {
-  int i;
-  for (i=0; i<argc; i++) {
-      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-  }
-  return 0;
-}
-
-
 // ****************************************************************************************
 //
 // create db tables
 //
 // ****************************************************************************************
-
-
 
 bool film_oversigt_typem::createdb(MYSQL *conn) {
   std::string sql_update;
@@ -1312,6 +1473,7 @@ int film_oversigt_typem::opdatere_film_oversigt(bool forceupdate) {
         14 fsize,
         15 fformat
         16 sub_title
+        17 insertdate
         */
         if (row[0]) new_movie.setfilmid(atoi(row[0]));
         if (row[1]) new_movie.setfilmtitle(row[1]);
@@ -1865,6 +2027,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
 // ****************************************************************************************
 
 int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
+  const char *dbname = (char *) "mythtvcontroller";
   // char sqlselect[4000];
   std::string sqlselect;
   std::string mainsqlselect1;
@@ -1939,6 +2102,46 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
 }
 
 
+void movie_drawLinesOfTextfont(Font *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
+  std::istringstream stream(text);
+  std::string word;
+  std::string currentLine;
+  std::string formattext;
+  float yoffset=0.0f;
+  int linecount=0;
+  while (stream >> word) {
+    // Check if adding the word exceeds the maximum width then print the line
+    if (currentLine.length() + word.length() + 1 > maxWidth) {
+      if (currentLine.length()>0) {
+        if (center) formattext = fmt::format("{:^{}s}",currentLine,maxWidth);
+        else formattext = fmt::format("{}",currentLine);
+        renderer.AddText(font, x, y+yoffset  ,formattext,1,1,1,1);
+        currentLine = word; // Start a new line with the current word
+        linecount++;
+        yoffset+=18.0f;
+      } else {
+        currentLine = word; // Start a new line with the current word
+      }
+    } else {
+      if (!currentLine.empty()) {
+        currentLine += " "; // Add a space before the next word
+      }
+      currentLine += word; // Add the word to the current line
+    }
+    if (linecount>maxlines) break;
+  }
+    // Print any remaining text in the current line
+  if (linecount<=maxlines) {
+    if (!currentLine.empty()) {
+      if (currentLine.length()>maxWidth) currentLine.resize(maxWidth);
+      if (center) formattext = fmt::format("{:^{}s}",currentLine,maxWidth);
+      else formattext = fmt::format("^{}",currentLine,maxWidth);
+      renderer.AddText(font, x, y+yoffset  ,formattext,1,1,1,1);
+      // drawText(font,formattext.c_str(), x, y + yoffset, scale, color);
+    }
+  }
+}
+
 
 
 
@@ -1969,190 +2172,41 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int xpos,ypos;
   static int load_rec=0;
   // load dvd covers dynamic one pr frame
-  if ((filmoversigt.size() > 0) && (movie_oversigt_loaded==false) && (load_rec<6)) {
-    if (load_rec<filmoversigt_antal) {
-      strcpy(tmpfilename,this->filmoversigt[load_rec].getfilmcoverfile());
-      if ((file_exists(tmpfilename)) && (this->filmoversigt[load_rec].gettextureid()==0)) {
-        this->filmoversigt[load_rec].settextureidfile(tmpfilename);
+  if (filmoversigt.size() > 0) {
+    if ((movie_oversigt_loaded==false) && (load_rec<6)) {
+      if (load_rec<filmoversigt_antal) {
+        strcpy(tmpfilename,this->filmoversigt[load_rec].getfilmcoverfile());
+        if ((file_exists(tmpfilename)) && (this->filmoversigt[load_rec].gettextureid()==0)) {
+          this->filmoversigt[load_rec].settextureidfile(tmpfilename);
+        }
       }
+      if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
+        movie_oversigt_loaded=true;
+        movie_oversigt_loaded_done=1;
+      } else load_rec++;
     }
-    if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
-      movie_oversigt_loaded=true;
-      movie_oversigt_loaded_done=1;
-    } else load_rec++;
-  }
-  glTranslatef(0.0f, 0.0f ,0.0f);
-  // mask
-  winsizx=200;
-  winsizy=200;
-  xpos=220;
-  ypos=700;
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
-    sofset=(_mangley/40)*8;
-    if ((i+sofset)<filmoversigt_antal) {
-      if (((i % bonline)==0) && (i>0)) {
-        xpos=220;
-        ypos=ypos-(winsizy+60);
-      }
-      if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
+    // glTranslatef(0.0f, 0.0f ,0.0f);
+    // mask
+    winsizx=200;
+    winsizy=200;
+    xpos=220;
+    ypos=200;
+    while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
+      renderer.AddTextureRect(100+i,_defaultdvdcover, 100.0f+xpos, ypos, 200, 240,1,1,1,1);
       if (((i+sofset)<filmoversigt_antal) && (filmoversigt[i+sofset].gettextureid())) {
-        // print cover dvd
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
-        glLoadName(120+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
-        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
-        glEnd();
-        // print movie cover over
-        glBindTexture(GL_TEXTURE_2D,filmoversigt[i+sofset].gettextureid());
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glLoadName(120+i+sofset);
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
-        glTexCoord2f(0, 0); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
-        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
-        glEnd(); //End quadrilateral coordinates
-      } else {
-        // print cover dvd
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
-        glLoadName(120+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
-        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
-        glEnd();
+        renderer.AddTextureRect(100+i,filmoversigt[i+sofset].gettextureid(),124.0f+xpos, ypos+2, 174, 236,1,1,1,1);
       }
-      strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // movie title     
-      lastslash=strrchr(temptxt,'/');
-      if (lastslash) strcpy(temptxt,lastslash+1);
-      drawLinesOfText(temptxt, 14.00f+xpos, 110.0f+ypos, 1.0f,12,2,1,true);
+      strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // movie title
+      movie_drawLinesOfTextfont(&myfont,temptxt, 124.0f+xpos + 20, ypos+256, 18, 22, 2, 2, true);
+      // renderer.AddText(&myfont, 124.0f+xpos + 20, ypos+256,temptxt,1,1,1,1);    
+      xpos+=205;
+      i++;
     }
-    xpos+=205;
-    i++;
-  }
-  movie_oversigt_loaded_nr=0;
-}
-
-
-// ****************************************************************************************
-//
-// normal oversigt new ver.
-//
-// ****************************************************************************************
-
-/*
-
-void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
-  int i=0;
-  int film_nr=0;
-  std::string tmpfilename;
-  std::string moviename;
-  float buttonsizex=config_menu.config_movie_main_window_icon_sizex;
-  float buttonsizey=config_menu.config_movie_main_window_icon_sizey;
-  float yof=config_menu.config_movie_main_window_sizey-(buttonsizey);                                        // start ypos
-  float xof=0.0f;
-  float boffset=0.0f;
-  int bonline=8;
-  unsigned int sofset=0;
-  static int movie_oversigt_loaded_done=0;
-  static bool movie_oversigt_loaded=false;
-  xof=config_menu.config_movie_main_windowx;                                                              // start xpos
-  int xx=(float) (config_menu.config_movie_main_window_sizex/buttonsizex);
-  int yy=(float) (config_menu.config_movie_main_window_sizey/buttonsizey);
-  int lfilmoversigt_antal=8*4;
-  if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) filmoversigt.size())) {
-    movie_oversigt_gfx_loading=true;
-    tmpfilename=filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile();
-    if ((file_exists(tmpfilename.c_str())) && (filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
-      filmoversigt[movie_oversigt_loaded_nr].settextureidfile((char *) tmpfilename.c_str());
-    }    
-    if (movie_oversigt_loaded_nr==(int) filmoversigt.size()) {
-      movie_oversigt_loaded=true;
-      movie_oversigt_loaded_done=1;
-      movie_oversigt_gfx_loading=false;
-    } else movie_oversigt_loaded_nr++;
-  }
-  while((i<lfilmoversigt_antal) && (i+sofset<filmoversigt.size())) {
-    sofset=(_mangley/40)*8;
-    if (((i % bonline)==0) && (i>0)) {
-      yof=yof-(config_menu.config_movie_main_window_icon_sizey+22);         // 92
-      xof=config_menu.config_movie_main_windowx;
-    }
-    glPushMatrix();
-    if (film_nr+1==(int) film_key_selected) boffset=10; else boffset=0;
-    if (filmoversigt[film_nr+sofset].gettextureid()) {
-      glEnable(GL_TEXTURE_2D);
-      // show default cover dvd
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);                           //
-      glLoadName(120+film_nr+sofset);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( xof, (yof+10)-boffset, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,(yof+buttonsizey-10)+boffset, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-15, (yof+buttonsizey)-10+boffset , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-15, (yof+10)-boffset , 0.0);
-      glEnd();
-      // show movie cover over
-      glBindTexture(GL_TEXTURE_2D,filmoversigt[film_nr+sofset].gettextureid());
-      glDisable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glLoadName(120+film_nr+sofset);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( xof+25,yof+10-boffset, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10+boffset, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-16, yof+buttonsizey-10+boffset , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-16, yof+10-boffset , 0.0);
-      glEnd();
-      // show mask over
-      glBindTexture(GL_TEXTURE_2D,_defaultdvdcover_mask);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glLoadName(120+film_nr+sofset);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( xof+25,yof+10-boffset, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof+25,yof+buttonsizey-10+boffset, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-16, yof+buttonsizey-10+boffset , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-16, yof+10-boffset , 0.0);
-      glEnd();
-    } else {
-      // show default cover dvd
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
-      glLoadName(120+film_nr+sofset);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( xof+15, yof+10-boffset, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof+15,yof+buttonsizey-10+boffset, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-15, yof+buttonsizey-10+boffset , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-15, yof+10-boffset , 0.0);
-      glEnd();
-    }
-    // show movie name
-    moviename = fmt::format("{}",filmoversigt[film_nr+sofset].getfilmtitle());    
-    // moviename.resize(60);
-    drawLinesOfText(moviename,14.00f+xof,yof-10,0.38f,20,2,1,true); // 10
-    glPopMatrix();
-    // next button
-    xof+=buttonsizex-10;
-    film_nr++;
-    i++;
+    movie_oversigt_loaded_nr=0;
   }
 }
 
 
-*/
 
 // All new versions 2 *****************************************************************************************************************
 
@@ -2166,8 +2220,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
 float film_getTextWidth(const std::string& text, float scale) {
   float width = 0.0f;
   for (char c : text){
-    Character ch = characters[c];
-    width += ch.advance * scale;  // glyph advance
+    // Character ch = characters[c];
+    // width += ch.advance * scale;  // glyph advance
   }
   return width;
 }
@@ -2181,17 +2235,7 @@ float film_getTextWidth(const std::string& text, float scale) {
 
 
 void movie_drawcover(int x, int y, int w, int h, GLuint textureId,int id,Color3 c) {
-  std::string temptxt;
-  glEnable(GL_TEXTURE_2D);
-  glColor4f(c.r, c.g, c.b, c.a);
-  glBindTexture(GL_TEXTURE_2D, textureId);
-  glLoadName(id);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex2i(x,     y);
-  glTexCoord2f(1, 0); glVertex2i(x + w, y);
-  glTexCoord2f(1, 1); glVertex2i(x + w, y + h);
-  glTexCoord2f(0, 1); glVertex2i(x,     y + h);
-  glEnd();
+  renderer.AddTextureRect(id,textureId, x, y, w, h,1,1,1,1);
 }
 
 
@@ -2227,12 +2271,14 @@ void film_oversigt_typem::draw_stream_search_item(int x, int y,int ii,GLuint nor
   if (ii == selected_icon_in_view-1) {                                                       // if (ii == film_key_selected-1) {
     if (y<search_startY-50) {
       movie_drawcover(x + 18, y + 18, 174, 214, texture ,ii+100,highcolor);
-      drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
+      renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
+      // drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
     }
   } else {
     if (y<search_startY-50) {
       movie_drawcover(x + 20, y + 20, 170, 210, texture ,ii+100,normalcolor);                                         // if (ii == film_key_selected-1) {
-      drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+      renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
+      // drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
     }
   }
 }
@@ -2270,10 +2316,10 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
   if (filmoversigt[ii].gettextureid() ) texture = filmoversigt[ii].gettextureid(); else texture = normal_icon;
   if (ii == selected_icon_in_view-1) {                                                       // if (ii == film_key_selected-1) {
     movie_drawcover(x + 18, y + 18, 174, 214, texture ,ii+100,highcolor);
-    drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 2);
+    renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
   } else {
     movie_drawcover(x + 20, y + 20, 170, 210, texture ,ii+100,normalcolor);                                         // if (ii == film_key_selected-1) {
-    drawText(font12, temprgtxt.c_str(), x + 10, y - 12, fontsize, 0);
+    renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
   }
 }
 
@@ -2281,7 +2327,7 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
 
 // **************************************************************************************************
 //
-// new film oversigt with kinetic scroll
+// Film oversigt with kinetic scroll
 //
 // **************************************************************************************************
 
@@ -2324,12 +2370,14 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
   glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+(rowHeight/2)-20 , 0.0);
   glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
   glEnd();
+  /*
+  // old ver
   // ---- RENDER -----------------------------------------------
   // show seach string
   if (strcmp(keybuffer,"")!=0) {
-    drawText(font24, keybuffer, 300.0f, 980.0f, 1.0f, 0);
+    // drawText(font24, keybuffer, 300.0f, 980.0f, 1.0f, 0);
     float textWidth = film_getTextWidth(keybuffer, 1.0f);
-    if (cursor) drawText(font24, "_", 300.0f+textWidth, 980.0f, 1.0f, 0);
+    // if (cursor) drawText(font24, "_", 300.0f+textWidth, 980.0f, 1.0f, 0);
   }
   for (int i = 0; i < visibleItems && (sofset + i) < filmoversigt.size(); ++i) {
     int index = sofset + i;
@@ -2341,13 +2389,26 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
       draw_stream_search_item( x, y, index-8, _defaultdvdcover, _defaultdvdcover, film_select_iconnr );
     }
   }
+  */
+  if (strcmp(keybuffer,"")!=0) {
+    printf("data in key buffer.\n");
+  }
+  // ---- RENDER -----------------------------------------------
+  for (int i = 0; i < visibleItems && (sofset+i) < filmoversigt.size();i++) {
+    int index = sofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    int x = startX + col * itemWidth + 40;
+    int y = startY + row * rowHeight - subOff - 20;
+    draw_stream_search_item( x, y, index, _defaultdvdcover, _defaultdvdcover, film_select_iconnr );
+  }
 }
 
 
 
 // **************************************************************************************************
 //
-// new film oversigt with kinetic scroll
+// Film oversigt with kinetic scroll
 //
 // **************************************************************************************************
 
@@ -2359,8 +2420,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int totalRows   = (int)ceil((float)filmoversigt.size() / itemsPerRow);
   int visibleRows = viewHeight / rowHeight;
   float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
-
-
   // scrollPos = std::clamp(scrollPos, 0.0f, maxScroll);
   if (scrollPos < 0) {
       scrollPos = 0;
@@ -2370,7 +2429,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       scrollPos = maxScroll;
       scrollVel = 0;
   }
-
   // ---- CALC --------------------------------------------------
   int firstRow   = (int)(scrollPos / rowHeight);
   float subOff   = fmod(scrollPos, rowHeight);
@@ -2378,16 +2436,13 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int screenTop = startY;
   int xof = startX;
   int visibleItems = (visibleRows + 3) * itemsPerRow;
-  // ---- RENDER -----------------------------------------------
-  for (int i = 0; i < visibleItems && (sofset + i) < filmoversigt.size(); ++i) {
+  for (int i = 0; i < visibleItems && (sofset+i) < filmoversigt.size();i++) {
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = xof + col * itemWidth + 40;
-    int y = screenTop - (row * rowHeight) + subOff - 40;
+    int x = startX + col * itemWidth + 40;
+    int y = startY + row * rowHeight - subOff - 20;
     draw_stream_item( x, y, index, _defaultdvdcover, _defaultdvdcover, film_select_iconnr );
   }
 }
-
-
 

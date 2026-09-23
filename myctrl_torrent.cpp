@@ -1,4 +1,3 @@
-
 #include <libtorrent/session.hpp>
 #include <libtorrent/magnet_uri.hpp>
 #include <libtorrent/torrent_info.hpp>
@@ -8,22 +7,25 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
+// #include <GL/glut.h>
+// #include <GL/gl.h>
+// #include <GL/glu.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <filesystem>
 #include <string>
 #include <mysql.h>                      // mysql stuf
+
+#include "renderer.h"
 #include "utility.h"
 #include "myctrl_torrent.h"
-#include "myctrl_glprint.h"
+// #include "myctrl_glprint.h"
 
 extern char configmysqluser[256];                              // /mythtv/mysql access info
 extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
-
+extern Renderer renderer;
 namespace lt = libtorrent;
 
 using namespace std;
@@ -39,6 +41,10 @@ extern bool do_show_torrent_options_move;
 extern float do_move_torrent_file_now_done;               // is it running now
 extern std::string do_show_load__torrent_file_string;
 
+extern Font myfont_torrent_overskrift;
+extern Font myfont;
+extern Font myfont_torrent_list;
+
 // ****************************************************************************************
 //
 // glprint text
@@ -48,7 +54,7 @@ extern std::string do_show_load__torrent_file_string;
 void myglprint(char *string) {
   int len,i;
   len = (int) strlen(string);
-  for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_9_BY_15, string[i]);
+  // for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_9_BY_15, string[i]);
 }
 
 // ****************************************************************************************
@@ -61,7 +67,7 @@ void myglprint(char *string) {
 void myglprintbig(char *string) {
   int len,i;
   len = (int) strlen(string);
-  for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+  // for (i = 0; i < len; i++) glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
 }
 
 
@@ -198,7 +204,8 @@ torrent_loader::torrent_loader() {
   pack.set_int(lt::settings_pack::upload_rate_limit, 0);
 
   // Disk/cache
-  pack.set_int(lt::settings_pack::cache_size, 512); // MB
+  // not in use any more in torrent
+  // pack.set_int(lt::settings_pack::cache_size, 512); // MB
 
   // Aktivitet
   pack.set_int(lt::settings_pack::active_downloads, 50);
@@ -754,7 +761,7 @@ void torrent_loader::opdate_torrent() {
   std::vector<lt::alert*> alerts;
   s.pop_alerts(&alerts);
   for (lt::alert* a : alerts) {
-    std::cout << a->message() << std::endl;
+    // std::cout << a->message() << std::endl;
   }
   // Sleep to avoid busy waiting
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -839,38 +846,13 @@ void torrent_loader::show_file_move() {
   int yof=400;
   int xxof=0;
   float procentdone=0.0f;
-  glPushMatrix();
-  // background
-  glEnable(GL_TEXTURE_2D);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_texturemusicplayer);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( xpos+225 + xof,ypos+180 + yof , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( xpos+225 + xof,ypos+250 + yof, 0.0);
-  glTexCoord2f(1, 1); glVertex3f( xpos+225+400 + xof,ypos+250 + yof, 0.0);
-  glTexCoord2f(1, 0); glVertex3f( xpos+225+400 + xof,ypos+180 + yof, 0.0);
-  glEnd();
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  xof=350;
-  yof=500;
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D,0);
-  glColor3f(0.2f, 0.8f, 0.2f);
+  renderer.AddTextureRect(0,_texturemusicplayer, xpos+225, ypos, 400, 250,1,1,1,1);
   procentdone=do_move_torrent_file_now_done/torrent_list[edit_line_nr].total_wanted;
   for(int xx=0;xx<(procentdone*100)/2;xx++) {
+    // manger blank hvid box som texture i stedet for _texturemusicplayer
+    renderer.AddTextureRect(0,_texturemusicplayer, xpos+200+xxof, ypos, 5, 30,1,1,1,1);
     xxof=xx*7;
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f( xpos+200 + xof + xxof,ypos+100 + yof , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( xpos+200 + xof + xxof,ypos+130 + yof, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( xpos+200+5 + xof + xxof,ypos+130 + yof, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( xpos+200+5 + xof + xxof,ypos+100 + yof, 0.0);
-    glEnd();
-  }
-  glPopMatrix();
+  } 
 }
 
 
@@ -889,52 +871,12 @@ void torrent_loader::show_move_options() {
   std::string showtxt;
   int xof=300;
   int yof=400;
-  glPushMatrix();
-  glEnable(GL_TEXTURE_2D);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_texturemusicplayer);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( xpos+225 + xof,ypos+100 + yof , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( xpos+225 + xof,ypos+350 + yof, 0.0);
-  glTexCoord2f(1, 1); glVertex3f( xpos+225+350 + xof,ypos+350 + yof, 0.0);
-  glTexCoord2f(1, 0); glVertex3f( xpos+225+350 + xof,ypos+100 + yof, 0.0);
-  glEnd();
-  glPopMatrix();
-  
-  glPushMatrix();  
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  // glTranslatef(350 + xof, 280 + yof, 0.0f);
-  xof=350;
-  yof=600;
-  glTranslatef(0.0f, 0.0f, 0.0f);
+  renderer.AddTextureRect(0,_texturemusicplayer, 420, 290, 150, 150,1,1,1,1);
   for (int n=0;n<3;n++) {
-    // glRasterPos2f(0.0f, 0.0f+(n*28));
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D,0);
-    if (n==torrent_info_move_line_nr) glColor3f(0.2f, 0.8f, 0.2f); else glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f( 200 + xof,100 + yof , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( 200 + xof,130 + yof, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 200+300 + xof,130 + yof, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 200+300 + xof,100 + yof, 0.0);
-    glEnd();
-    yof=yof-50;
-  }
-  glColor3f(0.5f, 0.5f, 0.0f);
-  glTranslatef(650.0f, 608.0f, 0.0f);
-  yof=600;
-  for (int n=0;n<3;n++) {
-    glDisable(GL_TEXTURE_2D);
-    glRasterPos2f(0.0f, 0.0f+(n*50));
     showtxt=fmt::format(" {:.25} ", options_text[n]);
-    myglprintbig((char *) showtxt.c_str());    
+    if (n==torrent_info_move_line_nr) renderer.AddText(&myfont,450, 350 + (n*18),showtxt,0.5,0.8,0.2,1);
+    else renderer.AddText(&myfont,450, 350 + (n*18),showtxt,1,1,1,1);
   }
-  glPopMatrix();    
 }
 
 
@@ -952,53 +894,15 @@ void torrent_loader::show_torrent_options() {
   std::string showtxt;
   int xof=300;
   int yof=400;
-  glPushMatrix();
-  glEnable(GL_TEXTURE_2D);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_texturemusicplayer);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( 225 + xof,100 + yof , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( 225 + xof,350 + yof, 0.0);
-  glTexCoord2f(1, 1); glVertex3f( 225+350 + xof,350 + yof, 0.0);
-  glTexCoord2f(1, 0); glVertex3f( 225+350 + xof,100 + yof, 0.0);
-  glEnd();
-  glPopMatrix();
   
-  glPushMatrix();  
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  // glTranslatef(350 + xof, 280 + yof, 0.0f);
-  xof=350;
-  yof=600;
-  glTranslatef(0.0f, 0.0f, 0.0f);
+  renderer.AddTextureRect(40,_texturemusicplayer, 626, 300, 100, 200,1,1,1,1);
   for (int n=0;n<3;n++) {
-    // glRasterPos2f(0.0f, 0.0f+(n*28));
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D,0);
-    if (n==torrent_info_line_nr) glColor3f(0.2f, 0.8f, 0.2f); else glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f( 200 + xof,100 + yof , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( 200 + xof,130 + yof, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 200+300 + xof,130 + yof, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 200+300 + xof,100 + yof, 0.0);
-    glEnd();
-    yof=yof-50;
-  }
-  glColor3f(0.5f, 0.5f, 0.0f);
-  glTranslatef(650.0f, 608.0f, 0.0f);
-  yof=600;
-  for (int n=0;n<3;n++) {
-    glDisable(GL_TEXTURE_2D);
-    glRasterPos2f(0.0f, 0.0f+(n*50));
     showtxt=fmt::format(" {:.25} ", options_text[n]);
-    myglprintbig((char *) showtxt.c_str());    
-  }
-  
-  glPopMatrix();    
+    if (n==torrent_info_line_nr) 
+      renderer.AddText(&myfont,650, 350 + (n*18),showtxt,0.2,0.8,0.2,1);
+    else 
+      renderer.AddText(&myfont,650, 350 + (n*18),showtxt,1,1,1,1);
+  }  
 }
 
 
@@ -1044,108 +948,45 @@ void torrent_loader::show_torrent_oversigt(int sofset,int key_selected) {
   int startofset=0;
   static int do_show_setup_select_linie=0;
   // background
-  glPushMatrix();
-  glEnable(GL_TEXTURE_2D);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,torrent_background);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  // background
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( 200,100 , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( 200,975 , 0.0);
-  glTexCoord2f(1, 1); glVertex3f( 200+1300,975 , 0.0);
-  glTexCoord2f(1, 0); glVertex3f( 200+1300,100 , 0.0);
-  glEnd();
-  glPopMatrix();
-  // close buttons
-  glPushMatrix();
-  glEnable(GL_TEXTURE_2D);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  glBindTexture(GL_TEXTURE_2D,_textureclose);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=188;
-  winsizy=81;
-  xpos=400;
-  ypos=-10;
-  glLoadName(40);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  glPopMatrix();
-  glPushMatrix();
-  glEnable(GL_TEXTURE_2D);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  glBindTexture(GL_TEXTURE_2D,_textureloadfile);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=188;
-  winsizy=81;
-  xpos=-140;
-  ypos=650;
-  glLoadName(41);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  glPopMatrix();
-  glPushMatrix();
-  // list of torrent running status.
-  glDisable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glRasterPos2f(750.0f, 0.0f+(870.0f));
-  myglprintbig((char *) "Torrent progress status."); 
-  glRasterPos2f(350.0f, 0.0f+(750.0f));
+  renderer.AddTextureRect(0,torrent_background, 200, 100, 1300, 975,1,1,1,1);
+  // close
+  renderer.AddTextureRect(40,_textureclose, 726, 950, 188, 81,1,1,1,1);
+  // load file
+  renderer.AddTextureRect(41,_textureloadfile, 188+30, 81+40, 188, 81,1,1,1,1);
+   // list of torrent running status.
+  renderer.AddText(&myfont_torrent_overskrift,670, 200 ,"Torrent progress status.",1,1,1,1);
   int tconections=0;
   for (int n=0;n<torrent_list.size();n++) tconections = tconections + torrent_list[n].num_connections;
-  std::string tempstr = fmt::format("Total connections {}",tconections);
-  myglprint((char *) tempstr.c_str());
-  glTranslatef(300, 480, 0.0f);
-  glRasterPos2f(0.0f, 0.0f+(230.0f));
-  myglprint((char *) "Name.                                                               Progress.                      Status.");
+  std::string tempstr = fmt::format("Total connections : {}",tconections);
+  renderer.AddText(&myfont,750, 230 ,tempstr,1,1,1,1);
+  renderer.AddText(&myfont_torrent_overskrift,450, 350 ,"Name.                                                               Progress.                      Status.",1,1,1,1);
   for (int n=0;n<TORRENT_ANTAL-1;n++) {
-    glRasterPos2f(0.0f, 0.0f+(200-(n*18)));
     if (n<torrent_list.size()) {
       std::string torrent_name = torrent_list.at(n).torrent_name;
       if (torrent_name.size()>64) {
-        torrent_name.resize(60); // Ensure the name is 64 characters long
+        torrent_name.resize(44); // Ensure the name is 64 characters long
         torrent_name += "..."; // Add ellipsis if truncated
       }
       if (torrent_list.at(n).active) {
         if (!(torrent_list.at(n).downloaded)) {
           if (torrent_list.at(n).paused) {
-            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, torrent_list.at(n).downloaded_size/1024/1024, format_bits(torrent_list.at(n).total_wanted), "Paused");
+            showtxt = fmt::format(" {:47} {:>8.4} % {} of {} {:>14}", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, torrent_list.at(n).downloaded_size/1024/1024, format_bits(torrent_list.at(n).total_wanted), "Paused");
           } else {
-            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {:>14}", torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), torrent_list.at(n).state_text);
+            showtxt = fmt::format(" {:47} {:>8.4} % {} of {} {:>14}", torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), torrent_list.at(n).state_text);
           }
         } else {
           if (get_automove_done(n)) {
-            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {} Downloaded/Moved.", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), "");
+            showtxt = fmt::format(" {:47} {:>8.4} % {} of {} {} Downloaded/Moved.", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).downloaded_size), format_bits(torrent_list.at(n).total_wanted), "");
           } else {
-            showtxt = fmt::format(" {:64} {:>8.4} % {} of {} {} Downloaded.", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).total_wanted), format_bits(torrent_list.at(n).total_wanted), "");
+            showtxt = fmt::format(" {:47} {:>8.4} % {} of {} {} Downloaded.", torrent_list.at(n).torrent_name, torrent_list.at(n).progress, format_bits(torrent_list.at(n).total_wanted), format_bits(torrent_list.at(n).total_wanted), "");
           }
         }
       } else {      
         showtxt = no_torrent_text[0];
       }
     } else showtxt = no_torrent_text[0];
-    myglprint((char *) showtxt.c_str());
+    renderer.AddText(&myfont_torrent_list,450, 400 + (n*18) ,showtxt,1,1,1,1);
   }
-  glPopMatrix();  
   coursornow(-70,528-((edit_line_nr)*18),0);
 }
 

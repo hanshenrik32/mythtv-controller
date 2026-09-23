@@ -351,8 +351,8 @@ class config_icons {
       config_moviex = 1920;
       config_moviey = 504;
       config_movie_icon = "movie_button";
-      config_movie1x = 1920;
-      config_movie1y = 696;
+      config_movie1x = 1720;
+      config_movie1y = 430;
       config_movie1_icon = "movie1";
       config_recordedx = 0;
       config_recordedy = 0;
@@ -390,7 +390,7 @@ class config_icons {
       config_upy= 1080;
       config_up_icon= "pup";
       config_search_activex= 1720;
-      config_search_activey= 126;
+      config_search_activey= 850;
       config_search_icon="search";
       config_search_backx= 1720;
       config_search_backy= 126;
@@ -490,7 +490,7 @@ class config_icons {
       config_radioplayer_bw_button_posy = 300;
       config_radioplayer_bw_button_sizx = 100;
       config_radioplayer_bw_button_sizy = 100;
-      config_radioplayer_play_button_posx = 50;
+      config_radioplayer_play_button_posx = 40;
       config_radioplayer_play_button_posy = 300;
       config_radioplayer_play_button_sizx = 100;
       config_radioplayer_play_button_sizy = 100;
@@ -525,18 +525,19 @@ class config_icons {
       config_mediaplayer_stop_button_sizx = 100;
       config_mediaplayer_stop_button_sizy = 100;
 
+      // Movie player info window
       config_movieplayer_infox = 400;
       config_movieplayer_infoy = 400;
       config_movieplayer_sizx = 800;
       config_movieplayer_sizy = 550;
-      config_movieplayer_coverx = 420;
+      config_movieplayer_coverx = 925;
       config_movieplayer_covery = 600;
-      config_movieplayer_cover_sizx = 220;
-      config_movieplayer_cover_sizy = 320;
+      config_movieplayer_cover_sizx = 230;
+      config_movieplayer_cover_sizy = 322;
       
       config_mediaplayer_info_icon = "musicplayer-info";
       config_exitx = 0;
-      config_exity = 1008;
+      config_exity = 0;
       config_exit_icon= "exit";
       config_music_main_windowx = 0;
       config_music_main_windowy = 920;

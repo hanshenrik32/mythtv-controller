@@ -38,13 +38,13 @@ class recorded_top_type {
 };
 
 
-class recorded_overigt {
+class recorded_overigt_class {
     private:
         recorded_top_type programs[40];
         recorded_top_type **programsp;
         unsigned int title_antal;
     public:
-        recorded_overigt() { title_antal=0; }
+        recorded_overigt_class() { title_antal=0; }
         unsigned int programs_type_antal(int nr) { return(programs[nr].prg_antal); }
         int opdatere_recorded_oversigt();
         void show_recorded_oversigt(int valgtnr,int subvalgtnr);

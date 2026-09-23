@@ -6,7 +6,8 @@ https://tvheadend.org/projects/tvheadend/wiki/Faq
 
 if you wants to make the deb file you have to install debhelper
 
-you need to install fmodstudioapi20307linux.tar.gz
+you need to install fmodstudioapi20311linux.tar.gz
+you can do that by 'sudo make installsound'
 
 # mythtv-controller 
 # packs to install to compile on Ubuntu 10.xx/12.xx

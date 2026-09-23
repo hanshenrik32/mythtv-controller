@@ -10,7 +10,6 @@
 
 const int stationamelength=40;
 
-
 // station info struct
 struct radio_oversigt_type {
     char station_name[stationamelength+1];			// station name
@@ -24,7 +23,7 @@ struct radio_oversigt_type {
     bool online;
     bool aktiv;
     bool texture_r_loaded=false;
-
+    bool gfx_loaded=false;
     unsigned int kbps;
     GLuint textureId;
     GLuint textureId_r;
@@ -38,7 +37,7 @@ struct radiotype_type {
 };
 
 
-int set_radio_popular(int stationid);                //
+// int set_radio_popular(int stationid);                //
 const int radiooptionsmax=40;				                 // mxa antal typer af radio stationer
 
 
@@ -60,8 +59,9 @@ class radiostation_class {
     bool startup_loaded;			                                         	    // load radio statios list
     bool check_radio_online_bool();                                                 // check and set radio station online flag (DO NOT WORK)
     bool hentradioart=false;
-    void drawcover(int x, int y, int w, int h, GLuint textureId ,  GLuint textureId2,int id,Color2 c);
-    public:
+    void drawcover(int x, int y, int w, int h, GLuint textureId,int id);
+  public:
+    char *get_station_name(int nr) { return (stack[nr].station_name); }
     int playingstationnr=-1;		                                                // nr in stack of playing radio station
     bool search_radio_online_done;
     bool search_loaded;
@@ -74,7 +74,6 @@ class radiostation_class {
     int getradiooptionsselect()  { return(radiosortopt[radiooptionsselect].radiosortoptart); }
     int set_radio_populars(int stationid);
     //
-    char *get_station_name(int nr) { return (stack[nr].station_name); }
     const char *get_station_gfxfile(int nr) { return (stack[nr].gfxfilename.c_str()); }
     const char *get_stream_url(int nr) { return (stack[nr].streamurl.c_str()); }
     const char *get_homepage(int nr) { return (stack[nr].homepage.c_str()); }
@@ -130,10 +129,11 @@ class radiostation_class {
 
     int search_startX = 20;
     int search_startY = 762;
+    int startY_search_view = 882;
     int search_viewHeight = 660;
 
     int startX = 20;
-    int startY = 882;
+    int startY = 60;               // 882;
     int viewHeight = 780;
     // end new scroll vars
     void onScroll(float delta) { scrollVel += delta * accel; }
@@ -150,7 +150,7 @@ class radiostation_class {
     void process_object_radio(json_value* value, int depth);
     void process_array_radio(json_value* value, int depth);
     void process_value_radio(json_value* value, int depth,int x);
-
+    
 };
 
 #endif
