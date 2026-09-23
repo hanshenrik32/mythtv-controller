@@ -1,9 +1,6 @@
 #ifndef MYTV_SETUP
 #define MYTV_SETUP
 
-#include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <vector>
 
 const int MAXPRGLIST_ANTAL=200;
@@ -39,6 +36,12 @@ struct channel_list_struct {
 };
 
 
+class channel_list_type {
+  public:
+    int antal;
+    std::vector <channel_list_struct> channel_list={};
+    channel_list_type();
+};
 
 //
 // used for tv channel db config
@@ -95,9 +98,9 @@ int load_channel_list_from_graber();
 //
 bool save_channel_list();
 //
-int load_channel_list();
+// int load_channel_list();
 //
-void order_channel_list();
+// void order_channel_list();
 //
 int order_channel_list_in_tvguide_db();
 //
@@ -110,7 +113,7 @@ void show_setup_sound();
 void show_setup_sql();
 void show_setup_tema();
 void show_setup_network();
-void show_setup_font(int startofset);
+void show_setup_font(int aktiv);
 void show_setup_keys();
 void show_setup_tv_graber(int startofset);
 void show_setup_rss(unsigned int startofset);                                   // rss reader setup

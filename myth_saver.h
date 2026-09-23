@@ -16,38 +16,30 @@
 // PICTURE3D  urtype=PICTURE3D - OK
 // MUSICMETER urtype=MUSICMETER - OK
 
-struct boxpos {
-    float xpos;               // pos
-    float ypos;
-    float zpos;
-    float sizex;              // size
-    float sizey;
-    float sizez;
-    GLuint texture;           // texture default to show
-    GLuint pictexture;        // other texture to use
-    GLuint musictexture;      // other texture to use
-};
 
-const int BOX_MATRIX_ANTAL=11;
 
-class boxarray {
-  private:
-    void build_default_array();
-    void set_new_textures(int mode,int type,GLuint newtexture);
-    struct boxpos matrix[BOX_MATRIX_ANTAL][BOX_MATRIX_ANTAL];                  // box matrix
-    float tilt;                                                                // tilt array
+class spectrum_class {
   public:
-    boxarray();
-    bool get_loaded_status() { return(matrix[0][0].pictexture); }             // return true if texture is loaded
-    void settexture();
-    void show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3);
-    //void show_music_3d_new(int aangle,GLuint textureId);
-    void show_music_3d_2(float aangle,GLuint textureId);
-    int loadboxpictures();
-    void createboxpictures();
-    void roll_array();
+    float music_spectrum[128] = {0};
+ };
+
+
+class musicmeter_class : public spectrum_class {
+  private:
+    float rot;    
+    float peak[512]={0};
+    float barHeight[512]={0};
+    public: 
+    void DrawPlasmaVortex(float cx, float cy,float radius,float bass);
+    void DrawOuterRingWithLines(float r);  
+    void DrawAudioRing();
+    void DrawClockRing(float radius);
+    // new
+    void DrawOuterRingClock(float r);
+    void renderScene();    
 };
 
 void drawPlasma(int width, int height);
+void AddGlowLine(float x1, float y1, float x2, float y2,float width,float r, float g, float b);
 
 #endif

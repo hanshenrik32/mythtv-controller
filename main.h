@@ -1,15 +1,15 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
-const char *SHOWVER={"0.50.2 Beta"};
-
+const char *SHOWVER={"0.54.4 Beta"};
 
 const int DOWNKEY=23;
 const int UPKEY=24;
 const int CLOSE=27;
 
 const int TV=1;
-const int MOVIE_STREAM=3;
+const int MOVIE_STREAM=13;
+const int MOVIE=3;
 const int MUSIC=2;
 const int RECORDED=4;
 const int SETUP=5;
@@ -19,9 +19,16 @@ const int LASTSONG=10;
 const int NEXTSONG=11;
 const int PAUSEBUTTON=12;
 
+const int TIDAL_PLAY_BUTTON=20;
+
+
+const int BACKINTIME=28;
+const int FORWARDINTIME=29;
+
 const int SHOW_RADIO_OVERVIEW=80;
 const int SHOW_MUSIC_OVERVIEW=81;
 const int SHOW_SPOTIFY_OVERVIEW=82;
+const int SHOW_STREAM_OVERVIEW=84;                      // new
 const int SHOW_TIDAL_OVERVIEW=83;
 const int SOUND_SETUP_OVERVIEW=30;
 const int NETWORK_SETUP_OVERVIEW=31;
@@ -38,6 +45,7 @@ const int TEMA_SETUP_OVERVIEW=41;
 const int RSS_SETUP_OVERVIEW=42;
 const int SPOTIFY_SETUP_OVERVIEW=43;
 const int TIDAL_SETUP_OVERVIEW=44;
+const int SETUP_BACKEND=45;
 const int EXIT_PROGRAM=96;
 
 // const int TIDAL=6;
@@ -170,7 +178,11 @@ void *update_rss_phread_loader();
 void *datainfoloader_movie(void *data);
 void *xbmcdatainfoloader_movie(void *data);
 
-
+int save_config(char * filename);
+void load_config(char * filename);
+void loadgfx();
+void freegfx();
+void show_background();
 
 // start (button)
 //
@@ -193,3 +205,5 @@ float uvcolortable2[]={0.8,0.0,0.8, \
 
 
 #endif
+
+

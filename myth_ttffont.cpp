@@ -1,16 +1,13 @@
 //
 // true type font manager
 //
-#include <GL/gl.h>
-#if defined __APPLE__ && defined __MACH__
-#include <OpenGL/gl.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>                    // Header File For The GLUT Library
+#include <GL/glew.h>
 #include <GL/glc.h>                     // glc true type font system
-#endif
+// #endif
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
+#include <sstream>
 #include "myth_ttffont.h"
 #include "utility.h"
 
@@ -50,8 +47,11 @@ int fontctrl::updatefontlist()
     int i;
     size_t flen=0;
     GLint count;
-    FILE *fil;
-    static const char *sysc="fc-list | awk -F\":\" '{print $2}' | sed 's/ //' | sort -u > fontlist.txt";
+
+    std::string name;
+    std::string path;
+    std::string line;
+    static const char *sysc="fc-list | grep .ttf | awk -F\":\" '{print $2\",\"$1 }' | sort -t',' -k1,1 -u > fontlist.txt";
     int ret=system(sysc);                                                       // get font name by fc-list command
     glc_font_id = glcGenFontID();
     glcContext(glc_font_id);
@@ -64,17 +64,22 @@ int fontctrl::updatefontlist()
     //if (debugmode) printf("Numbers of fonts found %d \n",mastercount);
     master = 0;
     i=0;
-    fil=fopen("fontlist.txt","r");
-    if (fil) {
-      while((!(feof(fil))) && (i<FONT_TYPE_MAX-1)) {
-        fgets(typeinfo[i].fontname,sizeof(typeinfo[i].fontname),fil);
-        //if (debugmode & 16) printf("Font name found %s",typeinfo[i].fontname);
+    std::ifstream file("fontlist.txt");
+    if (!file.is_open())
+        return 0;
+    while ((std::getline(file, line)) && (i<FONT_TYPE_MAX)) {
+        std::stringstream ss(line);
+        if (line.empty())
+            continue;
+        if (std::getline(ss, name, ',') && std::getline(ss, path)) {
+            // FontInfo font{};
+            strcpy(typeinfo[i].fontname, name.c_str());
+            typeinfo[i].fontpath = path;
+        }
         i++;
-      }
-      mastercount=i;
-      fclose(fil);
-      int ret=system("rm fontlist.txt");                                        // remove file again
     }
+    if (i) mastercount=i-1; else mastercount=0;
+    std::remove("rm fontlist.txt");                                        // remove file again
     return(i);
 }
 

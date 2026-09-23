@@ -112,14 +112,14 @@ class film_oversigt_typem : vlc_controller {
     unsigned int filmoversigt_antal;			  	                                // loaded antal
     int volume;
     // load vlc stuf
-//      libvlc_instance_t *vlc_inst;              //
-//      libvlc_media_player_t *vlc_mp;            //
     float getmovieposition();
     bool show_search_view;
-    
   public:
+    int getsubs_timer=0;
+    // used to fade playing movie info in/out
+    float film_fader=0;
     int selected_icon_in_view=1;
-
+    //
     int downTimeMs=0;
     bool moved=false;
     bool gettouchbutton;
@@ -147,7 +147,7 @@ class film_oversigt_typem : vlc_controller {
     int rowHeight   = 198+75;
     int itemWidth   = 198;
     int startX = 20;
-    int startY = 882;
+    int startY = 60;     // old 882;
     int viewHeight = 780;
 
     int search_startX = 20;
@@ -180,11 +180,14 @@ class film_oversigt_typem : vlc_controller {
     film_oversigt_typem(unsigned int antal);
     ~film_oversigt_typem();
     // overload func
-    int opdatere_film_oversigt(void);
+    int opdatere_film_oversigt();
+    int opdatere_film_oversigt(bool forceupdate);
     int opdatere_film_oversigt(char *movietitle);
     bool createdb(MYSQL *conn);
 
+    // select movie file
     std::string select_file_name(std::string startpath);
+    // select movie type
     std::string select_movie_type();
     bool update_movierec_in_db(int recnr);
     bool update_movierec_in_db_all(int recnr);
@@ -195,6 +198,29 @@ class film_oversigt_typem : vlc_controller {
     void draw_stream_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
     void show_film_oversigt(float _mangley,int filmnr);
     void show_film_search_oversigt(float _mangley,int filmnr);
+
+    void vlsupdateTexture();
+    void show_vlc_frame();
+    void vlc_initOpenGL();
+
+    void tilbage10sec();
+    void frem10sec();
+    void tilbage60sec();
+    void frem60sec();
+    long get_movie_length_ms();
+    long get_movie_pos();
+    // get subtitle info and fill vector
+    bool GetSubtitleTracks();
+    // get audio tracks info and fill vector
+    int GetAudioTracks();
+    // set subtitle active
+    bool SelectSubtitle(const std::string& search);
+    int antal_sub_tracks();
+    int antal_audio_tracks();
+    bool libvlc_player_play();                        // do we play ?
+
+    std::string active_audiotrack_name();
+    int active_audiotrack_id();
 };
 
 #endif

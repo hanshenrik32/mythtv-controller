@@ -1,7 +1,8 @@
-C = gcc
+C = cc
+CC = g++
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wno-format-truncation -pthread -m64 -std=c++17 -O0 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2
+CFLAGS =  -Wno-format-truncation -pthread -m64 -std=c++17 -O0 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2 -Wregister
 LDFLAGS= 
 
 PROG       = mythtv-controller
@@ -26,7 +27,6 @@ BUILD_NUMBER_FILE=build-number.txt
 LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 
 LIBICAL := $(shell find /usr/lib/ -name 'libical.so')
-
 
 ifeq ($(LBITS),64)
 	LIBFMT := $(shell find /usr/lib/x86_64-linux-gnu/ -name 'libfmt.so')
@@ -56,42 +56,29 @@ else
 	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
 
-OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2 -I/usr/include/freetype2 -lmediainfo -lfmt -ltorrent-rasterbar 
+OPTS = -I"/usr/include/mysql" -I/usr/include/libxml2 -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/lirc" -I/usr/include/freetype2 -I/usr/include/libpng16 $(LIBGLC) $(LIBFMOD) $(LIBICAL) $(LIBFMT) $(LIRCSOURCES) 
 
-
-SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl_mplaylist.cpp myctrl_radio.cpp myth_setupsql.cpp  myctrl_recorded.cpp myctrl_movie.cpp myctrl_tvprg.cpp myth_setup.cpp utility.cpp readjpg.cpp loadpng.cpp myth_saver.cpp myth_picture.cpp myth_ttffont.cpp checknet.cpp dds_loader.cpp myctrl_xbmc.cpp myctrl_torrent.cpp myth_vlcplayer.cpp myctrl_spotify.cpp myctrl_tidal2.cpp myctrl_glprint.cpp myctrl_tmdb.cpp  mongoose-master/mongoose.c json-parser/json.c 
+SRCS = main.cpp renderer.cpp shader.cpp utility.cpp readjpg.cpp myctrl_readwebfile.cpp myth_ttffont.cpp myctrl_stream.cpp myctrl_radio.cpp myth_setupsql.cpp myctrl_tidal2.cpp myctrl_mplaylist.cpp myctrl_music.cpp myctrl_movie.cpp myctrl_torrent.cpp myctrl_spotify.cpp myctrl_recorded.cpp myctrl_tvprg.cpp myth_vlcplayer.cpp myth_saver.cpp checknet.cpp myth_setup.cpp mongoose-master/mongoose.c json-parser/json.c
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL  `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl -lfreetype -ljsoncpp `pkg-config --cflags --libs gtk+-3.0` 
+	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp 
 endif
 
 all:
-	@echo "mythtv-controller ver 0.38.1 \nPossible targets:"
+	@echo "mythtv-controller ver 0.50.x \nPossible targets:"
 	@echo "'sudo sh apt-get.sh'        - Install software required by mythtv-controller"
 	@echo "'sudo make installsound'    - Install FMOD/irrklang sound system"
 	@echo "'make compile'              - Compile mythtv-controller"
 	@echo "'sudo make install'         - Install mythtv-controller in /usr/share/mythtv-controller"
 	@echo "'sudo make installtidal-dl' - Install tidal-dl"
 	@echo "'sudo make uninstall'       - Uninstall mythtv-controller FMOD/irrKlang libraries and headers"
-	
+
 
 
 compile: $(PROG)
 	@if [ -f build-number.txt ]; then touch build-number.txt; fi
-	# @if test -e build-number.txt; then touch build-number.txt; fi
-	#tar -zxvf json-parser.tar.gz
-	cd json-parser \
-	./configure \
-	make
-	@if ! test -d ~/.config/lirc/; then \
-	mkdir  ~/.config/lirc/; \
-		cp lirc/* ~/.config/lirc/; \
-		mkdir -p ~/.xmltv/; \
-	fi
-	cd ..
-	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
@@ -160,21 +147,4 @@ install:
 	PASSWDDB="$(openssl rand -base64 12)"
 	# replace "-" with "_" for database username
 	MAINDB="mythtvcontroller"
-	# If /root/.my.cnf exists then it won't ask for root password
-	#if [ -f /root/.my.cnf ]; then
-	#    mysql -e "CREATE DATABASE ${MAINDB} /*\!40100 DEFAULT CHARACTER SET utf8 */;"
-	#    mysql -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
-	#    mysql -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
-	#    mysql -e "FLUSH PRIVILEGES;"
-	# If /root/.my.cnf doesn't exist then it'll ask for root password   
-	#else
-	#    echo "Please enter root user MySQL password!"
-	#    echo "Note: password will be hidden when typing"
-	#    read -sp rootpasswd
-	#    mysql -uroot -p${rootpasswd} -e "CREATE DATABASE ${MAINDB} /*\!40100 DEFAULT CHARACTER SET utf8 */;"
-	#    mysql -uroot -p${rootpasswd} -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
-	#    mysql -uroot -p${rootpasswd} -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
-	#    mysql -uroot -p${rootpasswd} -e "FLUSH PRIVILEGES;"
-	#    "GRANT ALL PRIVILEGES ON mythtvcontroller.* to 'mythtv'@'%' WITH GRANT OPTION;"
-	#fi
 

@@ -10,6 +10,8 @@ Run on most debian based systems, like Ubuntu.
 
 Version.
 
+mythtv-controller ver 0.54.1 you can see tvguide overlaw on movies playing by pressing t - for tv guide. All opengl calls is 500% faster now. high framerate > 120
+
 mythtv-controller ver 0.50.0 - New plasma screen saver. Other errors is fixed to.
 
 mythtv-controller ver 0.46.1 - new scroll functions.

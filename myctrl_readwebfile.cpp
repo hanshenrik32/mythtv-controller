@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <random>
+#include <curl/curl.h>
 #include "myctrl_readwebfile.h"
 
 
@@ -266,11 +267,10 @@ int get_webfile2(char *webpath,char *outfile) {
   std::string command;
   // check file ext is image yes download
   if ((check_filename_ext(webpath)) && (strlen(webpath)<300)) {
-    command = "wget --quiet \"";
+    command = "wget \"";
     command = command + webpath;
-    command = command + "\" -O- | convert -thumbnail 'x320^' - - > ";
+    command = command + "\" -O ";
     command = command + outfile;
-    command = command + " 2>&1 ";                                                           // disable output
     //strcat(command," 2>> wget.log ");
     // printf(" do COMMAND *%s* \n",command.c_str());
     if (system(command.c_str()) == -1) {
@@ -278,4 +278,46 @@ int get_webfile2(char *webpath,char *outfile) {
     }
   }
   return(1);
+}
+
+
+// image downloader by libcurl
+
+static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+    FILE *fp = (FILE*)stream;
+    return fwrite(ptr, size, nmemb, fp);
+}
+
+
+// *************************************************************************
+// 
+// call function for image download
+//
+// *************************************************************************
+bool downloadImage(const std::string& url, const std::string& filename) {
+    CURL *curl = curl_easy_init();
+    if (!curl)
+      return false;
+    FILE *fp = fopen(filename.c_str(), "wb");
+    if (!fp) {
+      curl_easy_cleanup(curl);
+      return false;
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // skriv data til fil
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+    // timeout
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 20L);
+    // hvis HTTPS
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    CURLcode res = curl_easy_perform(curl);
+    fclose(fp);
+    curl_easy_cleanup(curl);
+    if (res != CURLE_OK) {
+      std::cerr << "curl fejl: " << curl_easy_strerror(res) << std::endl;
+        return false;
+    }
+    return true;
 }
