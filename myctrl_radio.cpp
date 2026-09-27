@@ -18,6 +18,8 @@
 #include <jsoncpp/json/json.h>
 #include <fstream>
 
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod_common.h"
+
 #include "renderer.h"
 #include "myctrl_readwebfile.h"
 #include "myctrl_radio.h"
@@ -47,6 +49,7 @@ extern bool do_zoom_music_cover;
 extern GLuint _textureradioplayer;
 extern GLuint onlineradio_empty;
 extern GLuint playing_tidal_icon_texture;
+extern GLuint _texturemovieinfobox;
 
 extern class config_icons config_menu; // config icons used in menu
 
@@ -903,7 +906,23 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
     draw_radio_item(x, y, index , normal_icon, normal_icon, playingstationnr);
   }
   if (stack.empty()) {
-    renderer.AddTextureRect(0,normal_icon, 400, 400, 800, 200,1,1,1,1);
+    renderer.AddTextureRect(0,_texturemovieinfobox, 400, 400, 800, 200,1,1,1,1);
+    renderer.AddText(&myfont,600 ,500 ,"No Stations is Loaded.",1,1,1,1);
+  }
+  // show status
+  static int vis_timeout=420;
+  if (loading_status!=FMOD_OPENSTATE_READY) {
+    if (vis_timeout==0) loading_status=FMOD_OPENSTATE_READY;;
+    if (vis_timeout>0) vis_timeout--;
+    std::string temptxt;
+    renderer.AddTextureRect(0,_texturemovieinfobox, 400, 400, 600, 200,1,1,1,1);
+    if (loading_status==FMOD_OPENSTATE_LOADING) temptxt="Loading";
+    if (loading_status==FMOD_OPENSTATE_CONNECTING) temptxt="Connecting";
+    else if (loading_status==FMOD_OPENSTATE_BUFFERING) temptxt="Buffering";
+    else temptxt="Error Playing Station";
+    temptxt=temptxt + " ";
+    temptxt=temptxt + aktivplay_station_name;
+    renderer.AddText(&myfont,600 ,500 ,temptxt,1,1,1,1);
   }
   return(1);
 }

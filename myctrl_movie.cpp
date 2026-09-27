@@ -2314,11 +2314,13 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
   temprgtxt = fmt::format("{:^20}",filmoversigt[ii].getfilmtitle());
   temprgtxt.resize(20);
   if (filmoversigt[ii].gettextureid() ) texture = filmoversigt[ii].gettextureid(); else texture = normal_icon;
-  if (ii == selected_icon_in_view-1) {                                                       // if (ii == film_key_selected-1) {
-    movie_drawcover(x + 18, y + 18, 174, 214, texture ,ii+100,highcolor);
+  if (ii == selected_icon_in_view-1) {
+    movie_drawcover(x + 18, y + 18, 174, 214, normal_icon ,ii+100,highcolor);
+    if (texture!=normal_icon) movie_drawcover(x + 18 + 20, y + 18, 174 - 20, 214, texture ,ii+100,highcolor);
     renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
   } else {
-    movie_drawcover(x + 20, y + 20, 170, 210, texture ,ii+100,normalcolor);                                         // if (ii == film_key_selected-1) {
+    movie_drawcover(x + 18, y + 18, 174, 214, normal_icon ,ii+100,highcolor);
+    if (texture!=normal_icon) movie_drawcover(x + 20 + 20 , y + 20, 170 - 20, 210, texture ,ii+100,normalcolor);
     renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
   }
 }
