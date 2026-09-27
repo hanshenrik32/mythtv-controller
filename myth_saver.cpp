@@ -12,6 +12,8 @@
 #include <GL/gl.h>
 #include <algorithm>
 #include <iostream>
+#include <chrono>
+
 
 #include "renderer.h"
 #include "myth_saver.h"
@@ -21,17 +23,18 @@ extern FILE *logfile;
 extern char configpicturepath[256];
 extern GLuint screensaverbox;
 extern GLuint newstuf_icon;
+extern GLuint ring_background;
 extern int orgwinsizex,orgwinsizey;
 extern musicoversigt_class musicoversigt;
 extern Renderer renderer;
 extern float spectrum[];                                                           // used for spectium
 
-#define PI 3.14159265358979323846
+
 
 float rot = 0.0f;
 
 #define NUM_BARS 128
-
+// #define PI 3.14159265358979323846
 
 // *****************************************************************************************
 //
@@ -206,7 +209,7 @@ void musicmeter_class::DrawOuterRingClock(float r) {
     }
   }
   // =====================================================
-  // 3. TEGN MED DIN SHADER
+  // 3. SEND TO SHADER
   // =====================================================
   renderer.DrawRawLines(ringVertices, GL_LINE_STRIP, 2.0f, GL_SRC_ALPHA, GL_ONE);
   renderer.DrawRawLines(minuteVertices, GL_LINES, 1.0f, GL_SRC_ALPHA, GL_ONE);
@@ -316,15 +319,15 @@ void AddGlowLine(float x1, float y1, float x2, float y2,float width,float r, flo
 }
 
 
-// new DrawBar3D
-// working
+  // new DrawBar3D
+  // working
 
-struct Color_bars {
-    float r, g, b, a;
-};
+  struct Color_bars {
+      float r, g, b, a;
+  };
 
 
-void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,float a,int color_part) {
+void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,float a,int color_part,float rotationX,float rotationY) {
   Color_bars color1;
   Color_bars color2;
   Color_bars color3;
@@ -332,21 +335,57 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
   Color_bars color5;
   Color_bars color6;
   float d = w * 1.8f;
+  float depth = d * 0.5f;
+  constexpr float PI = 3.14159265358979323846f;
+  // Barens retning langs cirklens tangent.
+  float angle = std::atan2(z, x) - PI * 0.5f;
+  float ca = std::cos(angle);
+  float sa = std::sin(angle);
+  // Fælles rotation for hele cirklen.
+  // float cr = std::cos(rotation);
+  // float sr = std::sin(rotation);
   Point3D p[8] = {
-    {x-d, 0, z-d}, {x+d, 0, z-d}, {x+d, 0, z+d}, {x-d, 0, z+d},
-    {x-d, h, z-d}, {x+d, h, z-d}, {x+d, h, z+d}, {x-d, h, z+d}
+      {-d, 0, -depth},
+      { d, 0, -depth},
+      { d, 0,  depth},
+      {-d, 0,  depth},
+
+      {-d, h, -depth},
+      { d, h, -depth},
+      { d, h,  depth},
+      {-d, h,  depth}
   };
   Point3D q[8];
+  float cx = std::cos(rotationX);
+  float sx = std::sin(rotationX);
+  float cy = std::cos(rotationY);
+  float sy = std::sin(rotationY);
   for (int i = 0; i < 8; i++) {
-    q[i] = Project3D(p[i]);
+      float localX = p[i].x;
+      float localZ = p[i].z;
+
+      // Orientér baren og placér den i cirklen.
+      float worldX = x + localX * ca - localZ * sa;
+      float worldY = p[i].y;
+      float worldZ = z + localX * sa + localZ * ca;
+
+      // Først rotation omkring X-aksen.
+      float rotatedY = worldY * cx - worldZ * sx;
+      float rotatedZ = worldY * sx + worldZ * cx;
+
+      // Derefter rotation omkring Y-aksen.
+      p[i].x = worldX * cy - rotatedZ * sy;
+      p[i].y = rotatedY;
+      p[i].z = worldX * sy + rotatedZ * cy;
+
+      q[i] = Project3D(p[i]);
   }
-  glDisable(GL_DEPTH_TEST);
-  glDepthMask(GL_FALSE);
-
-  std::cout << " hight = " << h << "\n";
-
 
   if (color_part==1) {
+    unsigned int color = 0x292f2d;
+    float r = ((color >> 16) & 0xFF) / 255.0f;
+    float g = ((color >>  8) & 0xFF) / 255.0f;
+    float b = ( color        & 0xFF) / 255.0f;    
     if ((h>=0.0f) && (h<2.0f)) {
       color1={0.01f, 0.01f, 0.01f, 0.1f};       // top
       color2={0.01f, 0.01f, 0.01f, 0.1f};       // bund
@@ -361,38 +400,42 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.03f, a};       // v side
       color4={0.03f, 0.03f, 0.03f, a};       // h side
-      color5={0.12f, 0.12f, 0.12f, a};       // top
+      color5={r, g, b, a};                   // top
       color6={0.01f, 0.01f, 0.01f, a};       // front
     } else if ((h>=20.0f) && (h<40.0f)) {
       color1={0.01f, 0.01f, 0.01f, a};       // top
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.03f, a};       // v side
       color4={0.03f, 0.03f, 0.03f, a};       // h side
-      color5={0.12f, 0.12f, 0.12f, a};       // top
+      color5={r, g, b, a};                   // top
       color6={0.01f, 0.01f, 0.01f, a};       // front
     } else if ((h>=40.0f) && (h<60.0f)) {
       color1={0.01f, 0.01f, 0.01f, a};       // top
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.12f, a};       // v side
       color4={0.03f, 0.03f, 0.12f, a};       // h side
-      color5={0.12f, 0.12f, 0.24f, a};       // top
+      color5={r, g, b, a};                   // top
       color6={0.01f, 0.01f, 0.01f, a};       // front
     } else if ((h>=60.0f) && (h<200.0f)) {
       color1={0.01f, 0.01f, 0.01f, a};       // top
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.12f, a};       // v side
       color4={0.03f, 0.03f, 0.12f, a};       // h side
-      color5={0.12f, 0.12f, 0.24f, a};       // top
+      color5={r, g, b, a};       // top
       color6={0.01f, 0.01f, 0.01f, a};       // front
     } else {
       color1={0.01f, 0.01f, 0.01f, a};       // top
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.03f, a};       // v side
       color4={0.03f, 0.03f, 0.03f, a};       // h side
-      color5={0.24f, 0.12f, 0.12f, a};       // top
+      color5={r, g, b, a};       // top
       color6={0.01f, 0.01f, 0.01f, a};       // front  
     }
   } else if (color_part==2) {
+    unsigned int color = 0x292f2d;
+    float r = ((color >> 16) & 0xFF) / 255.0f;
+    float g = ((color >>  8) & 0xFF) / 255.0f;
+    float b = ( color        & 0xFF) / 255.0f;    
     if ((h>=0.0f) && (h<2.0f)) {
       color1={0.01f, 0.01f, 0.01f, 0.1f};       // top
       color2={0.01f, 0.01f, 0.01f, 0.1f};       // bund
@@ -407,38 +450,42 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.03f, a};       // v side
       color4={0.03f, 0.03f, 0.03f, a};       // h side
-      color5={0.12f, 0.12f, 0.12f, a};       // top
+      color5={r, g, b, a};       // top
       color6={0.01f, 0.01f, 0.01f, a};       // front
     } else if ((h>=20.0f) && (h<40.0f)) {
       color1={0.01f, 0.01f, 0.01f, a};       // top
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.03f, a};       // v side
       color4={0.03f, 0.03f, 0.03f, a};       // h side
-      color5={0.12f, 0.03f, 0.01f, a};       // top
+      color5={r, g, b, a};       // top
       color6={0.01f, 0.01f, 0.01f, a};       // front
     } else if ((h>=40.0f) && (h<60.0f)) {
       color1={0.01f, 0.01f, 0.01f, a};       // top
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.12f, a};       // v side
       color4={0.03f, 0.03f, 0.12f, a};       // h side
-      color5={0.12f, 0.03f, 0.24f, a};       // top
+      color5={r, g, b, a};       // top
       color6={0.01f, 0.01f, 0.01f, a};       // front
     } else if ((h>=60.0f) && (h<200.0f)) {
       color1={0.01f, 0.01f, 0.01f, a};       // top
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.12f, 0.03f, 0.01f, a};       // v side
       color4={0.12f, 0.03f, 0.01f, a};       // h side
-      color5={0.22f, 0.12f, 0.01f, a};       // top
+      color5={r, g, b, a};       // top
       color6={0.01f, 0.01f, 0.01f, a};       // front
     } else {
       color1={0.01f, 0.01f, 0.01f, a};       // top
       color2={0.01f, 0.01f, 0.01f, a};       // bund
       color3={0.03f, 0.03f, 0.03f, a};       // v side
       color4={0.03f, 0.03f, 0.03f, a};       // h side
-      color5={0.24f, 0.12f, 0.01f, a};       // top
+      color5={r, g, b, a};       // top
       color6={0.01f, 0.01f, 0.01f, a};       // front  
     }
   } else if (color_part==3) {
+    unsigned int color = 0x292f2d;
+    float r = ((color >> 16) & 0xFF) / 255.0f;
+    float g = ((color >>  8) & 0xFF) / 255.0f;
+    float b = ( color        & 0xFF) / 255.0f;    
     if ((h>=0.0f) && (h<2.0f)) {
       color1={0.01f, 0.01f, 0.01f, 0.1f};       // top
       color2={0.01f, 0.01f, 0.01f, 0.1f};       // bund
@@ -485,6 +532,10 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
       color6={0.01f, 0.01f, 0.01f, a};       // front  
     }
   } else {
+    unsigned int color = 0x292f2d;
+    float r = ((color >> 16) & 0xFF) / 255.0f;
+    float g = ((color >>  8) & 0xFF) / 255.0f;
+    float b = ( color        & 0xFF) / 255.0f;    
     if ((h>=0.0f) && (h<2.0f)) {
       color1={0.01f, 0.01f, 0.01f, 0.1f};       // top
       color2={0.01f, 0.01f, 0.01f, 0.1f};       // bund
@@ -554,33 +605,47 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
   // renderer.AddQuad(q[0], q[1], q[5], q[4], color1.r, color1.g, color1.b,a); // front
   renderer.AddQuad(q[4], q[5], q[1], q[0],color1.r,color1.g,color1.b,color6.a); // front
  
-
   // 2. GRÅ KANTER
   
   float lineWidth = 1.0f;
   float edgeR = 0.0f, edgeG = 1.0f, edgeB = 0.4f; // Grå farve (0.0 = sort, 1.0 = hvid)
+  printf("Hight = %f \n",h);
   if (color_part==1) {
+    unsigned int color = 0x292f2d;
+    float r = ((color >> 16) & 0xFF) / 255.0f;
+    float g = ((color >>  8) & 0xFF) / 255.0f;
+    float b = ( color        & 0xFF) / 255.0f;    
     if ((h>=0.0f) && (h<2.0f)) {
       edgeR = 0.0f, edgeG = 0.0f, edgeB = 0.0f;
     } else if ((h>=2.0f) && (h<4.0f)) {
-      edgeR = 0.0f, edgeG = 0.2f, edgeB = 0.4f;
+      edgeR = r, edgeG = g, edgeB = b;
     } else if ((h>=4.0f) && (h<6.0f)) {
-      edgeR = 0.0f, edgeG = 0.4f, edgeB = 0.4f;
+      edgeR = r, edgeG = g, edgeB = b;
     } else if ((h>=6.0f) && (h<8.0f)) {
-      edgeR = 0.0f, edgeG = 0.5f, edgeB = 0.4f;
+      edgeR = r, edgeG = g, edgeB = b;
     } else if ((h>=8.0f) && (h<10.0f)) {
-      edgeR = 0.0f, edgeG = 0.7f, edgeB = 0.4f;
+      edgeR = r, edgeG = g, edgeB = b;
     } else if ((h>=10.0f) && (h<12.0f)) {
-      edgeR = 0.0f, edgeG = 0.7f, edgeB = 0.4f;
+      edgeR = r, edgeG = g, edgeB = b;
+    } else if ((h>=12.0f) && (h<20.0f)) {
+      edgeR = r, edgeG = g, edgeB = b;
     } else if ((h>=20.0f) && (h<40.0f)) {
-      edgeR = 0.0f, edgeG = 1.0f, edgeB = 0.4f;
+      edgeR = r, edgeG = g, edgeB = b;
     } else if ((h>=40.0f) && (h<60.0f)) {
-      edgeR = 0.0f, edgeG = 1.0f, edgeB = 0.6f;
+      edgeR = r, edgeG = g, edgeB = b;
     } else if ((h>=60.0f) && (h<80.0f)) {
-      edgeR = 0.0f, edgeG = 0.5f, edgeB = 0.7f;
+      edgeR = r, edgeG = g, edgeB = b;
     } else if ((h>=80.0f) && (h<100.0f)) {
-      edgeR = 0.0f, edgeG = 0.5f, edgeB = 0.8f;
-    } else if ((h>=100.0f) && (h<200.0f)) {
+      edgeR = r, edgeG = g, edgeB = b;
+    } else if ((h>=100.0f) && (h<120.0f)) {
+      edgeR = r, edgeG = g, edgeB = b;
+    } else if ((h>=120.0f) && (h<140.0f)) {
+      edgeR = r, edgeG = g, edgeB = b;
+    } else if ((h>=140.0f) && (h<160.0f)) {
+      edgeR = r, edgeG = g, edgeB = b;
+    } else if ((h>=160.0f) && (h<180.0f)) {
+      edgeR = r, edgeG = g, edgeB = b;
+    } else if ((h>=180.0f) && (h<200.0f)) {
       edgeR = 0.0f, edgeG = 0.5f, edgeB = 1.0f;
     } else {
       edgeR = 0.0f, edgeG = 1.0f, edgeB = 0.4f;
@@ -607,7 +672,7 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
     } else if ((h>=80.0f) && (h<100.0f)) {
       edgeR = 0.4f, edgeG = 0.5f, edgeB = 0.2f;
     } else if ((h>=100.0f) && (h<200.0f)) {
-      edgeR = 1.0f, edgeG = 0.7f, edgeB = 0.0f;
+      edgeR = 0.3f, edgeG = 0.7f, edgeB = 0.8f;
     } else {
       edgeR = 0.0f, edgeG = 1.0f, edgeB = 0.4f;
     }
@@ -664,9 +729,7 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
       edgeR = 0.0f, edgeG = 1.0f, edgeB = 0.4f;
     }
   }
-
   renderer.Flush();
-
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   // bund
@@ -690,9 +753,6 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
 }
 
 
-
-
-
 // main 3d ring
 
 struct BarInstance {
@@ -701,127 +761,86 @@ struct BarInstance {
 };
 
 
-
 void musicmeter_class::DrawAudioRing() {
-  float radius = 350.0f;
+  float radius = 400.0f;
   int count = NUM_BARS / 5; 
   std::vector<BarInstance> bars;
   bars.reserve(count);
-  // 1. Beregn positioner og gem i en liste
-  // bar 1
-  for (int i = 0; i < count; i++) {
-    float a = i * 2.0f * M_PI / count;
-    float x = cosf(a) * radius;
-    float z = sinf(a) * radius;
-
-    float bassReduce = 0.3f + (float)i / (NUM_BARS * 0.7f);
-    if(bassReduce > 1.0f)
-      bassReduce = 1.0f;
-
-    // float target = sqrtf(spectrum[i] * bassReduce * 128.0f) * 8.0f;
-    float target = log1pf(spectrum[i] * bassReduce * 80.0f) * 40.0f;
-
-    // Hurtig op
-    if (target > barHeight[i]) {
-      barHeight[i] += (target - barHeight[i]) * 0.45f;
-    } else {
-      // Langsom ned
-      barHeight[i] -= 2.5f;          // pixels pr. frame
-      if (barHeight[i] < target)
-          barHeight[i] = target;
+  renderer.AddTextureRect(0,ring_background, 1, 1, 1920, 1080,1,1,1,0.5);
+  for (int aantal_bars=0;aantal_bars<6;aantal_bars++) {
+    switch(aantal_bars) {
+      case 0: radius = 400.0f;
+              count = NUM_BARS / 3;
+              break;
+      case 1: radius = 360.0f;
+              count = NUM_BARS / 3;
+              break;
+      case 2: radius = 320.0f;
+              count = NUM_BARS / 3;
+              break;
+      case 3: radius = 280.0f;
+              count = NUM_BARS / 4;
+              break;
+      case 4: radius = 240.0f;
+              count = NUM_BARS / 5;
+              break;
+      case 5: radius = 200.0f;
+              count = NUM_BARS / 5;
+              break;
+      case 6: radius = 160.0f;
+              count = NUM_BARS / 5; 
+              break;
+      case 7: radius = 120.0f;
+              count = NUM_BARS / 6; 
+              break;
+      case 8: radius = 80.0f;
+              count = NUM_BARS / 6; 
+              break;
+      default:
+              break;
     }
-    float h = barHeight[i];
-    bars.push_back({x, z, h, 0.2f, 1.0f, 0.2f});
-  }
-  // 2. Sorter fra bagest til forrest (størst Z tegnes først)
-  std::sort(bars.begin(), bars.end(), [](const BarInstance& a, const BarInstance& b) {
-    return a.z > b.z;
-  });
-  for (const auto& bar : bars) {
-    DrawBar3D(bar.x, bar.z, 12.0f, bar.h, bar.r, bar.g, bar.b, 1.0f, 1);
-    renderer.Flush(); // Tvinger rendereren til at tegne baren i sin helhed før næste tegnes
-  }
-  
-  // bar 2
-  count = NUM_BARS / 5;
-  radius = 260.0f;
-  // 1. Beregn positioner og gem i en liste
-  for (int i = 0; i < count; i++) {
-    float a = i * 2.0f * M_PI / count;
-    float x = cosf(a) * radius;
-    float z = sinf(a) * radius;
+    // 1. Beregn positioner og gem i en liste
+    // bar 0
+    for (int i = 0; i < count; i++) {
+      float a = i * 2.0f * M_PI / count;
+      float x = cosf(a) * radius;
+      float z = sinf(a) * radius;
 
-    float bassReduce = 0.3f + (float)i / (NUM_BARS * 0.7f);
-    if(bassReduce > 1.0f)
-      bassReduce = 1.0f;
+      float bassReduce = 0.3f + (float)i / (NUM_BARS * 0.7f);
+      if(bassReduce > 1.0f)
+        bassReduce = 1.0f;
 
       // float target = sqrtf(spectrum[i] * bassReduce * 128.0f) * 8.0f;
-      float target = log1pf(spectrum[i+25] * bassReduce * 80.0f) * 40.0f;
+      float target = log1pf(spectrum[i] * bassReduce * 80.0f) * 35.0f;
 
-    // Hurtig op
-    if (target > barHeight[i]) {
-      barHeight[i] += (target - barHeight[i]) * 0.45f;
-    } else {
-      // Langsom ned
-      barHeight[i] -= 2.5f;          // pixels pr. frame
-      if (barHeight[i] < target)
+      // Hurtig op
+      if (target > barHeight[i]) {
+        barHeight[i] += (target - barHeight[i]) * 0.45f;
+      } else {
+        // Langsom ned
+        barHeight[i] -= 2.5f;          // pixels pr. frame
+        if (barHeight[i] < target)
           barHeight[i] = target;
+      }
+      float h = barHeight[i];
+      bars.push_back({x, z, h, 0.2f, 1.0f, 0.2f});
     }
-    float h = barHeight[i];
-    bars.push_back({x, z, h, 0.2f, 1.0f, 0.2f});
-  }
-  // 2. Sorter fra bagest til forrest (størst Z tegnes først)
-  std::sort(bars.begin(), bars.end(), [](const BarInstance& a, const BarInstance& b) {
-    return a.z > b.z;
-  });
-  // 2. Aktiver Additive Blending (Neon / Glow)   
-  // 3. Tegn barerne i sorteret rækkefølge
-  for (const auto& bar : bars) {
-    DrawBar3D(bar.x, bar.z, 10.0f, bar.h, bar.r, bar.g, bar.b, 1.0f, 2);
-    renderer.Flush(); // Tvinger rendereren til at tegne baren i sin helhed før næste tegnes
-  }
-  
-
-
-
-  // bar 3
-  count = NUM_BARS / 5;
-  radius = 170.0f;
-  // 1. Beregn positioner og gem i en liste
-  for (int i = 0; i < count; i++) {
-    float a = i * 2.0f * M_PI / count;
-    float x = cosf(a) * radius;
-    float z = sinf(a) * radius;
-
-    float bassReduce = 0.3f + (float)i / (NUM_BARS * 0.7f);
-    if(bassReduce > 1.0f)
-      bassReduce = 1.0f;
-
-      float target = log1pf(spectrum[i+35] * bassReduce * 80.0f) * 40.0f;
-
-    // Hurtig op
-    if (target > barHeight[i]) {
-      barHeight[i] += (target - barHeight[i]) * 0.35f;
-    } else {
-      // Langsom ned
-      barHeight[i] -= 2.5f;          // pixels pr. frame
-      if (barHeight[i] < target)
-          barHeight[i] = target;
+    // 2. Sorter fra bagest til forrest (størst Z tegnes først)
+    std::sort(bars.begin(), bars.end(), [](const BarInstance& a, const BarInstance& b) {
+      return a.z > b.z;
+    });
+    static const auto start = std::chrono::steady_clock::now();
+    float seconds = std::chrono::duration<float>( std::chrono::steady_clock::now() - start).count();
+    constexpr float PI = 3.14159265358979323846f;
+    // Sving ±15 grader. En hel svingning tager 8 sekunder.
+    float rotation = std::sin(seconds * (2.0f * PI / 16.0f)) * (15.0f * PI / 180.0f);
+    // Sving ±15 grader. En hel svingning tager 16 sekunder.
+    float rotationY = std::sin(seconds * (2.0f * PI / 32.0f)) * (15.0f * PI / 180.0f);
+    for (const auto& bar : bars) {
+      DrawBar3D(bar.x, bar.z, 12.0f, bar.h, bar.r, bar.g, bar.b, 1.0f, 2,rotation,rotationY);
+      renderer.Flush(); // Tvinger rendereren til at tegne baren i sin helhed før næste tegnes
     }
-    float h = barHeight[i];
-    bars.push_back({x, z, h, 0.2f, 1.0f, 0.2f});
   }
-  // 2. Sorter fra bagest til forrest (størst Z tegnes først)
-  std::sort(bars.begin(), bars.end(), [](const BarInstance& a, const BarInstance& b) {
-    return a.z > b.z;
-  });
-  // 2. Aktiver Additive Blending (Neon / Glow)   
-  // 3. Tegn barerne i sorteret rækkefølge
-  for (const auto& bar : bars) {
-    DrawBar3D(bar.x, bar.z, 10.0f, bar.h, bar.r, bar.g, bar.b, 0.5f, 3);
-    renderer.Flush(); // Tvinger rendereren til at tegne baren i sin helhed før næste tegnes
-  }
-
 }
 
 // end 3D ring

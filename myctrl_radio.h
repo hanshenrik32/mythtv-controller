@@ -6,6 +6,9 @@
 #include <GL/glu.h>
 #include <vector>
 #include "json-parser/json.h"
+
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod_common.h"
+
 //#include <irrKlang.h>
 
 const int stationamelength=40;
@@ -67,6 +70,8 @@ class radiostation_class {
     bool search_loaded;
     int selected_icon_in_view=1;
     bool playing;                                                                   // playing radio station
+    FMOD_OPENSTATE loading_status;
+    std::string aktivplay_station_name="";
     unsigned long check_radio_online(unsigned int startrecnr);	                    // check and set radio station online flag (DO NOT WORK)
     void nextradiooptselect();		                                    			// select next type in radio type oversigt
     void lastradiooptselect();                                      				//
@@ -76,7 +81,9 @@ class radiostation_class {
     //
     const char *get_station_gfxfile(int nr) { return (stack[nr].gfxfilename.c_str()); }
     const char *get_stream_url(int nr) { return (stack[nr].streamurl.c_str()); }
+    std::string get_stream_name(int nr) { return (stack[nr].station_name); }
     const char *get_homepage(int nr) { return (stack[nr].homepage.c_str()); }
+
     const char *get_desc(int nr) { return (stack[nr].desc.c_str()); }
     void set_kbps(int nr,int kbps) { stack[nr].kbps=kbps; }
     int load_radio_stations_gfx();		                                			// load all radio stations gfx
@@ -134,7 +141,7 @@ class radiostation_class {
 
     int startX = 20;
     int startY = 60;               // 882;
-    int viewHeight = 780;
+    int viewHeight = 780+200;
     // end new scroll vars
     void onScroll(float delta) { scrollVel += delta * accel; }
     void draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);  // draw single stream item

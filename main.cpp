@@ -333,6 +333,8 @@ GLuint analog_clock_background;
 
 GLuint _textureId9_askbox;
 
+GLuint ring_background;
+
 GLuint _textureIdplayicon; 	              // play icon
 GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
@@ -1761,6 +1763,7 @@ void display() {
     float xxx;
     static bool fmodcreatesound=false;
     static FMOD_OPENSTATE openstate;
+    static FMOD_OPENSTATE last_openstate;
     static int movie_play_status;
     int sounderrflag;
     char temptxt1[80];
@@ -1941,6 +1944,7 @@ void display() {
           400.0f,     // radius
           0.5        // 0.0 - 1.0
         );
+        
         saver_musicmeter.DrawAudioRing();
       }
       if (urtype == PLASMA) {
@@ -2798,7 +2802,7 @@ void display() {
       // show radio info
       if (radiooversigt.playing) {
         std::string temptxt;
-        if (radiooversigt.playingstationnr>0) {
+        if ((radiooversigt.playingstationnr>0) && (radiooversigt.playing)) {
           renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(4*18) ,"Station ",1,1,1,1);
           temptxt=radiooversigt.get_station_name(radiooversigt.playingstationnr);
           renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(4*18) ,temptxt,1,1,1,1);
@@ -3046,7 +3050,6 @@ void display() {
         do_show_load__torrent_file = false;
       }
     }
-
 
     // start play music
     if (do_play_music_cover) {
@@ -3519,24 +3522,29 @@ void display() {
         }
         if (radio_startplaying==false) {
           strcpy(aktivplay_music_path,radiooversigt.get_stream_url(rknapnr-1));
+          radiooversigt.aktivplay_station_name=radiooversigt.get_stream_name(rknapnr-1);
           printf("play radio path = %s \n",aktivplay_music_path);
           result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);
           result = sndsystem->createSound(aktivplay_music_path, FMOD_NONBLOCKING | FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
           ERRCHECK(result,rknapnr);
           radio_startplaying=true;
         }
+        last_openstate=openstate;
         sound->getOpenState(&openstate, 0, 0, 0);
-        if (openstate==FMOD_OPENSTATE_ERROR) printf("Check state openstate = FMOD_OPENSTATE_ERROR \n");
-        else if (openstate==FMOD_OPENSTATE_LOADING) printf("Check state openstate = FMOD_OPENSTATE_LOADING \n");
-        else if (openstate==FMOD_OPENSTATE_PLAYING) printf("Check state openstate = FMOD_OPENSTATE_PLAYING \n");
-        else if (openstate==FMOD_OPENSTATE_CONNECTING) printf("Check state openstate = FMOD_OPENSTATE_CONNECTING \n");
-        else if (openstate==FMOD_OPENSTATE_BUFFERING) printf("Check state openstate = FMOD_OPENSTATE_BUFFERING \n");
-        else if (openstate==FMOD_OPENSTATE_SEEKING) printf("Check state openstate = FMOD_OPENSTATE_SEEKING \n");
-        else printf("Check state  = %d \n",openstate);
-
+        if (last_openstate!=openstate) {
+          if (openstate==FMOD_OPENSTATE_ERROR) printf("Check state openstate = FMOD_OPENSTATE_ERROR \n");
+          else if (openstate==FMOD_OPENSTATE_LOADING) printf("Check state openstate = FMOD_OPENSTATE_LOADING \n");
+          else if (openstate==FMOD_OPENSTATE_PLAYING) printf("Check state openstate = FMOD_OPENSTATE_PLAYING \n");
+          else if (openstate==FMOD_OPENSTATE_CONNECTING) printf("Check state openstate = FMOD_OPENSTATE_CONNECTING \n");
+          else if (openstate==FMOD_OPENSTATE_BUFFERING) printf("Check state openstate = FMOD_OPENSTATE_BUFFERING \n");
+          else if (openstate==FMOD_OPENSTATE_SEEKING) printf("Check state openstate = FMOD_OPENSTATE_SEEKING \n");
+          else printf("Check state  = %d \n",openstate);
+        }
+        radiooversigt.loading_status=openstate;
         if (openstate == FMOD_OPENSTATE_ERROR) {
           do_play_radio=false;
           radio_startplaying=false;
+          radiooversigt.aktivplay_station_name="";
           snd=0;
         }
         if ((do_play_radio) && (openstate == FMOD_OPENSTATE_READY)) {
@@ -3901,7 +3909,8 @@ void display() {
             int yypos = 1050;
             float decay = 0.8f;        // 0.05f
             static float barHeights[45] = {0}; // persistent for smoothing
-            float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
+            // old float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
+            float target = log1pf(spectrum[qq] * 64.0f) * 4.0f;
             if (target > barHeights[qq]) {
               barHeights[qq] = target;
             } else {
@@ -3923,7 +3932,9 @@ void display() {
             int yypos = 1050;
             float decay = 0.8f;        // 0.05f
             static float barHeights[45] = {0}; // persistent for smoothing
-            float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
+       
+            // old float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
+            float target = log1pf(spectrum[qq] * 64.0f) * 4.0f;
             if (target > barHeights[qq]) {
               barHeights[qq] = target;
             } else {
@@ -3987,7 +3998,7 @@ void display() {
         fprintf(stderr,"Error saving config file mythtv-controller.conf\n");
       } else fprintf(stderr,"Saving config ok.\n");
       freegfx();                                                                // free gfx loaded
-      team_settings_load();                                         // load new team settings
+      team_settings_load();                                                     // load new team settings
       loadgfx();                                                                // reload all menu + icon gfx
     }
 
@@ -11518,6 +11529,7 @@ void loadgfx() {
     setupbackend          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupbackend");
     tvguide_last_hour_icon= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvguide_last_hour_icon");
     tvguide_next_hour_icon= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvguide_next_hour_icon");
+    ring_background       = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "ring_background");
 }
 
 
@@ -11668,6 +11680,7 @@ void freegfx() {
     glDeleteTextures(1, &setupbackend);
     glDeleteTextures(1, &tvguide_last_hour_icon);
     glDeleteTextures(1, &tvguide_next_hour_icon);
+    glDeleteTextures(1, &ring_background);
   }
 
 
@@ -11848,10 +11861,7 @@ void datainfoloader_webserver_v2() {
 }
 
 
-
-
-
-  // ****************************************************************************************
+// ****************************************************************************************
 //
 //  in use thread running the torrent update function
 //
@@ -11890,7 +11900,7 @@ int main(int argc,char** argv) {
       fputs("|  Y Y  \\___  | |  | |   Y  \\  |  \\   /  /_____/ \\  \\__(  <_> )   |  \\  |  |  | \\(  <_> )  |_|  |_\\  ___/|  | \\/   \n",logfile);
       fputs("|__|_|  / ____| |__| |___|  /__|   \\_/            \\___  >____/|___|  /__|  |__|   \\____/|____/____/\\___  >__|           \n",logfile);
       fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
-      fputs("Ver 0.50.x \n",logfile);
+      fputs("Ver 0.54.x \n",logfile);
     }
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
