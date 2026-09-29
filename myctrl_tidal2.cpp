@@ -90,7 +90,7 @@ extern config_icons config_menu;
 extern unsigned int do_show_editor_select_linie;
 extern GLuint _textureupdatetidalview; 	        // update icon tidal playlist in editor
 
-const char *tidal_gfx_path = "tidal_gfx/";
+const char *tidal_gfx_path = "tidal_stuf/tidal_gfx/";
 
 const int tidal_pathlength=80;
 const int tidal_namelength=80;
@@ -1099,7 +1099,8 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
               // get file name from url
               get_webfilename(downloadfilename,value->u.string.ptr);
               strcpy(downloadfilenamelong,localuserhomedir);
-              strcat(downloadfilenamelong,"/tidal_gfx/");
+              strcat(downloadfilenamelong,"/tidal_stuf/");
+              strcat(downloadfilenamelong,"tidal_gfx/");
               //strcat(downloadfilenamelong,stack[antal]->feed_showtxt);                              // add artist name to filename
               strcat(downloadfilenamelong,tidal_playlistid);
               strcat(downloadfilenamelong,"_");
@@ -1827,6 +1828,7 @@ int tidal_class::get_users_album(char *albumid) {
 // ****************************************************************************************
 
 int tidal_class::tidal_get_album_by_artist(char *artistid) {
+  bool dir_exist=true;
   std::string userfilename;
   FILE *userfile;
   std::string auth_kode;
@@ -1846,46 +1848,55 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
   url= url + "?countryCode=US&offset=0&limit=100&include=albums";
   userfilename = localuserhomedir;
   userfilename = userfilename + "/";
-  userfilename = userfilename + "tidal_artist_playlist_";
-  userfilename = userfilename + artistid;
-  userfilename = userfilename + ".json";
-  // use libcurl
-  curl_global_init(CURL_GLOBAL_ALL);
-  CURL *curl = curl_easy_init();
-  if ((curl) && (strlen(auth_kode.c_str())>0)) {
-    // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
-    header = curl_slist_append(header, auth_kode.c_str());
-    header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    // ask libcurl to use TLS version 1.3 or later
-    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
-    curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-    curl_easy_setopt(curl, CURLOPT_POST, 0);
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-    userfile=fopen(userfilename.c_str(),"w");
-    if (userfile) {
-      curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
-      res = curl_easy_perform(curl);
-      fclose(userfile);
+  userfilename = userfilename + "tidal_stuf/";
+  std::error_code ec;
+  std::filesystem::create_directory(userfilename, ec);
+  if (ec) {
+    dir_exist=false;
+    std::cerr << "Error create tidal_stuf dir" << "\n";
+  }
+  if (dir_exist) {
+    userfilename = userfilename + "tidal_artist_playlist_";
+    userfilename = userfilename + artistid;
+    userfilename = userfilename + ".json";
+    // use libcurl
+    curl_global_init(CURL_GLOBAL_ALL);
+    CURL *curl = curl_easy_init();
+    if ((curl) && (strlen(auth_kode.c_str())>0)) {
+      // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
+      header = curl_slist_append(header, auth_kode.c_str());
+      header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
+      curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+      // ask libcurl to use TLS version 1.3 or later
+      curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+      curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+      curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
+      curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+      curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+      curl_easy_setopt(curl, CURLOPT_POST, 0);
+      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+      userfile=fopen(userfilename.c_str(),"w");
+      if (userfile) {
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+        res = curl_easy_perform(curl);
+        fclose(userfile);
+      }
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);                   // get result in httpCode
+      if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      }
+      // always cleanup
+      curl_easy_cleanup(curl);
+      curl_global_cleanup();
+      if (httpCode == 200) {
+        return(200);
+      }
+    } else {
+      write_logfile(logfile,(char *) "Tidal curl fault");
     }
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);                   // get result in httpCode
-    if (res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-    }
-    // always cleanup
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
-    if (httpCode == 200) {
-      return(200);
-    }
-  } else {
-    write_logfile(logfile,(char *) "Tidal curl fault");
   }
   return(httpCode);
 }
@@ -2149,6 +2160,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force,bool cre
   // tidal_artist_playlist_$artistid.json have the data
   tidal_artis_playlist_file = localuserhomedir;
   tidal_artis_playlist_file = tidal_artis_playlist_file + "/";
+  tidal_artis_playlist_file = tidal_artis_playlist_file + "/tidal_stuf/";
   tidal_artis_playlist_file = tidal_artis_playlist_file + "tidal_artist_playlist_";
   tidal_artis_playlist_file = tidal_artis_playlist_file + artistid;
   tidal_artis_playlist_file = tidal_artis_playlist_file + ".json";
@@ -2433,7 +2445,9 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
   url=url + "/relationships/coverArt?countryCode=US&include=coverArt'";
   userfilename = localuserhomedir;
   // userfilename = userfilename + "/";
-  userfilename = userfilename + "/tidal_gfx/";
+  userfilename = userfilename + "/tidal_stuf/";
+  userfilename = userfilename + "tidal_gfx/";
+
   userfilename = userfilename + "tidal_album_cover_";
   userfilename = userfilename + albumid;
   userfilename = userfilename + ".json";
@@ -2448,7 +2462,8 @@ std::string tidal_class::get_artist_cover_image(char *albumid) {
     
   userfilename = localuserhomedir;
   // userfilename = userfilename + "/";
-  userfilename = userfilename + "/tidal_gfx/";
+  userfilename = userfilename + "/tidal_stuf/";
+  userfilename = userfilename + "tidal_gfx/";
   userfilename = userfilename + "tidal_album_cover_";
   userfilename = userfilename + albumid;
   userfilename = userfilename + ".json";
@@ -3404,7 +3419,8 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
                 gfxurl=get_artist_cover_image((char *) playlistid.c_str());
                 get_webfilename(downloadfilename,(char *) gfxurl.c_str());
                 strcpy(downloadfilenamelong,localuserhomedir);
-                strcat(downloadfilenamelong,"/tidal_gfx/");
+                strcat(downloadfilenamelong,"/tidal_stuf/");
+                strcat(downloadfilenamelong,"tidal_gfx/");
                 strcat(downloadfilenamelong,playlistid.c_str());
                 strcat(downloadfilenamelong,".jpg");
                 new_tidal_record.feed_gfx_url=std::string(downloadfilenamelong);
@@ -5252,7 +5268,7 @@ int tidal_class::load_tidal_iconoversigt() {
           if ( imagenamepointer ) {
             if (strlen(imagenamepointer)<1990) {
               strcpy(tmpfilename,localuserhomedir);
-              strcat(tmpfilename,"/tidal_gfx/");
+              strcat(tmpfilename,"tidal_stuf/tidal_gfx/");
               strcat(tmpfilename,imagenamepointer+1);
               strcat(tmpfilename,".jpg");
               stack[nr].textureId=loadTexture (tmpfilename);
