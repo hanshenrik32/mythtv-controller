@@ -2802,6 +2802,7 @@ void display() {
       // show radio info
       if (radiooversigt.playing) {
         std::string temptxt;
+        if (vis_tidal_oversigt && radiooversigt.playing) radiooversigt.playing=false;
         if ((radiooversigt.playingstationnr>0) && (radiooversigt.playing)) {
           renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(4*18) ,"Station ",1,1,1,1);
           temptxt=radiooversigt.get_station_name(radiooversigt.playingstationnr);
@@ -2882,7 +2883,12 @@ void display() {
           sprintf(temptxt,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs()+1);
           renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(6*18) ,"song ",1,1,1,1);
           renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+120, config_menu.config_tidalplayer_infoy+(6*18) ,temptxt,1,1,1,1);
-
+          // icon
+          if (tidal_oversigt.aktiv_song_tidal_icon) {
+            renderer.AddTextureRect(0,tidal_oversigt.aktiv_song_tidal_icon, config_menu.config_tidalplayer_infox+346,config_menu.config_tidalplayer_play_button_posy-124, 168, 120,1,1,1,1);
+          } else {
+            renderer.AddTextureRect(0,normal_icon, config_menu.config_tidalplayer_infox+346,config_menu.config_tidalplayer_play_button_posy-124, 168, 120,1,1,1,1);
+          }
           result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
           if ((result == FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
             result=sound->getLength(&playtime_songlength,FMOD_TIMEUNIT_MS);

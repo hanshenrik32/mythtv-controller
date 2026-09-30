@@ -78,26 +78,17 @@ extern Font myfont_search_bar;
 
 
 extern GLuint playing_tidal_icon_texture;
-
 extern GLuint onlineradio_empty;
-
 extern int do_show_tidal_search_oversigt;
-
 // extern Character characters[];
-
 extern config_icons config_menu;
-
 extern unsigned int do_show_editor_select_linie;
 extern GLuint _textureupdatetidalview; 	        // update icon tidal playlist in editor
-
 const char *tidal_gfx_path = "tidal_stuf/tidal_gfx/";
-
 const int tidal_pathlength=80;
 const int tidal_namelength=80;
 const int tidal_desclength=2000;
 const int feed_url=2000;
-
-
 //bool tidal_debug_json=false;
 extern FILE *logfile;
 extern char localuserhomedir[4096];                                                         // get in main
@@ -842,13 +833,13 @@ void tidal_class::process_value(json_value* value, int depth) {
             gfxurl=get_artist_cover_image((char *) tidal_playlist_id.c_str());
             cnew_tidal_record.feed_gfx_url=gfxurl;
             downloadfilenamelong = localuserhomedir;
-            downloadfilenamelong = downloadfilenamelong + "/tidal_gfx/";
+            downloadfilenamelong = downloadfilenamelong + "/tidal_stuf/tidal_gfx/";
             downloadfilenamelong = downloadfilenamelong + tidal_playlist_id;
             downloadfilenamelong = downloadfilenamelong + ".jpg";
             cnew_tidal_record.feed_gfx_url=downloadfilenamelong;
             // if dir do not exist create it
             std::string dirtocreate = localuserhomedir;
-            dirtocreate = dirtocreate + "/tidal_gfx";
+            dirtocreate = dirtocreate + "/tidal_stuf/tidal_gfx";
             if (!(fs::exists(dirtocreate))) {
               if  (!(fs::create_directories(dirtocreate))) {
                 printf("Error create dir %s \n",dirtocreate.c_str());
@@ -2159,7 +2150,6 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force,bool cre
   // process json artist file after create file name  
   // tidal_artist_playlist_$artistid.json have the data
   tidal_artis_playlist_file = localuserhomedir;
-  tidal_artis_playlist_file = tidal_artis_playlist_file + "/";
   tidal_artis_playlist_file = tidal_artis_playlist_file + "/tidal_stuf/";
   tidal_artis_playlist_file = tidal_artis_playlist_file + "tidal_artist_playlist_";
   tidal_artis_playlist_file = tidal_artis_playlist_file + artistid;
@@ -5610,25 +5600,23 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
   Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
   gfxfilename = stack_search[ii].feed_gfx_url;
   float fontsize=1.0f;
-  if (ii<stack_search.size()) {
-    if (gfxfilename.size() > 0) {
-      // load texture if not loaded
-      if (stack_search[ii].textureId == 0) {
-        if (file_exists(gfxfilename.c_str())) {
-          stack_search[ii].textureId = loadTexture((char *) gfxfilename.c_str());
-        } else stack_search[ii].feed_gfx_url="";
-      }
+  if ((stack_search.size()>0) && (ii<stack_search.size())) {
+    // load texture if not loaded
+    if (stack_search.at(ii).textureId == 0) {
+      if (file_exists(gfxfilename.c_str())) {
+        stack_search.at(ii).textureId = loadTexture((char *) gfxfilename.c_str());
+      } else stack_search.at(ii).feed_gfx_url="";
     }
     // Titel
-    temprgtxt = fmt::format("{:^20}",stack_search[ii].feed_showtxt);
-    if (stack_search[ii].textureId ) texture = stack_search[ii].textureId; else texture = onlineradio_empty;
+    temprgtxt = fmt::format("{:^20}",stack_search.at(ii).feed_showtxt);
+    if (stack_search.at(ii).textureId ) texture = stack_search.at(ii).textureId; else texture = onlineradio_empty;
     if (ii == stream_key_selected-1) {
       if (y>search_startY-30) {
         drawcover(x + 18, y + 18, 164  + sin(sinh)*4, 164  + sin(sinh)*4, texture , onlineradio_empty,ii+100,stream_key_selected);
         drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 200, 18, 22, 2, 2, true);
         // if room show artist name
         if (stack_search[ii].feed_showtxt.length()<21) {
-          temprgtxt = fmt::format("{:^20}",stack_search[ii].feed_artist);                           // feed_artist);
+          temprgtxt = fmt::format("{:^20}",stack_search.at(ii).feed_artist);                           // feed_artist);
           // drawLinesOfText(temprgtxt, x + 18, y - 8, fontsize, 22, 2, 2, true);
         }
       }
@@ -5637,9 +5625,11 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
         drawcover(x + 20, y + 10, 160, 160, texture , onlineradio_empty,ii+100,stream_key_selected);
         drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 185, 18, 22, 2, 2, true);
         // if room show artist name
-        if (stack_search[ii].feed_showtxt.length()<21) {
-          temprgtxt = fmt::format("{:^20}",stack_search[ii].feed_artist);                           // feed_artist);
-          drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 185+18, 18, 22, 1, 1, true);
+        if (ii<stack_search.size()) {
+          if (stack_search.at(ii).feed_showtxt.length()<21) {
+            temprgtxt = fmt::format("{:^20}",stack_search.at(ii).feed_artist);                           // feed_artist);
+            drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 185+18, 18, 22, 1, 1, true);
+          }
         }
       }
     }
