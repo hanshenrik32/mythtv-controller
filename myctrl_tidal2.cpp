@@ -2187,7 +2187,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force,bool cre
             loadartist = true;
           }
         }
-        if (loadartist || force) {
+        if ((loadartist || force) || (create_db_records==true)) {
           try {
             printf("\n\nTidal File to load: %s \n ",tidal_artis_playlist_file.c_str());
             value = json_parse(file_contents,file_size);                                  // parser create value obj
