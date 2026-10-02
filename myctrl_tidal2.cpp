@@ -23,7 +23,6 @@
 #include <iostream>
 #include <vector>
 #include <fmt/format.h>
-#include <sqlite3.h>                    // sqlite interface to xbmc
 #include <unistd.h>
 #include <experimental/filesystem>
 #include <spawn.h>
@@ -2188,8 +2187,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force,bool cre
             loadartist = true;
           }
         }
-
-        if (loadartist) {
+        if (loadartist || force) {
           try {
             printf("\n\nTidal File to load: %s \n ",tidal_artis_playlist_file.c_str());
             value = json_parse(file_contents,file_size);                                  // parser create value obj
@@ -5525,6 +5523,139 @@ void tidal_class::drawcover(int x, int y, int w, int h, GLuint textureId, GLuint
   }
 }
 
+
+
+
+
+
+void tidal_class::draw_tidal_item1(float x,float y,int ii, GLuint normal_icon, GLuint empty_icon, int stream_key_selected, float introProgress) {
+    if (ii < 0 || ii >= static_cast<int>(stack.size()))
+        return;
+
+    const float p = std::clamp(introProgress, 0.0f, 1.0f);
+
+    if (p <= 0.0f)
+        return;
+
+    auto& item = stack.at(ii);
+
+    // ---- LOAD COVER ------------------------------------------
+    if (item.textureId == 0 && !item.feed_gfx_url.empty()) {
+        if (file_exists(item.feed_gfx_url.c_str())) {
+            item.textureId = loadTexture(
+                const_cast<char*>(item.feed_gfx_url.c_str())
+            );
+        } else {
+            item.feed_gfx_url.clear();
+        }
+    }
+
+    GLuint fallback = empty_icon ? empty_icon : onlineradio_empty;
+    GLuint texture = item.textureId ? item.textureId : fallback;
+
+    // ---- INTRO -----------------------------------------------
+    float remaining = 1.0f - p;
+
+    // Starter 60 pixels under sin normale placering.
+    float animatedY = y + 60.0f * remaining * remaining * remaining;
+
+    // Ease-out-back: 85 % -> ca. 103 % -> 100 %.
+    const float overshoot = 2.6f;
+    float u = p - 1.0f;
+
+    float backEase =
+        1.0f +
+        (overshoot + 1.0f) * u * u * u +
+        overshoot * u * u;
+
+    float scale = 0.85f + 0.15f * backEase;
+
+    // Fade ind i den første del af animationen.
+    float alpha = std::clamp(p / 0.4f, 0.0f, 1.0f);
+    alpha = alpha * alpha * (3.0f - 2.0f * alpha);
+
+    // ---- MARKERET COVER --------------------------------------
+    bool selected = (ii == stream_key_selected - 1);
+
+    float baseSize = selected ? 164.0f : 160.0f;
+    float coverX = x + (selected ? 18.0f : 20.0f);
+    float coverY = animatedY + (selected ? 18.0f : 10.0f);
+
+    // Start pulseringen, når hele introen er færdig.
+    static auto pulseStart = std::chrono::steady_clock::now();
+    static bool pulseActive = false;
+
+    if (!selected || !tidalIntroFinished) {
+        if (selected)
+            pulseActive = false;
+    } else {
+        auto now = std::chrono::steady_clock::now();
+
+        if (!pulseActive) {
+            pulseStart = now;
+            pulseActive = true;
+        }
+
+        float seconds = std::chrono::duration<float>(
+            now - pulseStart
+        ).count();
+
+        baseSize += std::sin(seconds * 4.8f) * 4.0f;
+    }
+
+    // Skalering omkring coverets centrum.
+    float size = baseSize * scale;
+    coverX += (baseSize - size) * 0.5f;
+    coverY += (baseSize - size) * 0.5f;
+
+    renderer.AddTextureRect(
+        ii + 100,
+        texture,
+        coverX,
+        coverY,
+        size,
+        size,
+        1.0f, 1.0f, 1.0f, alpha
+    );
+
+    // ---- TITEL OG KUNSTNER ------------------------------------
+    // Samme bevægelse som coveret, men ingen skalering.
+    std::string text = fmt::format("{:^20}", item.feed_showtxt);
+
+    drawLinesOfTextfont(
+        &myfont,
+        text,
+        x + 18.0f,
+        animatedY + 185.0f,
+        18, 22, 2, 2, true
+    );
+
+    if (item.feed_showtxt.length() < 21) {
+        text = fmt::format("{:^20}", item.feed_artist);
+
+        drawLinesOfTextfont(
+            &myfont,
+            text,
+            x + 18.0f,
+            animatedY + 203.0f,
+            18, 22, 1, 1, true
+        );
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ****************************************************************************************
 //
 // Draw tidal item
@@ -5549,22 +5680,22 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
     float fontsize=1.0f;
     if (gfxfilename.size() > 0) {
       // load texture if not loaded
-      if (stack[ii].textureId == 0) {
+      if (stack.at(ii).textureId == 0) {
         if (file_exists(gfxfilename.c_str())) {
-          stack[ii].textureId = loadTexture((char *) gfxfilename.c_str());
-        } else stack[ii].feed_gfx_url="";
+          stack.at(ii).textureId = loadTexture((char *) gfxfilename.c_str());
+        } else stack.at(ii).feed_gfx_url="";
       }
     }
     // Titel
-    temprgtxt = fmt::format("{:^20}",stack[ii].feed_showtxt);
+    temprgtxt = fmt::format("{:^20}",stack.at(ii).feed_showtxt);
     // temprgtxt.resize(20);
-    if (stack[ii].textureId ) texture = stack[ii].textureId; else texture = onlineradio_empty;
+    if (stack.at(ii).textureId ) texture = stack.at(ii).textureId; else texture = onlineradio_empty;
     if (ii == stream_key_selected-1) {
       drawcover(x + 18, y + 18, 164  + sin(sinh)*4, 164  + sin(sinh)*4, texture , onlineradio_empty,ii+100,stream_key_selected);
       drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 185, 18, 22, 2, 2, true);
       // if room show artist name
-      if (stack[ii].feed_showtxt.length()<21) {
-        temprgtxt = fmt::format("{:^20}",stack[ii].feed_artist);                           // feed_artist);
+      if (stack.at(ii).feed_showtxt.length()<21) {
+        temprgtxt = fmt::format("{:^20}",stack.at(ii).feed_artist);                           // feed_artist);
         drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 185+18, 18, 22, 1, 1, true);
       }
       sinh = sinh + 0.08f;
@@ -5573,9 +5704,11 @@ void tidal_class::draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint 
       drawcover(x + 20, y + 10, 160, 160, texture , onlineradio_empty,ii+100,stream_key_selected);
       // renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
       drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 185, 18, 22, 2, 2, true);
-      if (stack[ii].feed_showtxt.length()<21) {
-        temprgtxt = fmt::format("{:^20}",stack[ii].feed_artist);                           // feed_artist);
-        drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 185+18, 18, 22, 1, 1, true);
+      if (ii<stack_search.size()) {
+        if (stack.at(ii).feed_showtxt.length()<21) {
+          temprgtxt = fmt::format("{:^20}",stack.at(ii).feed_artist);                           // feed_artist);
+          drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 185+18, 18, 22, 1, 1, true);
+        }
       }
     }
   }
@@ -5598,7 +5731,7 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
   GLuint texture;
   Color4 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
   Color4 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
-  gfxfilename = stack_search[ii].feed_gfx_url;
+  gfxfilename = stack_search.at(ii).feed_gfx_url;
   float fontsize=1.0f;
   if ((stack_search.size()>0) && (ii<stack_search.size())) {
     // load texture if not loaded
@@ -5615,7 +5748,7 @@ void tidal_class::draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,
         drawcover(x + 18, y + 18, 164  + sin(sinh)*4, 164  + sin(sinh)*4, texture , onlineradio_empty,ii+100,stream_key_selected);
         drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 200, 18, 22, 2, 2, true);
         // if room show artist name
-        if (stack_search[ii].feed_showtxt.length()<21) {
+        if (stack_search.at(ii).feed_showtxt.length()<21) {
           temprgtxt = fmt::format("{:^20}",stack_search.at(ii).feed_artist);                           // feed_artist);
           // drawLinesOfText(temprgtxt, x + 18, y - 8, fontsize, 22, 2, 2, true);
         }
@@ -5659,6 +5792,122 @@ float getTextWidth(const std::string& text, float scale) {
 // Show tidal view
 //
 // ************************************************************************************************************************
+
+void tidal_class::show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
+    if (itemsPerRow <= 0 || rowHeight <= 0)
+        return;
+
+    // ---- KINETIC SCROLL ---------------------------------------
+    scrollVel *= friction;
+    scrollPos += scrollVel;
+
+    if (std::fabs(scrollVel) < 0.01f)
+        scrollVel = 0.0f;
+
+    int totalRows = static_cast<int>(
+        std::ceil(static_cast<float>(stack.size()) / itemsPerRow)
+    );
+
+    float maxScroll = std::max(
+        0.0f,
+        totalRows * static_cast<float>(rowHeight) -
+        static_cast<float>(viewHeight)
+    );
+
+    if (scrollPos < 0.0f) {
+        scrollPos = 0.0f;
+        scrollVel = 0.0f;
+    } else if (scrollPos > maxScroll) {
+        scrollPos = maxScroll;
+        scrollVel = 0.0f;
+    }
+
+    if (stack.empty())
+        return;
+
+    // ---- PLACERING -------------------------------------------
+    int firstRow = static_cast<int>(scrollPos / rowHeight);
+    float subOff = std::fmod(scrollPos, static_cast<float>(rowHeight));
+
+    int firstIndex = firstRow * itemsPerRow;
+
+    int visibleRows = static_cast<int>(
+        std::ceil(
+            (static_cast<float>(viewHeight) + subOff) / rowHeight
+        )
+    );
+
+    int drawCount = std::min(
+        (visibleRows + 1) * itemsPerRow,
+        static_cast<int>(stack.size()) - firstIndex
+    );
+
+    // Kun rækkernes faktiske indhold i visningen styrer bølgen.
+    int introCount = std::min(
+        visibleRows * itemsPerRow,
+        static_cast<int>(stack.size()) - firstIndex
+    );
+
+    if (drawCount <= 0 || introCount <= 0)
+        return;
+
+    int introRows = (introCount + itemsPerRow - 1) / itemsPerRow;
+    int introCols = std::min(itemsPerRow, introCount);
+
+    // ---- INTRO START -----------------------------------------
+    const auto now = std::chrono::steady_clock::now();
+
+    if (!tidalIntroStarted) {
+        tidalIntroStart = now;
+        tidalIntroScrollStart = scrollPos;
+
+        tidalIntroStarted = true;
+        tidalIntroFinished = false;
+    }
+
+    float elapsed = std::chrono::duration<float>(
+        now - tidalIntroStart
+    ).count();
+
+    const float duration = 0.65f;
+
+    int maxWaveStep = (introRows - 1) + (introCols - 1);
+
+    // Begræns hele bølgens forsinkelse til 0,35 sekunder.
+    float waveDelay = maxWaveStep > 0
+        ? std::min(0.05f, 0.35f / maxWaveStep)
+        : 0.0f;
+
+    float introEnd = duration + maxWaveStep * waveDelay;
+
+    // Ved scrolling afsluttes introen, så nye rækker vises normalt.
+    if (elapsed >= introEnd ||
+        std::fabs(scrollPos - tidalIntroScrollStart) > 0.5f)
+    {
+        tidalIntroFinished = true;
+    }
+
+    // ---- RENDER ----------------------------------------------
+    for (int i = 0; i < drawCount; ++i) {
+        int index = firstIndex + i;
+        int col = i % itemsPerRow;
+        int row = i / itemsPerRow;
+        float x = startX + col * itemWidth + 40.0f;
+        float y = startY + row * rowHeight - subOff - 20.0f;
+        float progress = 1.0f;
+        if (!tidalIntroFinished) {
+            // Ekstra bufferrække venter på introens afslutning.
+            if (i >= introCount)
+                continue;
+            // Nederste højre først, øverste venstre sidst.
+            int waveStep = (introRows - 1 - row) + (introCols - 1 - col);
+            float delay = waveStep * waveDelay;
+            progress = std::clamp((elapsed - delay) / duration, 0.0f, 1.0f);
+        }
+        draw_tidal_item1( x, y, index, normal_icon, empty_icon, stream_key_selected, progress);
+    }
+}
+
 
 
 void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {

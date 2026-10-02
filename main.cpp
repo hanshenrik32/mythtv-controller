@@ -2187,24 +2187,22 @@ void display() {
         streamoversigt.show_stream_oversigt(normal_icon, 0, 1);
       }
       if (vis_radio_oversigt) {
-        radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , onlineradio320 , 0);
+        radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , onlineradio320 , 0);
       }
       // tidal stuf
       if (vis_tidal_oversigt) {
         if (do_show_tidal_search_oversigt == false) {
-          tidal_oversigt.set_textureloaded(false);
-          tidal_oversigt.show_tidal_oversigt( normal_icon , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
+          tidal_oversigt.set_textureloaded(false);       
+          tidal_oversigt.show_tidal_oversigt1( normal_icon , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );
         } else {
           tidal_oversigt.show_tidal_search_oversigt(_textureId_dir, _textureId_song, _textureIdback, _textureIdback, tidal_selected_startofset, tidalknapnr, keybuffer1);
         }
       }
       if (vis_music_oversigt) {    
         if (do_show_music_search_oversigt == false) {
-          musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-          // if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+          musicoversigt.show_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
         } else {
           musicoversigt.show_search_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-          // if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
         }
       } else if (vis_film_oversigt) {
         if (do_show_movie_search_oversigt==false) {
@@ -2381,7 +2379,7 @@ void display() {
     if ((vis_nyefilm_oversigt) && (film_oversigt.film_is_playing==false) && (do_show_setup == false) && (vis_spotify_oversigt == false) && (vis_tidal_oversigt == false) && (vis_music_oversigt == false) && (vis_stream_oversigt == false) && (vis_film_oversigt == false) && (vis_recorded_oversigt == false) && (vis_tv_oversigt == false) && (vis_radio_oversigt == false) && (vis_stream_oversigt == false)) {
       if (show_newmovietimeout == 0) vis_nyefilm_oversigt = false;
       if (fknapnr == 0) show_newmovietimeout--;
-      film_oversigt.show_minifilm_oversigt(0,0);
+      // film_oversigt.show_minifilm_oversigt(0,0);
     }
 
 
@@ -4010,7 +4008,7 @@ void display() {
 
     // show pfs
     // debug mode 1
-    showfps=false;
+    showfps=true;
     show_status=false;
     if ((showfps) && (show_status==false)) {
       // Gather our frames per second
@@ -5258,7 +5256,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_tv_oversigt = true;
           }
           
-
           if (vis_radio_oversigt) {
             radiooversigt.dragging=false;
             // giv slip → brug sidste bevægelse som start-hastighed
@@ -5268,15 +5265,18 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             int dt=upTime - radiooversigt.downTimeMs;
             if ((!radiooversigt.moved) && (dt<200)) radiooversigt.gettouchbutton=true;
           }
-
-
           // menu entry (81)
           if (id==SHOW_MUSIC_OVERVIEW) {
             printf("Music selected \n");
             vis_radio_oversigt = false;
             vis_music_oversigt = !vis_music_oversigt;
+            if (vis_music_oversigt==false) {
+              musicoversigt.musicIntroStarted=false;
+            }
             vis_spotify_oversigt = false;
             vis_radio_or_music_oversigt=false;
+            vis_tidal_oversigt = false;
+            tidal_oversigt.tidalIntroStarted=false;
             printf("Enable music view\n ");
           }
 
@@ -5297,6 +5297,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           if (id==SHOW_RADIO_OVERVIEW) {  // 80
             vis_radio_oversigt =! vis_radio_oversigt;
+            if (vis_radio_oversigt==false) {
+              radiooversigt.radioIntroStarted=false;
+            }
+            vis_music_oversigt = false;
+            musicoversigt.musicIntroStarted=false;
+            vis_tidal_oversigt = false;
+            tidal_oversigt.tidalIntroStarted=false;
           }
 
           // menu entry (2)
@@ -5304,7 +5311,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             printf("Radio og Music selected \n");
             vis_radio_or_music_oversigt=!vis_radio_or_music_oversigt;
             vis_radio_oversigt = false;
+            radiooversigt.radioIntroStarted=false;
             vis_music_oversigt = false;
+            musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
             vis_tv_oversigt = false;
             vis_recorded_oversigt = false;
@@ -5320,9 +5329,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if (id==MOVIE_STREAM) {
             printf("Movie Stream selected \n");
             vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
-            // close all other setup windows
             vis_radio_oversigt = false;
+            radiooversigt.radioIntroStarted=false;
             vis_music_oversigt = false;
+            musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
             vis_tv_oversigt = false;
             vis_recorded_oversigt = false;
@@ -5340,7 +5350,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_stream_or_movie_oversigt = false;
             // close all other setup windows
             vis_radio_oversigt = false;
+            radiooversigt.radioIntroStarted=false;
             vis_music_oversigt = false;
+            musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = !vis_film_oversigt;
             vis_tv_oversigt = false;
             vis_recorded_oversigt = false;
@@ -5355,8 +5367,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // menu entry
           if (id == RECORDED) {
             printf("Recorded selected \n");
-            // close all other setup windows
             vis_music_oversigt = false;
+            musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
             vis_tv_oversigt = false;
             vis_radio_or_music_oversigt = false;
@@ -5372,13 +5384,16 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
           if (id == SHOW_TIDAL_OVERVIEW) {
             printf("Tidal selected \n");
-            // close all other setup windows
             vis_music_oversigt = false;
+            musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
             vis_tv_oversigt = false;
             vis_radio_or_music_oversigt = false;
             vis_spotify_oversigt=false;
             vis_tidal_oversigt = !vis_tidal_oversigt;
+            if (vis_tidal_oversigt==false) {
+              tidal_oversigt.tidalIntroStarted=false;
+            }
             vis_recorded_oversigt = false;
             vis_stream_oversigt = false;
             vis_stream_or_movie_oversigt = false;
@@ -5391,11 +5406,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             printf("Spotify selected \n");
             // close all other setup windows
             vis_music_oversigt = false;
+            musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
             vis_tv_oversigt = false;
             vis_radio_or_music_oversigt = false;
             vis_spotify_oversigt=!vis_spotify_oversigt;
             vis_tidal_oversigt = false;
+            tidal_oversigt.tidalIntroStarted=false;
             vis_recorded_oversigt = false;
             vis_stream_oversigt = false;
             vis_stream_or_movie_oversigt = false;
@@ -5407,11 +5424,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((id == SETUP) && (!(do_show_tidal_search_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_music_oversigt)) && (!(vis_spotify_oversigt))) {
             do_show_setup =! do_show_setup;
             vis_music_oversigt = false;
+            musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
             vis_tv_oversigt = false;
             vis_stream_oversigt = false;
             vis_spotify_oversigt=false;
             vis_tidal_oversigt = false;
+            tidal_oversigt.tidalIntroStarted=false;
             vis_stream_or_movie_oversigt = false;
             vis_radio_or_music_oversigt = false;
             do_show_tvgraber = false;
@@ -5427,6 +5446,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if (vis_radio_or_music_oversigt) {
             if (id==29) {
               vis_radio_or_music_oversigt = ! vis_radio_or_music_oversigt;
+              if (vis_radio_or_music_oversigt==false) {
+                radiooversigt.radioIntroStarted=false;
+              }
             }
           }
 

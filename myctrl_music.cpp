@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fmt/format.h>
 #include <filesystem>
+#include <algorithm>
 
 using namespace std;
 
@@ -1788,6 +1789,74 @@ void musicoversigt_class::drawcover(int x, int y, int w, int h, GLuint textureId
 // Draw music item
 //
 // ****************************************************************************************
+void musicoversigt_class::draw_music_item1(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon,int stream_key_selected,float introProgress,float pulse) {
+  if (ii < 0 || ii >= static_cast<int>(musicoversigt.size()))
+    return;
+  float progress = std::clamp(introProgress, 0.0f, 1.0f);
+  if (progress <= 0.0f)
+    return;
+  auto& item = musicoversigt[ii];
+  // ---- LOAD COVER ------------------------------------------
+  std::string gfxfilename = musicoversigt[ii].album_coverfile;
+  if (gfxfilename.size() > 0) {
+    // load texture if not loaded
+    if (musicoversigt[ii].textureId == 0) {
+      if (file_exists(gfxfilename.c_str())) {
+        musicoversigt[ii].textureId = loadTexture((char *) gfxfilename.c_str());
+      }
+    }
+  }
+  GLuint fallback = normal_icon ? normal_icon : empty_icon;
+  GLuint texture = item.textureId ? item.textureId : fallback;
+  if (ii == 0) {
+    texture = item.oversigttype != -1 ? back_icon : _textureId28;
+    if (texture == 0) texture = _textureId28 ? _textureId28 : fallback;
+  }
+  // ---- GLID OP ---------------------------------------------
+  float remaining = 1.0f - progress;
+  float animatedY =
+    y + 60.0f * remaining * remaining * remaining;
+
+  // ---- ZOOM ------------------------------------------------
+  const float overshoot = 2.6f;
+  float u = progress - 1.0f;
+
+  float backEase =
+      1.0f +
+      (overshoot + 1.0f) * u * u * u +
+      overshoot * u * u;
+
+  float scale = 0.85f + 0.15f * backEase;
+  // ---- FADE ------------------------------------------------
+  float alpha = std::clamp(progress / 0.4f, 0.0f, 1.0f);
+  alpha = alpha * alpha * (3.0f - 2.0f * alpha);
+  // Behold dit eksisterende valg af markeret element.
+  bool selected = (ii == selected_icon_in_view - 1);
+  float baseSize = selected ? 190.0f : 180.0f;
+  float size = (baseSize + (selected ? pulse : 0.0f)) * scale;
+  float offset = ii == 0 ? 18.0f : 20.0f;
+  float coverX = x + offset + (baseSize - size) * 0.5f;
+  float coverY = animatedY + offset + (baseSize - size) * 0.5f;
+  renderer.AddTextureRect(
+      ii + 100,
+      texture,
+      coverX,
+      coverY,
+      size,
+      size,
+      1.0f, 1.0f, 1.0f, alpha
+  );
+
+  // ---- TITEL -----------------------------------------------
+  std::string text = fmt::format("{:^20}", item.album_name);
+  float textY = animatedY + 218.0f;
+  if (ii == 0 && item.oversigttype != -1 && !selected)
+    textY = animatedY + 228.0f;
+
+  renderer.AddText(&myfont,x + 20.0f,textY,text,1.0f, 1.0f, 1.0f, alpha
+  );
+}
+
 
 
 void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon, int stream_key_selected) {
@@ -1931,6 +2000,94 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
 
 // ****************************************************************************************
 //
+// Show music overview new version 3
+//
+// ****************************************************************************************
+
+void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
+  if (itemsPerRow <= 0 || rowHeight <= 0 || viewHeight <= 0)
+    return;
+  // ---- KINETIC SCROLL ---------------------------------------
+  scrollVel *= friction;
+  scrollPos += scrollVel;
+  if (std::fabs(scrollVel) < 0.01f)
+    scrollVel = 0.0f;
+
+  int count = static_cast<int>(musicoversigt.size());
+  int totalRows = (count + itemsPerRow - 1) / itemsPerRow;
+  float maxScroll = std::max(
+    0.0f,
+    totalRows * static_cast<float>(rowHeight) -
+    static_cast<float>(viewHeight)
+  );
+
+  if (scrollPos < 0.0f) {
+    scrollPos = 0.0f;
+    scrollVel = 0.0f;
+  } else if (scrollPos > maxScroll) {
+    scrollPos = maxScroll;
+    scrollVel = 0.0f;
+  }
+  if (count == 0)
+    return;
+  // ---- GRID ------------------------------------------------
+  int firstRow = static_cast<int>(scrollPos / rowHeight);
+  int sofset = firstRow * itemsPerRow;
+  float subOff = std::fmod(
+    scrollPos,
+    static_cast<float>(rowHeight)
+  );
+  int visibleRows = static_cast<int>(
+    std::ceil((static_cast<float>(viewHeight) + subOff) / static_cast<float>(rowHeight)));
+  int visibleItems = std::min((visibleRows + 2) * itemsPerRow, count - sofset);
+  int introCount = std::min(visibleRows * itemsPerRow,count - sofset);
+  if (introCount <= 0)
+    return;
+  int introRows = (introCount + itemsPerRow - 1) / itemsPerRow;
+  int introCols = std::min(itemsPerRow, introCount);
+  // ---- FÆLLES INTROTID --------------------------------------
+  const auto now = std::chrono::steady_clock::now();
+  if (!musicIntroStarted) {
+    musicIntroStart = now;
+    musicIntroScrollStart = scrollPos;
+    musicIntroStarted = true;
+    musicIntroFinished = false;
+  }
+  float elapsed = std::chrono::duration<float>(
+    now - musicIntroStart
+  ).count();
+  const float duration = 0.65f;
+  int maxWaveStep = (introRows - 1) + (introCols - 1);
+  float waveDelay = maxWaveStep > 0 ? std::min(0.05f, 0.35f / maxWaveStep) : 0.0f;
+  float introEnd = duration + maxWaveStep * waveDelay;
+  if (elapsed >= introEnd || std::fabs(scrollPos - musicIntroScrollStart) > 0.5f) {
+    musicIntroFinished = true;
+  }
+  // Pulsering begynder blødt efter introens normale sluttid.
+  float pulse = musicIntroFinished ? std::sin(std::max(0.0f, elapsed - introEnd) * 4.8f) * 4.0f : 0.0f;
+  // ---- TEGN ------------------------------------------------
+  for (int i = 0; i < visibleItems; ++i) {
+    int index = sofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    float x = startX + col * itemWidth + 40.0f;
+    float y = startY + row * rowHeight - subOff - 20.0f;
+    float progress = 1.0f;
+    if (!musicIntroFinished) {
+      // Bufferrækker tegnes først efter introen.
+      if (i >= introCount)
+          continue;
+      int waveStep = (introRows - 1 - row) + (introCols - 1 - col);
+      float delay = waveStep * waveDelay;
+      progress = std::clamp((elapsed - delay) / duration,0.0f,1.0f);
+    }
+    draw_music_item1(x,y,index,normal_icon,normal_icon,back_icon,music_select_iconnr,progress,pulse);
+  }
+}
+
+
+// ****************************************************************************************
+//
 // Show music overview new version 2
 //
 // ****************************************************************************************
@@ -1965,8 +2122,6 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     int y = startY + row * rowHeight - subOff - 20;
     draw_music_item( x, y, index, normal_icon, normal_icon , back_icon, music_select_iconnr);
   }
-
-
 }
 
 // ****************************************************************************************
@@ -2029,8 +2184,6 @@ void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint 
     draw_music_search_item( x, y, index, normal_icon, normal_icon , back_icon, music_select_iconnr);
   }
 }
-
-
 
 
 
