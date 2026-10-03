@@ -2291,6 +2291,151 @@ void film_oversigt_typem::draw_stream_search_item(int x, int y,int ii,GLuint nor
 //
 // ****************************************************************************************
 
+void film_oversigt_typem::draw_stream_item1(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress) {
+    if (ii < 0 || ii >= static_cast<int>(filmoversigt.size()))
+        return;
+
+    float progress = std::max(
+        0.0f, std::min(introProgress, 1.0f)
+    );
+
+    if (progress <= 0.0f)
+        return;
+
+    auto& film = filmoversigt[ii];
+
+    // ---- LOAD COVER ------------------------------------------
+    std::string gfxfilename = film.getfilmcoverfile();
+
+    if (film.gettextureid() == 0 && !gfxfilename.empty()) {
+        if (file_exists(gfxfilename.c_str())) {
+            film.settextureid(
+                loadTexture(const_cast<char*>(gfxfilename.c_str()))
+            );
+        }
+    }
+
+    GLuint background = normal_icon ? normal_icon : empty_icon;
+    GLuint texture = film.gettextureid();
+
+    if (texture == 0)
+        texture = background;
+
+    // ---- GLID OP ---------------------------------------------
+    float remaining = 1.0f - progress;
+
+    float animatedY =
+        y + 60.0f * remaining * remaining * remaining;
+
+    // ---- ZOOM: 85 % -> ca. 103 % -> 100 % ----------------------
+    const float overshoot = 2.6f;
+    float u = progress - 1.0f;
+
+    float backEase =
+        1.0f +
+        (overshoot + 1.0f) * u * u * u +
+        overshoot * u * u;
+
+    float scale = 0.85f + 0.15f * backEase;
+
+    // ---- FADE ------------------------------------------------
+    float alpha = std::max(
+        0.0f, std::min(progress / 0.4f, 1.0f)
+    );
+
+    alpha = alpha * alpha * (3.0f - 2.0f * alpha);
+
+    bool selected = (ii == selected_icon_in_view - 1);
+
+    // ---- FÆLLES CENTRUM FOR DVD OG COVER ----------------------
+    const float baseWidth = 174.0f;
+    const float baseHeight = 214.0f;
+
+    float frameX = x + 18.0f;
+    float frameY = animatedY + 18.0f;
+
+    float centerX = frameX + baseWidth * 0.5f;
+    float centerY = frameY + baseHeight * 0.5f;
+
+    // Alle lag skaleres omkring samme centrum.
+    auto drawLayer = [&](GLuint layerTexture,
+                         float layerX,
+                         float layerY,
+                         float layerWidth,
+                         float layerHeight)
+    {
+        renderer.AddTextureRect(
+            ii + 100,
+            layerTexture,
+            centerX + (layerX - centerX) * scale,
+            centerY + (layerY - centerY) * scale,
+            layerWidth * scale,
+            layerHeight * scale,
+            1.0f, 1.0f, 1.0f, alpha
+        );
+    };
+
+    // DVD-baggrund.
+    drawLayer(
+        background,
+        frameX,
+        frameY,
+        baseWidth,
+        baseHeight
+    );
+
+    // Filmcover med samme placering og størrelse som før.
+    if (texture != background) {
+        if (selected) {
+            drawLayer(
+                texture,
+                x + 38.0f,
+                animatedY + 18.0f,
+                154.0f,
+                214.0f
+            );
+        } else {
+            drawLayer(
+                texture,
+                x + 40.0f,
+                animatedY + 20.0f,
+                150.0f,
+                210.0f
+            );
+        }
+    }
+
+    // ---- TITEL -----------------------------------------------
+    std::string text = fmt::format("{:^20}", film.getfilmtitle());
+
+    // Begræns til 20 UTF-8-tegn uden at klippe midt i et tegn.
+    std::size_t pos = 0;
+    int characters = 0;
+
+    while (pos < text.size() && characters < 20) {
+        ++pos;
+
+        while (pos < text.size() &&
+               (static_cast<unsigned char>(text[pos]) & 0xC0) == 0x80)
+        {
+            ++pos;
+        }
+
+        ++characters;
+    }
+
+    text.resize(pos);
+
+    renderer.AddText(
+        &myfont,
+        x + 20.0f,
+        animatedY + 250.0f,
+        text,
+        1.0f, 1.0f, 1.0f, alpha
+    );
+}
+
+
 
 void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   // Baggrund
@@ -2413,6 +2558,97 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
 // Film oversigt with kinetic scroll
 //
 // **************************************************************************************************
+
+
+
+void film_oversigt_typem::show_film_oversigt1(float _mangley,int filmnr) {
+  if (itemsPerRow <= 0 || rowHeight <= 0 || viewHeight <= 0)
+    return;
+  if (filmoversigt.empty()) {
+    filmIntroStarted = false;
+    filmIntroFinished = false;
+    scrollPos = 0.0f;
+    scrollVel = 0.0f;
+    return;
+  }
+  // ---- KINETIC SCROLL ---------------------------------------
+  scrollVel *= friction;
+  scrollPos += scrollVel;
+  if (std::fabs(scrollVel) < 0.01f)
+    scrollVel = 0.0f;
+  int count = static_cast<int>(filmoversigt.size());
+  int totalRows = (count + itemsPerRow - 1) / itemsPerRow;
+  float maxScroll = std::max(
+    0.0f,
+    totalRows * static_cast<float>(rowHeight) -
+    static_cast<float>(viewHeight)
+  );
+  if (scrollPos < 0.0f) {
+    scrollPos = 0.0f;
+    scrollVel = 0.0f;
+  } else if (scrollPos > maxScroll) {
+    scrollPos = maxScroll;
+    scrollVel = 0.0f;
+  }
+  // ---- GRID ------------------------------------------------
+  int firstRow = static_cast<int>(scrollPos / rowHeight);
+  int sofset = firstRow * itemsPerRow;
+  float subOff = std::fmod(
+    scrollPos,
+    static_cast<float>(rowHeight)
+  );
+  int visibleRows = static_cast<int>(std::ceil((static_cast<float>(viewHeight) + subOff) / static_cast<float>(rowHeight)));
+  int visibleItems = std::min((visibleRows + 3) * itemsPerRow,count - sofset);
+  int introCount = std::min(visibleRows * itemsPerRow,count - sofset);
+  if (introCount <= 0)
+    return;
+  int introRows = (introCount + itemsPerRow - 1) / itemsPerRow;
+  int introCols = std::min(itemsPerRow, introCount);
+  // ---- FÆLLES INTROTID --------------------------------------
+  const auto now = std::chrono::steady_clock::now();
+  if (!filmIntroStarted) {
+    filmIntroStart = now;
+    filmIntroScrollStart = scrollPos;
+
+    filmIntroStarted = true;
+    filmIntroFinished = false;
+  }
+  float elapsed = std::chrono::duration<float>(
+    now - filmIntroStart
+  ).count();
+  const float duration = 0.65f;
+  int maxWaveStep = (introRows - 1) + (introCols - 1);
+  float waveDelay = maxWaveStep > 0 ? std::min(0.05f, 0.35f / maxWaveStep) : 0.0f;
+  float introEnd = duration + maxWaveStep * waveDelay;
+  // Scrolling afslutter introen.
+  if (elapsed >= introEnd || std::fabs(scrollPos - filmIntroScrollStart) > 0.5f) {
+    filmIntroFinished = true;
+  }
+
+  // ---- TEGN FILM -------------------------------------------
+  for (int i = 0; i < visibleItems; ++i) {
+    int index = sofset + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    float x = startX + col * itemWidth + 40.0f;
+    float y = startY + row * rowHeight - subOff - 20.0f;
+    float progress = 1.0f;
+    if (!filmIntroFinished) {
+      // Bufferrækker venter på introens afslutning.
+      if (i >= introCount)
+        continue;
+      // Nederste højre først, øverste venstre sidst.
+      int waveStep = (introRows - 1 - row) + (introCols - 1 - col);
+      float delay = waveStep * waveDelay;
+      progress = std::max(0.0f, std::min((elapsed - delay) / duration, 1.0f));
+    }
+    draw_stream_item1(x,y,index,_defaultdvdcover,_defaultdvdcover,film_select_iconnr,progress);
+  }
+}
+
+
+
+
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   // ---- KINETIC SCROLL ---------------------------------------

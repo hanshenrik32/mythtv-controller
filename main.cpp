@@ -2184,7 +2184,7 @@ void display() {
     if (visur==false) {
       if (vis_stream_oversigt) {
         // printf("vis_stream_oversigt\n");
-        streamoversigt.show_stream_oversigt(normal_icon, 0, 1);
+        streamoversigt.show_stream_oversigt1(normal_icon, 0, 1);
       }
       if (vis_radio_oversigt) {
         radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , onlineradio320 , 0);
@@ -2206,7 +2206,7 @@ void display() {
         }
       } else if (vis_film_oversigt) {
         if (do_show_movie_search_oversigt==false) {
-          film_oversigt.show_film_oversigt(0,film_select_iconnr);
+          film_oversigt.show_film_oversigt1(0,film_select_iconnr);
         } else {
           film_oversigt.show_film_search_oversigt(0,film_select_iconnr);
         }
@@ -5318,6 +5318,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_tv_oversigt = false;
             vis_recorded_oversigt = false;
             vis_stream_oversigt = false;
+            streamoversigt.streamIntroStarted=false;
             vis_spotify_oversigt=false;
             vis_tidal_oversigt = false;
             vis_stream_or_movie_oversigt = false;
@@ -5329,6 +5330,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if (id==MOVIE_STREAM) {
             printf("Movie Stream selected \n");
             vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
+            streamoversigt.streamIntroStarted=false;
             vis_radio_oversigt = false;
             radiooversigt.radioIntroStarted=false;
             vis_music_oversigt = false;
@@ -5354,9 +5356,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_music_oversigt = false;
             musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = !vis_film_oversigt;
+            if (vis_film_oversigt==false) {
+              film_oversigt.filmIntroStarted=false;
+            }
             vis_tv_oversigt = false;
             vis_recorded_oversigt = false;
             vis_stream_oversigt = false;
+            streamoversigt.streamIntroStarted=false;
             vis_spotify_oversigt=false;
             vis_tidal_oversigt = false;
             vis_radio_or_music_oversigt = false;
@@ -5370,6 +5376,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_music_oversigt = false;
             musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
+            film_oversigt.filmIntroStarted=false;
             vis_tv_oversigt = false;
             vis_radio_or_music_oversigt = false;
             vis_spotify_oversigt=false;
@@ -5387,6 +5394,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_music_oversigt = false;
             musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
+            film_oversigt.filmIntroStarted=false;
             vis_tv_oversigt = false;
             vis_radio_or_music_oversigt = false;
             vis_spotify_oversigt=false;
@@ -5396,6 +5404,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
             vis_recorded_oversigt = false;
             vis_stream_oversigt = false;
+            streamoversigt.streamIntroStarted=false;
             vis_stream_or_movie_oversigt = false;
             do_show_tvgraber = false;
             do_show_setup_torrent = false;
@@ -5408,6 +5417,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_music_oversigt = false;
             musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
+            film_oversigt.filmIntroStarted=false;
             vis_tv_oversigt = false;
             vis_radio_or_music_oversigt = false;
             vis_spotify_oversigt=!vis_spotify_oversigt;
@@ -5415,6 +5425,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             tidal_oversigt.tidalIntroStarted=false;
             vis_recorded_oversigt = false;
             vis_stream_oversigt = false;
+            streamoversigt.streamIntroStarted=false;
             vis_stream_or_movie_oversigt = false;
             do_show_tvgraber = false;
             do_show_setup_torrent = false;
@@ -5426,8 +5437,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_music_oversigt = false;
             musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = false;
+            film_oversigt.filmIntroStarted=false;
             vis_tv_oversigt = false;
             vis_stream_oversigt = false;
+            streamoversigt.streamIntroStarted=false;
             vis_spotify_oversigt=false;
             vis_tidal_oversigt = false;
             tidal_oversigt.tidalIntroStarted=false;
@@ -5473,16 +5486,20 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (id==29) {
               if (vis_film_oversigt) vis_film_oversigt=false;
               vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
+              film_oversigt.filmIntroStarted=false;
+              streamoversigt.streamIntroStarted=false;
             }
             // stream view
             if ((id==84) && (vis_stream_or_movie_oversigt)) {
               vis_stream_oversigt = true;
               vis_stream_or_movie_oversigt = false;
+              film_oversigt.filmIntroStarted=false;
             }
             // movie view
             if ((id==81) && (vis_stream_or_movie_oversigt)) {
               vis_film_oversigt = true;
               vis_stream_or_movie_oversigt = false;
+              streamoversigt.streamIntroStarted=false;
             }
           }
           //
@@ -5940,9 +5957,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               }
             }
           }
-
-
-
 
           
           //

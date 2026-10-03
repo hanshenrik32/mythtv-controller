@@ -221,6 +221,14 @@ class film_oversigt_typem : vlc_controller {
 
     std::string active_audiotrack_name();
     int active_audiotrack_id();
+
+    bool filmIntroStarted = false;
+    bool filmIntroFinished = false;
+    float filmIntroScrollStart = 0.0f;
+    std::chrono::steady_clock::time_point filmIntroStart;
+    void draw_stream_item1(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected,float introProgress = 1.0f);
+    void show_film_oversigt1(float _mangley,int filmnr);
+
 };
 
 #endif
