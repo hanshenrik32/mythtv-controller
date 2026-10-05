@@ -3122,6 +3122,9 @@ void display() {
                 if (result==FMOD_OK) {
                   result = sndsystem->playSound( sound,NULL,false, &channel);
                   musicoversigt.set_music_is_playing(true);
+                  radiooversigt.playing=false;
+                  tidal_oversigt.set_tidal_playing_flag(false);
+
                   ERRCHECK(result,do_play_music_aktiv_table_nr);
                   if (sndsystem) channel->setVolume(configsoundvolume);
 
@@ -3270,10 +3273,9 @@ void display() {
 
                 // save playlist flag to save it later 
                 save_ask_save_playlist=true;
-
                 musicoversigt.set_music_is_playing(false);
+                radiooversigt.playing=false;
                 tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
-                
                 // do_zoom_tidal_cover=true;                                       // show we play        
                 snd=1;
                 show_uv=true;
@@ -3333,6 +3335,7 @@ void display() {
                 // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
                 tidal_player_start_status = tidal_oversigt.tidal_play_now_song((char *) tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
                 musicoversigt.set_music_is_playing(false);
+                radiooversigt.playing=false;
                 tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
                 keybufferindex=0;
                 do_zoom_tidal_cover=true;                                       // show we play        
@@ -3563,6 +3566,8 @@ void display() {
             snd=1;
             radiooversigt.playingstationnr=rknapnr;
             radiooversigt.playing=true;                                 // set playing flag
+            musicoversigt.set_music_is_playing(false);
+            tidal_oversigt.set_tidal_playing_flag(false);
             do_play_radio=false;
           } else {
             // radiooversigt.set_radio_online(rknapnr-1,false);			// set radio til ofline (vis som rød)
@@ -4019,9 +4024,15 @@ void display() {
       fps = Frames / seconds;
       T0 = t;
       Frames = 0;
-      sprintf(temptxt,"FPS: %-4.0f \n", fps);
+      char temptxt111[2000];
+      sprintf(temptxt,"FPS: %-4.0f vis_radio_oversigt %d vis_music_oversigt %d vis_film_oversigt %d vis_tidal_oversigt %d vis_spotify_oversigt %d\n", fps, vis_radio_oversigt, vis_music_oversigt, vis_film_oversigt, vis_tidal_oversigt, vis_spotify_oversigt);
+      sprintf(temptxt111,"do_play_music_aktiv_table_nr %d radiooversigt.playing %d do_play_stream %d tidal_oversigt.tidal_is_playing %d do_play_recorded_aktiv_nr %d \n",do_play_music_aktiv_table_nr, radiooversigt.playing, do_play_stream, tidal_oversigt.get_tidal_playing_flag(), do_play_recorded_aktiv_nr);
+
+      renderer.AddTextureRect(0,big_search_bar,1, 1000, 1000, 100 ,1,1,1,1);
       renderer.AddText(&myfont,1, 1070 ,temptxt,1,1,1,1);
+      renderer.AddText(&myfont,1, 1050 ,temptxt111,1,1,1,1);
     }
+
     renderer.End();
     glutSwapBuffers();
 } // end display
@@ -5472,6 +5483,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if (channel)
                 channel->stop();
               snd=0;
+              radiooversigt.playing=false;
             }            
             if (id==23) {
               radiooversigt.onScroll(-11.25);
@@ -5845,6 +5857,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 do_stop_music_all=true;            // stop play music
               }
             }
+            radiooversigt.playing=false;
+            tidal_oversigt.set_tidal_playing_flag(false);
             if (result==0) do_shift_song=false;
             // write debug log
             sprintf(debuglogdata,"User Next song %s ",aktivplay_music_path);
@@ -6099,6 +6113,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         streamoversigt.playstream_url(streamoversigt.get_stream_url(sknapnr-1));
                       }
                     }
+                    tidal_oversigt.set_tidal_playing_flag(false);
+                    musicoversigt.set_music_is_playing(false);
                     // reset play function to new select
                     startstream = false;                      // start kun 1 instans
                     do_play_stream = false;                   //
@@ -6217,7 +6233,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
       } else if ((vis_spotify_oversigt) && (state==GLUT_UP)) {
         do_zoom_spotify_cover=!do_zoom_spotify_cover;
       } else if ((vis_radio_oversigt) && (state==GLUT_UP)) {
-        if (snd) do_zoom_radio_cover=!do_zoom_radio_cover;
+        if ((snd) && (radiooversigt.playing==true)) do_zoom_radio_cover=!do_zoom_radio_cover;
       } else if ((vis_music_oversigt) && (state==GLUT_UP)) {
         if (ask_open_dir_or_play_music==false) {
           if (snd) do_zoom_music_cover=!do_zoom_music_cover;
@@ -7777,7 +7793,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           }
           key=0;
         }
-
+ 
         // close setup windows again or close proram window.
         if (do_show_setup) {
           if (do_show_tvgraber) {
@@ -7944,6 +7960,14 @@ void handleKeypress(unsigned char key, int x, int y) {
           tidal_oversigt.do_setup_tidal_start_entry=false;
           key=0;
         } else key=0;
+        // reset all intro flags
+        film_oversigt.filmIntroStarted=false;
+        streamoversigt.streamIntroStarted=false;
+        tidal_oversigt.tidalIntroStarted=false;
+        radiooversigt.radioIntroStarted=false;
+        musicoversigt.musicIntroStarted=false;
+        streamoversigt.streamIntroStarted=false;
+        film_oversigt.filmIntroStarted=false;
         break;
       case '*':
         if (vis_spotify_oversigt) {
@@ -11897,7 +11921,7 @@ void datainfoloader_webserver_v2() {
     if (tidal_oversigt.do_update_tidal_start_entry) {
       tidal_oversigt.do_update_tidal_start_entry = false;
       // do_setup_tidal_start_entry=false;
-      tidal_oversigt.get_artist_from_file((char *) "",true,true);
+      tidal_oversigt.get_artist_from_file((char *) "",true,true,true);
     }
   }
 }
@@ -11995,7 +12019,7 @@ int main(int argc,char** argv) {
       printf("Token is ok.\n");
       if (checkartistdbexist()==false) {
         // File tidal_start_artistlists.txt
-        tidal_oversigt.get_artist_from_file((char *) "",true,true);
+        tidal_oversigt.get_artist_from_file((char *) "",true,true,true);
       }      
       tidal_oversigt.get_artist_from_file_and_update_for_editor((char *) "");
       tidal_oversigt.opdatere_tidal_oversigt(0);

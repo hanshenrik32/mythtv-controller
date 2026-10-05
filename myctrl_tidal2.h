@@ -124,10 +124,11 @@ class tidal_class {
     void process_value(json_value* value, int depth);
     void process_array(json_value* value, int depth);
 
-    int tidal_get_artists_all_albums(char *artistid,bool force,bool create_db_records);
+    int tidal_get_artists_all_albums(char *artistid,bool force,bool create_db_records,bool search_artist_name);
     int update_song_playcount(const char *playpath);
     void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id,Color4 c,int stream_key_selected);
   public:
+
     std::string tiddl_path="";                 // ="~/.local/bin/tiddl"; path is found by function run_tidal_dl()
     int setup_select_linie=0;
     bool tidal_stop_loader_thread=false;
@@ -304,7 +305,7 @@ class tidal_class {
     int get_users_playlist_plus_favorite(bool cleandb);
     void set_tidal_playing_flag(bool flag);    
     bool get_tidal_playing_flag();
-    int get_artist_from_file(char *filename, bool update_start_playlist,bool updatedb); // load artis playlists in db
+    int get_artist_from_file(char *filename, bool update_start_playlist,bool updatedb,bool search_artist_name); // load artis playlists in db
     int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                                  // play album
     int tidal_play_now_search_album(char *playlist_song,int tidalknapnr,bool now);                           // play album
     int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                                   // play song

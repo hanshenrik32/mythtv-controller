@@ -1503,7 +1503,7 @@ int tidal_class::save_tidal_artistlist(char *filename) {
 //
 // ****************************************************************************************
 
-int tidal_class::get_artist_from_file(char *filename, bool update_start_playlist,bool updatedb) {
+int tidal_class::get_artist_from_file(char *filename, bool update_start_playlist,bool updatedb,bool search_artist_name) {
   FILE *fp;
   char *artistidtxt=NULL;
   ssize_t read;
@@ -1521,7 +1521,7 @@ int tidal_class::get_artist_from_file(char *filename, bool update_start_playlist
       artistidtxt[strcspn(artistidtxt,"\n")]=0;                                   // remove \n from string
       if (artistidtxt) {
         if (*artistidtxt!='#') {
-          if (tidal_get_artists_all_albums((char *) artistidtxt,true,updatedb)) {
+          if (tidal_get_artists_all_albums((char *) artistidtxt,true,updatedb,search_artist_name)) {
             sleep(3);
           }
           if (update_start_playlist) tidal_start_playlist_array.push_back( artistidtxt );
@@ -2123,7 +2123,7 @@ std::string escapeSingleQuotesOss(const std::string& input) {
 // MAIN CALL
 //
 
-int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force,bool create_db_records) {
+int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force,bool create_db_records,bool search_artist_name) {
   int httpcode;
   std::string logdata;
   struct stat filestatus;
@@ -2187,7 +2187,12 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force,bool cre
             loadartist = true;
           }
         }
-        if ((loadartist || force) || (create_db_records==true)) {
+        //
+        // if search_artist_name is false then loadartist is true (load all albums by search string)
+        // if search_artist_name is true then loadartist is true if artist name is found in json file.
+        //
+        if (search_artist_name==false) loadartist=true;
+        if (loadartist) {
           try {
             printf("\n\nTidal File to load: %s \n ",tidal_artis_playlist_file.c_str());
             value = json_parse(file_contents,file_size);                                  // parser create value obj
@@ -3481,7 +3486,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
               myfile << artistid << "\n";
               myfile.close();
               // load aertist playlists
-              get_artist_from_file((char *) srtist_fname.c_str(),false,false);
+              get_artist_from_file((char *) srtist_fname.c_str(),false,false,true);
               // remove playlists file after process
               std::remove(srtist_fname.c_str());
               artistid="";
