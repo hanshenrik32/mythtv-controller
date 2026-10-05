@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <vector>
+#include <chrono>
 #include "json-parser/json.h"
 
 #include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod_common.h"
@@ -47,7 +48,6 @@ const int radiooptionsmax=40;				                 // mxa antal typer af radio st
 struct Color2 {
     float r, g, b, a;
 };
-
 
 
 class radiostation_class {
@@ -157,7 +157,14 @@ class radiostation_class {
     void process_object_radio(json_value* value, int depth);
     void process_array_radio(json_value* value, int depth);
     void process_value_radio(json_value* value, int depth,int x);
-    
+
+    bool radioIntroStarted = false;
+    bool radioIntroFinished = false;
+    float radioIntroScrollStart = 0.0f;
+    std::chrono::steady_clock::time_point radioIntroStart;
+
+    void draw_radio_item1(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress = 1.0f);
+    void show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 };
 
 #endif

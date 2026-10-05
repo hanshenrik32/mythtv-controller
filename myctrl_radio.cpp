@@ -829,6 +829,89 @@ void radiostation_class::drawcover(int x, int y, int w, int h, GLuint textureId,
 // *************************************************************************************
 
 
+
+void radiostation_class::draw_radio_item1(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress) {
+    if (ii < 0 || ii >= static_cast<int>(stack.size()))
+        return;
+    float p = std::clamp(introProgress, 0.0f, 1.0f);
+    if (p <= 0.0f)
+        return;
+    auto& station = stack[ii];
+    // ---- LOAD TEXTURE ----------------------------------------
+    if (!station.gfxfilename.empty() && station.textureId == 0 && !station.gfx_loaded) {
+        if (file_exists(station.gfxfilename.c_str())) {
+            station.textureId = loadTexture(
+                const_cast<char*>(station.gfxfilename.c_str())
+            );
+            station.gfx_loaded = (station.textureId != 0);
+        }
+    }
+
+    GLuint texture = station.textureId;
+
+    if (texture == 0)
+        texture = normal_icon ? normal_icon : empty_icon;
+
+    // ---- INTROANIMATION --------------------------------------
+    // Glid 60 pixels op med blød opbremsning.
+    float remaining = 1.0f - p;
+
+    float animatedY =
+        y + 60.0f * remaining * remaining * remaining;
+
+    // 85 % -> ca. 103 % -> 100 %.
+    const float overshoot = 2.6f;
+    float u = p - 1.0f;
+
+    float backEase =
+        1.0f +
+        (overshoot + 1.0f) * u * u * u +
+        overshoot * u * u;
+
+    float scale = 0.85f + 0.15f * backEase;
+
+    // Fade ind.
+    float alpha = std::clamp(p / 0.4f, 0.0f, 1.0f);
+    alpha = alpha * alpha * (3.0f - 2.0f * alpha);
+
+    // Behold din eksisterende markering.
+    bool selected = (ii == selected_icon_in_view);
+
+    float baseSize = selected ? 180.0f : 170.0f;
+    float size = baseSize * scale;
+
+    // Skalér omkring coverets centrum.
+    float coverX = x + 20.0f + (baseSize - size) * 0.5f;
+    float coverY = animatedY + 20.0f
+                 + (baseSize - size) * 0.5f;
+
+    renderer.AddTextureRect(
+        ii + 100,
+        texture,
+        coverX,
+        coverY,
+        size,
+        size,
+        1.0f, 1.0f, 1.0f, alpha
+    );
+
+    // ---- STATIONSNAVN ----------------------------------------
+    std::string text = fmt::format(
+        "{:^20}", station.station_name
+    );
+
+    // Behold dine eksisterende tekstplaceringer.
+    float textY = animatedY + (selected ? 200.0f : 210.0f);
+
+    renderer.AddText(
+        &myfont,
+        x + 20.0f,
+        textY,
+        text,
+        1.0f, 1.0f, 1.0f, alpha
+    );
+}
+
 void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   std::string temprgtxt;
   GLuint texture;
@@ -865,11 +948,126 @@ void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,
 }
 
 
+
 // *********************************************************************************************
 //
 // Show radio overview
 //
 // *********************************************************************************************
+
+void radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+  if (itemsPerRow <= 0 || rowHeight <= 0 || viewHeight <= 0)
+    return;
+  // ---- KINETIC SCROLL ---------------------------------------
+  scrollVel *= friction;
+  scrollPos += scrollVel;
+  if (std::fabs(scrollVel) < 0.01f)
+    scrollVel = 0.0f;
+  int count = static_cast<int>(stack.size());
+  int totalRows = (count + itemsPerRow - 1) / itemsPerRow;
+  float maxScroll = std::max(
+    0.0f,
+    totalRows * static_cast<float>(rowHeight) -
+    static_cast<float>(viewHeight)
+  );
+  if (scrollPos < 0.0f) {
+    scrollPos = 0.0f;
+    scrollVel = 0.0f;
+  } else if (scrollPos > maxScroll) {
+    scrollPos = maxScroll;
+    scrollVel = 0.0f;
+  }
+
+  if (stack.empty())
+    return;
+
+  // ---- GRID ------------------------------------------------
+  int firstRow = static_cast<int>(scrollPos / rowHeight);
+  int firstIndex = firstRow * itemsPerRow;
+
+  float subOff = std::fmod(
+    scrollPos,
+    static_cast<float>(rowHeight)
+  );
+  int visibleRows = static_cast<int>(std::ceil((static_cast<float>(viewHeight) + subOff) / static_cast<float>(rowHeight)));
+  int drawCount = std::min(
+    (visibleRows + 1) * itemsPerRow,
+    count - firstIndex
+  );
+  int introCount = std::min(
+    visibleRows * itemsPerRow,
+    count - firstIndex
+  );
+  if (drawCount <= 0 || introCount <= 0)
+    return;
+  int introRows = (introCount + itemsPerRow - 1) / itemsPerRow;
+  int introCols = std::min(itemsPerRow, introCount);
+  // ---- INTRO START -----------------------------------------
+  const auto now = std::chrono::steady_clock::now();
+  if (!radioIntroStarted) {
+    radioIntroStart = now;
+    radioIntroScrollStart = scrollPos;
+    radioIntroStarted = true;
+    radioIntroFinished = false;
+  }
+
+  float elapsed = std::chrono::duration<float>(now - radioIntroStart).count();
+  const float duration = 0.65f;
+  int maxWaveStep = (introRows - 1) + (introCols - 1);
+  float waveDelay = maxWaveStep > 0 ? std::min(0.05f, 0.35f / maxWaveStep) : 0.0f;
+  float introEnd = duration + maxWaveStep * waveDelay;
+  // Afslut introen ved scrolling.
+  if (elapsed >= introEnd || std::fabs(scrollPos - radioIntroScrollStart) > 0.5f) {
+    radioIntroFinished = true;
+  }
+  // ---- TEGN STATIONER ---------------------------------------
+  for (int i = 0; i < drawCount; ++i) {
+    int index = firstIndex + i;
+    int col = i % itemsPerRow;
+    int row = i / itemsPerRow;
+    float x = startX + col * itemWidth + 40.0f;
+    float y = startY + row * rowHeight - subOff - 20.0f;
+    float progress = 1.0f;
+    if (!radioIntroFinished) {
+      if (i >= introCount)
+          continue;
+      // Bølgen bevæger sig fra nederste højre
+      // mod øverste venstre.
+      int waveStep =
+          (introRows - 1 - row) +
+          (introCols - 1 - col);
+      float delay = waveStep * waveDelay;
+      progress = std::clamp(
+          (elapsed - delay) / duration,
+          0.0f,
+          1.0f
+      );
+    }
+    draw_radio_item1(x,y,index,normal_icon,normal_icon,playingstationnr,progress);
+  }
+  
+  if (stack.empty()) {
+    renderer.AddTextureRect(0,_texturemovieinfobox, 400, 400, 800, 200,1,1,1,1);
+    renderer.AddText(&myfont,600 ,500 ,"No Stations is Loaded.",1,1,1,1);
+  }
+  // show status
+  static int vis_timeout=420;
+  if (loading_status!=FMOD_OPENSTATE_READY) {
+    if (vis_timeout==0) loading_status=FMOD_OPENSTATE_READY;;
+    if (vis_timeout>0) vis_timeout--;
+    std::string temptxt;
+    renderer.AddTextureRect(0,_texturemovieinfobox, 400, 400, 600, 200,1,1,1,1);
+    if (loading_status==FMOD_OPENSTATE_LOADING) temptxt="Loading";
+    if (loading_status==FMOD_OPENSTATE_CONNECTING) temptxt="Connecting";
+    else if (loading_status==FMOD_OPENSTATE_BUFFERING) temptxt="Buffering";
+    else temptxt="Error Playing Station";
+    temptxt=temptxt + " ";
+    temptxt=temptxt + aktivplay_station_name;
+    renderer.AddText(&myfont,600 ,500 ,temptxt,1,1,1,1);
+  }
+  
+}
+
 
 
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {

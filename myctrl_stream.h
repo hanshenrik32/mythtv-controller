@@ -133,5 +133,17 @@ class stream_class : public vlc_controller {
     int playstream_url(char *path); // play by vlc
     void update_rss_nr_of_view(char *url);
     int get_play_status();
+
+    bool streamIntroStarted = false;
+    bool streamIntroFinished = false;
+
+    float streamIntroScrollStart = 0.0f;
+
+    std::chrono::steady_clock::time_point streamIntroStart;
+
+    void draw_stream_item1(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress = 1.0f);
+    void show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int stream_key_selected);
+
+
 };
 

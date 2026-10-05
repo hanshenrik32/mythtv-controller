@@ -811,7 +811,7 @@ void musicmeter_class::DrawAudioRing() {
         bassReduce = 1.0f;
 
       // float target = sqrtf(spectrum[i] * bassReduce * 128.0f) * 8.0f;
-      float target = log1pf(spectrum[i] * bassReduce * 80.0f) * 35.0f;
+      float target = log1pf((spectrum[i]/2.0f) * bassReduce * 80.0f) * 35.0f;
 
       // Hurtig op
       if (target > barHeight[i]) {

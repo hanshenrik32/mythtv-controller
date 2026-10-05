@@ -2,7 +2,7 @@ C = cc
 CC = g++
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS =  -Wno-format-truncation -pthread -m64 -std=c++17 -O0 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2 -Wregister
+CFLAGS =  -Wno-format-truncation -pthread -m64 -std=c++17 -ggdb -O0 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2 -Wregister
 LDFLAGS= 
 
 PROG       = mythtv-controller
