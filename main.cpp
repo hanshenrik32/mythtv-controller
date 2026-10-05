@@ -2284,7 +2284,7 @@ void display() {
       // show stream player control
       //
       // ******************************************************************************************************************
-      if ((vis_stream_oversigt) && (do_zoom_stream_cover)) {
+      if ((vis_stream_oversigt) && (do_zoom_stream_cover) && (stream_playnr>0)) {
         // renderer.AddTextureRect(0,_texturemusicplayer, config_menu.config_mediaplayer_infox,config_menu.config_mediaplayer_infoy, config_menu.config_mediaplayer_sizx, config_menu.config_mediaplayer_sizy,1,1,1,1);
         renderer.AddTextureRect(0,_texturemovieinfobox, config_menu.config_movieplayer_infox,config_menu.config_movieplayer_infoy, config_menu.config_movieplayer_sizx, config_menu.config_movieplayer_sizy,1,1,1,1);
         // play button
@@ -2294,15 +2294,15 @@ void display() {
         renderer.AddText(&myfont,450,26*18,"Name ",1,1,1,1);
         std::string tmptext;
         // show name
-        tmptext=streamoversigt.get_stream_name(sknapnr-1);
+        tmptext=streamoversigt.get_stream_name(stream_playnr);
         renderer.AddText(&myfont,450+120,26*18,tmptext,1,1,1,1);
         // show desc
         renderer.AddText(&myfont,450,26*19,"Desc ",1,1,1,1);
-        tmptext=streamoversigt.FeedCatalog[sknapnr-1].feed_desc;
+        tmptext=streamoversigt.FeedCatalog[stream_playnr].feed_desc;
         renderer.AddText(&myfont,450+120,26*19,tmptext,1,1,1,1);
         // show texture
-        if (streamoversigt.FeedCatalog[sknapnr-1].textureId) {
-          renderer.AddTextureRect(0,streamoversigt.FeedCatalog[sknapnr-1].textureId, config_menu.config_movieplayer_infox+540,config_menu.config_movieplayer_infoy+300, 220, 220,1,1,1,1);
+        if (streamoversigt.FeedCatalog[stream_playnr].textureId) {
+          renderer.AddTextureRect(0,streamoversigt.FeedCatalog[stream_playnr].textureId, config_menu.config_movieplayer_infox+540,config_menu.config_movieplayer_infoy+300, 220, 220,1,1,1,1);
         }
         // show status
         int playstatsus=streamoversigt.get_play_status();
@@ -12019,7 +12019,7 @@ int main(int argc,char** argv) {
       printf("Token is ok.\n");
       if (checkartistdbexist()==false) {
         // File tidal_start_artistlists.txt
-        tidal_oversigt.get_artist_from_file((char *) "",true,true,true);
+        tidal_oversigt.get_artist_from_file((char *) "",true,true,false);
       }      
       tidal_oversigt.get_artist_from_file_and_update_for_editor((char *) "");
       tidal_oversigt.opdatere_tidal_oversigt(0);

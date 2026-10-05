@@ -413,14 +413,18 @@ int stream_class::get_play_status() {
 const char *stream_class::get_stream_name(int nr) {
   if (FeedCatalog_search_view.size()==0) {
     if (nr<antal) {
-      return (FeedCatalog[nr].feed_name.c_str());
+      if (FeedCatalog[nr].feed_name.empty()) {
+        return "";
+      } else return (FeedCatalog[nr].feed_name.c_str());
     }
   } else {
     if (nr<FeedCatalog_search_view.size()) {
-      return (FeedCatalog_search_view[nr].feed_name.c_str());
+      if (FeedCatalog_search_view[nr].feed_name.empty()) {
+        return "";
+      } else return (FeedCatalog_search_view[nr].feed_name.c_str());
     }
   }
-  return NULL;
+  return "";
 }
 
 
@@ -473,7 +477,7 @@ void stream_class::update_rss_nr_of_view(char *url) {
 
 const char *stream_class::get_stream_desc(int nr) {
   if (FeedCatalog_search_view.size()==0) {
-    if (nr<antal) return (FeedCatalog[nr].feed_desc.c_str()); else return (NULL);
+    if (nr<antal) return (FeedCatalog[nr].feed_desc.c_str()); else return ("");
   } else  {
     if (nr<FeedCatalog_search_view.size()) return (FeedCatalog_search_view[nr].feed_desc.c_str()); else return (NULL);
   }
