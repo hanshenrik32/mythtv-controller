@@ -1627,88 +1627,64 @@ void stream_drawLinesOfTextfont(Font *font,const std::string& text, float x, flo
 }
 
 
+// ****************************************************************************************
+//
+// Funktion to draw stream item in screen.
+//
+// ****************************************************************************************
+
 void stream_class::draw_stream_item1(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress) {
-    if (ii < 0 || ii >= static_cast<int>(FeedCatalog.size()))
-        return;
-
-    float progress = std::max(
-        0.0f, std::min(introProgress, 1.0f)
-    );
-
-    if (progress <= 0.0f)
-        return;
-
-    auto& item = FeedCatalog[ii];
-
-    // ---- LOAD COVER ------------------------------------------
-    if (item.textureId == 0 && !item.feed_gfx_mythtv.empty()) {
-        if (file_exists(item.feed_gfx_mythtv.c_str())) {
-            item.textureId = loadTexture(
-                const_cast<char*>(item.feed_gfx_mythtv.c_str())
-            );
-        }
+  if (ii < 0 || ii >= static_cast<int>(FeedCatalog.size()))
+    return;
+  float progress = std::max(0.0f, std::min(introProgress, 1.0f));
+  if (progress <= 0.0f)
+    return;
+  auto& item = FeedCatalog[ii];
+  // ---- LOAD COVER ------------------------------------------
+  if (item.textureId == 0 && !item.feed_gfx_mythtv.empty()) {
+    if (file_exists(item.feed_gfx_mythtv.c_str())) {
+      item.textureId = loadTexture(const_cast<char*>(item.feed_gfx_mythtv.c_str()));
     }
+  }
+  GLuint fallback = normal_icon ? normal_icon : empty_icon;
+  GLuint texture = item.textureId ? item.textureId : fallback;
+  // ---- GLID OP ---------------------------------------------
+  float remaining = 1.0f - progress;
+  float animatedY = y + 60.0f * remaining * remaining * remaining;
+  // ---- ZOOM: 85 % -> ca. 103 % -> 100 % ----------------------
+  const float overshoot = 2.6f;
+  float u = progress - 1.0f;
+  float backEase = 1.0f + (overshoot + 1.0f) * u * u * u + overshoot * u * u;
+  float scale = 0.85f + 0.15f * backEase;
+  // ---- FADE ------------------------------------------------
+  float alpha = std::max(0.0f, std::min(progress / 0.4f, 1.0f));
+  alpha = alpha * alpha * (3.0f - 2.0f * alpha);
+  // Behold din eksisterende markering.
+  bool selected = (ii == selected_icon_in_view - 1);
+  float baseSize = selected ? 180.0f : 180.0f;
+  float size = baseSize * scale;
+  // Skalering omkring coverets centrum.
+  float coverX = x + 20.0f + (baseSize - size) * 0.5f;
+  float coverY = animatedY + 20.0f + (baseSize - size) * 0.5f;
+  renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,1.0f, 1.0f, 1.0f, alpha);
+  // ---- TITEL -----------------------------------------------
+  // Behold linjeombrydningen. Teksten flytter med coveret.
+  stream_drawLinesOfTextfont(&myfont,item.feed_name,x + 18.0f, animatedY + 218.0f, 18, 22, 2, 2, true);
+  if (selected) {
+      renderer.AddThickLine( x + 20.0f , animatedY + 18.0f, x + 202.0f, animatedY + 18.0f, 3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+      renderer.AddThickLine( x + 202.0f, animatedY + 18.0f, x + 202.0f, animatedY + 200.0f,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+      renderer.AddThickLine( x + 202.0f, animatedY + 200.0f, x + 20.0f ,animatedY + 200.0f,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+      renderer.AddThickLine( x + 20.0f , animatedY + 200.0f, x + 20.0f ,animatedY + 18.0f ,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+  }
 
-    GLuint fallback = normal_icon ? normal_icon : empty_icon;
-    GLuint texture = item.textureId ? item.textureId : fallback;
-
-    // ---- GLID OP ---------------------------------------------
-    float remaining = 1.0f - progress;
-
-    float animatedY =
-        y + 60.0f * remaining * remaining * remaining;
-
-    // ---- ZOOM: 85 % -> ca. 103 % -> 100 % ----------------------
-    const float overshoot = 2.6f;
-    float u = progress - 1.0f;
-
-    float backEase =
-        1.0f +
-        (overshoot + 1.0f) * u * u * u +
-        overshoot * u * u;
-
-    float scale = 0.85f + 0.15f * backEase;
-
-    // ---- FADE ------------------------------------------------
-    float alpha = std::max(
-        0.0f, std::min(progress / 0.4f, 1.0f)
-    );
-
-    alpha = alpha * alpha * (3.0f - 2.0f * alpha);
-
-    // Behold din eksisterende markering.
-    bool selected = (ii == selected_icon_in_view - 1);
-
-    float baseSize = selected ? 180.0f : 170.0f;
-    float size = baseSize * scale;
-
-    // Skalering omkring coverets centrum.
-    float coverX = x + 20.0f + (baseSize - size) * 0.5f;
-    float coverY = animatedY + 20.0f
-                 + (baseSize - size) * 0.5f;
-
-    renderer.AddTextureRect(
-        ii + 100,
-        texture,
-        coverX,
-        coverY,
-        size,
-        size,
-        1.0f, 1.0f, 1.0f, alpha
-    );
-
-    // ---- TITEL -----------------------------------------------
-    // Behold linjeombrydningen. Teksten flytter med coveret.
-    stream_drawLinesOfTextfont(
-        &myfont,
-        item.feed_name,
-        x + 18.0f,
-        animatedY + 210.0f,
-        18, 22, 2, 2, true
-    );
 }
 
 
+// ****************************************************************************************
+//
+// old
+//
+// ****************************************************************************************
 
 void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   GLuint texture;
@@ -1728,7 +1704,6 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
       }
     }
   }
-  
   if (FeedCatalog[ii].textureId)
     texture=FeedCatalog[ii].textureId;
   else texture=normal_icon;
@@ -1744,6 +1719,12 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   }
 }
 
+
+// ****************************************************************************************
+//
+// Funktion to draw stream overview in screen.
+//
+// ****************************************************************************************
 
 
 void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int stream_key_selected) {
@@ -1820,7 +1801,6 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
       // Bufferrækker venter, indtil introen er færdig.
       if (i >= introCount)
           continue;
-
       // Nederste højre først, øverste venstre sidst.
       int waveStep = (introRows - 1 - row) + (introCols - 1 - col);
       float delay = waveStep * waveDelay;

@@ -1993,7 +1993,7 @@ void display() {
           if (vis_stream_or_movie_oversigt) {
             renderer.AddTextureRect(3,_textureIdfilm_aktiv,config_menu.config_musicx,config_menu.config_musicy,iconsizex,iconsizex,1,1,1,1);
           } else {
-            renderer.AddTextureRect(84,streambutton,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
+            renderer.AddTextureRect(3,_textureIdfilm_aktiv,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
           }
         } else {
           glLoadName(80);           
@@ -2004,20 +2004,20 @@ void display() {
 
         }
       } else if (vis_spotify_oversigt) {
-        glLoadName(2);       
+        glLoadName(2);
         // printf("Show icon 2 3\n");                                                   // Info icon nr 82 spotify
-        renderer.AddTextureRect(2,spotifybutton1,config_menu.config_mediax,config_menu.config_mediay,iconsizex,iconsizex,1,1,1,1);
+        renderer.AddTextureRect(2,spotifybutton1,config_menu.config_tidal1x,config_menu.config_tidal1y,iconsizex,iconsizex,1,1,1,1); // config_mediay
       } else if (vis_tidal_oversigt) {
-        glLoadName(83);      
+        glLoadName(83);
         // printf("Show icon 2 4\n");                                                   // Info icon nr 83 tidal
         renderer.AddTextureRect(83,tidalbutton1,config_menu.config_tidal1x,config_menu.config_tidal1y,iconsizex,iconsizex,1,1,1,1);
       } else {
         if (vis_film_oversigt) {
-          glLoadName(3); 	
+          glLoadName(3);
           // printf("Show icon 2 5\n");		                                                    // film icon name 3
           // renderer.AddTextureRect(3,_textureIdfilm_aktiv,config_menu.config_musicx,config_menu.config_musicy,iconsizex,iconsizex,1,1,1,1);
         } else if (vis_stream_oversigt) {
-          glLoadName(3); 			 
+          glLoadName(3);
           // printf("Show stream icon 2 6\n");                                                   // film icon name 3
           renderer.AddTextureRect(3,streambutton,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
         } else if (vis_music_oversigt) {
@@ -5463,8 +5463,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             do_show_setup_torrent = false;
           }
 
-
-          
           // radio music tidal spotiy menu is enabled
           // vis_radio_or_music_oversigt
           if (vis_radio_or_music_oversigt) {
@@ -5499,12 +5497,19 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if (vis_film_oversigt) vis_film_oversigt=false;
               vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
               film_oversigt.filmIntroStarted=false;
+              tidal_oversigt.tidalIntroStarted=false;
+              radiooversigt.radioIntroStarted=false;
+              musicoversigt.musicIntroStarted=false;
               streamoversigt.streamIntroStarted=false;
             }
             // stream view
             if ((id==84) && (vis_stream_or_movie_oversigt)) {
               vis_stream_oversigt = true;
               vis_stream_or_movie_oversigt = false;
+              streamoversigt.streamIntroStarted=false;
+              tidal_oversigt.tidalIntroStarted=false;
+              radiooversigt.radioIntroStarted=false;
+              musicoversigt.musicIntroStarted=false;
               film_oversigt.filmIntroStarted=false;
             }
             // movie view
@@ -5512,6 +5517,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               vis_film_oversigt = true;
               vis_stream_or_movie_oversigt = false;
               streamoversigt.streamIntroStarted=false;
+              tidal_oversigt.tidalIntroStarted=false;
+              radiooversigt.radioIntroStarted=false;
+              musicoversigt.musicIntroStarted=false;
+              film_oversigt.filmIntroStarted=false;
             }
           }
           //
