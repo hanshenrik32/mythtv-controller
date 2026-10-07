@@ -2353,10 +2353,10 @@ void film_oversigt_typem::draw_stream_item1(float x,float y,int ii,GLuint normal
     renderer.AddThickLine( x + 20.0f , animatedY + 230.0f, x + 20.0f ,animatedY + 18.0f ,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
   }
   // ---- TITEL -----------------------------------------------
-  std::string text = fmt::format("{:<40}", film.getfilmtitle());
-  text.resize(40);
+  std::string formatedtext = fmt::format("{:<40}", film.getfilmtitle());
+  formatedtext.resize(40);
   // movie_drawLinesOfTextfont(Font *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center)  
-  movie_drawLinesOfTextfont(&myfont,text,x + 18.0f, animatedY + 248.0f, 18.0f, 21, 2, 2, true);
+  movie_drawLinesOfTextfont(&myfont,formatedtext,x + 18.0f, animatedY + 248.0f, 18.0f, 21, 2, 2, true);
 }
 
 
@@ -2395,11 +2395,12 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
     movie_drawcover(x + 18, y + 18, 174, 214, normal_icon ,ii+100,highcolor);
     if (texture!=normal_icon) movie_drawcover(x + 18 + 20, y + 18, 174 - 20, 214, texture ,ii+100,highcolor);
     renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
+    // movie_drawLinesOfTextfont(&myfont,temprgtxt,x + 18.0f, animatedY + 248.0f, 18.0f, 21, 2, 2, true);    
   } else {
     movie_drawcover(x + 18, y + 18, 174, 214, normal_icon ,ii+100,highcolor);
     if (texture!=normal_icon) movie_drawcover(x + 20 + 20 , y + 20, 170 - 20, 210, texture ,ii+100,normalcolor);
-    // renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
-    movie_drawLinesOfTextfont(&myfont,text,x + 18.0f, animatedY + 248.0f, 18.0f, 21, 2, 2, true);    
+    renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
+    // movie_drawLinesOfTextfont(&myfont,temprgtxt,x + 18.0f, animatedY + 248.0f, 18.0f, 21, 2, 2, true);    
   }
 }
 
