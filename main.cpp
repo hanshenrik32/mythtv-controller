@@ -57,6 +57,10 @@
 // type used
 using namespace std;
 
+static int movieWindow=0;
+static int mainWindow=0;
+bool movieWindowVisible = false;
+
 char systemcommand[8192];
 bool vis_error = false;
 int vis_error_timeout=0;
@@ -150,6 +154,8 @@ Font myfont_search_bar;
 fontctrl aktivfont;                                                             // font control (default aktiv font all over (if opencl))
 
 Renderer renderer;
+Renderer movieRenderer;
+
 // fontctrl aktivfont;                                                             // font control (default aktiv font all over (if opencl))
 wifinetdef wifinets;                            // wifi net class
 
@@ -543,6 +549,7 @@ char confighostip[256];				                          // this host ip adress
 char confighostwlanname[256];				                    // wlan netid name
 char confighostname[256];                               // this hostname
 char configdefaultplayer[256];				                  // default player
+std::string configdualscreen="no";             	        // default screen dual screen mode
 char configfontname[200];				                        // default ttf font name to load and use
 char configuse3deffect[20];			                      	// use 3d effects
 char configdefaultmusicpath[256];                       // internal db for music
@@ -2268,11 +2275,13 @@ void display() {
       // show movie playing. (play to texture)
       //
       // ******************************************************************************************************************
-
-      
       if (film_oversigt.film_is_playing) {
-        film_oversigt.show_vlc_frame();
-        if (aktiv_tv_oversigt.vis_tv_guide) {
+        if (movieWindow) {
+          film_oversigt.show_vlc_frame(true);
+        } else {
+          film_oversigt.show_vlc_frame(false);
+        }
+       if (aktiv_tv_oversigt.vis_tv_guide) {
           aktiv_tv_oversigt.fade=0.5f;
           aktiv_tv_oversigt.show_tv_oversigt( tvvalgtrecordnr , tvsubvalgtrecordnr , do_update_xmltv_show);
         } else aktiv_tv_oversigt.fade=0.8f;
@@ -2672,9 +2681,16 @@ void display() {
       do_zoom_tidal_cover=false;
       do_zoom_spotify_cover=false; 
       // start play movie
+
+      // if enable create new window for movie play (dual screen enabled)
+      
+      if (configdualscreen=="yes") {
+        ShowMovieWindow();
+      }
+      
       movie_play_status=film_oversigt.playmovie(fknapnr-1);
       if (movie_play_status==1) {
-        do_zoom_film_cover=false;
+        if (movieWindow && mainWindow) do_zoom_film_cover=true; else do_zoom_film_cover=false;
       } else {
         if (!(film_oversigt.libvlc_player_play())) {
           movie_play_status=-1;
@@ -4456,8 +4472,18 @@ void update2(int value) {
     if (code) std::free(code);
   }
   sndsystem->update();				        // run update on fmod sound system
-  glutTimerFunc(25, update2, 0);      // call again
-  glutPostRedisplay();
+  // glutTimerFunc(25, update2, 0);      // call again
+
+  if (mainWindow != 0) {
+    glutSetWindow(mainWindow);
+    glutPostRedisplay();
+  }
+  if (movieWindow != 0 && movieWindowVisible) {
+    glutSetWindow(movieWindow);
+    glutPostRedisplay();
+  }
+  if (mainWindow != 0) glutSetWindow(mainWindow);
+  glutTimerFunc(25, update2, 0);
 }
 
 
@@ -5547,6 +5573,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if ((id==9) && (aktiv_tv_oversigt.vis_tv_guide==false)) {
                 stopmovie=true;
                 do_zoom_film_cover=false;
+                HideMovieWindow();
               }
               // close windows again
               if ((id==3) && (aktiv_tv_oversigt.vis_tv_guide==false)) {
@@ -6731,6 +6758,15 @@ void handleKeypress(unsigned char key, int x, int y) {
         channel_list.channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list.channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
       }
     }
+    if (vis_tv_oversigt) {
+      if (key=='n') {
+        aktiv_tv_oversigt.visdato_unixtime=std::time(nullptr); // Hent nu tid
+        aktiv_tv_oversigt.dags_ofset=0;
+        aktiv_tv_oversigt.visdato_unixtime = aktiv_tv_oversigt.visdato_unixtime + (60*60*24);
+        aktiv_tv_oversigt.get_dr_proguide(aktiv_tv_oversigt.dags_ofset); // 0 = idag 1 = imorgen osv.
+        aktiv_tv_oversigt.opdatere_tv_oversigt((char *) "localhost",(char *) "mythtv",(char *) "bimmer");
+      }
+    }
 
     // gem key pressed in buffer
     if (keybufferindex<80) {
@@ -7444,15 +7480,6 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
           } else if (do_show_videoplayer) {
             // video player setting
-            if (do_show_setup_select_linie==0) {
-              if (key!=13) {
-                keybuffer[keybufferindex] = key;
-                keybufferindex++;
-                keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                keybuffer1.push_back(key);
-                // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
-              }
-            }
             // video player screen mode
             if (do_show_setup_select_linie==1) {
               if (key==32) {
@@ -8404,6 +8431,48 @@ void handleKeypress(unsigned char key, int x, int y) {
               fprintf(stderr,"Set aktiv font to %s \n",aktivfont.typeinfo[setupfontselectofset].fontname);
               strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
               aktivfont.selectfont(configfontname);
+            }
+
+            if (do_show_videoplayer) {
+              std::string svar="";
+              if (do_show_setup_select_linie==0) {
+                svar=film_oversigt.select_player();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                strcpy(configdefaultplayer, svar.c_str());
+              }
+              if (do_show_setup_select_linie==1) {
+                svar=film_oversigt.select_player_resolution();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="720p") {
+                  configdefaultplayer_screenmode=1;
+                } else if (svar=="720p") {
+                  configdefaultplayer_screenmode=2;
+                } else if (svar=="1080p") {
+                  configdefaultplayer_screenmode=3;
+                } else if (svar=="4K") {
+                  configdefaultplayer_screenmode=4;
+                }
+              }
+              if (do_show_setup_select_linie==2) {
+                svar=film_oversigt.select_enable_dual_screen_player();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="Dual Screen") configdualscreen="yes";
+                else if (svar=="Single Screen") configdualscreen="no";
+                else configdualscreen="no";
+              }
+              if (do_show_setup_select_linie==3) {
+                svar=film_oversigt.select_uv_screen_mode();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="None") {
+                  configuvmeter=0;
+                } if (svar=="Simple") {
+                  configuvmeter=1;
+                } if (svar=="Dual") {
+                  configuvmeter=2;
+                }else {
+                  configuvmeter=2;
+                }
+              }
             }
           }
           if (vis_recorded_oversigt) {
@@ -9393,6 +9462,10 @@ void handlespeckeypress(int key,int x,int y) {
                 if (do_show_setup_select_linie<11) do_show_setup_select_linie++;
               }
 
+              if (do_show_videoplayer) {
+                if (do_show_setup_select_linie<3) do_show_setup_select_linie++;
+              }
+
               // rss setup
               // setup rss source window
               if (do_show_setup_rss) {
@@ -9658,6 +9731,10 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                 }
 
+                if (do_show_videoplayer) {
+                  if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                }
+
                 // setup rss
                 if (do_show_setup_rss) {
                   if (rssstreamoversigt.setup_select_linie>0) rssstreamoversigt.setup_select_linie--;
@@ -9788,7 +9865,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath, \
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setdualscreen,setconfigdefaultmusicpath, \
                    setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize, \
                    streamfontsize,moviefontsize,tidalfontsize,spotifyfontsize,spotifydefaultdevice,starred_playlistname,startspotifyonboot,rssgraberupdate,trash_torrent_files,torrent_automove_file,torrent_download_path};
     int commandlength;
@@ -9887,6 +9964,10 @@ int parse_config(char *filename) {
               command = true;
               command_nr=setvideoplayer;
               commandlength=10;
+            } else if (strncmp(buffer+n,"dualscreen",9)==0) {
+              command = true;
+              command_nr=setdualscreen;
+              commandlength=9;
             } else if (strncmp(buffer+n,"debug",4)==0) {
               command_nr=setdebugmode;
               command = true;
@@ -10066,6 +10147,10 @@ int parse_config(char *filename) {
               if (strcmp(value,"")==0) strcpy(value,"internal");                               // set default player (internal vlc)
               strcpy(configvideoplayer,value);
               strcpy(configdefaultplayer,value);
+            }
+            // set dual screen mode
+            else if (command_nr==setdualscreen) {
+              if (strcmp(value,"yes")==0) configdualscreen="yes"; else configdualscreen="no";
             }
             // sound port
             else if (command_nr==setsoundoutport) {
@@ -10253,6 +10338,8 @@ int save_config(char * filename) {
     fputs(temp,file);
     snprintf(temp,sizeof(temp),"videoplayer=%s\n",configdefaultplayer);
     fputs(temp,file);
+    snprintf(temp,sizeof(temp),"dualscreen=%s\n",configdualscreen.c_str());
+    fputs(temp,file);
     snprintf(temp,sizeof(temp),"configdefaultmusicpath=%s\n",configdefaultmusicpath);
     fputs(temp,file);
     snprintf(temp,sizeof(temp),"configdefaultmoviepath=%s\n",configdefaultmoviepath);
@@ -10351,6 +10438,7 @@ void load_config(char * filename) {
   }
   */
   strcpy(configdefaultplayer,"internal");	                 	// default sound player (fmod) (default) movie player
+  configdualscreen="yes";	                 	                // default screen dual screen mode
   strcpy(configclosemythtvfrontend,"no");		                // close mythtv frontend
   strcpy(configscreensavertimeout,"30");	                 	// default screensaver timeout
   strcpy(configsoundoutport,"SPDIF");			                  // default sound interface
@@ -11955,6 +12043,100 @@ void opdate_threadfunction() {
 
 
 
+// ***************************************************************************
+//
+// Draw the movie window
+//
+// ***************************************************************************
+
+
+void DrawMovieWindow() {
+    // 1. Upload seneste VLC-frame til movieTexture.
+    // Brug din eksisterende mutex + newFrame-håndtering.
+    // glTexSubImage2D(...) skal udføres her på OpenGL-tråden.
+    // 2. Tegn filmen.
+    // movieRenderer.AddTextureRect(-1,movieTexture, 0, 0, 1920, 1080,1, 1, 1, 1);
+    // Færdiggør filmen før overlayet.
+    
+    // movieRenderer.Flush();
+    // 3. Tegn din egen grafik oven på filmen.
+    // Brug fonts og textures oprettet i dette vindues context.
+    //
+    // movieRenderer.AddText(...);
+    // movieRenderer.AddRect(...);
+    // movieRenderer.AddTextureRect(-1,movietexture, 0, 0, 1920, 1080,1, 1, 1, 1);
+    glViewport(0, 0,glutGet(GLUT_WINDOW_WIDTH),glutGet(GLUT_WINDOW_HEIGHT));
+    // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // glClear(GL_COLOR_BUFFER_BIT);
+    // glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_CULL_FACE);
+    // glDisable(GL_SCISSOR_TEST);
+    film_oversigt.show_vlc_frame(false);
+
+    // Tegn din egen grafik oven på filmen her:
+    // renderer.AddText(...);
+    // renderer.AddRect(...);
+
+    renderer.Flush();
+    glutSwapBuffers();
+}
+
+
+// ***************************************************************************
+//
+// create the movie window then needed
+//
+// ***************************************************************************
+
+void ShowMovieWindow() {
+  if (movieWindow == 0) {
+      glutSetWindow(mainWindow);
+      // Genbrug den i filmvinduet.
+      glutSetOption(GLUT_RENDERING_CONTEXT,GLUT_USE_CURRENT_CONTEXT);
+      glutInitWindowPosition(1920, 0);
+      glutInitWindowSize(1920, 1080);
+      movieWindow = glutCreateWindow("Film");
+      // Vinduets OpenGL-context er nu aktiv.
+      // Initialiser her:
+      // - GLEW
+      // - movieRenderer
+      // - movieTexture
+      // - fonts og overlay-textures
+      glutSetOption(GLUT_RENDERING_CONTEXT,GLUT_CREATE_NEW_CONTEXT);
+      glutDisplayFunc(DrawMovieWindow);
+      // Registrer også reshape-, tastatur- og muse-callbacks
+      // til filmvinduet, hvis du bruger dem.
+  } else {
+      glutSetWindow(movieWindow);
+      glutShowWindow();
+  }
+  movieWindowVisible = true;
+  glutPostRedisplay();
+  glutSetWindow(mainWindow);
+}
+
+
+// ***************************************************************************
+//
+// Hide the movie window
+//
+// ***************************************************************************
+
+void HideMovieWindow() {
+  movieWindowVisible = false;
+  if (movieWindow != 0) {
+    glutSetWindow(movieWindow);
+    glutHideWindow();
+  }
+  glutSetWindow(mainWindow);
+}
+
+// ***************************************************************************
+//
+// Main function
+//
+// ***************************************************************************
+
 int main(int argc,char** argv) {
     int dircreatestatus;
     const char *build_str = __DATE__;
@@ -12041,7 +12223,15 @@ int main(int argc,char** argv) {
     glutInit(&argc,argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(1920,1080);
-    glutCreateWindow("Mythtv-Controller");
+    mainWindow=glutCreateWindow("Mythtv-Controller");
+    glutDisplayFunc(display);                           // main loop func
+    
+    /*
+    glutInitWindowPosition(1920, 0);
+    glutInitWindowSize(1920, 1080);
+    movieWindow = glutCreateWindow("Film");
+    glutDisplayFunc(DrawMovieWindow);
+    */
     //
     // Start GLEW efter OpenGL context
     //
@@ -12115,13 +12305,16 @@ int main(int argc,char** argv) {
 
     film_oversigt.vlc_initOpenGL();
 
-    glutDisplayFunc(display);                           // main loop func
+    // glutDisplayFunc(display);                           // main loop func
+    // glutDisplayFunc(DrawMovieWindow);
+
     glutIdleFunc(idle);
     glutMouseFunc(handleMouse);                         // setup mousehandler
     glutMotionFunc(mouseMotion);                        // mouse
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
     glutSpecialFunc(handlespeckeypress);              // setup spacial key handler
     glutTimerFunc(25, update2, 0);                      // set start loop
+
 
     // start main loop now
     glutMainLoop();

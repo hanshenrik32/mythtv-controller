@@ -184,6 +184,9 @@ void loadgfx();
 void freegfx();
 void show_background();
 
+void ShowMovieWindow();
+void HideMovieWindow();
+
 // start (button)
 //
 float uvcolortable2[]={0.8,0.0,0.8, \

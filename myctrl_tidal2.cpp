@@ -4188,7 +4188,7 @@ int run_tidal_dl(const std::string& playlist_song) {
     tidal_oversigt.tiddl_path=exec("/bin/find ~/ -perm -g=x -type f -name tiddl");
     if (tidal_oversigt.tiddl_path=="") {
       perror("tiddl is not installed/found.");
-      write_logfile(logfile,"tiddl is not installed/found.");
+      write_logfile(logfile,(char *) "tiddl is not installed/found.");
     }
   }
   std::string url = "https://listen.tidal.com/album/" + playlist_song;

@@ -119,6 +119,7 @@ struct configkeytype configkeyslayout[12];			// functions keys startfunc
 extern char configuse3deffect[20];
 // extern char configvideoplayer[200];             // default video player
 extern char configdefaultplayer[200];
+extern std::string configdualscreen;
 extern int configdefaultplayer_screenmode;
 extern int configland;
 extern char *configlandsprog[];
@@ -685,26 +686,39 @@ void show_setup_video() {
   renderer.AddText(&myfont,xpos + 100 ,ypos + 150 ,"Videoplayer",1,1,1,1);
   renderer.AddText(&myfont,xpos + 240 ,ypos + 150 ,(char *) configdefaultplayer,1,1,1,1);
   renderer.AddText(&myfont,xpos + 100 ,ypos + 150+(1*18) ,"Player resolution",1,1,1,1);
-  renderer.AddText(&myfont,xpos + 100 ,ypos + 150+(2*18) ,"UV Meter mode",1,1,1,1);
   switch(configdefaultplayer_screenmode) {
-      case 1: text = "1024 x 768 (720p)";
-              break;
-      case 2: text = "1280 x 1024 (720p)";
-              break;
-      case 3: text = "1920 x 1080 (1080p)";
-              break;
-      case 4: text = "1360 x 768";
-              break;
-      default:text = "1024 x 768 (720p)";
-              break;
+    case 1: text = "1024 x 768 (720p)";
+            break;    
+    case 2: text = "1024 x 768 (720p)";
+            break;
+    case 3: text = "1920 x 1080 (1080p)";
+            break;
+    case 4: text = "3840 x 2160 (4K)";
+            break;
+    default:text = "1920 x 1080 (1080p)";
+            break;
   }
   renderer.AddText(&myfont,xpos + 240 ,ypos + 150 + (1*18) ,text,1,1,1,1);
 
+  renderer.AddText(&myfont,xpos + 100 ,ypos + 150 + (2*18) ,"Dual screen",1,1,1,1);
+  renderer.AddText(&myfont,xpos + 240 ,ypos + 150 + (2*18) ,configdualscreen,1,1,1,1);
+  
+  renderer.AddText(&myfont,xpos + 100 ,ypos + 150 + (3*18) ,"UV Meter mode",1,1,1,1);
   if (configuvmeter==0) text = "None";
   if (configuvmeter==1) text = "Simple";
   if (configuvmeter==2) text = "Dual";  
   if (configuvmeter>2) text = "None";
-  renderer.AddText(&myfont,xpos + 240 ,ypos + 150+(2*18) ,text,1,1,1,1);
+  renderer.AddText(&myfont,xpos + 240 ,ypos + 150+(3*18) ,text,1,1,1,1);
+  switch(do_show_setup_select_linie) {
+    case 0: showcoursornow(xpos + 240 ,ypos + 132 + (0*18),0);
+            break;
+    case 1: showcoursornow(xpos + 240 ,ypos + 132 + (1*18),0);
+            break;
+    case 2: showcoursornow(xpos + 240 ,ypos + 132 + (2*18),0);
+            break;
+    case 3: showcoursornow(xpos + 240 ,ypos + 132 + (3*18),0);
+            break;
+}
 }
 
 

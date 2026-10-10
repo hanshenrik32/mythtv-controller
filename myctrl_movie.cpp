@@ -26,6 +26,7 @@
 
 
 extern Renderer renderer;
+extern Renderer movieRenderer;
 
 extern Font myfont;
 extern Font myfont2;
@@ -574,8 +575,14 @@ void film_oversigt_typem::vlsupdateTexture() {
 
 // show video frams (playback texture)
 
-void film_oversigt_typem::show_vlc_frame() {
-  renderer.AddVideoTextureRect( 0, getVideoTexture(), 0, 0,1920, 1080, 1,1,1,1);
+void film_oversigt_typem::show_vlc_frame(bool moviewindow) {
+  if (moviewindow) {
+    // std::cout << "new movie window" << endl;
+    movieRenderer.AddVideoTextureRect( 0, getVideoTexture(), 0, 0,1920, 1080, 1,1,1,1);
+  } else {
+    // std::cout << "normal movie window" << endl;
+    renderer.AddVideoTextureRect( 0, getVideoTexture(), 0, 0,1920, 1080, 1,1,1,1);
+  }
 }
 
 
@@ -831,6 +838,115 @@ std::string film_oversigt_typem::select_file_name(std::string startpath) {
   return(filename);
 }
 
+
+// ****************************************************************************************
+//
+// select movieplayer
+//
+// ****************************************************************************************
+
+
+std::string film_oversigt_typem::select_player() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg player\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  TRUE \"Internal\" \
+  FALSE \"mpv\" \
+  FALSE \"mplayer\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ****************************************************************************************
+//
+// select movieplayer
+//
+// ****************************************************************************************
+
+
+std::string film_oversigt_typem::select_player_resolution() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg player\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"720p\" \
+  TRUE \"1080p\" \
+  FALSE \"4K\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ****************************************************************************************
+//
+// select movieplayer
+//
+// ****************************************************************************************
+
+
+std::string film_oversigt_typem::select_enable_dual_screen_player() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg player mode\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  TRUE \"Single Screen\" \
+  FALSE \"Dual Screen\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ****************************************************************************************
+//
+// select uv mode
+//
+// ****************************************************************************************
+
+std::string film_oversigt_typem::select_uv_screen_mode() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"UV Meter mode\" --radiolist --column=\"Vælg\" --column=\"Mode\" \
+  FALSE \"None\" \
+  FALSE \"Simple\" \
+  TRUE \"Dual\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
 
 
 
