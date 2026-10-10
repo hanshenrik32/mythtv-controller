@@ -12065,8 +12065,6 @@ void OnMovieWindowClose() {
     movieWindowVisible = false;
     movieWindow = 0;
     film_oversigt.stopmovie();
-    // Kald din eksisterende stopfunktion her,
-    // hvis filmen og lyden også skal stoppes.
     // Slet ikke rendererens fælles shaders/textures her.
 }
 
@@ -12082,32 +12080,13 @@ void DrawMovieWindow() {
     // Brug din eksisterende mutex + newFrame-håndtering.
     // glTexSubImage2D(...) skal udføres her på OpenGL-tråden.
     // 2. Tegn filmen.
-    // movieRenderer.AddTextureRect(-1,movieTexture, 0, 0, 1920, 1080,1, 1, 1, 1);
-    // Færdiggør filmen før overlayet.
-    
-    // movieRenderer.Flush();
-    // 3. Tegn din egen grafik oven på filmen.
-    // Brug fonts og textures oprettet i dette vindues context.
-    //
-    // movieRenderer.AddText(...);
-    // movieRenderer.AddRect(...);
-    // movieRenderer.AddTextureRect(-1,movietexture, 0, 0, 1920, 1080,1, 1, 1, 1);
     glViewport(0, 0,glutGet(GLUT_WINDOW_WIDTH),glutGet(GLUT_WINDOW_HEIGHT));
-    // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    // glClear(GL_COLOR_BUFFER_BIT);
     // glDisable(GL_DEPTH_TEST);
-    // glDisable(GL_CULL_FACE);
-    // glDisable(GL_SCISSOR_TEST);
     film_oversigt.show_vlc_frame(false);
-
+    // Status overlay
     if ((film_oversigt.film_is_playing) && (do_show_film_status_info)) {
       DrawMovieStatusInfo();
     }
-    
-    // Tegn din egen grafik oven på filmen her:
-    // renderer.AddText(...);
-    // renderer.AddRect(...);
-
     renderer.Flush();
     glutSwapBuffers();
 }
