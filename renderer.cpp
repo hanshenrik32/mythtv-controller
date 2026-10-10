@@ -9,7 +9,7 @@
 FT_Face face;
 
 
-bool Font::Load(const char *filename, int pixelsize) {
+bool MFont::Load(const char *filename, int pixelsize) {
     FT_Library ft;
     if(FT_Init_FreeType(&ft))
         return false;
@@ -215,7 +215,7 @@ void MakeProjection(float width,float height,float* m) {
 // ****************************************************************************************
 
 
-float Renderer::GetTextWidth(Font* font, const std::string& text) {
+float Renderer::GetTextWidth(MFont* font, const std::string& text) {
     if (!font)
         return 0.0f;
     float width = 0.0f;
@@ -429,7 +429,7 @@ void Renderer::AddFilledLine(float x1,float y1, float x2,float y2, float width, 
 // Draw text
 // works
 
-void Renderer::AddText(Font *font, float x, float y, const std::string &text, float r,float g,float b,float a) {
+void Renderer::AddText(MFont *font, float x, float y, const std::string &text, float r,float g,float b,float a) {
     float xpos = x;
     for(unsigned char c : text) {
         if (c >=128)

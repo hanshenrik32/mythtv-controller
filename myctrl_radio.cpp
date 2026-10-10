@@ -37,8 +37,8 @@ extern char configmysqlhost[256];                              //
 extern char configmusicpath[256];
 extern char localuserhomedir[4096];                                    // user homedir set in main
 
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 extern int radiooversigt_antal;
 extern bool do_zoom_radio_cover;

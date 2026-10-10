@@ -71,9 +71,9 @@ bool tidal_all_type_of_playes = false;
 // extern mFont font18;  // 18px font
 // extern mFont font24;  // 24px font
 
-extern Font myfont;
-extern Font myfont2;
-extern Font myfont_search_bar;
+extern MFont myfont;
+extern MFont myfont2;
+extern MFont myfont_search_bar;
 
 
 extern GLuint playing_tidal_icon_texture;
@@ -516,7 +516,7 @@ int Get_albums_by_artist() {
 //
 // ****************************************************************************************
 
-void drawLinesOfTextfont(Font *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
+void drawLinesOfTextfont(MFont *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
   std::istringstream stream(text);
   std::string word;
   std::string currentLine;
@@ -4188,7 +4188,7 @@ int run_tidal_dl(const std::string& playlist_song) {
     tidal_oversigt.tiddl_path=exec("/bin/find ~/ -perm -g=x -type f -name tiddl");
     if (tidal_oversigt.tiddl_path=="") {
       perror("tiddl is not installed/found.");
-      write_logfile(logfile,"tiddl is not installed/found.");
+      write_logfile(logfile,(char *) "tiddl is not installed/found.");
     }
   }
   std::string url = "https://listen.tidal.com/album/" + playlist_song;

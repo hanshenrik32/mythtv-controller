@@ -41,9 +41,9 @@ extern bool do_show_torrent_options_move;
 extern float do_move_torrent_file_now_done;               // is it running now
 extern std::string do_show_load__torrent_file_string;
 
-extern Font myfont_torrent_overskrift;
-extern Font myfont;
-extern Font myfont_torrent_list;
+extern MFont myfont_torrent_overskrift;
+extern MFont myfont;
+extern MFont myfont_torrent_list;
 
 // ****************************************************************************************
 //

@@ -41,8 +41,8 @@
 extern config_icons config_menu;
 
 extern Renderer renderer;
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 // web port
 static const char *s_http_port = "8000";

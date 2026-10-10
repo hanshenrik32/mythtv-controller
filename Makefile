@@ -63,7 +63,7 @@ SRCS = main.cpp renderer.cpp shader.cpp utility.cpp readjpg.cpp myctrl_readwebfi
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp 
+	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp -lX11
 endif
 
 all:

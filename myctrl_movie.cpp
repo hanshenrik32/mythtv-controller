@@ -26,9 +26,10 @@
 
 
 extern Renderer renderer;
+extern Renderer movieRenderer;
 
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 
 //extern mFont font12;  // 12px font
@@ -574,8 +575,14 @@ void film_oversigt_typem::vlsupdateTexture() {
 
 // show video frams (playback texture)
 
-void film_oversigt_typem::show_vlc_frame() {
-  renderer.AddVideoTextureRect( 0, getVideoTexture(), 0, 0,1920, 1080, 1,1,1,1);
+void film_oversigt_typem::show_vlc_frame(bool moviewindow) {
+  if (moviewindow) {
+    // std::cout << "new movie window" << endl;
+    movieRenderer.AddVideoTextureRect( 0, getVideoTexture(), 0, 0,1920, 1080, 1,1,1,1);
+  } else {
+    // std::cout << "normal movie window" << endl;
+    renderer.AddVideoTextureRect( 0, getVideoTexture(), 0, 0,1920, 1080, 1,1,1,1);
+  }
 }
 
 
@@ -831,6 +838,115 @@ std::string film_oversigt_typem::select_file_name(std::string startpath) {
   return(filename);
 }
 
+
+// ****************************************************************************************
+//
+// select movieplayer
+//
+// ****************************************************************************************
+
+
+std::string film_oversigt_typem::select_player() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg player\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  TRUE \"Internal\" \
+  FALSE \"mpv\" \
+  FALSE \"mplayer\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ****************************************************************************************
+//
+// select movieplayer
+//
+// ****************************************************************************************
+
+
+std::string film_oversigt_typem::select_player_resolution() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg player\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"720p\" \
+  TRUE \"1080p\" \
+  FALSE \"4K\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ****************************************************************************************
+//
+// select movieplayer
+//
+// ****************************************************************************************
+
+
+std::string film_oversigt_typem::select_enable_dual_screen_player() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Vælg player mode\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  TRUE \"Single Screen\" \
+  FALSE \"Dual Screen\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ****************************************************************************************
+//
+// select uv mode
+//
+// ****************************************************************************************
+
+std::string film_oversigt_typem::select_uv_screen_mode() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"UV Meter mode\" --radiolist --column=\"Vælg\" --column=\"Mode\" \
+  FALSE \"None\" \
+  FALSE \"Simple\" \
+  TRUE \"Dual\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
 
 
 
@@ -2102,7 +2218,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
 }
 
 
-void movie_drawLinesOfTextfont(Font *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
+void movie_drawLinesOfTextfont(MFont *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
   std::istringstream stream(text);
   std::string word;
   std::string currentLine;
@@ -2210,6 +2326,11 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 
 // All new versions 2 *****************************************************************************************************************
 
+
+
+
+
+
 // ****************************************************************************************
 //
 // get text width
@@ -2292,77 +2413,76 @@ void film_oversigt_typem::draw_stream_search_item(int x, int y,int ii,GLuint nor
 // ****************************************************************************************
 
 void film_oversigt_typem::draw_stream_item1(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress) {
-    if (ii < 0 || ii >= static_cast<int>(filmoversigt.size()))
-      return;
-    float progress = std::max(0.0f, std::min(introProgress, 1.0f));
-    if (progress <= 0.0f)
-      return;
-    auto& film = filmoversigt[ii];
-    // ---- LOAD COVER ------------------------------------------
-    std::string gfxfilename = film.getfilmcoverfile();
-    if (film.gettextureid() == 0 && !gfxfilename.empty()) {
-      if (file_exists(gfxfilename.c_str())) {
-        film.settextureid(loadTexture(const_cast<char*>(gfxfilename.c_str())));
-      }
+  if (ii < 0 || ii >= static_cast<int>(filmoversigt.size()))
+    return;
+  float progress = std::max(0.0f, std::min(introProgress, 1.0f));
+  if (progress <= 0.0f)
+    return;
+  auto& film = filmoversigt[ii];
+  // ---- LOAD COVER ------------------------------------------
+  std::string gfxfilename = film.getfilmcoverfile();
+  if (film.gettextureid() == 0 && !gfxfilename.empty()) {
+    if (file_exists(gfxfilename.c_str())) {
+      film.settextureid(loadTexture(const_cast<char*>(gfxfilename.c_str())));
     }
-    GLuint background = normal_icon ? normal_icon : empty_icon;
-    GLuint texture = film.gettextureid();
-    if (texture == 0) texture = background;
-    // ---- GLID OP ---------------------------------------------
-    float remaining = 1.0f - progress;
-    float animatedY = y + 60.0f * remaining * remaining * remaining;
-    // ---- ZOOM: 85 % -> ca. 103 % -> 100 % ----------------------
-    const float overshoot = 2.6f;
-    float u = progress - 1.0f;
-    float backEase = 1.0f + (overshoot + 1.0f) * u * u * u + overshoot * u * u;
-    float scale = 0.85f + 0.15f * backEase;
-    // ---- FADE ------------------------------------------------
-    float alpha = std::max(0.0f, std::min(progress / 0.4f, 1.0f));
-    alpha = alpha * alpha * (3.0f - 2.0f * alpha);
-    bool selected = (ii == selected_icon_in_view - 1);
-    // ---- FÆLLES CENTRUM FOR DVD OG COVER ----------------------
-    const float baseWidth = 174.0f;
-    const float baseHeight = 214.0f;
-    float frameX = x + 18.0f;
-    float frameY = animatedY + 18.0f;
-    float centerX = frameX + baseWidth * 0.5f;
-    float centerY = frameY + baseHeight * 0.5f;
-    // Alle lag skaleres omkring samme centrum.
-    auto drawLayer = [&](GLuint layerTexture,float layerX,float layerY,float layerWidth,float layerHeight) {
-        renderer.AddTextureRect(ii + 100,layerTexture,centerX + (layerX - centerX) * scale,centerY + (layerY - centerY) * scale,layerWidth * scale,layerHeight * scale,1.0f, 1.0f, 1.0f, alpha);
-    };
-    // DVD-baggrund.
-    drawLayer(background,frameX,frameY,baseWidth,baseHeight);
-    // Filmcover med samme placering og størrelse som før.
-    if (texture != background) {
-      if (selected) {
-        drawLayer(texture,x + 40.0f,animatedY + 20.0f,152.0f,214.0f);
-      } else {
-        drawLayer(texture,x + 40.0f,animatedY + 20.0f,152.0f,214.0f);
-      }
-    }
+  }
+  GLuint background = normal_icon ? normal_icon : empty_icon;
+  GLuint texture = film.gettextureid();
+  if (texture == 0) texture = background;
+  // ---- GLID OP ---------------------------------------------
+  float remaining = 1.0f - progress;
+  float animatedY = y + 60.0f * remaining * remaining * remaining;
+  // ---- ZOOM: 85 % -> ca. 103 % -> 100 % ----------------------
+  const float overshoot = 2.6f;
+  float u = progress - 1.0f;
+  float backEase = 1.0f + (overshoot + 1.0f) * u * u * u + overshoot * u * u;
+  float scale = 0.85f + 0.15f * backEase;
+  // ---- FADE ------------------------------------------------
+  float alpha = std::max(0.0f, std::min(progress / 0.4f, 1.0f));
+  alpha = alpha * alpha * (3.0f - 2.0f * alpha);
+  bool selected = (ii == selected_icon_in_view - 1);
+  // ---- FÆLLES CENTRUM FOR DVD OG COVER ----------------------
+  const float baseWidth = 174.0f;
+  const float baseHeight = 214.0f;
+  float frameX = x + 18.0f;
+  float frameY = animatedY + 18.0f;
+  float centerX = frameX + baseWidth * 0.5f;
+  float centerY = frameY + baseHeight * 0.5f;
+  // Alle lag skaleres omkring samme centrum.
+  auto drawLayer = [&](GLuint layerTexture,float layerX,float layerY,float layerWidth,float layerHeight) {
+      renderer.AddTextureRect(ii + 100,layerTexture,centerX + (layerX - centerX) * scale,centerY + (layerY - centerY) * scale,layerWidth * scale,layerHeight * scale,1.0f, 1.0f, 1.0f, alpha);
+  };
+  // DVD-baggrund.
+  drawLayer(background,frameX,frameY,baseWidth,baseHeight);
+  // Filmcover med samme placering og størrelse som før.
+  if (texture != background) {
     if (selected) {
-      renderer.AddThickLine( x + 20.0f , animatedY + 18.0f, x + 192.0f, animatedY + 18.0f, 3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-      renderer.AddThickLine( x + 192.0f, animatedY + 18.0f, x + 192.0f, animatedY + 230.0f,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-      renderer.AddThickLine( x + 192.0f, animatedY + 230.0f, x + 20.0f ,animatedY + 230.0f,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-      renderer.AddThickLine( x + 20.0f , animatedY + 230.0f, x + 20.0f ,animatedY + 18.0f ,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+      drawLayer(texture,x + 40.0f,animatedY + 20.0f,152.0f,214.0f);
+    } else {
+      drawLayer(texture,x + 40.0f,animatedY + 20.0f,152.0f,214.0f);
     }
-    // ---- TITEL -----------------------------------------------
-    std::string text = fmt::format("{:^20}", film.getfilmtitle());
-    // Begræns til 20 UTF-8-tegn uden at klippe midt i et tegn.
-    std::size_t pos = 0;
-    int characters = 0;
-    while (pos < text.size() && characters < 20) {
-      ++pos;
-      while (pos < text.size() && (static_cast<unsigned char>(text[pos]) & 0xC0) == 0x80) {
-        ++pos;
-      }
-      ++characters;
-    }
-    text.resize(pos);
-    renderer.AddText(&myfont,x + 20.0f,animatedY + 250.0f,text,1.0f, 1.0f, 1.0f, alpha);
+  }
+  if (selected) {
+    renderer.AddThickLine( x + 20.0f , animatedY + 18.0f, x + 192.0f, animatedY + 18.0f, 3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+    renderer.AddThickLine( x + 192.0f, animatedY + 18.0f, x + 192.0f, animatedY + 230.0f,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+    renderer.AddThickLine( x + 192.0f, animatedY + 230.0f, x + 20.0f ,animatedY + 230.0f,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+    renderer.AddThickLine( x + 20.0f , animatedY + 230.0f, x + 20.0f ,animatedY + 18.0f ,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+  }
+  // ---- TITEL -----------------------------------------------
+  std::string formatedtext = fmt::format("{:<40}", film.getfilmtitle());
+  formatedtext.resize(40);
+  // movie_drawLinesOfTextfont(Font *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center)  
+  movie_drawLinesOfTextfont(&myfont,formatedtext,x + 18.0f, animatedY + 248.0f, 18.0f, 21, 2, 2, true);
 }
 
+
+
+// ****************************************************************************************
+//
+// No anim version
+// Draw stream item
+//
+// ****************************************************************************************
 
 
 void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
@@ -2391,10 +2511,12 @@ void film_oversigt_typem::draw_stream_item(int x, int y,int ii,GLuint normal_ico
     movie_drawcover(x + 18, y + 18, 174, 214, normal_icon ,ii+100,highcolor);
     if (texture!=normal_icon) movie_drawcover(x + 18 + 20, y + 18, 174 - 20, 214, texture ,ii+100,highcolor);
     renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
+    // movie_drawLinesOfTextfont(&myfont,temprgtxt,x + 18.0f, animatedY + 248.0f, 18.0f, 21, 2, 2, true);    
   } else {
     movie_drawcover(x + 18, y + 18, 174, 214, normal_icon ,ii+100,highcolor);
     if (texture!=normal_icon) movie_drawcover(x + 20 + 20 , y + 20, 170 - 20, 210, texture ,ii+100,normalcolor);
     renderer.AddText(&myfont,x + 20,y + 200 + 50 ,temprgtxt,1,1,1,1);
+    // movie_drawLinesOfTextfont(&myfont,temprgtxt,x + 18.0f, animatedY + 248.0f, 18.0f, 21, 2, 2, true);    
   }
 }
 

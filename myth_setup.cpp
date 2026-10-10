@@ -72,8 +72,8 @@ extern GLuint _textureId_cursor;
 extern FMOD::System    *sndsystem;
 
 
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 
 
@@ -119,6 +119,7 @@ struct configkeytype configkeyslayout[12];			// functions keys startfunc
 extern char configuse3deffect[20];
 // extern char configvideoplayer[200];             // default video player
 extern char configdefaultplayer[200];
+extern std::string configdualscreen;
 extern int configdefaultplayer_screenmode;
 extern int configland;
 extern char *configlandsprog[];
@@ -685,26 +686,39 @@ void show_setup_video() {
   renderer.AddText(&myfont,xpos + 100 ,ypos + 150 ,"Videoplayer",1,1,1,1);
   renderer.AddText(&myfont,xpos + 240 ,ypos + 150 ,(char *) configdefaultplayer,1,1,1,1);
   renderer.AddText(&myfont,xpos + 100 ,ypos + 150+(1*18) ,"Player resolution",1,1,1,1);
-  renderer.AddText(&myfont,xpos + 100 ,ypos + 150+(2*18) ,"UV Meter mode",1,1,1,1);
   switch(configdefaultplayer_screenmode) {
-      case 1: text = "1024 x 768 (720p)";
-              break;
-      case 2: text = "1280 x 1024 (720p)";
-              break;
-      case 3: text = "1920 x 1080 (1080p)";
-              break;
-      case 4: text = "1360 x 768";
-              break;
-      default:text = "1024 x 768 (720p)";
-              break;
+    case 1: text = "1024 x 768 (720p)";
+            break;    
+    case 2: text = "1024 x 768 (720p)";
+            break;
+    case 3: text = "1920 x 1080 (1080p)";
+            break;
+    case 4: text = "3840 x 2160 (4K)";
+            break;
+    default:text = "1920 x 1080 (1080p)";
+            break;
   }
   renderer.AddText(&myfont,xpos + 240 ,ypos + 150 + (1*18) ,text,1,1,1,1);
 
+  renderer.AddText(&myfont,xpos + 100 ,ypos + 150 + (2*18) ,"Dual screen",1,1,1,1);
+  renderer.AddText(&myfont,xpos + 240 ,ypos + 150 + (2*18) ,configdualscreen,1,1,1,1);
+  
+  renderer.AddText(&myfont,xpos + 100 ,ypos + 150 + (3*18) ,"UV Meter mode",1,1,1,1);
   if (configuvmeter==0) text = "None";
   if (configuvmeter==1) text = "Simple";
   if (configuvmeter==2) text = "Dual";  
   if (configuvmeter>2) text = "None";
-  renderer.AddText(&myfont,xpos + 240 ,ypos + 150+(2*18) ,text,1,1,1,1);
+  renderer.AddText(&myfont,xpos + 240 ,ypos + 150+(3*18) ,text,1,1,1,1);
+  switch(do_show_setup_select_linie) {
+    case 0: showcoursornow(xpos + 240 ,ypos + 132 + (0*18),0);
+            break;
+    case 1: showcoursornow(xpos + 240 ,ypos + 132 + (1*18),0);
+            break;
+    case 2: showcoursornow(xpos + 240 ,ypos + 132 + (2*18),0);
+            break;
+    case 3: showcoursornow(xpos + 240 ,ypos + 132 + (3*18),0);
+            break;
+}
 }
 
 
@@ -782,7 +796,7 @@ void show_setup_font(int aktiv) {
   int i;
   std::string temptxt;
   int visantal;
-  static Font SampleFont;
+  static MFont SampleFont;
   int startofset=0;
   if (aktiv>18) startofset=(aktiv-18);
   renderer.AddTextureRect(0,setupfontback, 300, 300, 800, 650,1,1,1,1);
@@ -1389,7 +1403,7 @@ void select_exe_functions_keys_name() {
 void show_setup_keys() {
   std::string tmptxt;
   std::string fkeysname[]={"F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"};
-  static Font SampleFont;
+  static MFont SampleFont;
   // Load font.
   SampleFont.Load("/usr/share/fonts/truetype/ubuntu/UbuntuMono[wght].ttf",18);
   renderer.AddTextureRect(0,setupkeysback, 400, 300, 800, 630,1,1,1,1);

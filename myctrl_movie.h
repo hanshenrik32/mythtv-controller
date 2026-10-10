@@ -200,7 +200,7 @@ class film_oversigt_typem : vlc_controller {
     void show_film_search_oversigt(float _mangley,int filmnr);
 
     void vlsupdateTexture();
-    void show_vlc_frame();
+    void show_vlc_frame(bool moviewindow);
     void vlc_initOpenGL();
 
     void tilbage10sec();
@@ -229,6 +229,10 @@ class film_oversigt_typem : vlc_controller {
     void draw_stream_item1(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected,float introProgress = 1.0f);
     void show_film_oversigt1(float _mangley,int filmnr);
 
+    std::string select_player();
+    std::string select_enable_dual_screen_player();
+    std::string select_uv_screen_mode();
+    std::string select_player_resolution();
 };
 
 #endif
