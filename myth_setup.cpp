@@ -72,8 +72,8 @@ extern GLuint _textureId_cursor;
 extern FMOD::System    *sndsystem;
 
 
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 
 
@@ -796,7 +796,7 @@ void show_setup_font(int aktiv) {
   int i;
   std::string temptxt;
   int visantal;
-  static Font SampleFont;
+  static MFont SampleFont;
   int startofset=0;
   if (aktiv>18) startofset=(aktiv-18);
   renderer.AddTextureRect(0,setupfontback, 300, 300, 800, 650,1,1,1,1);
@@ -1403,7 +1403,7 @@ void select_exe_functions_keys_name() {
 void show_setup_keys() {
   std::string tmptxt;
   std::string fkeysname[]={"F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"};
-  static Font SampleFont;
+  static MFont SampleFont;
   // Load font.
   SampleFont.Load("/usr/share/fonts/truetype/ubuntu/UbuntuMono[wght].ttf",18);
   renderer.AddTextureRect(0,setupkeysback, 400, 300, 800, 630,1,1,1,1);

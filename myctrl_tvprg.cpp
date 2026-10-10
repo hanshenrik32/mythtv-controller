@@ -43,10 +43,10 @@
 
 extern Renderer renderer;
 
-extern Font myfont;
-extern Font myfont2;
-extern Font myfont_tv_guide_overskrift;
-extern Font myfont_mini;
+extern MFont myfont;
+extern MFont myfont2;
+extern MFont myfont_tv_guide_overskrift;
+extern MFont myfont_mini;
 extern config_icons config_menu;
 extern channel_list_type channel_list;
 extern char localuserhomedir[4096];                                             // user homedir

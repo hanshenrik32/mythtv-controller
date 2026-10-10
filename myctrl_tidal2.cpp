@@ -71,9 +71,9 @@ bool tidal_all_type_of_playes = false;
 // extern mFont font18;  // 18px font
 // extern mFont font24;  // 24px font
 
-extern Font myfont;
-extern Font myfont2;
-extern Font myfont_search_bar;
+extern MFont myfont;
+extern MFont myfont2;
+extern MFont myfont_search_bar;
 
 
 extern GLuint playing_tidal_icon_texture;
@@ -516,7 +516,7 @@ int Get_albums_by_artist() {
 //
 // ****************************************************************************************
 
-void drawLinesOfTextfont(Font *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
+void drawLinesOfTextfont(MFont *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
   std::istringstream stream(text);
   std::string word;
   std::string currentLine;

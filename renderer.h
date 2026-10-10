@@ -20,7 +20,7 @@ struct Character {
   int advance;
 };
 
-class Font {
+class MFont {
   public:
     bool Load(const char *filename,int size);
     Character glyph[256];
@@ -78,7 +78,7 @@ class Renderer {
     void AddRect(float x,float y,float w,float h,float r,float g,float b,float a);
     void AddTextureRect(int id,GLuint texture,float x,float y,float w,float h,float r,float g,float b,float a);
     void AddVideoTextureRect(int id,GLuint texture,float x,float y,float w,float h,float r,float g,float b,float a);
-    void AddText(Font *font,float x,float y,const std::string &text,float r,float g,float b,float a);
+    void AddText(MFont *font,float x,float y,const std::string &text,float r,float g,float b,float a);
     void AddTriangle(float x1,float y1,float x2,float y2,float x3,float y3,float r,float g,float b,float a);
     void DrawHand(float cx,float cy,float length,float angle,float width,float r,float g,float b,float a);
     void AddThickLine(float x1,float y1,float x2,float y2,float width, float r,float g,float b,float a);
@@ -88,7 +88,7 @@ class Renderer {
     void AddRoundedRect(float x, float y,float width, float height,float radius,float r, float g, float b, float a);
     void AddRoundedTextureRect(int id, GLuint texture,float x, float y, float w, float h,float radius,float r, float g, float b, float a);
     void DrawRawLines(const std::vector<TextureVertex>& lineVertices,GLenum primitive,float lineWidth,GLenum srcBlend,GLenum dstBlend);
-    float GetTextWidth(Font* font, const std::string& text);
+    float GetTextWidth(MFont* font, const std::string& text);
 
     void End();
     // void End2();

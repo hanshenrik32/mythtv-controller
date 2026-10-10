@@ -35,8 +35,8 @@ using namespace std;
 
 extern Renderer renderer;
 
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 extern GLuint playing_tidal_icon_texture;
 

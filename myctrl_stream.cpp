@@ -26,8 +26,8 @@
 #include "readjpg.h"
 
 
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 
 // web file loader
@@ -43,7 +43,7 @@ extern char localuserhomedir[4096];                                    // user h
 
 extern class config_icons config_menu; // config icons used in menu
 
-extern Font arial;
+extern MFont arial;
 
                                                                 // debug mode
                                                                 // 1  = wifi net
@@ -1586,7 +1586,7 @@ void drawcover(int x, int y, int w, int h, GLuint textureId,int id) {
 
 
 
-void stream_drawLinesOfTextfont(Font *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
+void stream_drawLinesOfTextfont(MFont *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
   std::istringstream stream(text);
   std::string word;
   std::string currentLine;

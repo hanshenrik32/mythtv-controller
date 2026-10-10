@@ -28,8 +28,8 @@
 extern Renderer renderer;
 extern Renderer movieRenderer;
 
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 
 //extern mFont font12;  // 12px font
@@ -2218,7 +2218,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
 }
 
 
-void movie_drawLinesOfTextfont(Font *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
+void movie_drawLinesOfTextfont(MFont *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
   std::istringstream stream(text);
   std::string word;
   std::string currentLine;

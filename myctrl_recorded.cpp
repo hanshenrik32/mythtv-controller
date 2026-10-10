@@ -45,8 +45,8 @@ extern int screen_size;
 extern int visvalgtnrtype;
 extern bool do_sqlite;
 
-extern Font myfont;
-extern Font myfont2;
+extern MFont myfont;
+extern MFont myfont2;
 
 
 

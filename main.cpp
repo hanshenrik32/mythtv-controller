@@ -1,7 +1,6 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <GL/glc.h>                     // glc true type font system
-
 #include <cmath>
 #include <cstdlib>
 #include <stdio.h>
@@ -30,6 +29,9 @@
 // time
 #include <ctime>
 #include <sys/timeb.h>
+
+#include <X11/Xlib.h>
+
 
 #include "main.h"
 #include "renderer.h"
@@ -143,13 +145,13 @@ static bool do_update_tidal_playlist = false;           // do it first time thre
 // film oversigt type class
 film_oversigt_typem film_oversigt(FILM_OVERSIGT_TYPE_SIZE+1);
 
-Font myfont;
-Font myfont2;
-Font myfont_tv_guide_overskrift;
-Font myfont_mini;
-Font myfont_torrent_overskrift;
-Font myfont_torrent_list;
-Font myfont_search_bar;
+MFont myfont;
+MFont myfont2;
+MFont myfont_tv_guide_overskrift;
+MFont myfont_mini;
+MFont myfont_torrent_overskrift;
+MFont myfont_torrent_list;
+MFont myfont_search_bar;
 
 fontctrl aktivfont;                                                             // font control (default aktiv font all over (if opencl))
 
@@ -201,7 +203,7 @@ char configmythsoundsystem[256];	                   		// selected soundsystem ou
 
 bool saver_irq = false;
 
-Font arial;
+MFont arial;
 GLint ctx, myFont;
 GLuint normal_icon=0;
 
@@ -819,7 +821,7 @@ void mouse(int button, int state, int mouseX, int mouseY)
 
 class MultiLineEditor {
 public:
-    MultiLineEditor(Font* editorFont,float positionX,float positionY,float editorWidth,float editorHeight) : font(editorFont), x(positionX), y(positionY), width(editorWidth), height(editorHeight) {
+    MultiLineEditor(MFont* editorFont,float positionX,float positionY,float editorWidth,float editorHeight) : font(editorFont), x(positionX), y(positionY), width(editorWidth), height(editorHeight) {
         lines.emplace_back();
     }
 
@@ -1138,7 +1140,7 @@ public:
     }
 
 private:
-    Font* font = nullptr;
+    MFont* font = nullptr;
 
     float x = 0.0f;
     float y = 0.0f;
@@ -12096,6 +12098,39 @@ void DrawMovieWindow() {
     glutSwapBuffers();
 }
 
+// ******************************************************************************************************************
+//
+//   Used to save and restore main window in fucus after open new windows for playing movies
+//
+//   På Linux/X11 kan du gemme det fokuserede vindue, inden filmvinduet åbnes, og gendanne fokus med XSetInputFocus()
+//
+// ******************************************************************************************************************
+
+Display* focusDisplay = nullptr;
+Window previousFocus = None;
+
+// save focus window
+
+void SaveMainFocus() {
+  if (!focusDisplay) focusDisplay = XOpenDisplay(nullptr);
+  if (!focusDisplay)
+    return;
+  int revertTo;
+  XGetInputFocus(focusDisplay, &previousFocus, &revertTo);
+}
+
+// restore focus window
+
+void RestoreMainFocus(int) {
+  if (!focusDisplay || previousFocus == None || previousFocus == PointerRoot)
+    return;
+  XWindowAttributes attributes{};
+  if (XGetWindowAttributes(focusDisplay, previousFocus, &attributes) && attributes.map_state == IsViewable) {
+    XSetInputFocus(focusDisplay,previousFocus,RevertToParent,CurrentTime);
+    XFlush(focusDisplay);
+  }
+}
+
 
 // ***************************************************************************
 //
@@ -12106,6 +12141,7 @@ void DrawMovieWindow() {
 void ShowMovieWindow() {
   if (movieWindow == 0) {
       glutSetWindow(mainWindow);
+      SaveMainFocus();
       // Genbrug den i filmvinduet.
       glutSetOption(GLUT_RENDERING_CONTEXT,GLUT_USE_CURRENT_CONTEXT);
       glutInitWindowPosition(1920, 0);
@@ -12128,6 +12164,7 @@ void ShowMovieWindow() {
   movieWindowVisible = true;
   glutPostRedisplay();
   glutSetWindow(mainWindow);
+  glutTimerFunc(150, RestoreMainFocus, 0);    // restore focus window
 }
 
 
