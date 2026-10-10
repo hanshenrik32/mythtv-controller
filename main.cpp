@@ -12055,6 +12055,20 @@ void opdate_threadfunction() {
 }
 
 
+// ***************************************************************************
+//
+// Close window on krys
+//
+// ***************************************************************************
+
+void OnMovieWindowClose() {
+    movieWindowVisible = false;
+    movieWindow = 0;
+    film_oversigt.stopmovie();
+    // Kald din eksisterende stopfunktion her,
+    // hvis filmen og lyden også skal stoppes.
+    // Slet ikke rendererens fælles shaders/textures her.
+}
 
 // ***************************************************************************
 //
@@ -12155,6 +12169,7 @@ void ShowMovieWindow() {
       // - fonts og overlay-textures
       glutSetOption(GLUT_RENDERING_CONTEXT,GLUT_CREATE_NEW_CONTEXT);
       glutDisplayFunc(DrawMovieWindow);
+      glutCloseFunc(OnMovieWindowClose);
       // Registrer også reshape-, tastatur- og muse-callbacks
       // til filmvinduet, hvis du bruger dem.
   } else {
@@ -12183,6 +12198,10 @@ void HideMovieWindow() {
   glutSetWindow(mainWindow);
 }
 
+
+
+
+
 // ***************************************************************************
 //
 // Main function
@@ -12209,7 +12228,7 @@ int main(int argc,char** argv) {
       fputs("|  Y Y  \\___  | |  | |   Y  \\  |  \\   /  /_____/ \\  \\__(  <_> )   |  \\  |  |  | \\(  <_> )  |_|  |_\\  ___/|  | \\/   \n",logfile);
       fputs("|__|_|  / ____| |__| |___|  /__|   \\_/            \\___  >____/|___|  /__|  |__|   \\____/|____/____/\\___  >__|           \n",logfile);
       fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
-      fputs("Ver 0.54.x \n",logfile);
+      fputs("Ver 0.55.x \n",logfile);
     }
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
@@ -12271,8 +12290,8 @@ int main(int argc,char** argv) {
       write_logfile(logfile,(char *) "Tidal no data downloaded.");
       exit(0);
     }
-
     glutInit(&argc,argv);
+    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_CONTINUE_EXECUTION); 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(1920,1080);
     mainWindow=glutCreateWindow("Mythtv-Controller");
