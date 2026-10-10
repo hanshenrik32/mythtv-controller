@@ -60,37 +60,23 @@ vlc_controller::vlc_controller() {
 
 
 vlc_controller::~vlc_controller() {
-    stopmedia();
-    if(videoTexture) glDeleteTextures(1,&videoTexture);
-    if(vlc_inst) libvlc_release(vlc_inst);
+  stopmedia();
+  if (videoTexture) glDeleteTextures(1,&videoTexture);
+  if(vlc_inst) libvlc_release(vlc_inst);
 }
+
 
 // init opengl for video texture
 
 void vlc_controller::initOpenGL() {
-    if(videoTexture != 0)
-        return;
-    glGenTextures(1,&videoTexture);
-    glBindTexture(GL_TEXTURE_2D,videoTexture);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RGBA,
-        width,
-        height,
-        0,
-        GL_BGRA,
-        GL_UNSIGNED_BYTE,
-        nullptr);
-    glTexParameteri(
-        GL_TEXTURE_2D,
-        GL_TEXTURE_MIN_FILTER,
-        GL_LINEAR);
-    glTexParameteri(
-        GL_TEXTURE_2D,
-        GL_TEXTURE_MAG_FILTER,
-        GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D,0);
+  if(videoTexture != 0)
+      return;
+  glGenTextures(1,&videoTexture);
+  glBindTexture(GL_TEXTURE_2D,videoTexture);
+  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_BGRA,GL_UNSIGNED_BYTE,nullptr);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glBindTexture(GL_TEXTURE_2D,0);
 }
 
 void *vlc_controller::lock(void *opaque,void **planes) {
