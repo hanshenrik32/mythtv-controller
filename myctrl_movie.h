@@ -232,7 +232,7 @@ class film_oversigt_typem : vlc_controller {
     std::string select_player();
     std::string select_enable_dual_screen_player();
     std::string select_uv_screen_mode();
-    std::string select_player_resolution();
+    std::string select_player_resolution();    
 };
 
 #endif

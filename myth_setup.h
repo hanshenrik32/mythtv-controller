@@ -126,5 +126,11 @@ void getLevels();
 void render_uv();
 
 void select_exe_functions_keys_name();
+std::string select_language();
+std::string select_system_resolution();
+std::string select_screen_timeout();
+std::string select_screen_mode();    
+    
+
 
 #endif

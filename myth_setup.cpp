@@ -607,6 +607,119 @@ int rss_stream_class::set_stream_name(int nr,char *name) {
 //
 // ****************************************************************************************
 
+std::string select_system_resolution() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Select Resolution\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"720p\" \
+  TRUE \"1080p\" \
+  FALSE \"4K\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
+
+
+std::string select_language() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Select Language\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"English\" \
+  TRUE \"Dansk\" \
+  FALSE \"Tysk\" \
+  FALSE \"Arabi\" \
+  FALSE \"France\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
+
+std::string select_screen_timeout() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Timeout min\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"5\" \
+  TRUE \"10\" \
+  FALSE \"20\" \
+  FALSE \"30\" \
+  FALSE \"60\" \
+  FALSE \"120\" \
+  FALSE \"Never\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
+
+
+std::string select_screen_mode() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Full Screen\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  TRUE \"Yes\" \
+  FALSE \"No\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
+
+
 void show_setup_screen() {
   char resl[1024];
   int winsizx=1200;
@@ -660,6 +773,16 @@ void show_setup_screen() {
   renderer.AddText(&myfont,450 ,450+(7*18) ,resl,1,1,1,1);
   sprintf(resl," Version  %s",glGetString(GL_VERSION));
   renderer.AddText(&myfont,450 ,450+(8*18) ,resl,1,1,1,1);
+  switch(do_show_setup_select_linie) {
+    case 0: showcoursornow(550 , 412 + (1*18) ,0);
+            break;
+    case 1: showcoursornow(550 , 412 + (2*18) ,0);
+            break;
+    case 2: showcoursornow(550 , 412 + (3*18) ,0);
+            break;
+    case 3: showcoursornow(550 , 412 + (5*18) ,0);
+            break;
+  }
 }
 
 
@@ -718,7 +841,7 @@ void show_setup_video() {
             break;
     case 3: showcoursornow(xpos + 240 ,ypos + 132 + (3*18),0);
             break;
-}
+  }
 }
 
 

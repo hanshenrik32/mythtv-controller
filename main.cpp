@@ -6461,7 +6461,6 @@ void handleKeypress(unsigned char key, int x, int y) {
   }
 
   if (((do_show_setup_keys) && (key!=27)) || (key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!=127) && (key!='S') && (key!='*') && (key!='U') && (key!=117) && (key!=optionmenukey) && (key!=13) && (key!=27) || ((vis_spotify_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_tidal_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_film_oversigt) && (key!=13) && (key!=27) && (key!=117)) || ((tidal_oversigt.do_setup_tidal_start_entry) && (key!=13) && (key!=27) && (key!=117)) || ((vis_radio_oversigt) && (key!='u') && (key!=optionmenukey) && (key!=27 && (key!=13)))) {
-
     if (do_show_setup_rss) {
       switch(rssstreamoversigt.setup_select_linie) {
         case 0: keybuffer1=rssstreamoversigt.get_stream_name_std(0+configrss_ofset);
@@ -7828,9 +7827,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         if (vis_film_oversigt) {
           if (film_oversigt.film_is_playing) {
             film_oversigt.stopmovie();
-            // vis_film_oversigt=false;
-            key=0;
+            stopmovie=true;
             film_oversigt.film_is_playing=false;
+            HideMovieWindow();
+            key=0;
           }
         }
 
@@ -8485,6 +8485,40 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }else {
                   configuvmeter=2;
                 }
+              }
+            }
+            //
+            // screen setup
+            //
+            if (do_show_setup_screen) {              
+              std::string svar="";
+              if (do_show_setup_select_linie==0) {
+                svar=select_system_resolution();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="720p") screen_size=1;
+                else if (svar=="1080p") screen_size=3;
+                else if (svar=="4K") screen_size=4;
+
+              }
+              if (do_show_setup_select_linie==1) {
+                svar=select_language();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="English") configland=0;
+                else if (svar=="Dansk") configland=1;
+                else if (svar=="France") configland=2;
+                else if (svar=="Tysk") configland=3;
+                else if (svar=="Arabi") configland=4;
+                else configland=0;
+              }
+              if (do_show_setup_select_linie==2) {
+                svar=select_screen_timeout();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                
+              }
+              if (do_show_setup_select_linie==3) {
+                svar=select_screen_mode();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="Yes") full_screen=true; else full_screen=false;
               }
             }
           }
@@ -9478,6 +9512,10 @@ void handlespeckeypress(int key,int x,int y) {
               if (do_show_videoplayer) {
                 if (do_show_setup_select_linie<3) do_show_setup_select_linie++;
               }
+              
+              if (do_show_setup_screen) {
+                if (do_show_setup_select_linie<3) do_show_setup_select_linie++;
+              }
 
               // rss setup
               // setup rss source window
@@ -9745,6 +9783,10 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 if (do_show_videoplayer) {
+                  if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                }
+
+                if (do_show_setup_screen) {
                   if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                 }
 

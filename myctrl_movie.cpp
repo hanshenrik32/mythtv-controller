@@ -460,6 +460,7 @@ int film_oversigt_typem::antal_audio_tracks() {
 
 bool film_oversigt_typem::SelectSubtitle(const std::string& search) {
   vlc_controller::SelectSubtitle(search);
+  return(true);
 }
 
 
@@ -479,7 +480,7 @@ int film_oversigt_typem::GetAudioTracks() {
 
 // ****************************************************************************************
 //
-// Return true if movie is playing
+// Return true if movie is playing (by vlc)
 //
 // ****************************************************************************************
 
