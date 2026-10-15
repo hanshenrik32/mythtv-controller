@@ -1666,7 +1666,12 @@ void stream_class::draw_stream_item1(float x,float y,int ii,GLuint normal_icon,G
   // Skalering omkring coverets centrum.
   float coverX = x + 20.0f + (baseSize - size) * 0.5f;
   float coverY = animatedY + 20.0f + (baseSize - size) * 0.5f;
-  renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,1.0f, 1.0f, 1.0f, alpha);
+  if (ii==stream_icon_over-100) {
+    renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,1.0f, 1.0f, 1.0f, 1.0f);
+  } else {
+    alpha=alpha-0.15f;
+    renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,1.0f, 1.0f, 1.0f, alpha);
+  }
   // ---- TITEL -----------------------------------------------
   // Behold linjeombrydningen. Teksten flytter med coveret.
   stream_drawLinesOfTextfont(&myfont,item.feed_name,x + 18.0f, animatedY + 218.0f, 18, 22, 2, 2, true);

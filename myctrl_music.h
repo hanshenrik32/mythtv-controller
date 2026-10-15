@@ -38,6 +38,7 @@ class musicoversigt_class {
     bool do_play;
     bool music_is_playing;                                                // do we play ?   
   public:
+    int music_icon_over=0;                      // used for mouse over
     int playingmusicnr=-1;
     int selected_icon_in_view=1;
     char overview_show_band_name[256];                                  // show band name in overview

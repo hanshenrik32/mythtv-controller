@@ -2409,7 +2409,7 @@ void film_oversigt_typem::draw_stream_search_item(int x, int y,int ii,GLuint nor
 
 // ****************************************************************************************
 //
-// Draw stream item
+// Draw stream item (in use)
 //
 // ****************************************************************************************
 
@@ -2451,7 +2451,12 @@ void film_oversigt_typem::draw_stream_item1(float x,float y,int ii,GLuint normal
   float centerY = frameY + baseHeight * 0.5f;
   // Alle lag skaleres omkring samme centrum.
   auto drawLayer = [&](GLuint layerTexture,float layerX,float layerY,float layerWidth,float layerHeight) {
+    if (ii==film_icon_over-100) {
+      renderer.AddTextureRect(ii + 100,layerTexture,centerX + (layerX - centerX) * scale,centerY + (layerY - centerY) * scale,layerWidth * scale,layerHeight * scale,1.0f, 1.0f, 1.0f, 1.0f);
+    } else {
+      alpha=alpha-0.15f;
       renderer.AddTextureRect(ii + 100,layerTexture,centerX + (layerX - centerX) * scale,centerY + (layerY - centerY) * scale,layerWidth * scale,layerHeight * scale,1.0f, 1.0f, 1.0f, alpha);
+    }
   };
   // DVD-baggrund.
   drawLayer(background,frameX,frameY,baseWidth,baseHeight);

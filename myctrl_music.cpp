@@ -1700,16 +1700,12 @@ void musicoversigt_class::draw_music_item1(float x,float y,int ii,GLuint normal_
   float offset = ii == 0 ? 18.0f : 20.0f;
   float coverX = x + offset + (baseSize - size) * 0.5f;
   float coverY = animatedY + offset + (baseSize - size) * 0.5f;
-  renderer.AddTextureRect(
-      ii + 100,
-      texture,
-      coverX,
-      coverY,
-      size,
-      size,
-      1.0f, 1.0f, 1.0f, alpha
-  );
-
+  if (ii==music_icon_over-100) {
+    renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,1.0f, 1.0f, 1.0f, 1.0f);
+  } else {
+    alpha=alpha-0.15f;
+    renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,0.65f, 0.65f, 0.65f, alpha);
+  }
   // ---- TITEL -----------------------------------------------
   std::string text = fmt::format("{:^20}", item.album_name);
   float textY = animatedY + 218.0f;

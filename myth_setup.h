@@ -131,6 +131,11 @@ std::string select_system_resolution();
 std::string select_screen_timeout();
 std::string select_screen_mode();    
     
+class ip_info {
+  public:
+    std::string network_name;
+    std::string network_ip;
+};
 
 
 #endif

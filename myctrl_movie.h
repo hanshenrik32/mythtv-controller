@@ -115,6 +115,7 @@ class film_oversigt_typem : vlc_controller {
     float getmovieposition();
     bool show_search_view;
   public:
+    int film_icon_over=0;                      // used for mouse over
     int getsubs_timer=0;
     // used to fade playing movie info in/out
     float film_fader=0;

@@ -128,7 +128,7 @@ class tidal_class {
     int update_song_playcount(const char *playpath);
     void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id,Color4 c,int stream_key_selected);
   public:
-
+    int tidal_icon_over=0;                      // used for mouse over
     std::string tiddl_path="";                 // ="~/.local/bin/tiddl"; path is found by function run_tidal_dl()
     int setup_select_linie=0;
     bool tidal_stop_loader_thread=false;

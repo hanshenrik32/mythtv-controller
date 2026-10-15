@@ -822,6 +822,8 @@ void radiostation_class::drawcover(int x, int y, int w, int h, GLuint textureId,
   }
 };
 
+
+
 // *************************************************************************************
 //
 // draw all items for radio
@@ -831,86 +833,62 @@ void radiostation_class::drawcover(int x, int y, int w, int h, GLuint textureId,
 
 
 void radiostation_class::draw_radio_item1(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress) {
-    if (ii < 0 || ii >= static_cast<int>(stack.size()))
-        return;
-    float p = std::clamp(introProgress, 0.0f, 1.0f);
-    if (p <= 0.0f)
-        return;
-    auto& station = stack[ii];
-    // ---- LOAD TEXTURE ----------------------------------------
-    if (!station.gfxfilename.empty() && station.textureId == 0 && !station.gfx_loaded) {
-        if (file_exists(station.gfxfilename.c_str())) {
-            station.textureId = loadTexture(
-                const_cast<char*>(station.gfxfilename.c_str())
-            );
-            station.gfx_loaded = (station.textureId != 0);
-        }
+  if (ii < 0 || ii >= static_cast<int>(stack.size()))
+    return;
+  float p = std::clamp(introProgress, 0.0f, 1.0f);
+  if (p <= 0.0f)
+    return;
+  auto& station = stack[ii];
+  // ---- LOAD TEXTURE ----------------------------------------
+  if (!station.gfxfilename.empty() && station.textureId == 0 && !station.gfx_loaded) {
+    if (file_exists(station.gfxfilename.c_str())) {
+      station.textureId = loadTexture(const_cast<char*>(station.gfxfilename.c_str()));
+      station.gfx_loaded = (station.textureId != 0);
     }
-
-    GLuint texture = station.textureId;
-
-    if (texture == 0)
-        texture = normal_icon ? normal_icon : empty_icon;
-
-    // ---- INTROANIMATION --------------------------------------
-    // Glid 60 pixels op med blød opbremsning.
-    float remaining = 1.0f - p;
-
-    float animatedY =
-        y + 60.0f * remaining * remaining * remaining;
-
-    // 85 % -> ca. 103 % -> 100 %.
-    const float overshoot = 2.6f;
-    float u = p - 1.0f;
-
-    float backEase =
-        1.0f +
-        (overshoot + 1.0f) * u * u * u +
-        overshoot * u * u;
-
-    float scale = 0.85f + 0.15f * backEase;
-
-    // Fade ind.
-    float alpha = std::clamp(p / 0.4f, 0.0f, 1.0f);
-    alpha = alpha * alpha * (3.0f - 2.0f * alpha);
-
-    // Behold din eksisterende markering.
-    bool selected = (ii == selected_icon_in_view);
-
-    float baseSize = selected ? 180.0f : 170.0f;
-    float size = baseSize * scale;
-
-    // Skalér omkring coverets centrum.
-    float coverX = x + 20.0f + (baseSize - size) * 0.5f;
-    float coverY = animatedY + 20.0f
-                 + (baseSize - size) * 0.5f;
-
-    renderer.AddTextureRect(
-        ii + 100,
-        texture,
-        coverX,
-        coverY,
-        size,
-        size,
-        1.0f, 1.0f, 1.0f, alpha
-    );
-
-    // ---- STATIONSNAVN ----------------------------------------
-    std::string text = fmt::format(
-        "{:^20}", station.station_name
-    );
-
-    // Behold dine eksisterende tekstplaceringer.
-    float textY = animatedY + (selected ? 200.0f : 210.0f);
-
-    renderer.AddText(
-        &myfont,
-        x + 20.0f,
-        textY,
-        text,
-        1.0f, 1.0f, 1.0f, alpha
-    );
+  }
+  GLuint texture = station.textureId;
+  if (texture == 0) texture = normal_icon ? normal_icon : empty_icon;
+  // ---- INTROANIMATION --------------------------------------
+  // Glid 60 pixels op med blød opbremsning.
+  float remaining = 1.0f - p;
+  float animatedY = y + 60.0f * remaining * remaining * remaining;
+  // 85 % -> ca. 103 % -> 100 %.
+  const float overshoot = 2.6f;
+  float u = p - 1.0f;
+  float backEase = 1.0f +(overshoot + 1.0f) * u * u * u + overshoot * u * u;
+  float scale = 0.85f + 0.15f * backEase;
+  // Fade ind.
+  float alpha = std::clamp(p / 0.4f, 0.0f, 1.0f);
+  alpha = alpha * alpha * (3.0f - 2.0f * alpha);
+  // Behold din eksisterende markering.
+  bool selected = (ii == selected_icon_in_view);
+  float baseSize = selected ? 180.0f : 170.0f;
+  float size = baseSize * scale;
+  // Skalér omkring coverets centrum.
+  float coverX = x + 20.0f + (baseSize - size) * 0.5f;
+  float coverY = animatedY + 20.0f + (baseSize - size) * 0.5f;
+  if (ii==radio_icon_over-100) {
+    renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,1.0f, 1.0f, 1.0f, 1.0f);
+  } else {
+    alpha=alpha-0.15f;
+    renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,1.0f, 1.0f, 1.0f, alpha);
+  }
+  // ---- STATIONSNAVN ----------------------------------------
+  std::string text = fmt::format("{:^20}", station.station_name);
+  // Behold dine eksisterende tekstplaceringer.
+  float textY = animatedY + (selected ? 200.0f : 210.0f);
+  renderer.AddText(&myfont,x + 20.0f,textY,text,1.0f, 1.0f, 1.0f, alpha);
 }
+
+
+
+
+// *************************************************************************************
+//
+// draw all items for radio (old version)
+//
+// *************************************************************************************
+
 
 void radiostation_class::draw_radio_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected) {
   std::string temprgtxt;

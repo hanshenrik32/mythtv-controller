@@ -64,6 +64,7 @@ class radiostation_class {
     bool hentradioart=false;
     void drawcover(int x, int y, int w, int h, GLuint textureId,int id);
   public:
+    int radio_icon_over=0;                      // used for mouse over
     char *get_station_name(int nr) { return (stack[nr].station_name); }
     int playingstationnr=-1;		                                                // nr in stack of playing radio station
     bool search_radio_online_done;
