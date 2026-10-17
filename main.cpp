@@ -7280,55 +7280,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         // setup window
         if (do_show_setup) {
           if (do_show_setup_sound) {
-              if (do_show_setup_select_linie==0) {
-                if (key==32) {
-                  if (soundsystem<numbersofsoundsystems-1) soundsystem++; else soundsystem=0;
-                  strcpy(keybuffer,avalible_device[soundsystem]);
-                  strcpy(configmythsoundsystem,avalible_device[soundsystem]);
-                } else strcpy(keybuffer,avalible_device[soundsystem]);
-              } else if (do_show_setup_select_linie==1) {
-                if (key==32) {
-                  if (strcmp(keybuffer,"HDMI")==0) {
-                    strcpy(keybuffer,"SPDIF");
-                    keybuffer1="SPDIF";
-                  } else if (strcmp(keybuffer,"SPDIF")==0) {
-                    strcpy(keybuffer,"STREAM");
-                    keybuffer1="STREAM";
-                  } else if (strcmp(keybuffer,"STREAM")==0) {
-                    strcpy(keybuffer,"HDMI");
-                    keybuffer1="HDMI";
-                  } else {
-                    strcpy(keybuffer,"STREAM");
-                    keybuffer1="STREAM";
-                  }
-                } else {
-                  strcpy(keybuffer,"DEFAULT");
-                  keybuffer1="DEFAULT";
-                }
-              } else if (do_show_setup_select_linie==2) {
-                if (key==32) {
-                  if (strcmp(keybuffer,"FMOD")==0) {
-                    strcpy(keybuffer,"SDL");
-                    keybuffer1="SDL";
-                  } else if (strcmp(keybuffer,"SDL")==0) {
-                    strcpy(keybuffer,"FMOD");
-                    keybuffer1="FMOD";
-                  } else {
-                    strcpy(keybuffer,"FMOD");
-                    keybuffer1="FMOD";
-                  }
-                } else {
-                  strcpy(keybuffer,"FMOD");
-                  keybuffer1="FMOD";
-                }
-              } else {
-                if (key!=13) {
-                  keybuffer[keybufferindex]=key;
-                  keybufferindex++;
-                  keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                  keybuffer1.push_back(key);
-                }
-              }
+            //
           } else if (do_show_setup_screen) {
             if (do_show_setup_select_linie==0) {
               if (key==32) {		// space key
@@ -7605,7 +7557,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           if (do_show_setup_sound) {
               switch(do_show_setup_select_linie) {
                   case 0:
-                    strcpy(configmythsoundsystem,keybuffer);
+                    strcpy(configmythsoundsystem,keybuffer1.c_str());
                     break;
                   case 1:
                     strcpy(configsoundoutport,keybuffer);
@@ -8761,7 +8713,22 @@ void handleKeypress(unsigned char key, int x, int y) {
           } else configrss_ofset++;
           */
         }
-
+        //
+        // set sound output device from select_sound_output_device() call here.
+        //
+        if (do_show_setup_sound) {
+          std::string device_selected;
+          switch(do_show_setup_select_linie) {
+            case 0: device_selected=select_sound_output_device();
+                    if (device_selected.length()>0) {
+                      SetOutputDevice(sndsystem,0);
+                      strcpy(configmythsoundsystem,device_selected.c_str());
+                      // set sound out device
+                    }
+                    break;
+            case 1: break;
+          }
+        }
 
         if (do_show_torrent) {
           printf("enter pressed\n ");
@@ -10868,6 +10835,23 @@ void load_config(char * filename) {
 // ****************************************************************************************
 
 
+bool SelectOutputDevice(FMOD::System* system, int deviceId) {
+  if (!system)
+    return false;
+  int count = 0;
+  if (system->getNumDrivers(&count) != FMOD_OK)
+    return false;
+  if (deviceId < 0 || deviceId >= count)
+    return false;
+  FMOD_RESULT result = system->setDriver(deviceId);
+  if (result != FMOD_OK) {
+    std::printf("Kan ikke skifte lydoutput: %s\n", FMOD_ErrorString(result));
+    return false;
+  }
+  return true;
+}
+
+
 int init_sound_system(int devicenr) {
     int num;
     char fmoddrivername[512];
@@ -10890,16 +10874,16 @@ int init_sound_system(int devicenr) {
     for(int n=0;n<9;n++) strcpy(avalible_device[n],"");
     fprintf(stderr,"\nSound cards \n");
     fprintf(stderr,"-----------\n");
-    int numdrivers;
+    int numdrivers=0;
     result = sndsystem->getNumDrivers(&numdrivers);
     ERRCHECK(result,0);
     numbersofsoundsystems=numdrivers;				// numbers of devices
     for (count=0; count < numdrivers; count++) {
-       char name[256];
-       result = sndsystem->getDriverInfo(count, name, sizeof(name), 0,0,0,0);
-       ERRCHECK(result,0);
-       strcpy(avalible_device[count],name);			// save device name to list
-       fprintf(stderr," %d - %s\n", count , name);
+      char name[256];
+      result = sndsystem->getDriverInfo(count, name, sizeof(name), 0,0,0,0);
+      ERRCHECK(result,0);
+      strcpy(avalible_device[count],name);			// save device name to list
+      fprintf(stderr," %d - %s\n", count , name);
     }
     if (devicenr>numdrivers) devicenr=0;			// hvis der er valgt et soundcard i config filen som ikke findes vælg default
     // setlect default soundcard=0
@@ -10912,8 +10896,10 @@ int init_sound_system(int devicenr) {
       result = sndsystem->getPluginHandle(FMOD_PLUGINTYPE_CODEC, count, &handle);
       ERRCHECK(result,0);
       result = sndsystem->getPluginInfo(handle, 0, name, 256, 0);
+      fprintf(stderr," Plugins - %s\n", name);
       ERRCHECK(result,0);
     }
+    /*
     result = sndsystem->getNumPlugins(FMOD_PLUGINTYPE_OUTPUT, &num);
     ERRCHECK(result,0);
     for (count = 0; count < num; count++) {
@@ -10922,6 +10908,7 @@ int init_sound_system(int devicenr) {
         result = sndsystem->getPluginInfo(handle, 0, name, 256, 0);
         ERRCHECK(result,0);
     }
+    */
     result = sndsystem->getPluginHandle(FMOD_PLUGINTYPE_OUTPUT, 2, &handle);
     ERRCHECK(result,0);
     if (handle==3) strcpy(configdeviceid,"FMOD ESD");

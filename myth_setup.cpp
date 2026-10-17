@@ -73,13 +73,14 @@ extern int setup_icon_over;
 extern MFont myfont;
 extern MFont myfont2;
 
-
+extern char avalible_device[10][256];			                    // sound system devises list
 
 // controll rss
 //
 rss_stream_class rssstreamoversigt;
 //
 
+extern int numbersofsoundsystems;
 
 extern bool hent_tv_channels;
 extern tv_graber_config  aktiv_tv_graber;
@@ -1308,6 +1309,63 @@ void show_setup_network() {
 // Setup sound config
 //
 // ****************************************************************************************
+
+std::string select_sound_output_device() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string device_list="";
+  for(int i=0;i<numbersofsoundsystems;i++) {
+    if (i==0) device_list=device_list + "TRUE ";
+    else device_list=device_list + "FALSE ";
+    device_list=device_list + "\"";
+    device_list=device_list + avalible_device[i];
+     device_list=device_list + "\"";
+  }
+  std::string popenstring="/usr/bin/zenity --list --title=\"Sound device output\" --radiolist --column=\"Vælg\" --column=\"Type\" ";
+  popenstring=popenstring +  device_list;
+  /*
+  eks
+  std::string popenstring="/usr/bin/zenity --list --title=\"Sound device output\" --radiolist --column=\"Vælg\" --column=\"Type\" \  
+  FALSE \"5\" \
+  TRUE \"10\" \
+  FALSE \"20\" \
+  FALSE \"30\" \
+  FALSE \"60\" \
+  FALSE \"120\" \
+  FALSE \"Never\"";
+  */
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// set output sound device
+
+bool SetOutputDevice(FMOD::System* system, int deviceId) {
+  if (!system)
+    return false;
+  int count = 0;
+  if (system->getNumDrivers(&count) != FMOD_OK)
+    return false;
+  if (deviceId < 0 || deviceId >= count)
+    return false;
+  FMOD_RESULT result = system->setDriver(deviceId);
+  if (result != FMOD_OK) {
+    std::printf("Kan ikke skifte lydoutput: %s\n",FMOD_ErrorString(result));
+      return false;
+  }
+  return true;
+}
+
 
 void show_setup_sound() {
    renderer.AddTextureRect(0,setupsoundback, 400, 300, 800, 500,1,1,1,1);
