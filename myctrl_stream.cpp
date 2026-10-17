@@ -1720,7 +1720,7 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
   } else {
     drawcover(x+20, y+20, buttonsizex, buttonsizey, texture,ii+100);
     // renderer.AddText(&myfont,x + 18, y + 210,temprgtxt,1,1,1,1);
-    stream_drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 210, 18, 22, 2, 2, true);
+    stream_drawLinesOfTextfont(&myfont,temprgtxt, x + 18, y + 210, 18, 22, 2, 2, true);    
   }
 }
 

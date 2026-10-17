@@ -5721,6 +5721,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               mknapnr=id-99;
               ask_open_dir_or_play_music=true;
             }
+            // enable music search view
+            if (id==5) {
+              do_show_music_search_oversigt = !do_show_music_search_oversigt;
+            }
             
             // back button
             if ((id==100) && (strcmp(musicoversigt.get_album_name(mknapnr-1),"   BACK")==0)) {
@@ -7049,6 +7053,18 @@ void handleKeypress(unsigned char key, int x, int y) {
         if (ask_open_dir_or_play) {
           if (key==32) {
             dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
+          }
+        }
+
+        if (do_show_music_search_oversigt) {
+          if (key!=8) {
+            keybuffer[keybufferindex]=key;
+            keybufferindex++;
+            keybuffer[keybufferindex]='\0';       // else input key text in buffer
+            keybuffer1.push_back(key);
+          }
+          if (key==8) {
+            if (keybuffer1.size()>0) keybuffer1.erase(keybuffer1.length()-1);
           }
         }
       }
@@ -11039,7 +11055,7 @@ void mouseMotion(int x, int y) {
   if (menu_icon_over==0) {
     aktiv_tv_oversigt.tvguide_icon_over=0;
     if (id>=100) {
-      if (vis_tidal_oversigt) {
+      if (vis_tidal_oversigt || do_show_tidal_search_oversigt) {
         tidal_oversigt.tidal_icon_over=id;
       } else if (vis_music_oversigt) {
         musicoversigt.music_icon_over=id;
