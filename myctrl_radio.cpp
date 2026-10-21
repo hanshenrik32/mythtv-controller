@@ -831,7 +831,6 @@ void radiostation_class::drawcover(int x, int y, int w, int h, GLuint textureId,
 // *************************************************************************************
 
 
-
 void radiostation_class::draw_radio_item1(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress) {
   if (ii < 0 || ii >= static_cast<int>(stack.size()))
     return;
@@ -1003,7 +1002,7 @@ void radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     int index = firstIndex + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    float x = startX + col * itemWidth + 40.0f;
+    float x = startX + col * itemWidth + 20.0f;
     float y = startY + row * rowHeight - subOff - 20.0f;
     float progress = 1.0f;
     if (!radioIntroFinished) {
@@ -1047,6 +1046,11 @@ void radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
 }
 
 
+// ***********************************************************************************
+//
+// not in use
+//
+// ***********************************************************************************
 
 bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
   int buttonsizex=164;  

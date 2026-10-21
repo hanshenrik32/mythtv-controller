@@ -1954,7 +1954,7 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    float x = startX + col * itemWidth + 40.0f;
+    float x = startX + col * itemWidth + 20.0f;
     float y = startY + row * rowHeight - subOff - 20.0f;
     float progress = 1.0f;
     if (!musicIntroFinished) {
@@ -2002,7 +2002,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 40;
+    int x = startX + col * itemWidth + 20;
     int y = startY + row * rowHeight - subOff - 20;
     draw_music_item( x, y, index, normal_icon, normal_icon , back_icon, music_select_iconnr);
   }
@@ -2093,11 +2093,9 @@ void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint 
     // Placeringen beregnes ud fra rækkefølgen i søgeresultaterne.
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 40;
+    int x = startX + col * itemWidth + 20;
     int y = startY + row * rowHeight - subOff - 20;
     draw_music_search_item( x, y, index, normal_icon, normal_icon, back_icon, music_select_iconnr);
   }
 }
-
-
 

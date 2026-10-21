@@ -3178,13 +3178,13 @@ void show_setup_interface() {
   ypos=200+100;
   if (setup_icon_over==13) renderer.AddTextureRect(45,setupbackend, xpos, ypos, winsizx, winsizy,1,1,1,1);
   else renderer.AddTextureRect(45,setupbackend, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
-
   // close button
   xpos=200+400;
   ypos=900+10;
   winsizx = 355;
   winsizy = 81;
-  renderer.AddTextureRect(37,_texturesetupclose, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==14) renderer.AddTextureRect(37,_texturesetupclose, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(37,_texturesetupclose, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
 }
 
 

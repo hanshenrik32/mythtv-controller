@@ -187,6 +187,8 @@ void show_background();
 void ShowMovieWindow();
 void HideMovieWindow();
 
+inline float fastSpectrumTarget(float spectrum);
+
 // start (button)
 //
 float uvcolortable2[]={0.8,0.0,0.8, \
