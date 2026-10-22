@@ -2601,7 +2601,7 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 40;
+    int x = startX + col * itemWidth + 20;
     int y = startY + row * rowHeight - subOff - 20;
     draw_stream_search_item( x, y, index, _defaultdvdcover, _defaultdvdcover, film_select_iconnr );
   }
@@ -2686,7 +2686,7 @@ void film_oversigt_typem::show_film_oversigt1(float _mangley,int filmnr) {
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    float x = startX + col * itemWidth + 40.0f;
+    float x = startX + col * itemWidth + 20.0f;
     float y = startY + row * rowHeight - subOff - 20.0f;
     float progress = 1.0f;
     if (!filmIntroFinished) {
@@ -2704,7 +2704,11 @@ void film_oversigt_typem::show_film_oversigt1(float _mangley,int filmnr) {
 
 
 
+// **********************************************************************************
+//
 // old version
+//
+// **********************************************************************************
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   // ---- KINETIC SCROLL ---------------------------------------

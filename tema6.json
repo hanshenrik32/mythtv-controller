@@ -254,7 +254,7 @@
             "radioplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 50,
-                "y": 470,
+                "y": 520,
                 "sizx": 100,
                 "sizy": 100
             },
@@ -267,21 +267,21 @@
             "radioplayer_stop_button": {
                 "icon_path": "mplaystop",
                 "x": 150,
-                "y": 470,
+                "y": 520,
                 "sizx": 100,
                 "sizy": 100
             },
             "radioplayer_ff_button": {
                 "icon_path": "mplaynext",
                 "x": 250,
-                "y": 470,
+                "y": 520,
                 "sizx": 100,
                 "sizy": 100
             },
             "radioplayer_bw_button": {
                 "icon_path": "mplaylast",
                 "x": 350,
-                "y": 470,
+                "y": 520,
                 "sizx": 100,
                 "sizy": 100
             },
