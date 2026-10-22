@@ -629,6 +629,7 @@ class config_icons {
       config_mediaplayer_stop_button_posy = 330;
       config_mediaplayer_stop_button_sizx = 100;
       config_mediaplayer_stop_button_sizy = 100;
+      config_mediaplayer_info_icon = "musicplayer-info";
 
       // Movie player info window
       config_movieplayer_infox = 400;
@@ -640,7 +641,6 @@ class config_icons {
       config_movieplayer_cover_sizx = 230;
       config_movieplayer_cover_sizy = 322;
       
-      config_mediaplayer_info_icon = "musicplayer-info";
       config_exitx = 0;
       config_exity = 0;
       config_exit_icon= "exit";

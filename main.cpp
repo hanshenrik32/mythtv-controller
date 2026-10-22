@@ -2831,16 +2831,16 @@ void display() {
       if (do_zoom_tidal_cover) {
         renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_tidalplayer_infox, config_menu.config_tidalplayer_infoy, config_menu.config_tidalplayer_sizx, config_menu.config_tidalplayer_sizy,1,1,1,1);
       } else if (do_zoom_spotify_cover) {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
+        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_spotifyplayer_infox, config_menu.config_spotifyplayer_infoy, config_menu.config_spotifyplayer_sizx, config_menu.config_spotifyplayer_sizy,1,1,1,1);
       } else if (do_zoom_radio_cover) {
         renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
       } else if (do_zoom_music_cover) {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
+        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_musicplayer_infox, config_menu.config_musicplayer_infoy, config_menu.config_musicplayer_sizx, config_menu.config_musicplayer_sizy,1,1,1,1);
       } else {
         renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
       }
       // buttons
-      // play
+      // play/stop and other
       if (do_zoom_tidal_cover) {
         if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,1,1,1,1);
         else renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
@@ -2926,12 +2926,14 @@ void display() {
         renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(8*18) ,showbb,1,1,1,1);
 
         // Radio cover
-        GLuint radiotexture_2;
+        GLuint radiotexture_2;        
         radiotexture_2=radiooversigt.get_texture(radiooversigt.playingstationnr-1);
         if (radiotexture_2) {
-          renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
+          // renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
+          renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_coverx,config_menu.config_radioplayer_covery,config_menu.config_radioplayer_cover_sizx, config_menu.config_radioplayer_cover_sizy, 1,1,1,1);
+
         } else {
-          renderer.AddTextureRect(0,normal_icon, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
+          // renderer.AddTextureRect(0,normal_icon, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
         }
         result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
         if ((result == FMOD_OK) && (ms>0)) {

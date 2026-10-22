@@ -262,10 +262,10 @@
                 "sizy": 100
             },
             "radioplayer_info_cover": {
-                "x": 348,
-                "y": 400,
-                "sizx": 167,
-                "sizy": 119
+                "x": 808,
+                "y": 365,
+                "sizx": 162,
+                "sizy": 139
             },
             "radioplayer_stop_button": {
                 "icon_path": "mplaystop",
