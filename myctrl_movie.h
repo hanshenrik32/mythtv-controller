@@ -115,6 +115,7 @@ class film_oversigt_typem : vlc_controller {
     float getmovieposition();
     bool show_search_view;
   public:
+    int film_icon_over=0;                      // used for mouse over
     int getsubs_timer=0;
     // used to fade playing movie info in/out
     float film_fader=0;
@@ -232,7 +233,7 @@ class film_oversigt_typem : vlc_controller {
     std::string select_player();
     std::string select_enable_dual_screen_player();
     std::string select_uv_screen_mode();
-    std::string select_player_resolution();
+    std::string select_player_resolution();    
 };
 
 #endif

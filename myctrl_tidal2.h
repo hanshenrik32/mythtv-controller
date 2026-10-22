@@ -125,10 +125,10 @@ class tidal_class {
     void process_array(json_value* value, int depth);
 
     int tidal_get_artists_all_albums(char *artistid,bool force,bool create_db_records,bool search_artist_name);
-    int update_song_playcount(const char *playpath);
-    void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id,Color4 c,int stream_key_selected);
+    int update_song_playcount(const char *playpath);    
+    void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id, int stream_key_selected,Color4 color);
   public:
-
+    int tidal_icon_over=0;                      // used for mouse over
     std::string tiddl_path="";                 // ="~/.local/bin/tiddl"; path is found by function run_tidal_dl()
     int setup_select_linie=0;
     bool tidal_stop_loader_thread=false;
@@ -335,27 +335,19 @@ class tidal_class {
 
     void onScroll(float delta) { scrollVel += delta * accel; }
 
-    void draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+    // void draw_tidal_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
+    // void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
     void draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
-    void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
     void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,std::string searchstring);
-
     int update_playlist_playcount(const char *playid);
     void convert_m4a_to_flac(char *path,int tidalknapnr);
-
-
     int antal_in_playlist() { return tidal_aktiv_song.size(); }
-
     int delete_stack_element(int nr);
-
-    void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id, int stream_key_selected);
-
-
     bool tidalIntroStarted = false;
     bool tidalIntroFinished = false;
     float tidalIntroScrollStart = 0.0f;
     std::chrono::steady_clock::time_point tidalIntroStart;
-    void draw_tidal_item1(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress = 1.0f);
+    void draw_tidal_item(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress = 1.0f);
     void show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
 
 };

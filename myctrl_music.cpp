@@ -37,6 +37,7 @@ extern Renderer renderer;
 
 extern MFont myfont;
 extern MFont myfont2;
+extern MFont myfont_search_bar;
 
 extern GLuint playing_tidal_icon_texture;
 
@@ -57,6 +58,7 @@ extern GLuint _textureId_dir; 	                  // folder image
 
 
 extern char keybuffer[512];                     // keyboard buffer
+extern std::string keybuffer1;
 
 extern FILE *logfile;
 extern char debuglogdata[1024];
@@ -1594,58 +1596,67 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
 //
 // ****************************************************************************************
 
-/*
+
 void musicoversigt_class::drawcover(int x, int y, int w, int h, GLuint textureId, GLuint icon, int id, Color3 c) {
-  glEnable(GL_TEXTURE_2D);
-  glColor4f(c.r, c.g, c.b, c.a);
   if (textureId!=_textureId_dir) {
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    glLoadName(id);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex2i(x + 10,          y + 10);
-    glTexCoord2f(1, 0); glVertex2i(x + 10 + w - 20, y + 10);
-    glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
-    glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
-    glEnd();
+    renderer.AddTextureRect(id,textureId, x, y, w, h,c.r,c.g ,c.b,c.a);
   } else {
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    glLoadName(id);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex2i(x + 10,          y + 10);
-    glTexCoord2f(1, 0); glVertex2i(x + 10 + w - 20, y + 10);
-    glTexCoord2f(1, 1); glVertex2i(x + 10 + w - 20 ,y + h - 10);
-    glTexCoord2f(0, 1); glVertex2i(x + 10,          y + h - 10);
-    glEnd();
+    renderer.AddTextureRect(id,textureId, x, y, w, h,c.r,c.g ,c.b,c.a);
   }
   if ((playingmusicnr>0) && (musicoversigt[id-100].directory_id == playingmusicnr)) {
-    glBindTexture(GL_TEXTURE_2D, playing_record_icon_texture);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex2i(x + w - 40, y + h - 40);
-    glTexCoord2f(1, 0); glVertex2i(x + w - 10, y + h - 40);
-    glTexCoord2f(1, 1); glVertex2i(x + w - 10, y + h - 10);
-    glTexCoord2f(0, 1); glVertex2i(x + w - 40, y + h - 10);
-    glEnd();
+    renderer.AddTextureRect(id,playing_tidal_icon_texture, x+w-40, y+h-40, 40, 40,c.r,c.g ,c.b,c.a);
   }
 }
-*/
 
 // ****************************************************************************************
 //
-// Draw cover with new icon overlay
+// Funktion to draw lines of text in screen.
 //
 // ****************************************************************************************
 
 
-void musicoversigt_class::drawcover(int x, int y, int w, int h, GLuint textureId, GLuint icon, int id, Color3 c) {
-  if (textureId!=_textureId_dir) {
-    renderer.AddTextureRect(id,textureId, x, y, w, h,1,1,1,1);
-  } else {
-    renderer.AddTextureRect(id,textureId, x, y, w, h,1,1,1,1);
+
+void music_drawLinesOfTextfont(MFont *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center) {
+  std::istringstream stream(text);
+  std::string word;
+  std::string currentLine;
+  std::string formattext;
+  float yoffset=0.0f;
+  int linecount=0;
+  while (stream >> word) {
+    // Check if adding the word exceeds the maximum width then print the line
+    if (currentLine.length() + word.length() + 1 > maxWidth) {
+      if (currentLine.length()>0) {
+        if (center) formattext = fmt::format("{:^{}s}",currentLine,maxWidth);
+        else formattext = fmt::format("{}",currentLine);
+        renderer.AddText(font, x, y+yoffset  ,formattext,1,1,1,1);
+        currentLine = word; // Start a new line with the current word
+        linecount++;
+        yoffset+=18.0f;
+      } else {
+        currentLine = word; // Start a new line with the current word
+      }
+    } else {
+      if (!currentLine.empty()) {
+        currentLine += " "; // Add a space before the next word
+      }
+      currentLine += word; // Add the word to the current line
+    }
+    if (linecount>maxlines) break;
   }
-  if ((playingmusicnr>0) && (musicoversigt[id-100].directory_id == playingmusicnr)) {
-    renderer.AddTextureRect(id,playing_tidal_icon_texture, x+w-40, y+h-40, 40, 40,1,1,1,1);
+    // Print any remaining text in the current line
+  if (linecount<=maxlines) {
+    if (!currentLine.empty()) {
+      if (currentLine.length()>maxWidth) currentLine.resize(maxWidth);
+      if (center) formattext = fmt::format("{:^{}s}",currentLine,maxWidth);
+      else formattext = fmt::format("^{}",currentLine,maxWidth);
+      renderer.AddText(font, x, y+yoffset  ,formattext,1,1,1,1);
+      // drawText(font,formattext.c_str(), x, y + yoffset, scale, color);
+    }
   }
 }
+
+
 
 // ****************************************************************************************
 //
@@ -1683,12 +1694,7 @@ void musicoversigt_class::draw_music_item1(float x,float y,int ii,GLuint normal_
   // ---- ZOOM ------------------------------------------------
   const float overshoot = 2.6f;
   float u = progress - 1.0f;
-
-  float backEase =
-      1.0f +
-      (overshoot + 1.0f) * u * u * u +
-      overshoot * u * u;
-
+  float backEase =1.0f + (overshoot + 1.0f) * u * u * u + overshoot * u * u;
   float scale = 0.85f + 0.15f * backEase;
   // ---- FADE ------------------------------------------------
   float alpha = std::clamp(progress / 0.4f, 0.0f, 1.0f);
@@ -1700,27 +1706,28 @@ void musicoversigt_class::draw_music_item1(float x,float y,int ii,GLuint normal_
   float offset = ii == 0 ? 18.0f : 20.0f;
   float coverX = x + offset + (baseSize - size) * 0.5f;
   float coverY = animatedY + offset + (baseSize - size) * 0.5f;
-  renderer.AddTextureRect(
-      ii + 100,
-      texture,
-      coverX,
-      coverY,
-      size,
-      size,
-      1.0f, 1.0f, 1.0f, alpha
-  );
-
+  if (ii==music_icon_over-100) {
+    renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,1.0f, 1.0f, 1.0f, 1.0f);
+  } else {
+    alpha=alpha-0.15f;
+    renderer.AddTextureRect(ii + 100,texture,coverX,coverY,size,size,0.65f, 0.65f, 0.65f, alpha);
+  }
   // ---- TITEL -----------------------------------------------
   std::string text = fmt::format("{:^20}", item.album_name);
-  float textY = animatedY + 218.0f;
+  float textY = animatedY + 218.0f;   //218
   if (ii == 0 && item.oversigttype != -1 && !selected)
-    textY = animatedY + 228.0f;
-
-  renderer.AddText(&myfont,x + 20.0f,textY,text,1.0f, 1.0f, 1.0f, alpha
-  );
+    textY = animatedY + 228.0f; // 228
+  music_drawLinesOfTextfont(&myfont,text, x + 18, textY, 12, 22, 2, 2, true);
 }
 
 
+
+
+// ***********************************************************************************************
+//
+// Not in use
+// 
+// ***********************************************************************************************
 
 void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon, int stream_key_selected) {
   // Baggrund
@@ -1790,7 +1797,7 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
 
 // ****************************************************************************************
 //
-// Draw music search item
+// Draw music search item.
 //
 // ****************************************************************************************
 
@@ -1800,14 +1807,13 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
   std::string temprgtxt;
   std::string gfxfilename;
   GLuint texture;
-  Color3 highcolor={0.30f, 0.50f, 0.90f, 1.0f};
-  Color3 normalcolor={0.15f, 0.15f, 0.15f, 1.0f};
+  Color3 highcolor={1.00f, 1.00f, 0.90f, 0.85f};
+  Color3 highcolor_mouseover={1.00f, 1.00f, 0.90f, 1.0f};
+  Color3 normalcolor={1.0f, 1.0f, 0.90f, 0.85f};
   // Cover
   gfxfilename = musicoversigt[ii].album_coverfile;
-  
   //float fontsize = float (configdefaultmusicfontsize/100)*2;
   float fontsize = 1.0f;
-
   if (gfxfilename.size() > 0) {
     // load texture if not loaded
     if (musicoversigt[ii].textureId == 0) {
@@ -1824,12 +1830,20 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
     if (y>search_startY-30) {
       if (ii==0) {
         if (musicoversigt[ii].oversigttype!=-1) {
-          drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
+          if (ii==music_icon_over-100) {
+            drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor_mouseover);
+          } else {
+            drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor);
+          }
           renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
           // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
         } else {
           if (texture==0) texture=normal_icon;
-          drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
+          if (ii==music_icon_over-100) {
+            drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor_mouseover);
+          } else {
+            drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor);
+          }
           renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
           // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
           // none
@@ -1837,8 +1851,11 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
       } else {
         if (musicoversigt[ii].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
         else glBindTexture(GL_TEXTURE_2D,musicoversigt[ii].textureId);
-
-        drawcover(x + 18, y + 18, 164, 164, texture , normal_icon, ii+100, highcolor);
+        if (ii==music_icon_over-100) {
+          drawcover(x + 18, y + 18, 180, 180, texture , normal_icon, ii+100, highcolor_mouseover);
+        } else {
+          drawcover(x + 18, y + 18, 180, 180, texture , normal_icon, ii+100, highcolor);
+        }
         renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
       }
@@ -1846,13 +1863,21 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
   } else {
     if (ii==0) {
       if (y>search_startY-30) {
-        drawcover(x + 18, y + 18, 164, 164, texture , back_icon, ii+100, highcolor);
+        if (ii==music_icon_over-100) {
+          drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor_mouseover);
+        } else {
+          drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor);
+        }
         renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
       }
     } else {
       if (y>search_startY-30) {
-        drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, normalcolor);
+        if (ii==music_icon_over-100) {
+          drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, highcolor_mouseover);
+        } else {
+          drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, normalcolor);
+        }
         renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
       }
@@ -1875,7 +1900,6 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
   scrollPos += scrollVel;
   if (std::fabs(scrollVel) < 0.01f)
     scrollVel = 0.0f;
-
   int count = static_cast<int>(musicoversigt.size());
   int totalRows = (count + itemsPerRow - 1) / itemsPerRow;
   float maxScroll = std::max(
@@ -1883,7 +1907,6 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
     totalRows * static_cast<float>(rowHeight) -
     static_cast<float>(viewHeight)
   );
-
   if (scrollPos < 0.0f) {
     scrollPos = 0.0f;
     scrollVel = 0.0f;
@@ -1916,9 +1939,7 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
     musicIntroStarted = true;
     musicIntroFinished = false;
   }
-  float elapsed = std::chrono::duration<float>(
-    now - musicIntroStart
-  ).count();
+  float elapsed = std::chrono::duration<float>(now - musicIntroStart).count();
   const float duration = 0.65f;
   int maxWaveStep = (introRows - 1) + (introCols - 1);
   float waveDelay = maxWaveStep > 0 ? std::min(0.05f, 0.35f / maxWaveStep) : 0.0f;
@@ -1933,7 +1954,7 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    float x = startX + col * itemWidth + 40.0f;
+    float x = startX + col * itemWidth + 20.0f;
     float y = startY + row * rowHeight - subOff - 20.0f;
     float progress = 1.0f;
     if (!musicIntroFinished) {
@@ -1951,7 +1972,7 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
 
 // ****************************************************************************************
 //
-// Show music overview new version 2
+// Show music overview (not in use)
 //
 // ****************************************************************************************
 
@@ -1964,11 +1985,11 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   int visibleRows = viewHeight / rowHeight;
   float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
   if (scrollPos < 0) {
-      scrollPos = 0;
-      scrollVel = 0;
+    scrollPos = 0;
+    scrollVel = 0;
   } else if (scrollPos > maxScroll) {
-      scrollPos = maxScroll;
-      scrollVel = 0;
+    scrollPos = maxScroll;
+    scrollVel = 0;
   }
   // ---- CALC --------------------------------------------------
   int firstRow   = (int)(scrollPos / rowHeight);
@@ -1981,7 +2002,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 40;
+    int x = startX + col * itemWidth + 20;
     int y = startY + row * rowHeight - subOff - 20;
     draw_music_item( x, y, index, normal_icon, normal_icon , back_icon, music_select_iconnr);
   }
@@ -1993,25 +2014,53 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
 //
 // ****************************************************************************************
 
+
+auto toLower = [](std::string text) {
+  std::transform(text.begin(), text.end(), text.begin(),[](unsigned char c) {
+    return static_cast<char>(std::tolower(c));
+  });
+  return text;
+};
+
+
 void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
   char searchstring[200];
   bool cursor=true;
   int buttonsize=180;
   float yof_top=orgwinsizey-(rowHeight*1)+20;                               // start ypos
   float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
+  // Find alle albums, som matcher søgningen.
+  std::vector<int> foundIndices;
+  foundIndices.reserve(musicoversigt.size());
+
+  const std::string search = toLower(keybuffer1);
+  for (int i = 0; i < static_cast<int>(musicoversigt.size()); ++i) {
+    const std::string album = toLower(musicoversigt[i].album_name);
+    if (search.empty() || album.find(search) != std::string::npos) {
+      foundIndices.push_back(i);
+    }
+  }
+
+  // Start øverst, når søgeteksten ændres.
+  static std::string previousSearch;
+  if (previousSearch != keybuffer1) {
+    scrollPos = 0.0f;
+    scrollVel = 0.0f;
+    previousSearch = keybuffer1;
+  }
   // ---- KINETIC SCROLL ---------------------------------------
   scrollVel *= friction;
   scrollPos += scrollVel;
   if (fabs(scrollVel) < 0.01f) scrollVel = 0;
-  int totalRows   = (int)ceil((float)musicoversigt.size() / itemsPerRow);
+  int totalRows = (static_cast<int>(foundIndices.size()) + itemsPerRow - 1) / itemsPerRow;  
   int visibleRows = search_viewHeight / rowHeight;
   float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
   if (scrollPos < 0) {
-      scrollPos = 0;
-      scrollVel = 0;
+    scrollPos = 0;
+    scrollVel = 0;
   } else if (scrollPos > maxScroll) {
-      scrollPos = maxScroll;
-      scrollVel = 0;
+    scrollPos = maxScroll;
+    scrollVel = 0;
   }
   // ---- CALC --------------------------------------------------
   int firstRow   = (int)(scrollPos / rowHeight);
@@ -2035,18 +2084,18 @@ void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint 
   }
   strcpy(searchstring,keybuffer);
   if (strcmp(searchstring,"")!=0) {
-    renderer.AddText(&myfont, 300, 180 ,searchstring,1,1,1,1);
+    renderer.AddText(&myfont_search_bar, 400, 120 ,searchstring,1,1,1,1);
     // if (cursor) glcRenderString("_"); else glcRenderString(" ");
   }
-  for (int i = 0; i < visibleItems && (sofset+i) < musicoversigt.size();i++) {
-    int index = sofset + i;
+  for (int i = 0; i < visibleItems && (sofset + i) < static_cast<int>(foundIndices.size()); ++i) {
+    // Det oprindelige indeks bruges til at hente og vælge albummet.
+    int index = foundIndices[sofset + i];
+    // Placeringen beregnes ud fra rækkefølgen i søgeresultaterne.
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 40;
+    int x = startX + col * itemWidth + 20;
     int y = startY + row * rowHeight - subOff - 20;
-    draw_music_search_item( x, y, index, normal_icon, normal_icon , back_icon, music_select_iconnr);
+    draw_music_search_item( x, y, index, normal_icon, normal_icon, back_icon, music_select_iconnr);
   }
 }
-
-
 

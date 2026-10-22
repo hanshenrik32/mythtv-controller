@@ -8,62 +8,107 @@ class config_icons {
     // main icons settings from json file
     int config_tvguidex;
     int config_tvguidey;
-    int config_tvguide_icon_sizex;
-    int config_tvguide_icon_sizey;
+    int config_tvguide_sizx;
+    int config_tvguide_sizy;
     std::string config_tvguide_icon;
     GLuint config_tvguidex_textureId;
     std::string config_tema_path;
     int config_spotifyx;
     int config_spotifyy;
     std::string config_spotify_icon;
+    int config_spotify_sizx;
+    int config_spotify_sizy;
     int config_spotify1x;
     int config_spotify1y;
     std::string config_spotify1_icon;
+    int config_spotify1_sizx;
+    int config_spotify1_sizy;
+
     int config_tidalx;
     int config_tidaly;
     std::string config_tidal_icon;
+    int config_tidal_sizx;
+    int config_tidal_sizy;
+
     int config_tidal1x;
     int config_tidal1y;
     std::string config_tidal1_icon;
+    int config_tidal1_sizx;
+    int config_tidal1_sizy;
+
     int config_musicx;
     int config_musicy;
     std::string config_music_icon;
+    int config_music_sizx;
+    int config_music_sizy;
+    
     int config_music_activex;
     int config_music_activey;
     std::string config_music_active_icon;
+    int config_music_active_sizx;
+    int config_music_active_sizy;
     int config_mediax;
     int config_mediay;
     std::string config_media_icon;
+    int config_media_sizx;
+    int config_media_sizy;
     int config_media1x;
     int config_media1y;
     std::string config_media1_icon;
+    int config_media1_sizx;
+    int config_media1_sizy;
     int config_radiox;
     int config_radioy;
     std::string config_radio_icon;
+    int config_radio_sizx;
+    int config_radio_sizy;
     int config_radio1x;
     int config_radio1y;
     std::string config_radio1_icon;
+    int config_radio1_sizx;
+    int config_radio1_sizy;
+
+    int config_moviestreamx=1720;
+    int config_moviestreamy=504;
+    std::string config_moviestream_icon="media_button";
+    int config_moviestream_sizx=200;
+    int config_moviestream_sizy=200;
+
     int config_moviex;
     int config_moviey;
     std::string config_movie_icon;
+    int config_movie_sizx;
+    int config_movie_sizy;
     int config_movie1x;               // når movie er valgt
     int config_movie1y;
     std::string config_movie1_icon;
+    int config_movie1_sizx;               // når movie er valgt
+    int config_movie1_sizy;
     int config_recordedx;
     int config_recordedy;
     std::string config_recorded_icon;
+    int config_recorded_sizx;
+    int config_recorded_sizy;
     int config_recorded1x;
     int config_recorded1y;
     std::string config_recorded1_icon;
+    int config_recorded1_sizx;
+    int config_recorded1_sizy;
     int config_closex;
     int config_closey;
     std::string config_close_icon;
+    int config_close_sizx;
+    int config_close_sizy;
     int config_closemainx;
     int config_closemainy;
     std::string config_closemain_icon;
+    int config_closemain_sizx;
+    int config_closemain_sizy;
     int config_setupx;
     int config_setupy;
     std::string config_setup_icon;
+    int config_setup_sizx;
+    int config_setup_sizy;
     int config_setup_selectedx;
     int config_setup_selectedy;
     std::string config_setup_selected_icon;
@@ -73,18 +118,26 @@ class config_icons {
     int config_playinfox;
     int config_playinfoy;    
     std::string config_playinfo_icon;
+    int config_playinfo_sizx;
+    int config_playinfo_sizy;
     int config_reset_searchx;
     int config_reset_searchy;
     std::string config_reset_search_icon;
     int config_upx;
     int config_upy;
     std::string config_up_icon;
+    int config_up_sizx;
+    int config_up_sizy;
     int config_downx;
     int config_downy;
     std::string config_down_icon;
+    int config_down_sizx;
+    int config_down_sizy;
     int config_search_activex;
     int config_search_activey;
     std::string config_search_icon;
+    int config_search_active_sizx;
+    int config_search_active_sizy;
     int config_search_backx;
     int config_search_backy;
     std::string config_search_back_icon;
@@ -97,7 +150,6 @@ class config_icons {
     int config_musicplayer_covery;
     int config_musicplayer_cover_sizx;
     int config_musicplayer_cover_sizy;
-    
 
     int config_musicplayer_play_button_posx;
     int config_musicplayer_play_button_posy;
@@ -298,32 +350,45 @@ class config_icons {
       config_tema_path="/opt/mythtv-controller/tema3/";
       config_tvguidex = 1920;
       config_tvguidey = 1080;
-      config_tvguide_icon_sizex = 180;
-      config_tvguide_icon_sizey = 180;
+      config_tvguide_sizx = 200;
+      config_tvguide_sizy = 200;
       config_tvguide_icon = "tv";
+
       config_spotifyx = 1920;
       config_spotifyy = 696;
       config_spotify_icon = "spotify_button";
+      config_spotify_sizx = 200;
+      config_spotify_sizy = 200;
 
       config_spotify1x = 1920;
       config_spotify1y = 696;
       config_spotify1_icon = "spotify_button";
+      config_spotify1_sizx = 200;
+      config_spotify1_sizy = 200;
 
       config_tidalx = 1920;
       config_tidaly = 696;
       config_tidal_icon = "tidal_button";
+      config_tidal_sizx = 200;
+      config_tidal_sizy = 200;
 
       config_tidal1x = 1920;
       config_tidal1y = 696;
       config_tidal1_icon = "tidal_button";
+      config_tidal1_sizx = 200;
+      config_tidal1_sizy = 200;
 
       config_musicx = 1920;
       config_musicy = 500;
       config_music_icon = "music_button";
+      config_music_sizx = 200;
+      config_music_sizy = 200;
 
       config_music_activex = 1920;
       config_music_activey = 500;
       config_music_active_icon = "music1";
+      config_music_active_sizx = 200;
+      config_music_active_sizy = 200;
 
       config_radio_or_music_oversigtx=1920;
       config_radio_or_music_oversigty=1080;
@@ -332,45 +397,77 @@ class config_icons {
       config_mediax = 1920;
       config_mediay = 696;
       config_media_icon = "media_button";
+      config_media_sizx = 200;
+      config_media_sizy = 200;
 
       config_media1x = 1920;
       config_media1y = 696;
       config_media1_icon = "media_button";
+      config_media1_sizx = 200;
+      config_media1_sizy = 200;
 
       config_radiox = 1920;
       config_radioy = 0;
       config_radio_icon = "radio_button";
+      config_radio_sizx = 200;
+      config_radio_sizy = 200;
+
       config_radio1x = 1920;
       config_radio1y = 0;
       config_radio1_icon = "radio_button";
+      config_radio1_sizx = 200;
+      config_radio1_sizy = 200;
 
       config_media_buttonx=1920;
       config_media_buttony=504;
       config_media_button_icon="media_button";
 
+      config_moviestreamx=1720;
+      config_moviestreamy=504;
+      config_moviestream_icon="media_button";
+      config_moviestream_sizx=200;
+      config_moviestream_sizy=200;
+
       config_moviex = 1920;
       config_moviey = 504;
       config_movie_icon = "movie_button";
+      config_movie_sizx = 200;
+      config_movie_sizy = 200;
+
       config_movie1x = 1720;
       config_movie1y = 430;
       config_movie1_icon = "movie1";
+      config_movie1_sizx = 200;
+      config_movie1_sizy = 200;
+
       config_recordedx = 0;
       config_recordedy = 0;
       config_recorded_icon = "recorded_button";
+      config_recorded_sizx = 0;
+      config_recorded_sizy = 0;
 
       config_recorded1x = 0;
       config_recorded1y = 0;
       config_recorded1_icon = "recorded_button";
+      config_recorded1_sizx = 0;
+      config_recorded1_sizy = 0;
 
       config_closex = 1920;
       config_closey = 302;
       config_close_icon = "close";
+      config_close_sizx = 200;
+      config_close_sizy = 200;
+
       config_closemainx = 1920;
       config_closemainy = 30;
       config_closemain_icon = "closemain";
+      config_closemain_sizx = 200;
+      config_closemain_sizy = 200;
       config_setupx = 0;
       config_setupy = 0;
       config_setup_icon = "setupmenu";
+      config_setup_sizx = 200;
+      config_setup_sizy = 200;
       config_setup_selectedx = 0;
       config_setup_selectedy = 0;
       config_setup_selected_icon = "setupmenu1";
@@ -380,20 +477,28 @@ class config_icons {
       config_playinfox = 1920;
       config_playinfoy = 1080;
       config_playinfo_icon = "playinfo";
+      config_playinfo_sizx = 200;
+      config_playinfo_sizy = 200;
       config_reset_searchx = 1920;
       config_reset_searchy = 1080;
       config_reset_search_icon = "reset_search";
       config_downx = 1920;
       config_downy = 1080;
       config_down_icon= "pdown";
-      config_upx= 1920;
-      config_upy= 1080;
-      config_up_icon= "pup";
-      config_search_activex= 1720;
-      config_search_activey= 850;
+      config_down_sizx = 200;
+      config_down_sizy = 200;
+      config_upx = 1920;
+      config_upy = 1080;
+      config_up_icon = "pup";
+      config_up_sizx = 1920;
+      config_up_sizy = 1080;
+      config_search_activex = 1720;
+      config_search_activey = 850;
       config_search_icon="search";
-      config_search_backx= 1720;
-      config_search_backy= 126;
+      config_search_active_sizx = 200;
+      config_search_active_sizy = 200;
+      config_search_backx = 1720;
+      config_search_backy = 126;
       config_search_back_icon="search_back";
       config_musicplayer_infox = 480;
       config_musicplayer_infoy = 300;
@@ -524,6 +629,7 @@ class config_icons {
       config_mediaplayer_stop_button_posy = 330;
       config_mediaplayer_stop_button_sizx = 100;
       config_mediaplayer_stop_button_sizy = 100;
+      config_mediaplayer_info_icon = "musicplayer-info";
 
       // Movie player info window
       config_movieplayer_infox = 400;
@@ -535,7 +641,6 @@ class config_icons {
       config_movieplayer_cover_sizx = 230;
       config_movieplayer_cover_sizy = 322;
       
-      config_mediaplayer_info_icon = "musicplayer-info";
       config_exitx = 0;
       config_exity = 0;
       config_exit_icon= "exit";

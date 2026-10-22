@@ -67,21 +67,20 @@ extern GLuint textureId_uv2;
 extern GLuint _textureId28;
 extern GLuint _textureId_cursor;
 
-
-
 extern FMOD::System    *sndsystem;
-
+extern int setup_icon_over;
 
 extern MFont myfont;
 extern MFont myfont2;
 
-
+extern char avalible_device[10][256];			                    // sound system devises list
 
 // controll rss
 //
 rss_stream_class rssstreamoversigt;
 //
 
+extern int numbersofsoundsystems;
 
 extern bool hent_tv_channels;
 extern tv_graber_config  aktiv_tv_graber;
@@ -98,7 +97,7 @@ extern char configxbmcpass[256];                //
 extern char configxbmchost[256];                //
 extern char confighostname[256];                // host name
 extern char configbackend[20];					        // backend system xbmc/mythtv
-extern char confighostip[256];				        	// mysql host ip adress
+extern std::vector<ip_info> confighostip;		        	  // mysql host ip adress
 extern char confighostwlanname[256];				    // wlan name id
 extern char configpicturepath[256];             // path til pictures gallery source
 extern char configmusicpath[256];               // path til music source (found in sqlbase/mythtvbackend)
@@ -607,6 +606,119 @@ int rss_stream_class::set_stream_name(int nr,char *name) {
 //
 // ****************************************************************************************
 
+std::string select_system_resolution() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Select Resolution\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"720p\" \
+  TRUE \"1080p\" \
+  FALSE \"4K\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
+
+
+std::string select_language() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Select Language\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"English\" \
+  TRUE \"Dansk\" \
+  FALSE \"Tysk\" \
+  FALSE \"Arabi\" \
+  FALSE \"France\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
+
+std::string select_screen_timeout() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Timeout min\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  FALSE \"5\" \
+  TRUE \"10\" \
+  FALSE \"20\" \
+  FALSE \"30\" \
+  FALSE \"60\" \
+  FALSE \"120\" \
+  FALSE \"Never\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
+
+
+std::string select_screen_mode() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string popenstring="/usr/bin/zenity --list --title=\"Full Screen\" --radiolist --column=\"Vælg\" --column=\"Type\" \
+  TRUE \"Yes\" \
+  FALSE \"No\"";
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
+
+
 void show_setup_screen() {
   char resl[1024];
   int winsizx=1200;
@@ -660,6 +772,16 @@ void show_setup_screen() {
   renderer.AddText(&myfont,450 ,450+(7*18) ,resl,1,1,1,1);
   sprintf(resl," Version  %s",glGetString(GL_VERSION));
   renderer.AddText(&myfont,450 ,450+(8*18) ,resl,1,1,1,1);
+  switch(do_show_setup_select_linie) {
+    case 0: showcoursornow(550 , 412 + (1*18) ,0);
+            break;
+    case 1: showcoursornow(550 , 412 + (2*18) ,0);
+            break;
+    case 2: showcoursornow(550 , 412 + (3*18) ,0);
+            break;
+    case 3: showcoursornow(550 , 412 + (5*18) ,0);
+            break;
+  }
 }
 
 
@@ -718,7 +840,7 @@ void show_setup_video() {
             break;
     case 3: showcoursornow(xpos + 240 ,ypos + 132 + (3*18),0);
             break;
-}
+  }
 }
 
 
@@ -944,7 +1066,7 @@ void show_wlan_networks(int valgtnr) {
 // ****************************************************************************************
 
 void show_setup_network() {
-  char tmptxt[1024];
+  std::string tmptxt;
   char id[80];			// wlan id
   int si;				// wlan signal
   int winsizx=100;
@@ -959,55 +1081,31 @@ void show_setup_network() {
   renderer.AddText(&myfont,340, 500,"Hostname",1,1,1,1);
   renderer.AddText(&myfont,340+120, 500,confighostname,1,1,1,1);
 
-  renderer.AddText(&myfont,340, 500+(1*18),"IP adress",1,1,1,1);
-  renderer.AddText(&myfont,340+120, 500+(1*18),confighostip,1,1,1,1);
+  renderer.AddText(&myfont,340, 500+(1*18),"Name/IP",1,1,1,1);
+  int nantal=confighostip.size();
+  int i=0;
+  if (nantal>0) {
+    while((i<nantal) && (i<6)) {
+      renderer.AddText(&myfont,340+120, 500+((i+1)*18),confighostip[i].network_name.c_str(),1,1,1,1);
+      renderer.AddText(&myfont,340+120+120, 500+((i+1)*18),confighostip[i].network_ip.c_str(),1,1,1,1);
+      i++;
+    }
+  }
+  if (wifinets.antal()>0) {
+    renderer.AddText(&myfont,340, 500+(6*18),"WLAN",1,1,1,1);
+    renderer.AddText(&myfont,340+120, 500+(6*18),confighostwlanname,1,1,1,1);
+  } else {
+    // no wifi network avable
+    renderer.AddText(&myfont,340, 500+(7*18),"WLAN",1,1,1,1);
+    renderer.AddText(&myfont,340+120, 500+(7*18),"No Wifi connection",1,1,1,1);
+  }
+  renderer.AddText(&myfont,340, 500+(8*18),"Signal",1,1,1,1);
+  renderer.AddText(&myfont,340+120, 500+(8*18),confighostwlanname,1,1,1,1);
 
-  renderer.AddText(&myfont,340, 500+(2*18),"WLAN",1,1,1,1);
-  renderer.AddText(&myfont,340+120, 500+(2*18),confighostwlanname,1,1,1,1);
-
-  renderer.AddText(&myfont,340, 500+(3*18),"Signal",1,1,1,1);
-  renderer.AddText(&myfont,340+120, 500+(3*18),confighostwlanname,1,1,1,1);
-
-  renderer.AddText(&myfont,340, 500+(4*18),"Password",1,1,1,1);
-  renderer.AddText(&myfont,340+120, 500+(4*18),confighostwlanname,1,1,1,1);
+  renderer.AddText(&myfont,340, 500+(9*18),"Password",1,1,1,1);
+  renderer.AddText(&myfont,340+120, 500+(9*18),confighostwlanname,1,1,1,1);
 
   /*
-  glPushMatrix();
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,setupnetworkback);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4),200 , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),800 , 0.0);
-  glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+800,800 , 0.0);
-  glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,200 , 0.0);
-  glEnd();
-  glPopMatrix();
-  glPushMatrix();
-  // close buttons
-  glEnable(GL_TEXTURE_2D);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  glBindTexture(GL_TEXTURE_2D,_textureclose);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=188;
-  winsizy=81;
-  xpos=430;
-  ypos=80;
-  glLoadName(40);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  glPopMatrix();
   // text input background
   glPushMatrix();
   winsizx=200;
@@ -1212,6 +1310,63 @@ void show_setup_network() {
 //
 // ****************************************************************************************
 
+std::string select_sound_output_device() {
+  char filenamepath[1024];
+  strcpy(filenamepath,"");
+  std::string filename="";
+  std::string device_list="";
+  for(int i=0;i<numbersofsoundsystems;i++) {
+    if (i==0) device_list=device_list + "TRUE ";
+    else device_list=device_list + "FALSE ";
+    device_list=device_list + "\"";
+    device_list=device_list + avalible_device[i];
+     device_list=device_list + "\"";
+  }
+  std::string popenstring="/usr/bin/zenity --list --title=\"Sound device output\" --radiolist --column=\"Vælg\" --column=\"Type\" ";
+  popenstring=popenstring +  device_list;
+  /*
+  eks
+  std::string popenstring="/usr/bin/zenity --list --title=\"Sound device output\" --radiolist --column=\"Vælg\" --column=\"Type\" \  
+  FALSE \"5\" \
+  TRUE \"10\" \
+  FALSE \"20\" \
+  FALSE \"30\" \
+  FALSE \"60\" \
+  FALSE \"120\" \
+  FALSE \"Never\"";
+  */
+  FILE *f = popen(popenstring.c_str(), "r");
+  fgets(filenamepath, 1024, f);
+  if (!(f)) {
+    return "";
+  }
+  fclose(f);
+  if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+  }
+  return(filename);
+}
+
+
+// set output sound device
+
+bool SetOutputDevice(FMOD::System* system, int deviceId) {
+  if (!system)
+    return false;
+  int count = 0;
+  if (system->getNumDrivers(&count) != FMOD_OK)
+    return false;
+  if (deviceId < 0 || deviceId >= count)
+    return false;
+  FMOD_RESULT result = system->setDriver(deviceId);
+  if (result != FMOD_OK) {
+    std::printf("Kan ikke skifte lydoutput: %s\n",FMOD_ErrorString(result));
+      return false;
+  }
+  return true;
+}
+
+
 void show_setup_sound() {
    renderer.AddTextureRect(0,setupsoundback, 400, 300, 800, 500,1,1,1,1);
   // close
@@ -1266,55 +1421,42 @@ void show_setup_sql() {
     } else sprintf(text,"NO XBMC version found");
     renderer.AddText(&myfont, 500, 650+(1*18),text,1,1,1,1);
   }
-  
   if (strcmp(configbackend,"mythtv")==0) renderer.AddText(&myfont, 500, 400+(2*18),"backend",1,1,1,1);
   else renderer.AddText(&myfont, 500, 400+(2*18),"buildin",1,1,1,1);
   renderer.AddText(&myfont, 600.0f+120.0f, 400+(2*18),configbackend,1,1,1,1);
-
   if (do_show_setup_select_linie==0) {
     float strlength=renderer.GetTextWidth(&myfont, configbackend);
     showcoursornow(600+120.0f+strlength, 400+(1*18),0);
   }
-  
   if (strcmp(configbackend,"mythtv")==0) renderer.AddText(&myfont, 500, 400+(3*18),"Host",1,1,1,1);
   else renderer.AddText(&myfont, 500, 400+(3*18),"Host",1,1,1,1);
   renderer.AddText(&myfont, 600.0f+120.0f, 400+(3*18),configmysqlhost,1,1,1,1);
-
   if (do_show_setup_select_linie==1) {
     float strlength=renderer.GetTextWidth(&myfont, configmysqlhost);
     showcoursornow(600+120.0f+strlength, 400+(2*18),0);
   }
-  
   if (strcmp(configbackend,"mythtv")==0) renderer.AddText(&myfont, 500, 400+(4*18),"User",1,1,1,1);
   else renderer.AddText(&myfont, 500.0f, 400+(4*18),"User",1,1,1,1);
   renderer.AddText(&myfont, 600.0f+120.0f, 400+(4*18),configmysqluser,1,1,1,1);
-
   if (do_show_setup_select_linie==2) {
     float strlength=renderer.GetTextWidth(&myfont, configmysqluser);
     showcoursornow(600+120.0f+strlength, 400+(3*18),0);
   }
-
   if (strcmp(configbackend,"mythtv")==0) renderer.AddText(&myfont, 500, 400+(5*18),"Password",1,1,1,1);
   else renderer.AddText(&myfont, 500.0f+120.0f, 400+(5*18),"Password",1,1,1,1);
   renderer.AddText(&myfont, 600.0f+120.0f, 400+(5*18),configmysqlpass,1,1,1,1);
-  
   if (do_show_setup_select_linie==3) {
     float strlength=renderer.GetTextWidth(&myfont, configmysqlpass);
     showcoursornow(600+120.0f+strlength, 400+(4*18),0);
   }
-  
   renderer.AddText(&myfont, 500.0f, 400+(6*18),"Music path",1,1,1,1);
   renderer.AddText(&myfont, 600.0f+120.0f, 400+(6*18),configmusicpath,1,1,1,1);
-
   if (do_show_setup_select_linie==4) {
     float strlength=renderer.GetTextWidth(&myfont, configmusicpath);
     showcoursornow(600+120.0f+strlength, 400+(5*18),0);
   }
-
-  
   renderer.AddText(&myfont, 500.0f, 400+(7*18),"Movie path",1,1,1,1);
   renderer.AddText(&myfont, 600.0f+120.0f, 400+(7*18),configmoviepath,1,1,1,1);  
-  
   if (do_show_setup_select_linie==5) {
     float strlength=renderer.GetTextWidth(&myfont, configmoviepath);
     showcoursornow(600+120.0f+strlength, 400+(6*18),0);
@@ -1972,6 +2114,7 @@ void showrss_list() {
 // setup rss
 //
 // ****************************************************************************************
+
 void show_setup_rss(unsigned int startofset) {
   int winsizx=1300;
   int winsizy=975;
@@ -2090,238 +2233,6 @@ void show_setup_rss(unsigned int startofset) {
     case 35:showcoursornow(850+ll2,330+(17*18),0);
             break;
   }
-
-  /*  
-  // background
-  glPushMatrix();
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,setuprssback);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  // background
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( 200,100 , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( 200,975 , 0.0);
-  glTexCoord2f(1, 1); glVertex3f( 200+1300,975 , 0.0);
-  glTexCoord2f(1, 0); glVertex3f( 200+1300,100 , 0.0);
-  glEnd();
-  glPopMatrix();
-  // close buttons
-  glPushMatrix();
-  glEnable(GL_TEXTURE_2D);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  glBindTexture(GL_TEXTURE_2D,_textureclose);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=188;
-  winsizy=81;
-  xpos=400;
-  ypos=-10;
-  glLoadName(40);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  glPopMatrix();
-  glPushMatrix();
-  // overskrift
-  glDisable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glTranslatef(260, 680, 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  myglprint4((char *) " NR RSS Feed Name.");
-  glPopMatrix();
-  glPushMatrix();
-  glDisable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glTranslatef(684, 680, 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  myglprint4((char *) "Podcast URL");
-  glPopMatrix();
-
-  // printf("do_show_setup_select_linie=%d startofset=%d streamantal=%d select name %s \n",(rssstreamoversigt.setup_select_linie/2)+startofset,startofset,rssstreamoversigt.streamantal(),rssstreamoversigt.get_stream_name_std(rssstreamoversigt.setup_select_linie/2+startofset).c_str());
-
-  for (int n=0;n<19;n++) {
-    glPushMatrix();
-    if (n+startofset==rssstreamoversigt.setup_select_linie/2+startofset) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
-    glTranslatef(260 , 660-(n*20) , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    showtxt=fmt::format("{:3} ",n+startofset);
-    myglprint4((char *) showtxt.c_str());
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(300 , 660-(n*20) , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);   
-    if ((startofset+n)<=rssstreamoversigt.streamantal()) {
-      showtxt=rssstreamoversigt.get_stream_name_std(startofset+n);
-    } else {
-      showtxt=" BLANK";
-    }
-    myglprint4((char *) showtxt.c_str());
-    if ((startofset+n)<=rssstreamoversigt.streamantal()) {
-      showtxt=rssstreamoversigt.get_stream_url_std(startofset+n);
-    } else {
-      showtxt="BLANK";
-    }
-    glRasterPos2f(392.0f, 0.0f);
-    myglprint4((char *) showtxt.c_str());
-    glPopMatrix();
-  }
-  switch(rssstreamoversigt.setup_select_linie) {
-      case 0: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(0*20),strlen(rssstreamoversigt.get_stream_name_std(0+startofset).c_str()));
-              else showcoursornow(-70,510-(0*20),0);
-              break;
-      case 1: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(0*20),strlen(rssstreamoversigt.get_stream_url_std(0+startofset).c_str()));
-              else showcoursornow(320,510-(0*20),0);
-              break;
-      case 2: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+1)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(1*20),strlen(rssstreamoversigt.get_stream_name_std(1+startofset).c_str()));
-              else showcoursornow(-70,510-(1*20),0);
-              break;
-      case 3: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+1)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(1*20),strlen(rssstreamoversigt.get_stream_url_std(1+startofset).c_str()));
-              else showcoursornow(320,510-(1*20),0);
-              break;
-      case 4: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+2)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(2*20),strlen(rssstreamoversigt.get_stream_name_std(2+startofset).c_str()));
-              else showcoursornow(-70,510-(2*20),0);
-              break;
-      case 5: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+2)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(2*20),strlen(rssstreamoversigt.get_stream_url_std(2+startofset).c_str()));
-              else showcoursornow(320,510-(2*20),0);
-              break;
-      case 6: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+3)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(3*20),strlen(rssstreamoversigt.get_stream_name_std(3+startofset).c_str()));
-              else showcoursornow(-70,510-(3*20),0);
-              break;
-      case 7: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+3)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(3*20),strlen(rssstreamoversigt.get_stream_url_std(3+startofset).c_str()));
-              else showcoursornow(320,510-(3*20),0);
-              break;
-      case 8: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+4)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(4*20),strlen(rssstreamoversigt.get_stream_name_std(4+startofset).c_str()));
-              else showcoursornow(-70,510-(4*20),0);
-              break;
-      case 9: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+4)<rssstreamoversigt.streamantal()) showcoursornow(320,510-(4*20),strlen(rssstreamoversigt.get_stream_url_std(4+startofset).c_str()));
-              else showcoursornow(320,510-(4*20),0);
-              break;
-      case 10:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+5)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(5*20),strlen(rssstreamoversigt.get_stream_name_std(5+startofset).c_str()));
-              else showcoursornow(-70,510-(5*20),0);
-              break;
-      case 11:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+5)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(5*20),strlen(rssstreamoversigt.get_stream_url_std(5+startofset).c_str()));
-              else showcoursornow(320,510-(5*20),0);
-              break;
-      case 12:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+6)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(6*20),strlen(rssstreamoversigt.get_stream_name_std(6+startofset).c_str()));
-              else showcoursornow(-70,510-(6*20),0);
-              break;
-      case 13:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+6)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(6*20),strlen(rssstreamoversigt.get_stream_url_std(6+startofset).c_str()));
-              else showcoursornow(320,510-(6*20),0);
-              break;
-      case 14:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+7)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(7*20),strlen(rssstreamoversigt.get_stream_name_std(7+startofset).c_str()));
-              else showcoursornow(-70,510-(7*20),0);
-              break;
-      case 15:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+7)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(7*20),strlen(rssstreamoversigt.get_stream_url_std(7+startofset).c_str()));
-              else showcoursornow(320,510-(7*20),0);
-              break;
-      case 16:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+8)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(8*20),strlen(rssstreamoversigt.get_stream_name_std(8+startofset).c_str()));
-              else showcoursornow(-70,510-(8*20),0);
-              break;
-      case 17:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+8)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(8*20),strlen(rssstreamoversigt.get_stream_url_std(8+startofset).c_str()));
-              else showcoursornow(320,510-(8*20),0);
-              break;
-      case 18: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+9)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(9*20),strlen(rssstreamoversigt.get_stream_name_std(9+startofset).c_str()));
-              else showcoursornow(-70,510-(9*20),0);
-              break;
-      case 19: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+9)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(9*20),strlen(rssstreamoversigt.get_stream_url_std(9+startofset).c_str()));
-              else showcoursornow(320,510-(9*20),0);
-              break;
-      case 20: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+10)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(10*20),strlen(rssstreamoversigt.get_stream_name_std(10+startofset).c_str()));
-              else showcoursornow(-70,510-(10*20),0);
-              break;
-      case 21: glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+10)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(10*20),strlen(rssstreamoversigt.get_stream_url_std(10+startofset).c_str()));
-              else showcoursornow(320,510-(10*20),0);
-              break;
-      case 22:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+11)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(11*20),strlen(rssstreamoversigt.get_stream_name_std(11+startofset).c_str()));
-              else showcoursornow(-70,510-(11*20),0);
-              break;
-      case 23:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+11)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(11*20),strlen(rssstreamoversigt.get_stream_url_std(11+startofset).c_str()));
-              else showcoursornow(320,510-(11*20),0);
-              break;
-      case 24:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+12)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(12*20),strlen(rssstreamoversigt.get_stream_name_std(12+startofset).c_str()));
-              else showcoursornow(-70,510-(12*20),0);
-              break;
-      case 25:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+12)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(12*20),strlen(rssstreamoversigt.get_stream_url_std(12+startofset).c_str()));
-              else showcoursornow(320,510-(12*20),0);
-              break;
-      case 26:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+13)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(13*20),strlen(rssstreamoversigt.get_stream_name_std(13+startofset).c_str()));
-              else showcoursornow(-70,510-(13*20),0);
-              break;
-      case 27:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+13)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(13*20),strlen(rssstreamoversigt.get_stream_url_std(13+startofset).c_str()));
-              else showcoursornow(320,510-(13*20),0);
-              break;
-      case 28:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+14)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(14*20),strlen(rssstreamoversigt.get_stream_name_std(14+startofset).c_str()));
-              else showcoursornow(-70,510-(14*20),0);
-              break;
-      case 29:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+14)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(14*20),strlen(rssstreamoversigt.get_stream_url_std(14+startofset).c_str()));
-              else showcoursornow(320,510-(14*20),0);
-              break;
-      case 30:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+14)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(15*20),strlen(rssstreamoversigt.get_stream_name_std(15+startofset).c_str()));
-              else showcoursornow(-70,510-(15*20),0);
-              break;
-      case 31:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+15)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(15*20),strlen(rssstreamoversigt.get_stream_url_std(15+startofset).c_str()));
-              else showcoursornow(320,510-(15*20),0);
-              break;
-      case 32:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+16)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(16*20),strlen(rssstreamoversigt.get_stream_name_std(16+startofset).c_str()));
-              else showcoursornow(-70,510-(16*20),0);
-              break;
-      case 33:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+16)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(16*20),strlen(rssstreamoversigt.get_stream_url_std(16+startofset).c_str()));
-              else showcoursornow(320,510-(16*20),0);
-              break;
-      case 34:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+17)<=rssstreamoversigt.streamantal()) showcoursornow(-70,510-(17*20),strlen(rssstreamoversigt.get_stream_name_std(17+startofset).c_str()));
-              else showcoursornow(-70,510-(17*20),0);
-              break;
-      case 35:glColor3f(1.0f,1.0f,1.0f);
-              if ((startofset+17)<=rssstreamoversigt.streamantal()) showcoursornow(320,510-(17*20),strlen(rssstreamoversigt.get_stream_url_std(17+startofset).c_str()));
-              else showcoursornow(320,510-(17*20),0);
-              break;
-  }
-  */
 }
 
 
@@ -3200,67 +3111,80 @@ void show_setup_interface() {
   winsizy=200;
   xpos=300+200;
   ypos=200+500;
-  renderer.AddTextureRect(30,_texturesoundsetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==1) renderer.AddTextureRect(30,_texturesoundsetup, xpos, ypos, winsizx, winsizy,1,1,1,1.0f);
+  else renderer.AddTextureRect(30,_texturesoundsetup, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   //***********************************************************************************************
   // buttons
   xpos=300+400;
   ypos=200+500;
-  renderer.AddTextureRect(31,_texturesourcesetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==2) renderer.AddTextureRect(31,_texturesourcesetup, xpos, ypos, winsizx, winsizy,1,1,1,1.0f);
+  else renderer.AddTextureRect(31,_texturesourcesetup, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   //***********************************************************************************************
   // buttons
   xpos=300+600;
   ypos=200+500;
-  renderer.AddTextureRect(32,_textureimagesetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==3) renderer.AddTextureRect(32,_textureimagesetup, xpos, ypos, winsizx, winsizy,1,1,1,1.0f);
+  else renderer.AddTextureRect(32,_textureimagesetup, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   //***********************************************************************************************
   // buttons
   xpos=300+800;
   ypos=200+500;
-  renderer.AddTextureRect(33,_texturetemasetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==4) renderer.AddTextureRect(33,_texturetemasetup, xpos, ypos, winsizx, winsizy,1,1,1,1.0f);
+  else renderer.AddTextureRect(33,_texturetemasetup, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   //***********************************************************************************************
   // button for torrent
   xpos=300+200;
   ypos=200+300;
-  renderer.AddTextureRect(34,_texturemythtvsql, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==5) renderer.AddTextureRect(34,_texturemythtvsql, xpos, ypos, winsizx, winsizy,1,1,1,1.0f);
+  else renderer.AddTextureRect(34,_texturemythtvsql, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   //***********************************************************************************************
   // buttons
   xpos=300+400;
   ypos=200+300;
-  renderer.AddTextureRect(35,_texturesetupfont, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==6) renderer.AddTextureRect(35,_texturesetupfont, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(35,_texturesetupfont, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // *************************************************************************************************
   xpos=300+600;
   ypos=200+300;
-  renderer.AddTextureRect(36,_texturekeyssetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==7) renderer.AddTextureRect(36,_texturekeyssetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(36,_texturekeyssetup, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // setup video player button
   xpos=300+800;
   ypos=200+300;
-  renderer.AddTextureRect(38,_texturevideoplayersetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==8) renderer.AddTextureRect(38,_texturevideoplayersetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(38,_texturevideoplayersetup, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // setup tv graber to use
   xpos=300+200; // 400
   ypos=200+100;
-  renderer.AddTextureRect(39,_texturetvgrabersetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==9) renderer.AddTextureRect(39,_texturetvgrabersetup, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(39,_texturetvgrabersetup, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // setup rss
   xpos=300+400; // 600 
   ypos=200+100;
-  renderer.AddTextureRect(42,_texturekeysrss, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==10) renderer.AddTextureRect(42,_texturekeysrss, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(42,_texturekeysrss, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // setup spotify
   xpos=300+600; // 800
   ypos=200+100;
-  renderer.AddTextureRect(43,_texturespotify, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==11) renderer.AddTextureRect(43,_texturespotify, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(43,_texturespotify, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // setup tidal
   xpos=300+800; // 1000
   ypos=200+100;
-  renderer.AddTextureRect(44,_texturetidal, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==12) renderer.AddTextureRect(44,_texturetidal, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(44,_texturetidal, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // setup backend
   xpos=300+0; // 1000
   ypos=200+100;
-  renderer.AddTextureRect(45,setupbackend, xpos, ypos, winsizx, winsizy,1,1,1,1);
-
+  if (setup_icon_over==13) renderer.AddTextureRect(45,setupbackend, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(45,setupbackend, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // close button
   xpos=200+400;
   ypos=900+10;
   winsizx = 355;
   winsizy = 81;
-  renderer.AddTextureRect(37,_texturesetupclose, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  if (setup_icon_over==14) renderer.AddTextureRect(37,_texturesetupclose, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(37,_texturesetupclose, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
 }
 
 

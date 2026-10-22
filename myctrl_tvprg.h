@@ -95,6 +95,7 @@ class tv_oversigt {
     int createdb_if_not_exist();
     tv_oversigt_pr_kanal new_kanal;                                 // used to add new entrys
   public:
+    int tvguide_icon_over=0;                                        // used for mouse over
     bool vis_tv_guide=false;                                        // used as flag to show tv guide in movie playing overlay
     float fade=0.6f;
     std::time_t visdato_unixtime=0;

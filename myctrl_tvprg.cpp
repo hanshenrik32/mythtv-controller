@@ -1657,12 +1657,14 @@ void tv_oversigt::show_tv_oversigt(int selectchanel,int selectprg,bool do_update
       const unsigned int programId = channelIdBase + static_cast<unsigned int>(p - firstProgram);
       program.aktive = selected;
       program.program_idnr = programId;
-      
       if (x+width>1896) {
         width=1896-x;
       }
-
-      renderer.AddRoundedTextureRect(programId,0,x,y,width,itemH,10, r, g, b,fade);
+      if (tvguide_icon_over==programId) {
+        renderer.AddRoundedTextureRect(programId,0,x,y,width,itemH,10, r, g, b,1.0f);
+      } else {
+        renderer.AddRoundedTextureRect(programId,0,x,y,width,itemH,10, r, g, b,fade);
+      }
       const std::string timeText = fmt::format("{} - {} {} ",Get_time_min(program.start),Get_time_min(program.end),programId);
       renderer.AddText(&myfont_mini,x + 8, y + 18,timeText,1, 1, 1, tfade);
       const std::string titleText = fmt::format("{} ",program.title);

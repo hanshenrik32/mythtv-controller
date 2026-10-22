@@ -2,6 +2,10 @@
 #define MYTV_SETUP
 
 #include <vector>
+// sound system
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20311linux/api/core/inc/fmod_errors.h"
+
 
 const int MAXPRGLIST_ANTAL=200;
 const int MAXCHANNEL_ANTAL=400;
@@ -126,5 +130,19 @@ void getLevels();
 void render_uv();
 
 void select_exe_functions_keys_name();
+std::string select_language();
+std::string select_system_resolution();
+std::string select_screen_timeout();
+std::string select_screen_mode();
+std::string select_sound_output_device();
+bool SetOutputDevice(FMOD::System* system, int deviceId);    
+
+
+class ip_info {
+  public:
+    std::string network_name;
+    std::string network_ip;
+};
+
 
 #endif

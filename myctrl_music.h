@@ -38,6 +38,7 @@ class musicoversigt_class {
     bool do_play;
     bool music_is_playing;                                                // do we play ?   
   public:
+    int music_icon_over=0;                      // used for mouse over
     int playingmusicnr=-1;
     int selected_icon_in_view=1;
     char overview_show_band_name[256];                                  // show band name in overview
@@ -70,7 +71,7 @@ class musicoversigt_class {
     const float accel = 2.0f;
 
     int itemsPerRow = 8;
-    int rowHeight   = 198;
+    int rowHeight   = 198+30;
     int itemWidth   = 198;
 
     int startX = 20;
@@ -80,7 +81,7 @@ class musicoversigt_class {
 
     int search_startX = 20;
     int search_startY = 60+180; //  762;
-    int search_viewHeight = 660;
+    int search_viewHeight = 880;
     // end new scroll vars
     bool search_music_online_done;
     bool play() { return(do_play);}    

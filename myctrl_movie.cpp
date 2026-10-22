@@ -460,6 +460,7 @@ int film_oversigt_typem::antal_audio_tracks() {
 
 bool film_oversigt_typem::SelectSubtitle(const std::string& search) {
   vlc_controller::SelectSubtitle(search);
+  return(true);
 }
 
 
@@ -479,7 +480,7 @@ int film_oversigt_typem::GetAudioTracks() {
 
 // ****************************************************************************************
 //
-// Return true if movie is playing
+// Return true if movie is playing (by vlc)
 //
 // ****************************************************************************************
 
@@ -2408,7 +2409,7 @@ void film_oversigt_typem::draw_stream_search_item(int x, int y,int ii,GLuint nor
 
 // ****************************************************************************************
 //
-// Draw stream item
+// Draw stream item (in use)
 //
 // ****************************************************************************************
 
@@ -2450,7 +2451,12 @@ void film_oversigt_typem::draw_stream_item1(float x,float y,int ii,GLuint normal
   float centerY = frameY + baseHeight * 0.5f;
   // Alle lag skaleres omkring samme centrum.
   auto drawLayer = [&](GLuint layerTexture,float layerX,float layerY,float layerWidth,float layerHeight) {
+    if (ii==film_icon_over-100) {
+      renderer.AddTextureRect(ii + 100,layerTexture,centerX + (layerX - centerX) * scale,centerY + (layerY - centerY) * scale,layerWidth * scale,layerHeight * scale,1.0f, 1.0f, 1.0f, 1.0f);
+    } else {
+      alpha=alpha-0.15f;
       renderer.AddTextureRect(ii + 100,layerTexture,centerX + (layerX - centerX) * scale,centerY + (layerY - centerY) * scale,layerWidth * scale,layerHeight * scale,1.0f, 1.0f, 1.0f, alpha);
+    }
   };
   // DVD-baggrund.
   drawLayer(background,frameX,frameY,baseWidth,baseHeight);
@@ -2595,7 +2601,7 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 40;
+    int x = startX + col * itemWidth + 20;
     int y = startY + row * rowHeight - subOff - 20;
     draw_stream_search_item( x, y, index, _defaultdvdcover, _defaultdvdcover, film_select_iconnr );
   }
@@ -2680,7 +2686,7 @@ void film_oversigt_typem::show_film_oversigt1(float _mangley,int filmnr) {
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    float x = startX + col * itemWidth + 40.0f;
+    float x = startX + col * itemWidth + 20.0f;
     float y = startY + row * rowHeight - subOff - 20.0f;
     float progress = 1.0f;
     if (!filmIntroFinished) {
@@ -2698,7 +2704,11 @@ void film_oversigt_typem::show_film_oversigt1(float _mangley,int filmnr) {
 
 
 
+// **********************************************************************************
+//
 // old version
+//
+// **********************************************************************************
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   // ---- KINETIC SCROLL ---------------------------------------

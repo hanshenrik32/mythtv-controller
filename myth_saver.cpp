@@ -609,7 +609,7 @@ void DrawBar3D(float x, float z, float w, float h, float r, float g, float b,flo
   
   float lineWidth = 1.0f;
   float edgeR = 0.0f, edgeG = 1.0f, edgeB = 0.4f; // Grå farve (0.0 = sort, 1.0 = hvid)
-  printf("Hight = %f \n",h);
+  // printf("Hight = %f \n",h);
   if (color_part==1) {
     unsigned int color = 0x292f2d;
     float r = ((color >> 16) & 0xFF) / 255.0f;

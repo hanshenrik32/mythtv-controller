@@ -32,6 +32,11 @@
 
 #include <X11/Xlib.h>
 
+#include <ifaddrs.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <cstdio>
 
 #include "main.h"
 #include "renderer.h"
@@ -82,6 +87,13 @@ int findtype=0;
 unsigned int musicoversigt_antal=0;                       // antal aktive sange
 char music_db_update_loader[256];                         //
 int music_select_iconnr;                                  // selected icon
+
+int setup_icon_over=0;
+int menu_icon_over=0;
+float menu_icon_rcolor=0.65f;
+float menu_icon_gcolor=0.65f;
+float menu_icon_bcolor=0.65f;
+
 
 // json
 
@@ -547,7 +559,7 @@ char movie_search_name[80];                             // name to use thewn sea
 char playlistfilename[512];                             // name to use thewn save playlist
 FILE *logfile=NULL;                   // global logfile
 
-char confighostip[256];				                          // this host ip adress
+std::vector<ip_info> confighostip;                      // this host ip adress
 char confighostwlanname[256];				                    // wlan netid name
 char confighostname[256];                               // this hostname
 char configdefaultplayer[256];				                  // default player
@@ -2049,37 +2061,48 @@ void display() {
     // icon 1
     if (vis_radio_or_music_oversigt) {
       glLoadName(82);                                                           // Info icon nr 82 spotify
-      renderer.AddTextureRect(82,spotifybutton,config_menu.config_spotifyx,config_menu.config_spotifyy,iconsizex,iconsizex,1,1,1,1);
+      if (menu_icon_over==1) renderer.AddTextureRect(82,spotifybutton,config_menu.config_spotifyx,config_menu.config_spotifyy,config_menu.config_spotify_sizx,config_menu.config_spotify_sizy,1,1,1,1);
+      else renderer.AddTextureRect(82,spotifybutton,config_menu.config_spotifyx,config_menu.config_spotifyy,config_menu.config_spotify_sizx,config_menu.config_spotify_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
     } else {
       // play info icon
       if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
-          glLoadName(27);                                                           // Info icon nr 27
-          renderer.AddTextureRect(27,_textureIdplayinfo,config_menu.config_playinfox,config_menu.config_playinfoy,iconsizex,iconsizex,1,1,1,1);
+        glLoadName(27);                                                           // Info icon nr 27
+        if (menu_icon_over==1) renderer.AddTextureRect(27,_textureIdplayinfo,config_menu.config_playinfox,config_menu.config_playinfoy,config_menu.config_playinfo_sizx,config_menu.config_playinfo_sizy,1,1,1,1);
+        else renderer.AddTextureRect(27,_textureIdplayinfo,config_menu.config_playinfox,config_menu.config_playinfoy,config_menu.config_playinfo_sizx,config_menu.config_playinfo_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       } else {
-          // tv
-          glLoadName(1);                                                            // Tv guide icon nr 1
-          renderer.AddTextureRect(1,_textureIdtv,config_menu.config_tvguidex,config_menu.config_tvguidey,iconsizex,iconsizex,1,1,1,1);
+        // tv
+        glLoadName(1);                                                            // Tv guide icon nr 1
+        if (menu_icon_over==1) renderer.AddTextureRect(1,_textureIdtv,config_menu.config_tvguidex,config_menu.config_tvguidey,config_menu.config_tvguide_sizx,config_menu.config_tvguide_sizy,1.0f,1.0f,1.0f,1);
+        else renderer.AddTextureRect(1,_textureIdtv,config_menu.config_tvguidex,config_menu.config_tvguidey,config_menu.config_tvguide_sizx,config_menu.config_tvguide_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       }
     }
+
     // Icon 2
     if (vis_radio_oversigt) {
-      renderer.AddTextureRect(80,radiobutton,config_menu.config_tidal1x,config_menu.config_tidal1y,iconsizex,iconsizex,1,1,1,1);
+      renderer.AddTextureRect(80,radiobutton,config_menu.config_radio1x,config_menu.config_radio1y,config_menu.config_radio1_sizx,config_menu.config_radio1_sizy,1,1,1,1);
     }
     if (vis_radio_or_music_oversigt) {
       glLoadName(83);
       // printf("Show icon 2 1\n");                                                   // Info icon nr 83 tidal
-      if (vis_radio_oversigt==false) renderer.AddTextureRect(83,tidalbutton,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
+      if (vis_radio_oversigt==false) {
+        if (menu_icon_over==2) 
+          renderer.AddTextureRect(83,tidalbutton,config_menu.config_tidalx,config_menu.config_tidaly,config_menu.config_tidal_sizx,config_menu.config_tidal_sizy,1,1,1,1);
+        else 
+          renderer.AddTextureRect(83,tidalbutton,config_menu.config_tidalx,config_menu.config_tidaly,config_menu.config_tidal_sizx,config_menu.config_tidal_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
+      }
     } else if (vis_film_oversigt) {
       if (vis_film_oversigt) {
         if (vis_stream_or_movie_oversigt) {
-          renderer.AddTextureRect(3,_textureIdfilm_aktiv,config_menu.config_musicx,config_menu.config_musicy,iconsizex,iconsizex,1,1,1,1);
+          if (menu_icon_over==2) renderer.AddTextureRect(3,_textureIdfilm_aktiv,config_menu.config_moviestreamx,config_menu.config_moviestreamy,config_menu.config_moviestream_sizx,config_menu.config_moviestream_sizy,1,1,1,1);
+          else renderer.AddTextureRect(3,_textureIdfilm_aktiv,config_menu.config_moviestreamx,config_menu.config_moviestreamy,config_menu.config_moviestream_sizx,config_menu.config_moviestream_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
         } else {
-          renderer.AddTextureRect(3,_textureIdfilm_aktiv,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
+          renderer.AddTextureRect(3,_textureIdfilm_aktiv,config_menu.config_movie1x,config_menu.config_movie1y,config_menu.config_movie1_sizx,config_menu.config_movie1_sizy,1,1,1,1);
         }
       } else {
         glLoadName(80);           
         // printf("Show icon 2 2\n");                                                   // Info icon nr stream
-        renderer.AddTextureRect(84,streambutton,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
+        if (menu_icon_over==2) renderer.AddTextureRect(84,streambutton,config_menu.config_spotify1x,config_menu.config_spotify1y,config_menu.config_spotify1_sizx,config_menu.config_spotify1_sizy,1,1,1,1);
+        else renderer.AddTextureRect(84,streambutton,config_menu.config_spotify1x,config_menu.config_spotify1y,config_menu.config_spotify1_sizx,config_menu.config_spotify1_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       }
       if (vis_stream_or_movie_oversigt) {
 
@@ -2087,11 +2110,11 @@ void display() {
     } else if (vis_spotify_oversigt) {
       glLoadName(2);
       // printf("Show icon 2 3\n");                                                   // Info icon nr 82 spotify
-      renderer.AddTextureRect(2,spotifybutton1,config_menu.config_tidal1x,config_menu.config_tidal1y,iconsizex,iconsizex,1,1,1,1); // config_mediay
+      renderer.AddTextureRect(2,spotifybutton1,config_menu.config_tidal1x,config_menu.config_tidal1y,config_menu.config_tidal1_sizx,config_menu.config_tidal1_sizy,1,1,1,1); // config_mediay
     } else if (vis_tidal_oversigt) {
       glLoadName(83);
       // printf("Show icon 2 4\n");                                                   // Info icon nr 83 tidal
-      renderer.AddTextureRect(83,tidalbutton1,config_menu.config_tidal1x,config_menu.config_tidal1y,iconsizex,iconsizex,1,1,1,1);
+      renderer.AddTextureRect(83,tidalbutton1,config_menu.config_tidal1x,config_menu.config_tidal1y,config_menu.config_tidal1_sizx,config_menu.config_tidal1_sizy,1,1,1,1);
     } else {
       if (vis_film_oversigt) {
         glLoadName(3);
@@ -2100,30 +2123,32 @@ void display() {
       } else if (vis_stream_oversigt) {
         glLoadName(3);
         // printf("Show stream icon 2 6\n");                                                   // film icon name 3
-        renderer.AddTextureRect(3,streambutton,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
+        renderer.AddTextureRect(3,streambutton,config_menu.config_media1x,config_menu.config_media1y,config_menu.config_media1_sizx,config_menu.config_media1_sizy,1,1,1,1);
       } else if (vis_music_oversigt) {
         // printf("Show icon 2 7\n");
         glLoadName(2); 			// Overwrite the first name in the buffer
-        renderer.AddTextureRect(2,_textureIdmusic_aktiv,config_menu.config_music_activex,config_menu.config_music_activey,iconsizex,iconsizex,1,1,1,1);
+        renderer.AddTextureRect(2,_textureIdmusic_aktiv,config_menu.config_music_activex,config_menu.config_music_activey,config_menu.config_music_active_sizx,config_menu.config_music_active_sizy,1,1,1,1);
       } else if (vis_radio_oversigt) {
         // printf("Show icon 2 8\n");
         glLoadName(2); 			// Overwrite the first name in the buffer
-        renderer.AddTextureRect(2,radiobutton1,config_menu.config_radio1x,config_menu.config_radio1y,iconsizex,iconsizex,1,1,1,1);
+        renderer.AddTextureRect(2,radiobutton1,config_menu.config_radio1x,config_menu.config_radio1y,config_menu.config_radio1_sizx,config_menu.config_radio1_sizy,1,1,1,1);
       } else if (vis_spotify_oversigt) {          
         glLoadName(2); 			// Overwrite the first name in the buffer
         // printf("Show icon 2 9\n");
-        renderer.AddTextureRect(2,_textureIdmusic,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
+        renderer.AddTextureRect(2,_textureIdmusic,config_menu.config_spotify1x,config_menu.config_spotify1y,config_menu.config_spotify1_sizx,config_menu.config_spotify1_sizy,1,1,1,1);
       } else if (vis_tidal_oversigt) {
         glLoadName(2); 			// Overwrite the first name in the buffer
         // printf("Show icon 2 10\n");
-        renderer.AddTextureRect(2,_textureIdmusic,config_menu.config_tidalx,config_menu.config_tidaly,iconsizex,iconsizex,1,1,1,1);
+        renderer.AddTextureRect(2,_textureIdmusic,config_menu.config_tidalx,config_menu.config_tidaly,config_menu.config_tidal_sizx,config_menu.config_tidal_sizy,1,1,1,1);
       } else {
         if (vis_stream_or_movie_oversigt) {
-          renderer.AddTextureRect(84,streambutton,config_menu.config_spotify1x,config_menu.config_spotify1y,iconsizex,iconsizex,1,1,1,1);
+          if (menu_icon_over==2) renderer.AddTextureRect(84,streambutton,config_menu.config_mediax,config_menu.config_mediay,config_menu.config_media_sizx,config_menu.config_media_sizy,1,1,1,1);
+          else renderer.AddTextureRect(84,streambutton,config_menu.config_mediax,config_menu.config_mediay,config_menu.config_media_sizx,config_menu.config_media_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
         } else {
           glLoadName(2); 			// Overwrite the first name in the buffer
-          // printf("Show icon 2 11\n");
-          renderer.AddTextureRect(2,_textureIdmusic,config_menu.config_musicx,config_menu.config_musicy,iconsizex,iconsizex,1,1,1,1);
+          // printf("Show icon 2 music\n");
+          if (menu_icon_over==2) renderer.AddTextureRect(2,_textureIdmusic,config_menu.config_musicx,config_menu.config_musicy,config_menu.config_music_sizx,config_menu.config_music_sizy,1,1,1,1);
+          else renderer.AddTextureRect(2,_textureIdmusic,config_menu.config_musicx,config_menu.config_musicy,config_menu.config_music_sizx,config_menu.config_music_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
         }
       }
     }
@@ -2134,34 +2159,38 @@ void display() {
       // printf("Show icon 3 1\n");
       glLoadName(80); 			                                                  // radio icon name 80
       if (vis_radio_oversigt==false) {
-        renderer.AddTextureRect(80,radiobutton,config_menu.config_movie1x,config_menu.config_movie1y,iconsizex,iconsizex,1,1,1,1);
+        if (menu_icon_over==3) renderer.AddTextureRect(80,radiobutton,config_menu.config_radiox,config_menu.config_radioy,config_menu.config_radio_sizx,config_menu.config_movie1_sizy,1,1,1,1);
+        else renderer.AddTextureRect(80,radiobutton,config_menu.config_radiox,config_menu.config_radioy,config_menu.config_radio_sizx,config_menu.config_radio_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       } else {
-        renderer.AddTextureRect(23,_textureIdpup,config_menu.config_upx,config_menu.config_upy,iconsizex,iconsizex,1,1,1,1);
+        if (menu_icon_over==3) renderer.AddTextureRect(23,_textureIdpup,config_menu.config_upx,config_menu.config_upy,config_menu.config_up_sizx,config_menu.config_up_sizy,1,1,1,1);
+        else renderer.AddTextureRect(23,_textureIdpup,config_menu.config_upx,config_menu.config_upy,config_menu.config_up_sizx,config_menu.config_up_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       }
-
     } else if (vis_stream_or_movie_oversigt) {
       if (vis_film_oversigt) {
-        renderer.AddTextureRect(23,_textureIdpup,config_menu.config_upx,config_menu.config_upy,iconsizex,iconsizex,1,1,1,1);
+        renderer.AddTextureRect(23,_textureIdpup,config_menu.config_upx,config_menu.config_upy,config_menu.config_up_sizx,config_menu.config_up_sizy,1,1,1,1);
       } else {
         glLoadName(3);    
-        // printf("Show icon 2\n");                                                       // Info icon nr movie
-        renderer.AddTextureRect(3,moviebutton,config_menu.config_movie1x,config_menu.config_movie1y,iconsizex,iconsizex,1,1,1,1);
+        // printf("Show icon 3\n");                                                       // movie icon
+        if (menu_icon_over==3) renderer.AddTextureRect(3,moviebutton,config_menu.config_moviex,config_menu.config_moviey,config_menu.config_movie_sizx,config_menu.config_movie_sizy,1,1,1,1);
+        else renderer.AddTextureRect(3,moviebutton,config_menu.config_moviex,config_menu.config_moviey,config_menu.config_movie_sizx,config_menu.config_movie_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       }
     } else {
       //icon pil up
       if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
           glLoadName(23); 			// Overwrite the first name in the buffer
           // printf("Show icon 3\n");
-          renderer.AddTextureRect(23,_textureIdpup,config_menu.config_upx,config_menu.config_upy,iconsizex,iconsizex,1,1,1,1);
+          if (menu_icon_over==3) renderer.AddTextureRect(23,_textureIdpup,config_menu.config_upx,config_menu.config_upy,config_menu.config_up_sizx,config_menu.config_up_sizy,1,1,1,1);
+          else renderer.AddTextureRect(23,_textureIdpup,config_menu.config_upx,config_menu.config_upy,config_menu.config_up_sizx,config_menu.config_up_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       } else {
         if ((vis_film_oversigt) || (vis_stream_oversigt)) {
           // printf("Show icon 4\n");
-          renderer.AddTextureRect(0,_textureIdfilm_aktiv,config_menu.config_moviex,config_menu.config_moviey,iconsizex,iconsizex,1,1,1,1);
+          if (menu_icon_over==3) renderer.AddTextureRect(0,_textureIdfilm_aktiv,config_menu.config_moviex,config_menu.config_moviey,config_menu.config_movie_sizx,config_menu.config_movie_sizy,1,1,1,1);
+          else renderer.AddTextureRect(0,_textureIdfilm_aktiv,config_menu.config_moviex,config_menu.config_moviey,config_menu.config_movie_sizx,config_menu.config_movie_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
         } else {
-
           glLoadName(13); 			// Overwrite the first name in the buffer
           // printf("Show icon 5\n");
-          renderer.AddTextureRect(13,moviebutton_2,config_menu.config_moviex,config_menu.config_moviey,iconsizex,iconsizex,1,1,1,1);
+          if (menu_icon_over==3) renderer.AddTextureRect(13,moviebutton_2,config_menu.config_moviestreamx,config_menu.config_moviestreamy,config_menu.config_moviestream_sizx,config_menu.config_moviestream_sizy,1,1,1,1);
+          else renderer.AddTextureRect(13,moviebutton_2,config_menu.config_moviestreamx,config_menu.config_moviestreamy,config_menu.config_moviestream_sizx,config_menu.config_moviestream_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
         }
       }
     }
@@ -2170,23 +2199,27 @@ void display() {
     if (vis_radio_or_music_oversigt) {
       if (vis_radio_oversigt==false) {
         glLoadName(81); 			                                                  // music icon name 81          
-        renderer.AddTextureRect(81,musicbutton,config_menu.config_recordedx,config_menu.config_recordedy,iconsizex,iconsizex,1,1,1,1);
+        if (menu_icon_over==4) renderer.AddTextureRect(81,musicbutton,config_menu.config_recordedx,config_menu.config_recordedy,config_menu.config_recorded_sizx,config_menu.config_recorded_sizy,1,1,1,1);
+        else renderer.AddTextureRect(81,musicbutton,config_menu.config_recordedx,config_menu.config_recordedy,config_menu.config_recorded_sizx,config_menu.config_recorded_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       } else {
-        renderer.AddTextureRect(23,_textureIdpdown,config_menu.config_recordedx,config_menu.config_recordedy,iconsizex,iconsizex,1,1,1,1);
+        if (menu_icon_over==4) renderer.AddTextureRect(23,_textureIdpdown,config_menu.config_recordedx,config_menu.config_recordedy,config_menu.config_recorded_sizx,config_menu.config_recorded_sizy,1,1,1,1);
+        else renderer.AddTextureRect(23,_textureIdpdown,config_menu.config_recordedx,config_menu.config_recordedy,config_menu.config_recorded_sizx,config_menu.config_recorded_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       }
     } else {
       // pil down
       if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
         glLoadName(24); 			                                                // load film icon name
-        renderer.AddTextureRect(24,_textureIdpdown,config_menu.config_downx,config_menu.config_downy,iconsizex,iconsizex,1,1,1,1);
+        if (menu_icon_over==4) renderer.AddTextureRect(24,_textureIdpdown,config_menu.config_downx,config_menu.config_downy,config_menu.config_down_sizx,config_menu.config_down_sizy,1,1,1,1);
+        else renderer.AddTextureRect(24,_textureIdpdown,config_menu.config_downx,config_menu.config_downy,config_menu.config_down_sizx,config_menu.config_down_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
       } else {
         // recorded icon
         if (vis_recorded_oversigt) {
           glLoadName(4);                                                        //
-          renderer.AddTextureRect(4,_textureIdrecorded_aktiv,config_menu.config_recorded1x,config_menu.config_recorded1y,iconsizex,iconsizex,1,1,1,1);
+          renderer.AddTextureRect(4,_textureIdrecorded_aktiv,config_menu.config_recorded1x,config_menu.config_recorded1y,config_menu.config_recorded1_sizx,config_menu.config_recorded1_sizy,1,1,1,1);
         } else {
           glLoadName(4);                                                        //
-          renderer.AddTextureRect(4,_textureIdrecorded,config_menu.config_recordedx,config_menu.config_recordedy,iconsizex,iconsizex,1,1,1,1);
+          if (menu_icon_over==4) renderer.AddTextureRect(4,_textureIdrecorded,config_menu.config_recordedx,config_menu.config_recordedy,config_menu.config_recorded_sizx,config_menu.config_recorded_sizy,1,1,1,1);
+          else renderer.AddTextureRect(4,_textureIdrecorded,config_menu.config_recordedx,config_menu.config_recordedy,config_menu.config_recorded_sizx,config_menu.config_recorded_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
           // moviebutton_2
           // _textureIdrecorded
         }
@@ -2195,35 +2228,33 @@ void display() {
     // Icon 5
     if (vis_radio_or_music_oversigt) {
       glLoadName(29);
-      renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,iconsizex,iconsizex,1,1,1,1);
+      if (menu_icon_over==5) renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,config_menu.config_close_sizx,config_menu.config_close_sizy,1,1,1,1);
+      else renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,config_menu.config_close_sizx,config_menu.config_close_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
     }
-    if (vis_stream_or_movie_oversigt) {
+    if (vis_stream_or_movie_oversigt) {      
       glLoadName(29);
-      renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,iconsizex,iconsizex,1,1,1,1);
+      if (menu_icon_over==5) renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,config_menu.config_close_sizx,config_menu.config_close_sizy,1,1,1,1);
+      else renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,config_menu.config_close_sizx,config_menu.config_close_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
     }
     if (vis_stream_oversigt) {
-      renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,iconsizex,iconsizex,1,1,1,1);
+      if (menu_icon_over==5) renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,config_menu.config_close_sizx,config_menu.config_close_sizy,1,1,1,1);
+      else renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,config_menu.config_close_sizx,config_menu.config_close_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
     }
-
-
     if ((vis_film_oversigt) && (film_oversigt.get_search_view())) {
-      // 28
-      glLoadName(28);
-      /*
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( config_menu.config_reset_searchx, config_menu.config_reset_searchy , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( config_menu.config_reset_searchx, config_menu.config_reset_searchy+iconsizex , 0.0);
-      glTexCoord2f(1, 1); glVertex3f( config_menu.config_reset_searchx+iconsizex, config_menu.config_reset_searchy+iconsizex , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( config_menu.config_reset_searchx+iconsizex, config_menu.config_reset_searchy , 0.0);
-      glEnd();
-      */
+      // 29
+      if (menu_icon_over==5) renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,iconsizex,iconsizex,1,1,1,1);
+      else renderer.AddTextureRect(29,_textureclosemain,config_menu.config_closex,config_menu.config_closey,iconsizex,iconsizex,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
     }
     if (vis_uv_meter==false) {
       if ((!(vis_stream_or_movie_oversigt)) && (!(vis_radio_or_music_oversigt)) && (!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_spotify_oversigt))&& (!(vis_tidal_oversigt)) && (!(show_status_update))) {
         // setup icon
         glLoadName(5);
-        if (do_show_setup) renderer.AddTextureRect(5,_texturesetupmenu_select,config_menu.config_setupx,config_menu.config_setupy,iconsizex,iconsizex,1,1,1,1);
-          else renderer.AddTextureRect(5,_texturesetupmenu,config_menu.config_setupx,config_menu.config_setupy,iconsizex,iconsizex,1,1,1,1);
+        if (do_show_setup) {
+          renderer.AddTextureRect(5,_texturesetupmenu_select,config_menu.config_setupx,config_menu.config_setupy,config_menu.config_setup_sizx,config_menu.config_setup_sizy,1,1,1,1);
+        } else {
+            if (menu_icon_over==5) renderer.AddTextureRect(5,_texturesetupmenu,config_menu.config_setupx,config_menu.config_setupy,config_menu.config_setup_sizx,config_menu.config_setup_sizy,1,1,1,1);
+            else renderer.AddTextureRect(5,_texturesetupmenu,config_menu.config_setupx,config_menu.config_setupy,config_menu.config_setup_sizx,config_menu.config_setup_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
+          }
       }
     }
     if ((vis_spotify_oversigt) && (firsttimespotifyupdate==false)) {
@@ -2237,11 +2268,13 @@ void display() {
     }
     if (vis_tidal_oversigt) {
         glLoadName(5);
-        renderer.AddTextureRect(5,spotify_search,config_menu.config_search_activex,config_menu.config_search_activey,iconsizex,iconsizex,1,1,1,1);
-    }
+        if (menu_icon_over==5) renderer.AddTextureRect(5,spotify_search,config_menu.config_search_activex,config_menu.config_search_activey,config_menu.config_search_active_sizx,config_menu.config_search_active_sizy,1,1,1,1);
+        else renderer.AddTextureRect(5,spotify_search,config_menu.config_search_activex,config_menu.config_search_activey,config_menu.config_search_active_sizx,config_menu.config_search_active_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
+      }
     if (vis_music_oversigt) {
         glLoadName(5);
-        renderer.AddTextureRect(5,spotify_search,config_menu.config_search_activex,config_menu.config_search_activey,iconsizex,iconsizex,1,1,1,1);
+        if (menu_icon_over==5) renderer.AddTextureRect(5,spotify_search,config_menu.config_search_activex,config_menu.config_search_activey,config_menu.config_search_active_sizx,config_menu.config_search_active_sizy,1,1,1,1);
+        else renderer.AddTextureRect(5,spotify_search,config_menu.config_search_activex,config_menu.config_search_activey,config_menu.config_search_active_sizx,config_menu.config_search_active_sizy,menu_icon_rcolor,menu_icon_gcolor,menu_icon_bcolor,1);
     }
     // show exit button
     if ((!(vis_music_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!((do_show_spotify_search_oversigt)))) {
@@ -2302,10 +2335,12 @@ void display() {
       if (dirmusic.numbersinlist()>0) {
         // window ask play ?
         renderer.AddTextureRect(0,_textureId9_askbox, 500 , 200, 800, 600,1,1,1,1);
-        // play button
-        renderer.AddTextureRect(20,_textureIdplayicon, 520 , 680, 100, 100,1,1,1,1);
-        // 21 = close
-        renderer.AddTextureRect(22,_textureswap, 520+110 , 680, 100, 100,1,1,1,1);
+        // 20 = play button
+        if (menu_icon_over==20) renderer.AddTextureRect(20,_textureIdplayicon, 520 , 680, 100, 100,1,1,1,1);
+        else renderer.AddTextureRect(20,_textureIdplayicon, 520 , 680, 100, 100,0.85f,0.85f,0.85f,1);
+        // 22 = swap
+        if (menu_icon_over==22) renderer.AddTextureRect(22,_textureswap, 520+110 , 680, 100, 100,1,1,1,1);
+        else renderer.AddTextureRect(22,_textureswap, 520+110 , 680, 100, 100,0.85f,0.85f,0.85f,1);
         std::string temprgtxt;
         temprgtxt = fmt::format("Nr of songs : {:<8} {:<20}",dirmusic.numbersinlist(),musicoversigt.get_album_name(mknapnr-1));
         renderer.AddText(&myfont, 500 + 20 , 200 + 40 ,temprgtxt,1,1,1,1);
@@ -2371,9 +2406,11 @@ void display() {
       // renderer.AddTextureRect(0,_texturemusicplayer, config_menu.config_mediaplayer_infox,config_menu.config_mediaplayer_infoy, config_menu.config_mediaplayer_sizx, config_menu.config_mediaplayer_sizy,1,1,1,1);
       renderer.AddTextureRect(0,_texturemovieinfobox, config_menu.config_movieplayer_infox,config_menu.config_movieplayer_infoy, config_menu.config_movieplayer_sizx, config_menu.config_movieplayer_sizy,1,1,1,1);
       // play button
-      renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20     , 830, 120, 120,1,1,1,1);
+      if (menu_icon_over==8) renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20     , 830, 120, 120,1,1,1,1);
+      else renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20     , 830, 120, 120,0.85f,0.85f,0.85f,1);
       // stop button
-      renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100 , 830, 120, 120,1,1,1,1);
+      if (menu_icon_over==9) renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100 , 830, 120, 120,1,1,1,1);
+      else renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100 , 830, 120, 120,0.85f,0.85f,0.85f,1);
       renderer.AddText(&myfont,450,26*18,"Name ",1,1,1,1);
       std::string tmptext;
       // show name
@@ -2480,13 +2517,15 @@ void display() {
     // draw window
     renderer.AddTextureRect(0,_texturemovieinfobox, config_menu.config_movieplayer_infox,config_menu.config_movieplayer_infoy, config_menu.config_movieplayer_sizx, config_menu.config_movieplayer_sizy,1,1,1,1);
     // play button
-    renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20     , 830, 120, 120,1,1,1,1);
+    if (menu_icon_over==8) renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20     , 830, 120, 120,1,1,1,1);
+    else renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20, 830, 120, 120,0.85f,0.85f,0.85f,1);
     // stop button
-    renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100 , 830, 120, 120,1,1,1,1);
+    if (menu_icon_over==9) renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100 , 830, 120, 120,1,1,1,1);
+    else renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100, 830, 120, 120,0.85f,0.85f,0.85f,1);
     // back button
-    renderer.AddTextureRect(10,_texturemlast,         400+20+200 , 830, 120, 120,1,1,1,1);
+    renderer.AddTextureRect(10,_texturemlast,         400+20+200, 830, 120, 120,1,1,1,1);
     // ff button
-    renderer.AddTextureRect(11,_texturemnext,         400+20+300 , 830, 120, 120,1,1,1,1);
+    renderer.AddTextureRect(11,_texturemnext,         400+20+300, 830, 120, 120,1,1,1,1);
     // cover
     if (film_oversigt.editmode==2) {
       renderer.AddTextureRect(31,_defaultdvdcover, 896 , 600, 220+40, 320,1,1,1,1);
@@ -2792,39 +2831,53 @@ void display() {
       if (do_zoom_tidal_cover) {
         renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_tidalplayer_infox, config_menu.config_tidalplayer_infoy, config_menu.config_tidalplayer_sizx, config_menu.config_tidalplayer_sizy,1,1,1,1);
       } else if (do_zoom_spotify_cover) {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
+        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_spotifyplayer_infox, config_menu.config_spotifyplayer_infoy, config_menu.config_spotifyplayer_sizx, config_menu.config_spotifyplayer_sizy,1,1,1,1);
       } else if (do_zoom_radio_cover) {
         renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
       } else if (do_zoom_music_cover) {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
+        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_musicplayer_infox, config_menu.config_musicplayer_infoy, config_menu.config_musicplayer_sizx, config_menu.config_musicplayer_sizy,1,1,1,1);
       } else {
         renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
       }
       // buttons
-      // play
+      // play/stop and other
       if (do_zoom_tidal_cover) {
-        renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,1,1,1,1);
-        renderer.AddTextureRect(9,_texturemstop, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_stop_button_posx,config_menu.config_tidalplayer_stop_button_posy, config_menu.config_tidalplayer_stop_button_sizx, config_menu.config_tidalplayer_stop_button_sizy,1,1,1,1);
-        renderer.AddTextureRect(10,_texturemlast, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_ff_button_posx,config_menu.config_tidalplayer_ff_button_posy, config_menu.config_tidalplayer_ff_button_sizx, config_menu.config_tidalplayer_ff_button_sizy,1,1,1,1);               
-        renderer.AddTextureRect(11,_texturemnext, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_bw_button_posx,config_menu.config_tidalplayer_bw_button_posy, config_menu.config_tidalplayer_bw_button_sizx, config_menu.config_tidalplayer_bw_button_sizy,1,1,1,1);
+        if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_stop_button_posx,config_menu.config_tidalplayer_stop_button_posy, config_menu.config_tidalplayer_stop_button_sizx, config_menu.config_tidalplayer_stop_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(9,_texturemstop, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_stop_button_posx,config_menu.config_tidalplayer_stop_button_posy, config_menu.config_tidalplayer_stop_button_sizx, config_menu.config_tidalplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_ff_button_posx,config_menu.config_tidalplayer_ff_button_posy, config_menu.config_tidalplayer_ff_button_sizx, config_menu.config_tidalplayer_ff_button_sizy,1,1,1,1);
+        else  renderer.AddTextureRect(10,_texturemlast, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_ff_button_posx,config_menu.config_tidalplayer_ff_button_posy, config_menu.config_tidalplayer_ff_button_sizx, config_menu.config_tidalplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_bw_button_posx,config_menu.config_tidalplayer_bw_button_posy, config_menu.config_tidalplayer_bw_button_sizx, config_menu.config_tidalplayer_bw_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(11,_texturemnext, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_bw_button_posx,config_menu.config_tidalplayer_bw_button_posy, config_menu.config_tidalplayer_bw_button_sizx, config_menu.config_tidalplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
       } else if (do_zoom_radio_cover) {
         // play button + stop button
-        renderer.AddTextureRect(8,_texturemplay, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_radioplayer_play_button_posy, config_menu.config_radioplayer_play_button_sizx, config_menu.config_radioplayer_play_button_sizy,1,1,1,1);
-        renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,1,1,1,1);
+        if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_radioplayer_play_button_posy, config_menu.config_radioplayer_play_button_sizx, config_menu.config_radioplayer_play_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(8,_texturemplay, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_radioplayer_play_button_posy, config_menu.config_radioplayer_play_button_sizx, config_menu.config_radioplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
       } else if (do_zoom_music_cover) {
         // play button + stop + fw + back button
-        renderer.AddTextureRect(8,_texturemplay, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_play_button_posx,config_menu.config_musicplayer_play_button_posy, config_menu.config_musicplayer_play_button_sizx, config_menu.config_musicplayer_play_button_sizy,1,1,1,1);
-        renderer.AddTextureRect(9,_texturemstop, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_stop_button_posx,config_menu.config_musicplayer_stop_button_posy, config_menu.config_musicplayer_stop_button_sizx, config_menu.config_musicplayer_stop_button_sizy,1,1,1,1);
-        renderer.AddTextureRect(10,_texturemlast, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_ff_button_posx,config_menu.config_musicplayer_ff_button_posy, config_menu.config_musicplayer_ff_button_sizx, config_menu.config_musicplayer_ff_button_sizy,1,1,1,1);        
-        renderer.AddTextureRect(11,_texturemnext, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_bw_button_posx,config_menu.config_musicplayer_bw_button_posy, config_menu.config_musicplayer_bw_button_sizx, config_menu.config_musicplayer_bw_button_sizy,1,1,1,1);
+        if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_play_button_posx,config_menu.config_musicplayer_play_button_posy, config_menu.config_musicplayer_play_button_sizx, config_menu.config_musicplayer_play_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(8,_texturemplay, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_play_button_posx,config_menu.config_musicplayer_play_button_posy, config_menu.config_musicplayer_play_button_sizx, config_menu.config_musicplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_stop_button_posx,config_menu.config_musicplayer_stop_button_posy, config_menu.config_musicplayer_stop_button_sizx, config_menu.config_musicplayer_stop_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(9,_texturemstop, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_stop_button_posx,config_menu.config_musicplayer_stop_button_posy, config_menu.config_musicplayer_stop_button_sizx, config_menu.config_musicplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_ff_button_posx,config_menu.config_musicplayer_ff_button_posy, config_menu.config_musicplayer_ff_button_sizx, config_menu.config_musicplayer_ff_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(10,_texturemlast, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_ff_button_posx,config_menu.config_musicplayer_ff_button_posy, config_menu.config_musicplayer_ff_button_sizx, config_menu.config_musicplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_bw_button_posx,config_menu.config_musicplayer_bw_button_posy, config_menu.config_musicplayer_bw_button_sizx, config_menu.config_musicplayer_bw_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(11,_texturemnext, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_bw_button_posx,config_menu.config_musicplayer_bw_button_posy, config_menu.config_musicplayer_bw_button_sizx, config_menu.config_musicplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
         // music icon
         GLuint tmptexture=aktiv_playlist.get_textureid(1);
         renderer.AddTextureRect(0,tmptexture,config_menu.config_musicplayer_infox+346, config_menu.config_musicplayer_infoy+57,168,120,1,1,1,1);
       } else if (do_zoom_spotify_cover) {
-        renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,1,1,1,1);
-        renderer.AddTextureRect(9,_texturemstop, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_spotifyplayer_stop_button_posy, config_menu.config_spotifyplayer_stop_button_sizx, config_menu.config_spotifyplayer_stop_button_sizy,1,1,1,1);
-        renderer.AddTextureRect(10,_texturemlast, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_ff_button_posx,config_menu.config_spotifyplayer_ff_button_posy, config_menu.config_spotifyplayer_ff_button_sizx, config_menu.config_spotifyplayer_ff_button_sizy,1,1,1,1);               
-        renderer.AddTextureRect(11,_texturemnext, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_bw_button_posx,config_menu.config_spotifyplayer_bw_button_posy, config_menu.config_spotifyplayer_bw_button_sizx, config_menu.config_spotifyplayer_bw_button_sizy,1,1,1,1);
+        if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_spotifyplayer_stop_button_posy, config_menu.config_spotifyplayer_stop_button_sizx, config_menu.config_spotifyplayer_stop_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(9,_texturemstop, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_spotifyplayer_stop_button_posy, config_menu.config_spotifyplayer_stop_button_sizx, config_menu.config_spotifyplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_ff_button_posx,config_menu.config_spotifyplayer_ff_button_posy, config_menu.config_spotifyplayer_ff_button_sizx, config_menu.config_spotifyplayer_ff_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(10,_texturemlast, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_ff_button_posx,config_menu.config_spotifyplayer_ff_button_posy, config_menu.config_spotifyplayer_ff_button_sizx, config_menu.config_spotifyplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_bw_button_posx,config_menu.config_spotifyplayer_bw_button_posy, config_menu.config_spotifyplayer_bw_button_sizx, config_menu.config_spotifyplayer_bw_button_sizy,1,1,1,1);
+        else renderer.AddTextureRect(11,_texturemnext, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_bw_button_posx,config_menu.config_spotifyplayer_bw_button_posy, config_menu.config_spotifyplayer_bw_button_sizx, config_menu.config_spotifyplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
       }
     }
     // show radio info
@@ -2873,12 +2926,14 @@ void display() {
         renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(8*18) ,showbb,1,1,1,1);
 
         // Radio cover
-        GLuint radiotexture_2;
+        GLuint radiotexture_2;        
         radiotexture_2=radiooversigt.get_texture(radiooversigt.playingstationnr-1);
         if (radiotexture_2) {
-          renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
+          // renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
+          renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_coverx,config_menu.config_radioplayer_covery,config_menu.config_radioplayer_cover_sizx, config_menu.config_radioplayer_cover_sizy, 1,1,1,1);
+
         } else {
-          renderer.AddTextureRect(0,normal_icon, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
+          // renderer.AddTextureRect(0,normal_icon, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
         }
         result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
         if ((result == FMOD_OK) && (ms>0)) {
@@ -3193,7 +3248,8 @@ void display() {
   // tidal ask play or open playlist
   //
   if ((vis_tidal_oversigt) && (!(visur)) && (do_zoom_tidal_cover==false) && (ask_open_dir_or_play_tidal) && (tidalknapnr>0)) {
-    renderer.AddTextureRect(20,spotify_askplay, 550, 400, 551, 328,1,1,1,1);
+    if (menu_icon_over==20) renderer.AddTextureRect(20,spotify_askplay, 550, 400, 551, 328,1,1,1,1);
+    else renderer.AddTextureRect(20,spotify_askplay, 550, 400, 551, 328,0.85f,0.85f,0.85f,1.0f);
   }
 
   // first show status window
@@ -3945,11 +4001,12 @@ void display() {
     if (vis_uv_meter) {
       if ((configuvmeter==1) || (configuvmeter==4)) {
         for(int qq=0;qq<32;qq++) {
-          int yypos = 1050;
+          int yypos = 1080;
           float decay = 0.8f;        // 0.05f
           static float barHeights[45] = {0}; // persistent for smoothing
           // old float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
-          float target = log1pf(spectrum[qq] * 64.0f) * 4.0f;
+          // float target = log1pf(spectrum[qq] * 64.0f) * 4.0f;
+          float target = fastSpectrumTarget(spectrum[qq]);
           if (target > barHeights[qq]) {
             barHeights[qq] = target;
           } else {
@@ -3968,12 +4025,13 @@ void display() {
       }
       if ((configuvmeter==2) || (configuvmeter==3)) {
         for(int qq=0;qq<32;qq++) {
-          int yypos = 1050;
+          int yypos = 1080;
           float decay = 0.8f;        // 0.05f
           static float barHeights[45] = {0}; // persistent for smoothing
       
           // old float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
-          float target = log1pf(spectrum[qq] * 64.0f) * 4.0f;
+          // slow float target = log1pf(spectrum[qq] * 64.0f) * 4.0f;
+          float target = fastSpectrumTarget(spectrum[qq]);
           if (target > barHeights[qq]) {
             barHeights[qq] = target;
           } else {
@@ -3996,7 +4054,6 @@ void display() {
   if (tidal_oversigt.do_setup_tidal_start_entry) {
     tidal_oversigt.setup_tidal_start_entry();
   }
-
 
   //
   // show search box and text for radio and music and movie and spotify and tidal offline search NOT spotify online search
@@ -4045,7 +4102,7 @@ void display() {
   // debug mode 1
   showfps=true;
   show_status=false;
-  if ((showfps) && (show_status==false)) {
+  if ((debugmode) && (showfps) && (show_status==false)) {
     // Gather our frames per second
     Frames++;
     GLuint t = SDL_GetTicks();
@@ -4068,7 +4125,25 @@ void display() {
 
 
 
+inline float fastSpectrumTarget(float spectrum) {
+    float x = 1.0f + spectrum * 64.0f;
 
+    std::uint32_t bits;
+    std::memcpy(&bits, &x, sizeof(bits));
+
+    const int exponent = int((bits >> 23) & 255u) - 127;
+
+    // Normalisér til intervallet [1, 2).
+    bits = (bits & 0x007FFFFFu) | 0x3F800000u;
+    float m;
+    std::memcpy(&m, &bits, sizeof(m));
+
+    const float z  = (m - 1.0f) / (m + 1.0f);
+    const float z2 = z * z;
+
+    return float(exponent) * 2.77258872f
+         + 8.0f * z * (1.0f + z2 * (0.33333333f + z2 * 0.2f));
+}
 
 // ****************************************************************************************
 //
@@ -5399,13 +5474,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // menu entry (3)
           if ((id==MOVIE) && (vis_stream_or_movie_oversigt==true)) {
             printf("Movie selected \n");
-            vis_stream_or_movie_oversigt = false;
+            // vis_stream_or_movie_oversigt = false;
             // close all other setup windows
             vis_radio_oversigt = false;
             radiooversigt.radioIntroStarted=false;
             vis_music_oversigt = false;
             musicoversigt.musicIntroStarted=false;
             vis_film_oversigt = !vis_film_oversigt;
+            vis_stream_or_movie_oversigt=false;
             if (vis_film_oversigt==false) {
               film_oversigt.filmIntroStarted=false;
             }
@@ -5448,7 +5524,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             vis_tv_oversigt = false;
             vis_radio_or_music_oversigt = false;
             vis_spotify_oversigt=false;
-            vis_tidal_oversigt = !vis_tidal_oversigt;
+            if ((vis_tidal_oversigt) && (vis_radio_or_music_oversigt==false)) {
+              vis_tidal_oversigt=false;
+              vis_radio_or_music_oversigt=true;
+            } else vis_tidal_oversigt =! vis_tidal_oversigt;
             if (vis_tidal_oversigt==false) {
               tidal_oversigt.tidalIntroStarted=false;
             }
@@ -5534,6 +5613,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if (vis_stream_or_movie_oversigt) {
             if (id==29) {
               if (vis_film_oversigt) vis_film_oversigt=false;
+              // vis_stream_or_movie_oversigt=false;
               vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
               film_oversigt.filmIntroStarted=false;
               tidal_oversigt.tidalIntroStarted=false;
@@ -5675,11 +5755,19 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           */
 
+          if ((vis_music_oversigt) && (id==27)) {
+            do_zoom_music_cover =! do_zoom_music_cover;
+            id=0;
+          }
           // music select play stuf
           if ((vis_music_oversigt) && (do_zoom_music_cover==false)) {
             if (id>99) {
               mknapnr=id-99;
               ask_open_dir_or_play_music=true;
+            }
+            // enable music search view
+            if (id==5) {
+              do_show_music_search_oversigt = !do_show_music_search_oversigt;
             }
             
             // back button
@@ -6461,7 +6549,6 @@ void handleKeypress(unsigned char key, int x, int y) {
   }
 
   if (((do_show_setup_keys) && (key!=27)) || (key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!=127) && (key!='S') && (key!='*') && (key!='U') && (key!=117) && (key!=optionmenukey) && (key!=13) && (key!=27) || ((vis_spotify_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_tidal_oversigt) && (key!='*') && (key!=13) && (key!=27)) || ((vis_film_oversigt) && (key!=13) && (key!=27) && (key!=117)) || ((tidal_oversigt.do_setup_tidal_start_entry) && (key!=13) && (key!=27) && (key!=117)) || ((vis_radio_oversigt) && (key!='u') && (key!=optionmenukey) && (key!=27 && (key!=13)))) {
-
     if (do_show_setup_rss) {
       switch(rssstreamoversigt.setup_select_linie) {
         case 0: keybuffer1=rssstreamoversigt.get_stream_name_std(0+configrss_ofset);
@@ -7012,6 +7099,18 @@ void handleKeypress(unsigned char key, int x, int y) {
             dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
           }
         }
+
+        if (do_show_music_search_oversigt) {
+          if (key!=8) {
+            keybuffer[keybufferindex]=key;
+            keybufferindex++;
+            keybuffer[keybufferindex]='\0';       // else input key text in buffer
+            keybuffer1.push_back(key);
+          }
+          if (key==8) {
+            if (keybuffer1.size()>0) keybuffer1.erase(keybuffer1.length()-1);
+          }
+        }
       }
 
 
@@ -7225,55 +7324,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         // setup window
         if (do_show_setup) {
           if (do_show_setup_sound) {
-              if (do_show_setup_select_linie==0) {
-                if (key==32) {
-                  if (soundsystem<numbersofsoundsystems-1) soundsystem++; else soundsystem=0;
-                  strcpy(keybuffer,avalible_device[soundsystem]);
-                  strcpy(configmythsoundsystem,avalible_device[soundsystem]);
-                } else strcpy(keybuffer,avalible_device[soundsystem]);
-              } else if (do_show_setup_select_linie==1) {
-                if (key==32) {
-                  if (strcmp(keybuffer,"HDMI")==0) {
-                    strcpy(keybuffer,"SPDIF");
-                    keybuffer1="SPDIF";
-                  } else if (strcmp(keybuffer,"SPDIF")==0) {
-                    strcpy(keybuffer,"STREAM");
-                    keybuffer1="STREAM";
-                  } else if (strcmp(keybuffer,"STREAM")==0) {
-                    strcpy(keybuffer,"HDMI");
-                    keybuffer1="HDMI";
-                  } else {
-                    strcpy(keybuffer,"STREAM");
-                    keybuffer1="STREAM";
-                  }
-                } else {
-                  strcpy(keybuffer,"DEFAULT");
-                  keybuffer1="DEFAULT";
-                }
-              } else if (do_show_setup_select_linie==2) {
-                if (key==32) {
-                  if (strcmp(keybuffer,"FMOD")==0) {
-                    strcpy(keybuffer,"SDL");
-                    keybuffer1="SDL";
-                  } else if (strcmp(keybuffer,"SDL")==0) {
-                    strcpy(keybuffer,"FMOD");
-                    keybuffer1="FMOD";
-                  } else {
-                    strcpy(keybuffer,"FMOD");
-                    keybuffer1="FMOD";
-                  }
-                } else {
-                  strcpy(keybuffer,"FMOD");
-                  keybuffer1="FMOD";
-                }
-              } else {
-                if (key!=13) {
-                  keybuffer[keybufferindex]=key;
-                  keybufferindex++;
-                  keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                  keybuffer1.push_back(key);
-                }
-              }
+            //
           } else if (do_show_setup_screen) {
             if (do_show_setup_select_linie==0) {
               if (key==32) {		// space key
@@ -7550,7 +7601,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           if (do_show_setup_sound) {
               switch(do_show_setup_select_linie) {
                   case 0:
-                    strcpy(configmythsoundsystem,keybuffer);
+                    strcpy(configmythsoundsystem,keybuffer1.c_str());
                     break;
                   case 1:
                     strcpy(configsoundoutport,keybuffer);
@@ -7599,7 +7650,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   strcpy(confighostname,keybuffer);
                   break;
                  case 1:
-                  strcpy(confighostip,keybuffer);
+                  // confighostip[0]=(char *) keybuffer;
                   break;
                  case 2:
                   strcpy(confighostwlanname,keybuffer);
@@ -7828,9 +7879,10 @@ void handleKeypress(unsigned char key, int x, int y) {
         if (vis_film_oversigt) {
           if (film_oversigt.film_is_playing) {
             film_oversigt.stopmovie();
-            // vis_film_oversigt=false;
-            key=0;
+            stopmovie=true;
             film_oversigt.film_is_playing=false;
+            HideMovieWindow();
+            key=0;
           }
         }
 
@@ -8487,6 +8539,40 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
             }
+            //
+            // screen setup
+            //
+            if (do_show_setup_screen) {              
+              std::string svar="";
+              if (do_show_setup_select_linie==0) {
+                svar=select_system_resolution();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="720p") screen_size=1;
+                else if (svar=="1080p") screen_size=3;
+                else if (svar=="4K") screen_size=4;
+
+              }
+              if (do_show_setup_select_linie==1) {
+                svar=select_language();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="English") configland=0;
+                else if (svar=="Dansk") configland=1;
+                else if (svar=="France") configland=2;
+                else if (svar=="Tysk") configland=3;
+                else if (svar=="Arabi") configland=4;
+                else configland=0;
+              }
+              if (do_show_setup_select_linie==2) {
+                svar=select_screen_timeout();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                
+              }
+              if (do_show_setup_select_linie==3) {
+                svar=select_screen_mode();
+                svar.erase(std::remove(svar.begin(), svar.end(), '\n'), svar.end());
+                if (svar=="Yes") full_screen=true; else full_screen=false;
+              }
+            }
           }
           if (vis_recorded_oversigt) {
             do_play_recorded_aktiv_nr=1;							// set play aktiv recorded program flag (bliver sat igang i draw)
@@ -8671,7 +8757,22 @@ void handleKeypress(unsigned char key, int x, int y) {
           } else configrss_ofset++;
           */
         }
-
+        //
+        // set sound output device from select_sound_output_device() call here.
+        //
+        if (do_show_setup_sound) {
+          std::string device_selected;
+          switch(do_show_setup_select_linie) {
+            case 0: device_selected=select_sound_output_device();
+                    if (device_selected.length()>0) {
+                      SetOutputDevice(sndsystem,0);
+                      strcpy(configmythsoundsystem,device_selected.c_str());
+                      // set sound out device
+                    }
+                    break;
+            case 1: break;
+          }
+        }
 
         if (do_show_torrent) {
           printf("enter pressed\n ");
@@ -9478,6 +9579,10 @@ void handlespeckeypress(int key,int x,int y) {
               if (do_show_videoplayer) {
                 if (do_show_setup_select_linie<3) do_show_setup_select_linie++;
               }
+              
+              if (do_show_setup_screen) {
+                if (do_show_setup_select_linie<3) do_show_setup_select_linie++;
+              }
 
               // rss setup
               // setup rss source window
@@ -9745,6 +9850,10 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 if (do_show_videoplayer) {
+                  if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                }
+
+                if (do_show_setup_screen) {
                   if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                 }
 
@@ -10437,6 +10546,7 @@ void load_config(char * filename) {
   MYSQL_RES *res;
   MYSQL_ROW row;
   // mysql stuf
+  struct ifaddrs* interfaces = nullptr;
   FILE *file;
   struct hostent *remoteHost;
   struct in_addr **addr_list;
@@ -10557,16 +10667,47 @@ void load_config(char * filename) {
     strcpy(configmythhost,remoteHost->h_name);
     strcpy(configmysqlip,inet_ntoa(*addr_list[0]));			// ip adress on sql server
     remoteHost = gethostbyname(confighostname);
+    // confighostip.reserve(10);
+    /*
     if (remoteHost) {
       addr_list = (struct in_addr **) remoteHost->h_addr_list;
       fprintf(stderr,"Hostname : %s\n", remoteHost->h_name);
-      for(int i = 0; addr_list[i] != NULL; i++) {
-        fprintf(stderr,"Ip is  : %s\n", inet_ntoa(*addr_list[i]));
+      struct in_addr **addr_list1 = reinterpret_cast<struct in_addr **>(remoteHost->h_addr_list);
+      for (int i = 0; addr_list1[i] != nullptr; ++i) {
+          std::printf("IP: %s\n", inet_ntoa(*addr_list1[i]));
+          confighostip.push_back((char *) inet_ntoa(*addr_list1[i]));
       }
-      strcpy(confighostip,inet_ntoa(*addr_list[0]));
-    } else strcpy(confighostip,"127.0.0.1");
+    }
+    */
+  }
+  if (getifaddrs(&interfaces) == -1) {
+    std::perror("getifaddrs");
   } else {
-    fprintf(stderr,"Error recolving hostname.\n");
+    // confighostip.clear();
+    for (auto* iface = interfaces;
+      iface != nullptr;
+      iface = iface->ifa_next) {
+      if (iface->ifa_addr == nullptr)
+          continue;
+      const int family = iface->ifa_addr->sa_family;
+      if (family != AF_INET && family != AF_INET6)
+          continue;
+      const socklen_t addressSize =(family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
+      char ip[NI_MAXHOST];
+      const int result = getnameinfo(iface->ifa_addr,addressSize,ip, sizeof(ip),nullptr, 0,NI_NUMERICHOST);
+      if (result != 0) {
+          std::fprintf(stderr, "%s: %s\n",iface->ifa_name, gai_strerror(result));
+          continue;
+      }
+      std::printf("%-16s %-4s %s\n",iface->ifa_name,family == AF_INET ? "IPv4" : "IPv6",ip);
+      // confighostip.network_ip.emplace_back(ip);
+      ip_info new_ip;
+      new_ip.network_name=iface->ifa_name;
+      new_ip.network_ip=ip;
+      confighostip.push_back(new_ip);
+      
+    }
+    freeifaddrs(interfaces);
   }
   strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation' and hostname like '");
   strcat(sqlselect,configmysqlhost);
@@ -10738,6 +10879,23 @@ void load_config(char * filename) {
 // ****************************************************************************************
 
 
+bool SelectOutputDevice(FMOD::System* system, int deviceId) {
+  if (!system)
+    return false;
+  int count = 0;
+  if (system->getNumDrivers(&count) != FMOD_OK)
+    return false;
+  if (deviceId < 0 || deviceId >= count)
+    return false;
+  FMOD_RESULT result = system->setDriver(deviceId);
+  if (result != FMOD_OK) {
+    std::printf("Kan ikke skifte lydoutput: %s\n", FMOD_ErrorString(result));
+    return false;
+  }
+  return true;
+}
+
+
 int init_sound_system(int devicenr) {
     int num;
     char fmoddrivername[512];
@@ -10760,16 +10918,16 @@ int init_sound_system(int devicenr) {
     for(int n=0;n<9;n++) strcpy(avalible_device[n],"");
     fprintf(stderr,"\nSound cards \n");
     fprintf(stderr,"-----------\n");
-    int numdrivers;
+    int numdrivers=0;
     result = sndsystem->getNumDrivers(&numdrivers);
     ERRCHECK(result,0);
     numbersofsoundsystems=numdrivers;				// numbers of devices
     for (count=0; count < numdrivers; count++) {
-       char name[256];
-       result = sndsystem->getDriverInfo(count, name, sizeof(name), 0,0,0,0);
-       ERRCHECK(result,0);
-       strcpy(avalible_device[count],name);			// save device name to list
-       fprintf(stderr," %d - %s\n", count , name);
+      char name[256];
+      result = sndsystem->getDriverInfo(count, name, sizeof(name), 0,0,0,0);
+      ERRCHECK(result,0);
+      strcpy(avalible_device[count],name);			// save device name to list
+      fprintf(stderr," %d - %s\n", count , name);
     }
     if (devicenr>numdrivers) devicenr=0;			// hvis der er valgt et soundcard i config filen som ikke findes vælg default
     // setlect default soundcard=0
@@ -10782,8 +10940,10 @@ int init_sound_system(int devicenr) {
       result = sndsystem->getPluginHandle(FMOD_PLUGINTYPE_CODEC, count, &handle);
       ERRCHECK(result,0);
       result = sndsystem->getPluginInfo(handle, 0, name, 256, 0);
+      fprintf(stderr," Plugins - %s\n", name);
       ERRCHECK(result,0);
     }
+    /*
     result = sndsystem->getNumPlugins(FMOD_PLUGINTYPE_OUTPUT, &num);
     ERRCHECK(result,0);
     for (count = 0; count < num; count++) {
@@ -10792,6 +10952,7 @@ int init_sound_system(int devicenr) {
         result = sndsystem->getPluginInfo(handle, 0, name, 256, 0);
         ERRCHECK(result,0);
     }
+    */
     result = sndsystem->getPluginHandle(FMOD_PLUGINTYPE_OUTPUT, 2, &handle);
     ERRCHECK(result,0);
     if (handle==3) strcpy(configdeviceid,"FMOD ESD");
@@ -10893,6 +11054,78 @@ void handlefrictionGeneric(T& o) {
 // ******************************************************************************************
 
 void mouseMotion(int x, int y) {
+  int id;
+  id = renderer.HitTest(x, y);
+  if (debugmode) printf("id = %d x=%d y=%d\n",id,x,y);
+  if (do_show_setup) {
+    if (id==45) setup_icon_over=13;
+    else if (id==39) setup_icon_over=9;   // tvguide
+    else if (id==42) setup_icon_over=10; // rss
+    else if (id==43) setup_icon_over=11; // spotify
+    else if (id==44) setup_icon_over=12; // tidal
+    else if (id==34) setup_icon_over=5; //  torrent
+    else if (id==35) setup_icon_over=6; //  font
+    else if (id==36) setup_icon_over=7; //  f keys
+    else if (id==38) setup_icon_over=8; //  play 
+    else if (id==30) setup_icon_over=1; //  audio
+    else if (id==31) setup_icon_over=2; //  audio
+    else if (id==32) setup_icon_over=3; //  audio
+    else if (id==33) setup_icon_over=4; // screen config
+    else if (id==37) setup_icon_over=14; // close button
+    else setup_icon_over=0;
+
+  } else {
+    
+    if (id==1) menu_icon_over=1;                // tv
+    else if (id==2) menu_icon_over=2;           // music/radio
+    else if (id==3) menu_icon_over=3;           // 
+    else if (id==4) menu_icon_over=4;           // 
+    else if (id==5) menu_icon_over=5;           // recorded
+    else if (id==6) menu_icon_over=6;           // setup
+    else if (id==13) menu_icon_over=3;
+    else if (id==82) menu_icon_over=1;
+    else if (id==83) menu_icon_over=2;
+    else if (id==84) menu_icon_over=2;
+    else if (id==81) menu_icon_over=4;
+    else if (id==80) menu_icon_over=3;
+    else if (id==29) menu_icon_over=5;          // close
+    else if (id==23) menu_icon_over=3;          // up
+    else if (id==24) menu_icon_over=4;          // down
+    else if (id==27) menu_icon_over=1;          // info    
+    else if (id==20) menu_icon_over=20;         // play ?
+    else if (id==22) menu_icon_over=22;         // music swap songs selected
+    else menu_icon_over=0;
+    
+    /*
+    if ((x>1740) && (x<1920) && (y>10) && (y<200)) menu_icon_over=1;    // tv guide
+    else if ((x>1740) && (x<1920) && (y>230) && (y<410)) menu_icon_over=2;    //
+    else if ((x>1740) && (x<1920) && (y>440) && (y<620)) menu_icon_over=3;    //
+    else if ((x>1740) && (x<1920) && (y>640) && (y<820)) menu_icon_over=4;    //
+    else if ((x>1740) && (x<1920) && (y>840) && (y<1020)) menu_icon_over=5;    //
+    else if ((x>1740) && (x<1920) && (y>1040) && (y<1080)) menu_icon_over=6;    //
+    else menu_icon_over=0;   
+    */
+    
+  }
+  if (menu_icon_over==0) {
+    aktiv_tv_oversigt.tvguide_icon_over=0;
+    if (id>=100) {
+      if (vis_tidal_oversigt || do_show_tidal_search_oversigt) {
+        tidal_oversigt.tidal_icon_over=id;
+      } else if (vis_music_oversigt) {
+        musicoversigt.music_icon_over=id;
+      } else if (vis_radio_oversigt) {
+        radiooversigt.radio_icon_over=id;
+      } else if (vis_film_oversigt) {
+        film_oversigt.film_icon_over=id;
+      } else if (vis_film_oversigt) {
+        streamoversigt.stream_icon_over=id;
+      } else if (vis_tv_oversigt) {
+        aktiv_tv_oversigt.tvguide_icon_over=id;
+      }
+    }
+  }
+
   handleDragGeneric(vis_stream_oversigt,  streamoversigt,  x, y);
   handleDragGeneric(vis_spotify_oversigt, spotify_oversigt, x, y);
   handleDragGeneric(vis_tidal_oversigt,   tidal_oversigt,   x, y);
@@ -11071,70 +11304,111 @@ int team_settings_load() {
     config_menu.config_tvguidex=(iRoot["tema1"]["icons"]["tvguide"].get("x","0").asInt());
     config_menu.config_tvguidey=(iRoot["tema1"]["icons"]["tvguide"].get("y","0").asInt());
     config_menu.config_tvguide_icon=(iRoot["tema1"]["icons"]["tvguide"].get("icon_path","0").asString());
+    config_menu.config_tvguide_sizx=(iRoot["tema1"]["icons"]["tvguide"].get("sizx","0").asInt());
+    config_menu.config_tvguide_sizy=(iRoot["tema1"]["icons"]["tvguide"].get("sizy","0").asInt());
 
     config_menu.config_musicx=(iRoot["tema1"]["icons"]["music"].get("x","0").asInt());
     config_menu.config_musicy=(iRoot["tema1"]["icons"]["music"].get("y","0").asInt());
     config_menu.config_music_icon=(iRoot["tema1"]["icons"]["music"].get("icon_path","0").asString());
+    config_menu.config_music_sizx=(iRoot["tema1"]["icons"]["music"].get("sizx","0").asInt());
+    config_menu.config_music_sizy=(iRoot["tema1"]["icons"]["music"].get("sizy","0").asInt());
 
     config_menu.config_music_activex=(iRoot["tema1"]["icons"]["music_active"].get("x","0").asInt());
     config_menu.config_music_activey=(iRoot["tema1"]["icons"]["music_active"].get("y","0").asInt());
     config_menu.config_music_active_icon=(iRoot["tema1"]["icons"]["music_active"].get("icon_path","0").asString());
+    config_menu.config_music_active_sizx=(iRoot["tema1"]["icons"]["music_active"].get("sizx","0").asInt());
+    config_menu.config_music_active_sizy=(iRoot["tema1"]["icons"]["music_active"].get("sizy","0").asInt());
 
     config_menu.config_mediax=(iRoot["tema1"]["icons"]["media"].get("x","0").asInt());
     config_menu.config_mediay=(iRoot["tema1"]["icons"]["media"].get("y","0").asInt());
     config_menu.config_media_icon=(iRoot["tema1"]["icons"]["media"].get("icon_path","0").asString());
-
+    config_menu.config_media_sizx=(iRoot["tema1"]["icons"]["media"].get("sizx","0").asInt());
+    config_menu.config_media_sizy=(iRoot["tema1"]["icons"]["media"].get("sizy","0").asInt());
+ 
     config_menu.config_media1x=(iRoot["tema1"]["icons"]["media1"].get("x","0").asInt());
     config_menu.config_media1y=(iRoot["tema1"]["icons"]["media1"].get("y","0").asInt());
     config_menu.config_media1_icon=(iRoot["tema1"]["icons"]["media1"].get("icon_path","0").asString());
-
+    config_menu.config_media1_sizx=(iRoot["tema1"]["icons"]["media1"].get("sizx","0").asInt());
+    config_menu.config_media1_sizy=(iRoot["tema1"]["icons"]["media1"].get("sizy","0").asInt());
+ 
     config_menu.config_spotifyx=(iRoot["tema1"]["icons"]["spotify"].get("x","0").asInt());
     config_menu.config_spotifyy=(iRoot["tema1"]["icons"]["spotify"].get("y","0").asInt());
     config_menu.config_spotify_icon=(iRoot["tema1"]["icons"]["spotify"].get("icon_path","0").asString());
+    config_menu.config_spotify_sizx=(iRoot["tema1"]["icons"]["spotify"].get("sizx","0").asInt());
+    config_menu.config_spotify_sizy=(iRoot["tema1"]["icons"]["spotify"].get("sizy","0").asInt());
 
     config_menu.config_spotify1x=(iRoot["tema1"]["icons"]["spotify1"].get("x","0").asInt());
     config_menu.config_spotify1y=(iRoot["tema1"]["icons"]["spotify1"].get("y","0").asInt());
     config_menu.config_spotify1_icon=(iRoot["tema1"]["icons"]["spotify1"].get("icon_path","0").asString());
-
+    config_menu.config_spotify1_sizx=(iRoot["tema1"]["icons"]["spotify1"].get("sizx","0").asInt());
+    config_menu.config_spotify1_sizy=(iRoot["tema1"]["icons"]["spotify1"].get("sizy","0").asInt());
+ 
     config_menu.config_tidalx=(iRoot["tema1"]["icons"]["tidal"].get("x","0").asInt());
     config_menu.config_tidaly=(iRoot["tema1"]["icons"]["tidal"].get("y","0").asInt());
     config_menu.config_tidal_icon=(iRoot["tema1"]["icons"]["tidal"].get("icon_path","0").asString());
+    config_menu.config_tidal_sizx=(iRoot["tema1"]["icons"]["tidal"].get("sizx","0").asInt());
+    config_menu.config_tidal_sizy=(iRoot["tema1"]["icons"]["tidal"].get("sizy","0").asInt());
 
     config_menu.config_tidal1x=(iRoot["tema1"]["icons"]["tidal1"].get("x","0").asInt());
     config_menu.config_tidal1y=(iRoot["tema1"]["icons"]["tidal1"].get("y","0").asInt());
     config_menu.config_tidal1_icon=(iRoot["tema1"]["icons"]["tidal1"].get("icon_path","0").asString());
+    config_menu.config_tidal1_sizx=(iRoot["tema1"]["icons"]["tidal1"].get("sizx","0").asInt());
+    config_menu.config_tidal1_sizy=(iRoot["tema1"]["icons"]["tidal1"].get("sizy","0").asInt());
 
     config_menu.config_radiox=(iRoot["tema1"]["icons"]["radio"].get("x","0").asInt());
     config_menu.config_radioy=(iRoot["tema1"]["icons"]["radio"].get("y","0").asInt());
     config_menu.config_radio_icon=(iRoot["tema1"]["icons"]["radio"].get("icon_path","0").asString());
+    config_menu.config_radio_sizx=(iRoot["tema1"]["icons"]["radio"].get("sizx","0").asInt());
+    config_menu.config_radio_sizy=(iRoot["tema1"]["icons"]["radio"].get("sizy","0").asInt());
 
     config_menu.config_radio1x=(iRoot["tema1"]["icons"]["radio1"].get("x","0").asInt());
     config_menu.config_radio1y=(iRoot["tema1"]["icons"]["radio1"].get("y","0").asInt());
     config_menu.config_radio1_icon=(iRoot["tema1"]["icons"]["radio1"].get("icon_path","0").asString());
+    config_menu.config_radio1_sizx=(iRoot["tema1"]["icons"]["radio1"].get("sizx","0").asInt());
+    config_menu.config_radio1_sizy=(iRoot["tema1"]["icons"]["radio1"].get("sizy","0").asInt());
+
+    config_menu.config_moviestreamx=(iRoot["tema1"]["icons"]["moviestream"].get("x","0").asInt());
+    config_menu.config_moviestreamy=(iRoot["tema1"]["icons"]["moviestream"].get("y","0").asInt());
+    config_menu.config_moviestream_icon=(iRoot["tema1"]["icons"]["moviestream"].get("icon_path","0").asString());
+    config_menu.config_moviestream_sizx=(iRoot["tema1"]["icons"]["moviestream"].get("sizx","0").asInt());
+    config_menu.config_moviestream_sizy=(iRoot["tema1"]["icons"]["moviestream"].get("sizy","0").asInt());
+
 
     config_menu.config_moviex=(iRoot["tema1"]["icons"]["movie"].get("x","0").asInt());
     config_menu.config_moviey=(iRoot["tema1"]["icons"]["movie"].get("y","0").asInt());
     config_menu.config_movie_icon=(iRoot["tema1"]["icons"]["movie"].get("icon_path","0").asString());
+    config_menu.config_movie_sizx=(iRoot["tema1"]["icons"]["movie"].get("sizx","0").asInt());
+    config_menu.config_movie_sizy=(iRoot["tema1"]["icons"]["movie"].get("sizy","0").asInt());
 
     config_menu.config_movie1x=(iRoot["tema1"]["icons"]["movie1"].get("x","0").asInt());
     config_menu.config_movie1y=(iRoot["tema1"]["icons"]["movie1"].get("y","0").asInt());
     config_menu.config_movie1_icon=(iRoot["tema1"]["icons"]["movie1"].get("icon_path","0").asString());
+    config_menu.config_movie1_sizx=(iRoot["tema1"]["icons"]["movie1"].get("sizx","0").asInt());
+    config_menu.config_movie1_sizy=(iRoot["tema1"]["icons"]["movie1"].get("sizy","0").asInt());
 
     config_menu.config_recordedx=(iRoot["tema1"]["icons"]["recorded"].get("x","0").asInt());
     config_menu.config_recordedy=(iRoot["tema1"]["icons"]["recorded"].get("y","0").asInt());
     config_menu.config_recorded_icon=(iRoot["tema1"]["icons"]["recorded"].get("icon_path","0").asString());
+    config_menu.config_recorded_sizx=(iRoot["tema1"]["icons"]["recorded"].get("sizx","0").asInt());
+    config_menu.config_recorded_sizy=(iRoot["tema1"]["icons"]["recorded"].get("sizy","0").asInt());
 
     config_menu.config_recorded1x=(iRoot["tema1"]["icons"]["recorded1"].get("x","0").asInt());
     config_menu.config_recorded1y=(iRoot["tema1"]["icons"]["recorded1"].get("y","0").asInt());
     config_menu.config_recorded1_icon=(iRoot["tema1"]["icons"]["recorded1"].get("icon_path","0").asString());
+    config_menu.config_recorded1_sizx=(iRoot["tema1"]["icons"]["recorded1"].get("sizx","0").asInt());
+    config_menu.config_recorded1_sizy=(iRoot["tema1"]["icons"]["recorded1"].get("sizy","0").asInt());
 
     config_menu.config_closex=(iRoot["tema1"]["icons"]["close"].get("x","0").asInt());
     config_menu.config_closey=(iRoot["tema1"]["icons"]["close"].get("y","0").asInt());
     config_menu.config_close_icon=(iRoot["tema1"]["icons"]["close"].get("icon_path","0").asString());
+    config_menu.config_close_sizx=(iRoot["tema1"]["icons"]["close"].get("sizx","0").asInt());
+    config_menu.config_close_sizy=(iRoot["tema1"]["icons"]["close"].get("sizy","0").asInt());
 
     config_menu.config_setupx=(iRoot["tema1"]["icons"]["setup"].get("x","0").asInt());
     config_menu.config_setupy=(iRoot["tema1"]["icons"]["setup"].get("y","0").asInt());
     config_menu.config_setup_icon=(iRoot["tema1"]["icons"]["setup"].get("icon_path","0").asString());
+    config_menu.config_setup_sizx=(iRoot["tema1"]["icons"]["setup"].get("sizx","0").asInt());
+    config_menu.config_setup_sizy=(iRoot["tema1"]["icons"]["setup"].get("sizy","0").asInt());
 
     config_menu.config_loadingx=(iRoot["tema1"]["icons"]["loading"].get("x","0").asInt());
     config_menu.config_loadingy=(iRoot["tema1"]["icons"]["loading"].get("y","0").asInt());
@@ -11143,14 +11417,27 @@ int team_settings_load() {
     config_menu.config_playinfox=(iRoot["tema1"]["icons"]["playinfo_icon"].get("x","0").asInt());
     config_menu.config_playinfoy=(iRoot["tema1"]["icons"]["playinfo_icon"].get("y","0").asInt());
     config_menu.config_playinfo_icon=(iRoot["tema1"]["icons"]["playinfo_icon"].get("icon_path","0").asString());
+    config_menu.config_playinfo_sizx=(iRoot["tema1"]["icons"]["playinfo_icon"].get("sizx","0").asInt());
+    config_menu.config_playinfo_sizy=(iRoot["tema1"]["icons"]["playinfo_icon"].get("sizy","0").asInt());
 
     config_menu.config_downx=(iRoot["tema1"]["icons"]["down"].get("x","0").asInt());
     config_menu.config_downy=(iRoot["tema1"]["icons"]["down"].get("y","0").asInt());
     config_menu.config_down_icon=(iRoot["tema1"]["icons"]["down"].get("icon_path","0").asString());
+    config_menu.config_down_sizx=(iRoot["tema1"]["icons"]["down"].get("sizx","0").asInt());
+    config_menu.config_down_sizy=(iRoot["tema1"]["icons"]["down"].get("sizy","0").asInt());
 
     config_menu.config_upx=(iRoot["tema1"]["icons"]["up"].get("x","0").asInt());
     config_menu.config_upy=(iRoot["tema1"]["icons"]["up"].get("y","0").asInt());
     config_menu.config_up_icon=(iRoot["tema1"]["icons"]["up"].get("icon_path","0").asString());
+    config_menu.config_up_sizx=(iRoot["tema1"]["icons"]["up"].get("sizx","0").asInt());
+    config_menu.config_up_sizy=(iRoot["tema1"]["icons"]["up"].get("sizy","0").asInt());
+
+    config_menu.config_search_activex=(iRoot["tema1"]["icons"]["search"].get("x","0").asInt());
+    config_menu.config_search_activey=(iRoot["tema1"]["icons"]["search"].get("y","0").asInt());
+    config_menu.config_search_icon=(iRoot["tema1"]["icons"]["search"].get("icon_path","0").asString());
+    config_menu.config_search_active_sizx=(iRoot["tema1"]["icons"]["search"].get("sizx","0").asInt());
+    config_menu.config_search_active_sizy=(iRoot["tema1"]["icons"]["search"].get("sizy","0").asInt());
+
 
     config_menu.config_musicplayer_coverx=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("x","0").asInt());
     config_menu.config_musicplayer_covery=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("y","0").asInt());
@@ -11326,6 +11613,10 @@ int team_settings_load() {
 
     
   } catch (const std::exception &e) {
+
+    printf("Error parsing team json file.\n");
+    write_logfile(logfile,"Error parsing team json file.");
+
     config_menu.config_tema_path="tema2/";
 
     config_menu.config_tvguidex=1720;
@@ -11376,6 +11667,12 @@ int team_settings_load() {
     config_menu.config_media_buttony=504;
     config_menu.config_media_button_icon="media_button";
 
+    config_menu.config_moviestreamx=1720;
+    config_menu.config_moviestreamy=504;
+    config_menu.config_moviestream_icon="media_button";
+    config_menu.config_moviestream_sizx=200;
+    config_menu.config_moviestream_sizy=200;
+
 
     config_menu.config_moviex=1720;
     config_menu.config_moviey=430;
@@ -11408,14 +11705,20 @@ int team_settings_load() {
     config_menu.config_playinfox=1720;
     config_menu.config_playinfoy=10; // 888
     config_menu.config_playinfo_icon="playinfo";
+    config_menu.config_playinfo_sizx=200;
+    config_menu.config_playinfo_sizy=200;
 
     config_menu.config_downx=1720;
     config_menu.config_downy=640;      // 312;
     config_menu.config_down_icon="pdown";
+    config_menu.config_down_sizx=200;
+    config_menu.config_down_sizy=200;
 
     config_menu.config_upx=1720;
     config_menu.config_upy=430;    // 504;
     config_menu.config_up_icon="pup";
+    config_menu.config_up_sizx=200;
+    config_menu.config_up_sizy=200;
 
     config_menu.config_musicplayer_infox=480;
     config_menu.config_musicplayer_infoy=520;
@@ -12359,7 +12662,8 @@ int main(int argc,char** argv) {
     // glutDisplayFunc(DrawMovieWindow);
 
     glutIdleFunc(idle);
-    glutMouseFunc(handleMouse);                         // setup mousehandler
+    glutMouseFunc(handleMouse);                         // setup mousehandler    
+    glutPassiveMotionFunc(mouseMotion);
     glutMotionFunc(mouseMotion);                        // mouse
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
     glutSpecialFunc(handlespeckeypress);              // setup spacial key handler

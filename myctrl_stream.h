@@ -43,6 +43,7 @@ class stream_class : public vlc_controller {
     int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
     int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
   public:
+    int stream_icon_over=0;                                                 // used by mouse over
     bool toplevel;
     enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
     std::vector<stream_oversigt_type> FeedCatalog;
