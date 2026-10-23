@@ -27,7 +27,7 @@ cmake --build build -j"$(nproc)"
 sudo cmake --install build
 
 
-Version.
+# Version history.
 
 mythtv-controller ver 0.55.1 Tema update and more access to settings in temajson config file.
 
