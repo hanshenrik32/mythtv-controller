@@ -1749,7 +1749,7 @@ float pixelToGLY(float y) {
 
 // ********************************************************************************************
 //
-// draw playing movie status over movie
+// draw playing movie status overlay on movie
 //
 // ********************************************************************************************
 
@@ -1822,6 +1822,85 @@ void DrawMovieStatusInfo() {
     renderer.AddTextureRect(0,0, 548, 1042, barwidth, 26,fader,fader,fader,fader);
   }
 }
+
+// *************************************************************************************
+//
+// Display analog clock on full screen
+//
+// *************************************************************************************
+
+
+void display_analog_clock() {
+  static float angleHour = 0,angleMin  = 0,angleSec  = 0;
+  static float last_angleSec=0.0f;  
+  static time_t today=0;
+  if (analog_clock_background) renderer.AddTextureRect(0,analog_clock_background, 1, 1, 1920, 1080,1,1,1,1);
+  // Markeringerne rundt om uret
+  float angle1min = M_PI / 30.0f;
+  float cx = 1920.0f * 0.5f;
+  float cy = 1080.0f * 0.5f;
+  float clockRadius = 400.0f;
+  float minStart  = clockRadius * 0.87f;
+  float minEnd    = clockRadius * 0.95f;
+  float stepStart = clockRadius * 0.85f;
+  float stepEnd   = clockRadius * 0.95f;
+  for (int i = 0; i < 60; i++) {
+      float angle = i * angle1min - M_PI / 2.0f;
+      float start;
+      float end;
+      float r;
+      float g;
+      float b;
+      float width;
+      if (i % 5 == 0) {
+          // 5-sekunders markering
+          start = stepStart;
+          end   = stepEnd;
+          r     = 1.0f;
+          g     = 0.0f;
+          b     = 0.0f;
+          width = 5.0f;
+      } else {
+          // Sekundmarkering
+          start = minStart;
+          end   = minEnd;
+          r     = 1.0f;
+          g     = 1.0f;
+          b     = 1.0f;
+          width = 2.0f;
+      }
+      float x1 = cx + cosf(angle) * start;
+      float y1 = cy + sinf(angle) * start;
+      float x2 = cx + cosf(angle) * end;
+      float y2 = cy + sinf(angle) * end;
+      renderer.AddThickLine(x1, y1,x2, y2,width,r, g, b, 1.0f);
+  }
+
+  // show clock hands
+  time_t nowt = time(nullptr);
+  tm *t = localtime(&nowt);
+  // minutter + sekunder giver glidende minutviser
+  angleMin = ((t->tm_min + t->tm_sec / 60.0f) * 2.0f * M_PI) / 60.0f;
+  // timer + minutter giver glidende timeviser
+  angleHour = ((t->tm_hour % 12 + t->tm_min / 60.0f) * 2.0f * M_PI) / 12.0f;
+  // timeviser
+  renderer.DrawHand(cx,cy,clockRadius*0.65f,angleHour,6.0f,0,1,1,1);
+  // minutviser
+  renderer.DrawHand(cx,cy, clockRadius*0.80f, angleMin, 4.0f, 0,1,1,1);
+  // Flydende sekundviser
+  using Clock = std::chrono::system_clock;
+  auto now = Clock::now();
+  auto millisecondsSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+  // Position inden for det aktuelle minut: 0.0 til under 60.0
+  double seconds = static_cast<double>(millisecondsSinceEpoch % 60000) / 1000.0;
+  // 0 sekunder skal pege lige op
+  angleSec = static_cast<float>(seconds / 60.0 * 2.0 * M_PI - M_PI / 2.0);
+  float handLength = clockRadius * 0.90f;
+  float secX = cx + cosf(angleSec) * handLength;
+  float secY = cy + sinf(angleSec) * handLength;
+  renderer.AddThickLine(cx, cy,secX, secY,3.0f,1.0f, 1.0f, 1.0f, 1.0f);
+}
+
 
 
 // *************************************************************************************
@@ -1938,71 +2017,7 @@ void display() {
         float centerx=1920/2;
         float centery=1080/2;
       if ((streamoversigt.stream_is_playing==false) && (radiooversigt.playing==false) && (tidal_oversigt.get_tidal_playing_flag()== false) && (musicoversigt.play()==false) && (film_oversigt.film_is_playing==false)) {
-        if (analog_clock_background) renderer.AddTextureRect(0,analog_clock_background, 1, 1, 1920, 1080,1,1,1,1);
-        // Markeringerne rundt om uret
-        float angle1min = M_PI / 30.0f;
-        float cx = 1920.0f * 0.5f;
-        float cy = 1080.0f * 0.5f;
-        float clockRadius = 400.0f;
-        float minStart  = clockRadius * 0.87f;
-        float minEnd    = clockRadius * 0.95f;
-        float stepStart = clockRadius * 0.85f;
-        float stepEnd   = clockRadius * 0.95f;
-        for (int i = 0; i < 60; i++) {
-            float angle = i * angle1min - M_PI / 2.0f;
-            float start;
-            float end;
-            float r;
-            float g;
-            float b;
-            float width;
-            if (i % 5 == 0) {
-                // 5-sekunders markering
-                start = stepStart;
-                end   = stepEnd;
-                r     = 1.0f;
-                g     = 0.0f;
-                b     = 0.0f;
-                width = 5.0f;
-            } else {
-                // Sekundmarkering
-                start = minStart;
-                end   = minEnd;
-                r     = 1.0f;
-                g     = 1.0f;
-                b     = 1.0f;
-                width = 2.0f;
-            }
-            float x1 = cx + cosf(angle) * start;
-            float y1 = cy + sinf(angle) * start;
-            float x2 = cx + cosf(angle) * end;
-            float y2 = cy + sinf(angle) * end;
-            renderer.AddThickLine(x1, y1,x2, y2,width,r, g, b, 1.0f);
-        }
-
-        // show clock hands
-        time_t nowt = time(nullptr);
-        tm *t = localtime(&nowt);
-        // minutter + sekunder giver glidende minutviser
-        angleMin = ((t->tm_min + t->tm_sec / 60.0f) * 2.0f * M_PI) / 60.0f;
-        // timer + minutter giver glidende timeviser
-        angleHour = ((t->tm_hour % 12 + t->tm_min / 60.0f) * 2.0f * M_PI) / 12.0f;
-        // timeviser
-        renderer.DrawHand(cx,cy,clockRadius*0.65f,angleHour,6.0f,0,1,1,1);
-        // minutviser
-        renderer.DrawHand(cx,cy, clockRadius*0.80f, angleMin, 4.0f, 0,1,1,1);
-        // Flydende sekundviser
-        using Clock = std::chrono::system_clock;
-        auto now = Clock::now();
-        auto millisecondsSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-        // Position inden for det aktuelle minut: 0.0 til under 60.0
-        double seconds = static_cast<double>(millisecondsSinceEpoch % 60000) / 1000.0;
-        // 0 sekunder skal pege lige op
-        float angleSec = static_cast<float>(seconds / 60.0 * 2.0 * M_PI - M_PI / 2.0);
-        float handLength = clockRadius * 0.90f;
-        float secX = cx + cosf(angleSec) * handLength;
-        float secY = cy + sinf(angleSec) * handLength;
-        renderer.AddThickLine(cx, cy,secX, secY,3.0f,1.0f, 1.0f, 1.0f, 1.0f);
+        display_analog_clock();
       } else {
         // Music is playing
         // vis spectum as screen saver
@@ -2030,15 +2045,16 @@ void display() {
         }
       }
     }
-    if (urtype == MUSICMETER3) {
+    if ((snd) && (urtype == MUSICMETER3)) {
       saver_musicmeter.DrawPlasmaVortex(
         960.0f,     // center X
         540.0f,     // center Y
         400.0f,     // radius
         0.5        // 0.0 - 1.0
-      );
-      
+      );   
       saver_musicmeter.DrawAudioRing();
+    } else {
+      display_analog_clock();
     }
     if (urtype == PLASMA) {
       drawPlasma(1920,1080);
