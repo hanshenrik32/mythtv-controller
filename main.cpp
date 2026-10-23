@@ -2045,6 +2045,7 @@ void display() {
         }
       }
     }
+
     if ((snd) && (urtype == MUSICMETER3)) {
       saver_musicmeter.DrawPlasmaVortex(
         960.0f,     // center X
@@ -2902,7 +2903,7 @@ void display() {
       if (vis_tidal_oversigt && radiooversigt.playing) radiooversigt.playing=false;
       if ((radiooversigt.playingstationnr>0) && (radiooversigt.playing)) {
         renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(4*18) ,"Station ",1,1,1,1);
-        temptxt=radiooversigt.get_station_name(radiooversigt.playingstationnr);
+        temptxt=radiooversigt.get_station_name(radiooversigt.playingstationnr-1);
         renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(4*18) ,temptxt,1,1,1,1);
         renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(5*18) ,"Song Name ",1,1,1,1);
         if ((channel) && (sound) && (snd)) {
@@ -2937,7 +2938,7 @@ void display() {
         renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(6*18) ,aktivartistname,1,1,1,1);
         
         renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(8*18) ,"Bit rate ",1,1,1,1);
-        int bbs=radiooversigt.get_kbps(radiooversigt.playingstationnr);
+        int bbs=radiooversigt.get_kbps(radiooversigt.playingstationnr-1);
         std::string showbb=fmt::format("{} Kps.",bbs);
         renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(8*18) ,showbb,1,1,1,1);
 
@@ -12546,7 +12547,7 @@ int main(int argc,char** argv) {
       }
       // show version and exit
       if (strcmp(argv[1],"-v")==0) {
-        printf("\n\nVersion %s \n",SHOWVER);
+        printf("Version %s \n",SHOWVER);
         exit(0);
       }
     }
