@@ -265,3 +265,35 @@ install(CODE "
     endif()
 ")
 
+set(FMOD_SDK_NAME "fmodstudioapi20311linux")
+
+set(FMOD_SOURCE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/${FMOD_SDK_NAME}"
+    CACHE PATH "FMOD SDK, som skal installeres"
+)
+
+set(FMOD_INSTALL_DIR "/opt/mythtv-controller/${FMOD_SDK_NAME}")
+
+add_custom_target(installsound
+    COMMAND "${CMAKE_COMMAND}" -E echo
+        "Installerer FMOD fra ${FMOD_SOURCE_DIR}"
+
+    COMMAND "${CMAKE_COMMAND}" -E make_directory
+        "/opt/mythtv-controller"
+
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+        "${FMOD_SOURCE_DIR}"
+        "${FMOD_INSTALL_DIR}"
+
+    COMMAND /usr/bin/touch
+        "/etc/mythtv-controller.conf"
+
+    COMMAND /usr/bin/chmod 644
+        "/etc/mythtv-controller.conf"
+
+    COMMAND "${CMAKE_COMMAND}" -E echo
+        "FMOD er installeret i ${FMOD_INSTALL_DIR}"
+
+    VERBATIM
+)
+

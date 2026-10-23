@@ -10,6 +10,16 @@ Run on most debian based systems, like Ubuntu.
 
 build Cmake.
 
+# First set fmod api.
+
+cmake -S . -B build -DFMOD_ROOT="$PWD/fmodstudioapi20311linux"
+
+# Then install fmod api
+
+sudo cmake --build build --target installsound
+
+# After fmod api install build app.
+
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build -j"$(nproc)"
 
