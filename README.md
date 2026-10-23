@@ -27,7 +27,10 @@ cd mythtv-controller
 cmake -S . -B build -DFMOD_ROOT="$PWD/fmodstudioapi20311linux"
 
 ### If you get a error about
+### CMake Error in CMakeLists.txt:
+### ...
 ### "/usr/include/sysprof-6"
+### ...
 ### Then reinstall packed sysprof by.
 ### sudo apt update
 ### sudo apt install --reinstall libsysprof-capture-4-dev
