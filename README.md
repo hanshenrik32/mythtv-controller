@@ -8,9 +8,21 @@ if you wants to make the deb file you have to install debhelper.
 
 Run on most debian based systems, like Ubuntu.
 
-build Cmake.
+# First clone mythtv.controller
 
-# First set fmod api.
+git clone https://github.com/hanshenrik32/mythtv-controller.git
+
+build by cmake.
+
+# First install needed packed.
+
+sudo apt-get install g++ make curl libcurl-ocaml-dev libdevil-dev libsdl1.2-dev freeglut3-dev libsdl-image1.2-dev dialog imagemagick xmltv libglc-dev libical-dev unzip libical-dev unzip libical-dev lirc libsqlite3-dev libvlc-dev libxrandr-dev libxml2-dev libhttp-ocaml-dev libmediainfo-dev libfreetype-dev libfreetype6 libfreetype6-dev libfmt-dev  libglfw3 libglfw3-dev libjsoncpp-dev libtorrent-rasterbar-dev libtorrent-dev libfmt-dev libmediainfo-dev liblirc-dev ffmpeg libgtk-3-dev libglew-dev libmariadb-dev
+
+# Then cd to source files.
+
+cd mythtv-controller
+
+# Start install mythtv-controller.
 
 cmake -S . -B build -DFMOD_ROOT="$PWD/fmodstudioapi20311linux"
 

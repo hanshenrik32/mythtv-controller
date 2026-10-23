@@ -2593,9 +2593,7 @@ void film_oversigt_typem::show_film_search_oversigt(float _mangley,int filmnr) {
     }
   }
   */
-  if (strcmp(keybuffer,"")!=0) {
-    printf("data in key buffer.\n");
-  }
+
   // ---- RENDER -----------------------------------------------
   for (int i = 0; i < visibleItems && (sofset+i) < filmoversigt.size();i++) {
     int index = sofset + i;
