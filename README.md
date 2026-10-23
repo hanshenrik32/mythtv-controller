@@ -8,7 +8,28 @@ if you wants to make the deb file you have to install debhelper.
 
 Run on most debian based systems, like Ubuntu.
 
+build Cmake.
+
+# First set fmod api.
+
+cmake -S . -B build -DFMOD_ROOT="$PWD/fmodstudioapi20311linux"
+
+# Then install fmod api
+
+sudo cmake --build build --target installsound
+
+# After fmod api install build app.
+
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j"$(nproc)"
+
+# Install mythtv-controller in /opt/mythtv-controller
+sudo cmake --install build
+
+
 Version.
+
+mythtv-controller ver 0.55.1 Tema update and more access to settings in temajson config file.
 
 mythtv-controller ver 0.54.1 you can see tvguide overlaw on movies playing by pressing t - for tv guide. All opengl calls is 500% faster now. high framerate > 120
 

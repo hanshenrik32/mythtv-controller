@@ -5,7 +5,7 @@
         "iconpath": "/opt/mythtv-controller/tema4/",
         "icons" : {
             "tvguide": {
-                "icon_path": "tv",
+                "icon_path": "tv_button",
                 "x": 1626,
                 "y": 210,
                 "sizx": 294,
@@ -254,7 +254,7 @@
             "radioplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 50,
-                "y": 480,
+                "y": 510,
                 "sizx": 100,
                 "sizy": 100
             },
@@ -267,28 +267,28 @@
             "radioplayer_stop_button": {
                 "icon_path": "mplaystop",
                 "x": 150,
-                "y": 490,
+                "y": 510,
                 "sizx": 100,
                 "sizy": 100
             },
             "radioplayer_ff_button": {
                 "icon_path": "mplaynext",
                 "x": 250,
-                "y": 490,
+                "y": 510,
                 "sizx": 100,
                 "sizy": 100
             },
             "radioplayer_bw_button": {
                 "icon_path": "mplaylast",
                 "x": 350,
-                "y": 490,
+                "y": 510,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 50,
-                "y": 490,
+                "y": 480,
                 "sizx": 100,
                 "sizy": 100
             },
@@ -301,21 +301,21 @@
             "musicplayer_stop_button": {
                 "icon_path": "mplaystop",
                 "x": 150,
-                "y": 490,
+                "y": 480,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_ff_button": {
                 "icon_path": "mplaynext",
                 "x": 250,
-                "y": 490,
+                "y": 480,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_bw_button": {
                 "icon_path": "mplaylast",
                 "x": 350,
-                "y": 490,
+                "y": 480,
                 "sizx": 100,
                 "sizy": 100
             },
