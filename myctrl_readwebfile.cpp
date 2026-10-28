@@ -71,7 +71,7 @@ int get_webfilenamelong(char* fname, char* webpath) {
 
 // ****************************************************************************************
 //
-// return string for filename or null
+// return string for filename (random name string) or null
 //
 // ****************************************************************************************
 
@@ -100,7 +100,7 @@ int get_webfilename(char *fname,char *webpath) {
 
 // ****************************************************************************************
 //
-// web downloader ver .1 by hans-henrik
+// web downloader ver 0.1 by hans-henrik
 //
 // return hostname ,webpath from source link eks. www.dr.dk/images/image1.png
 // return hname   = www.dr.dk
@@ -283,7 +283,7 @@ int get_webfile2(char *webpath,char *outfile) {
 
 // image downloader by libcurl
 
-static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+static size_t curl_write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
     FILE *fp = (FILE*)stream;
     return fwrite(ptr, size, nmemb, fp);
 }
@@ -305,7 +305,7 @@ bool downloadImage(const std::string& url, const std::string& filename) {
     }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     // skriv data til fil
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
     // timeout
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L);

@@ -15,6 +15,17 @@
 #include <filesystem>
 #include <algorithm>
 
+#include <filesystem>
+#include <functional>
+#include <algorithm>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
 using namespace std;
 
 #include "renderer.h"
@@ -596,6 +607,7 @@ GLuint musicoversigt_class::get_textureId(int nr) {
 
 
 int musicoversigt_class::opdatere_music_oversigt_nodb() {
+  namespace fs = std::filesystem;
   const char *database = (char *) "mythtvcontroller";  
   int parent;
   int dirid;
@@ -732,9 +744,12 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
               }              
               mysql_close(conn2);
             }
-            sqlselect = fmt::format("insert into music_directories(directory_id,path,parent_id) values({},'{}',{})",0,de->d_name,0);
-            mysql_query(conn,sqlselect.c_str());
-            res = mysql_store_result(conn);
+            if (dirfindes==false) {
+              sqlselect = fmt::format("insert into music_directories(directory_id,path,parent_id) values({},'{}',{})",0,de->d_name,0);
+              mysql_query(conn,sqlselect.c_str());
+              res = mysql_store_result(conn);
+              if (res==NULL) printf("Error insert into mariadb.");
+            }
             strcpy(newmusicoversigt_record.album_name,de->d_name);
             strcpy(newmusicoversigt_record.album_path,"");
             strcat(newmusicoversigt_record.album_path,de->d_name);
@@ -745,6 +760,28 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
             newmusicoversigt_record.oversigttype=0;
 
             icon_filename = fmt::format("{}{}/front.jpg",dirpath,de->d_name);
+
+            auto findCover = [](const fs::path& directory) {
+              for (const char* filename : {
+                    "front.jpg",
+                    "mythcfront.jpg",
+                    "cover.jpg",
+                    "cover.png"
+                  }) {
+                  const fs::path cover = directory / filename;
+                  if (fs::is_regular_file(cover)) {
+                    return cover.string();
+                  }
+              }
+              return std::string{};
+            };
+            std::string patch_to_check = dirpath;
+            patch_to_check = patch_to_check + de->d_name;
+            std::string tmppath=findCover(patch_to_check);
+            strcpy(newmusicoversigt_record.album_coverfile,tmppath.c_str());
+            if (strlen(newmusicoversigt_record.album_coverfile)==0) printf("No cover found for %s \n",de->d_name);
+
+            /*
             if (file_exists(icon_filename.c_str())) {
               strcpy(newmusicoversigt_record.album_coverfile,icon_filename.c_str());
             } else {
@@ -755,9 +792,16 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                 icon_filename = fmt::format("{}{}/cover.jpg",dirpath,de->d_name);
                 if (file_exists(icon_filename.c_str())) {
                   strcpy(newmusicoversigt_record.album_coverfile,icon_filename.c_str());
-                } else strcpy(newmusicoversigt_record.album_coverfile,"");
+                } else {
+                  icon_filename = fmt::format("{}{}/cover.png",dirpath,de->d_name);
+                  if (file_exists(icon_filename.c_str())) {
+                    icon_filename = fmt::format("{}{}/cover.png",dirpath,de->d_name);
+                  } else strcpy(newmusicoversigt_record.album_coverfile,"");
+                }
               }
             }
+            if (strlen(newmusicoversigt_record.album_coverfile)==0) printf("No cover found for %s \n",de->d_name);
+            */
 
             musicoversigt.push_back(newmusicoversigt_record);
             parent_dir_id=0;
@@ -808,7 +852,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
               while(de = readdir(dirp1)) {
                 if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0)) {
                   // if dir
-                  // opret i album dmknapnr =b
+                  // opret i album
                   if (de->d_type==DT_DIR) {
                     conn2=mysql_init(NULL);
                     if (conn2) {
@@ -837,7 +881,6 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                       conn2=mysql_init(NULL);
                       if (conn2) {
                         mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-                        // sprintf(sqlselect1,"select album_id from music_albums where album_name like '%s'",de->d_name);
                         sqlselect1=fmt::format("select album_id from music_albums where album_name like '{}'",de->d_name);
                         mysql_query(conn2,sqlselect1.c_str());
                         res2 = mysql_store_result(conn2);
@@ -936,6 +979,482 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   write_logfile(logfile,(char *) "MUSIC Done update music directory.");
   if (i) return 0; else return 1;
 }
+
+
+
+// *****************************************************************************
+//
+// New version NOT IN USE FOR NOW. (rekursivt) 
+// Load/update music info to new db mythtvcontroller
+//
+// *****************************************************************************
+
+int musicoversigt_class::opdatere_music_oversigt_nodb1() {
+    namespace fs = std::filesystem;
+
+    // Forudsætter, at tekstfelterne i music_oversigt_type
+    // og music_db_update_loader er char-arrays.
+    auto copyText = [](auto& destination, const std::string& source) {
+      if (source.size() >= sizeof(destination)) {
+        throw std::runtime_error("Teksten er for lang til et tekstfelt: " + source);
+      }
+      std::snprintf(destination,sizeof(destination),"%s",source.c_str());
+    };
+    music_db_update_loader[0] = '\0';
+    try {
+        // ---------------------------------------------------------
+        // FIND MUSIKMAPPE
+        // ---------------------------------------------------------
+
+        std::string configuredPath = configdefaultmusicpath;
+
+        if (configuredPath.empty()) {
+          configuredPath = "~/Music";
+        }
+        // Udvid ~ og ~/ manuelt.
+        if (configuredPath == "~" ||
+          configuredPath.rfind("~/", 0) == 0) {
+          const char* home = std::getenv("HOME");
+          if (!home || !*home) {
+            throw std::runtime_error("HOME er ikke defineret.");
+          }
+          configuredPath = std::string(home) + configuredPath.substr(1);
+        }
+        const fs::path root = fs::canonical(fs::path(configuredPath));
+        if (!fs::is_directory(root)) {
+          throw std::runtime_error("Musikstien er ikke en mappe: " + root.string());
+        }
+
+        // ---------------------------------------------------------
+        // DATABASEFORBINDELSE
+        // Lukker automatisk forbindelsen, også ved fejl.
+        // ---------------------------------------------------------
+
+        using MysqlConnection = std::unique_ptr<MYSQL, decltype(&mysql_close)>;
+        MysqlConnection connection(
+            mysql_init(nullptr),
+            &mysql_close
+        );
+        if (!connection) {
+          throw std::runtime_error("mysql_init fejlede.");
+        }
+        MYSQL* conn = connection.get();
+        if (!mysql_real_connect(
+              conn,
+              configmysqlhost,
+              configmysqluser,
+              configmysqlpass,
+              "mythtvcontroller",
+              0,
+              nullptr,
+              0)) {
+            throw std::runtime_error(mysql_error(conn));
+        }
+        if (mysql_set_character_set(conn, "utf8mb4") != 0) {
+          throw std::runtime_error(mysql_error(conn));
+        }
+
+        // ---------------------------------------------------------
+        // SQL-HJÆLPEFUNKTIONER
+        // ---------------------------------------------------------
+
+        auto executeSQL = [&](const std::string& sql) {
+          if (mysql_query(conn, sql.c_str()) != 0) {
+            throw std::runtime_error(mysql_error(conn));
+          }
+        };
+        auto escapeSQL = [&](const std::string& text) {
+            std::string escaped(text.size() * 2 + 1, '\0');
+            const unsigned long length = mysql_real_escape_string(conn,escaped.data(),text.c_str(), static_cast<unsigned long>(text.size()));
+            if (length > text.size() * 2) {
+              throw std::runtime_error(mysql_error(conn));
+            }
+            escaped.resize(length);
+            return escaped;
+        };
+
+        // Returnerer første id fra en SELECT, eller 0 ved intet match.
+        auto selectId = [&](const std::string& sql) -> int {
+          executeSQL(sql);
+          using MysqlResult = std::unique_ptr<MYSQL_RES, decltype(&mysql_free_result)>;
+          MysqlResult result(mysql_store_result(conn),&mysql_free_result);
+          if (!result) {
+            throw std::runtime_error(mysql_error(conn));
+          }
+          MYSQL_ROW row = mysql_fetch_row(result.get());
+          if (!row || !row[0]) {
+            return 0;
+          }
+          return std::stoi(row[0]);
+        };
+
+        // ---------------------------------------------------------
+        // OPRET MANGLENDE TABELLER
+        // Eksisterende tabeller og data bevares.
+        // ---------------------------------------------------------
+
+        executeSQL(
+          "CREATE TABLE IF NOT EXISTS music_directories ("
+          "directory_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+          "path TEXT,"
+          "parent_id INT"
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+
+        executeSQL(
+          "CREATE TABLE IF NOT EXISTS music_artists ("
+          "artist_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+          "artist_name VARCHAR(255)"
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+
+        executeSQL(
+          "CREATE TABLE IF NOT EXISTS music_albums ("
+          "album_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+          "artist_id INT,"
+          "album_name VARCHAR(255),"
+          "year INT,"
+          "compilation INT"
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+
+        executeSQL(
+          "CREATE TABLE IF NOT EXISTS music_songs ("
+          "song_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+          "filename TEXT,"
+          "name VARCHAR(255),"
+          "track INT,"
+          "artist_id INT,"
+          "album_id INT,"
+          "genre_id INT,"
+          "year INT,"
+          "length INT,"
+          "numplays INT,"
+          "rating INT,"
+          "lastplay DATETIME,"
+          "date_entered DATETIME,"
+          "date_modified DATETIME,"
+          "format VARCHAR(4),"
+          "mythdigest VARCHAR(255),"
+          "size INT,"
+          "description VARCHAR(255),"
+          "comment VARCHAR(255),"
+          "disc_count INT,"
+          "disc_number INT,"
+          "track_count INT,"
+          "start_time INT,"
+          "stop_time INT,"
+          "eq_preset VARCHAR(255),"
+          "relative_volume INT,"
+          "sample_rate INT,"
+          "bitrate INT,"
+          "bpm INT,"
+          "directory_id INT"
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+
+        executeSQL(
+          "CREATE TABLE IF NOT EXISTS music_genres ("
+          "genre_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+          "genre VARCHAR(255)"
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+
+        executeSQL(
+          "CREATE TABLE IF NOT EXISTS music_playlist ("
+          "playlist_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+          "playlist_name VARCHAR(255),"
+          "playlist_songs TEXT,"
+          "last_accessed DATETIME,"
+          "length INT,"
+          "songcount INT,"
+          "hostname VARCHAR(64)"
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+
+        // ---------------------------------------------------------
+        // FIND ELLER OPRET DATABASEPOSTER
+        // ---------------------------------------------------------
+
+        auto getArtistId = [&](const std::string& name) -> int {
+            const std::string escapedName = escapeSQL(name);
+            int id = selectId(fmt::format(
+              "SELECT artist_id FROM music_artists "
+              "WHERE BINARY artist_name = '{}' "
+              "ORDER BY artist_id LIMIT 1",
+              escapedName
+            ));
+            if (id != 0) {
+              return id;
+            }
+            executeSQL(fmt::format(
+              "INSERT INTO music_artists (artist_name) "
+              "VALUES ('{}')",
+              escapedName
+            ));
+            return static_cast<int>(mysql_insert_id(conn));
+        };
+
+        auto getDirectoryId = [&](const std::string& name,
+                                int parentId) -> int {
+          const std::string escapedName = escapeSQL(name);
+          // Samme mappenavn kan findes under forskellige forældre.
+          int id = selectId(fmt::format(
+            "SELECT directory_id FROM music_directories "
+            "WHERE BINARY path = '{}' AND parent_id = {} "
+            "ORDER BY directory_id LIMIT 1",
+            escapedName,
+            parentId
+          ));
+          if (id != 0) {
+            return id;
+          }
+          executeSQL(fmt::format(
+            "INSERT INTO music_directories (path, parent_id) "
+            "VALUES ('{}', {})",
+            escapedName,
+            parentId
+          ));
+          return static_cast<int>(mysql_insert_id(conn));
+        };
+
+        auto getAlbumId = [&](const std::string& name,
+                            int artistId) -> int {
+          const std::string escapedName = escapeSQL(name);
+          int id = selectId(fmt::format(
+            "SELECT album_id FROM music_albums "
+            "WHERE BINARY album_name = '{}' AND artist_id = {} "
+            "ORDER BY album_id LIMIT 1",
+            escapedName,
+            artistId
+          ));
+
+          if (id != 0) {
+            return id;
+          }
+          executeSQL(fmt::format(
+            "INSERT INTO music_albums "
+            "(artist_id, album_name, year, compilation) "
+            "VALUES ({}, '{}', 0, 0)",
+            artistId,
+            escapedName
+          ));
+          return static_cast<int>(mysql_insert_id(conn));
+        };
+
+        // ---------------------------------------------------------
+        // FILTYPER OG COVERS
+        // ---------------------------------------------------------
+
+        auto musicExtension = [](const fs::path& file) {
+          std::string extension = file.extension().string();
+          std::transform(
+            extension.begin(),
+            extension.end(),
+            extension.begin(),
+            [](unsigned char c) {
+                return static_cast<char>(std::tolower(c));
+            }
+          );
+
+          if (extension == ".mp3"  ||
+            extension == ".flac" ||
+            extension == ".wav"  ||
+            extension == ".ogg") {
+            return extension.substr(1);
+          }
+          return std::string{};
+        };
+        auto findCover = [](const fs::path& directory) {
+          for (const char* filename : {
+                "front.jpg",
+                "mythcfront.jpg",
+                "cover.jpg",
+                "cover.png"
+              }) {
+              const fs::path cover = directory / filename;
+              if (fs::is_regular_file(cover)) {
+                return cover.string();
+              }
+          }
+          return std::string{};
+        };
+
+        // ---------------------------------------------------------
+        // OPBYG NY OVERSIGT
+        // Den gamle oversigt erstattes først efter vellykket scan.
+        // ---------------------------------------------------------
+        std::vector<music_oversigt_type> newOverview;
+        music_oversigt_type playlist{};
+        copyText(playlist.album_name, "PLAYLIST");
+        playlist.textureId = 0;
+        playlist.directory_id = 0;
+        playlist.parent_id = 0;
+        playlist.album_id = 0;
+        playlist.artist_id = 0;
+        playlist.oversigttype = -1;
+        newOverview.push_back(playlist);
+        music_oversigt_loaded_nr = 0;
+        unsigned int directoryCount = 0;
+        unsigned int newSongCount = 0;
+        // ---------------------------------------------------------
+        // REKURSIV SCANNING
+        // ---------------------------------------------------------
+        std::function<void(const fs::path&, int, int)> scanDirectory;
+        scanDirectory = [&](const fs::path& directory,
+                            int directoryId,
+                            int artistId) {
+            printf("Checking directory: %s\n", directory.c_str());
+            std::vector<fs::path> directories;
+            std::vector<fs::path> files;
+            for (const auto& entry : fs::directory_iterator(directory)) {
+                if (entry.path().filename() == "@eaDir") {
+                  continue;
+                }
+                // Spring symbolske links over, så der ikke opstår
+                // cirkulær rekursion.
+                if (entry.is_symlink()) {
+                  continue;
+                }
+                if (entry.is_directory()) {
+                  directories.push_back(entry.path());
+                }
+                else if (entry.is_regular_file() &&
+                         !musicExtension(entry.path()).empty()) {
+                    files.push_back(entry.path());
+                }
+            }
+
+            std::sort(directories.begin(), directories.end());
+            std::sort(files.begin(), files.end());
+
+            // Album-id er lokalt for denne mappe.
+            int albumId = 0;
+
+            if (!files.empty()) {
+              std::string albumName = directory.filename().string();
+              if (albumName.empty()) {
+                albumName = "Music";
+              }
+              albumId = getAlbumId(albumName, artistId);
+            }
+
+            // -----------------------------------------------------
+            // MUSIKFILER I DENNE MAPPE
+            // -----------------------------------------------------
+
+            for (const fs::path& file : files) {
+              const std::string filename = file.string();
+              const std::string escapedFilename = escapeSQL(filename);
+              const int existingSongId = selectId(fmt::format(
+                "SELECT song_id FROM music_songs "
+                "WHERE BINARY filename = '{}' "
+                "ORDER BY song_id LIMIT 1",
+                escapedFilename
+              ));
+              if (existingSongId == 0) {
+                  // Filnavn uden endelse bruges som titel.
+                  const std::string title = file.stem().string();
+                  const std::string format = musicExtension(file);
+
+                  executeSQL(fmt::format(
+                    "INSERT INTO music_songs ("
+                    "filename, name, track, artist_id, album_id,"
+                    "genre_id, year, length, numplays, rating,"
+                    "lastplay, date_entered, date_modified,"
+                    "format, mythdigest, size, description, comment,"
+                    "disc_count, disc_number, track_count,"
+                    "start_time, stop_time, eq_preset,"
+                    "relative_volume, sample_rate, bitrate, bpm,"
+                    "directory_id"
+                    ") VALUES ("
+                    "'{}', '{}', 0, {}, {},"
+                    "0, 0, 0, 0, 0,"
+                    "'1970-01-01 00:00:00', NOW(), NOW(),"
+                    "'{}', '', 0, '', '',"
+                    "0, 0, 0,"
+                    "0, 0, '',"
+                    "0, 0, 0, 0,"
+                    "{}"
+                    ")",
+                    escapedFilename,
+                    escapeSQL(title),
+                    artistId,
+                    albumId,
+                    escapeSQL(format),
+                    directoryId
+                  ));
+
+                  ++newSongCount;
+              }
+              // Eksisterende sange bevarer metadata og statistik.
+              // Loaderteksten må gerne forkortes.
+              std::snprintf(music_db_update_loader, sizeof(music_db_update_loader),"%s", file.filename().string().c_str());
+              ++music_oversigt_loaded_nr;
+            }
+            // -----------------------------------------------------
+            // UNDERMAPPER
+            // -----------------------------------------------------
+
+            for (const fs::path& child : directories) {
+                const std::string name = child.filename().string();
+                const int childDirectoryId = getDirectoryId(name, directoryId);
+                ++directoryCount;
+                int childArtistId = artistId;
+                // Første niveau under musikroden er kunstneren.
+                if (directoryId == 0) {
+                  childArtistId = getArtistId(name);
+                  music_oversigt_type item{};
+                  copyText(item.album_name, name);
+                  copyText(item.album_path, name);
+                  copyText(item.album_coverfile, findCover(child));
+                  item.textureId = 0;
+                  item.directory_id = childDirectoryId;
+                  item.parent_id = 0;
+                  item.album_id = 0;
+                  item.artist_id = childArtistId;
+                  item.oversigttype = 0;
+                  newOverview.push_back(item);
+                }
+                // Funktionen kalder sig selv for næste niveau.
+                scanDirectory(
+                  child,
+                  childDirectoryId,
+                  childArtistId
+                );
+            }
+        };
+        // Rodmappen har id=0.
+        // Musikfiler direkte i roden får artist_id=0.
+        scanDirectory(root, 0, 0);
+        // ---------------------------------------------------------
+        // UDSKIFT OVERSIGTEN EFTER VELLYKKET SCANNING
+        // ---------------------------------------------------------
+        clean_music_oversigt();
+        musicoversigt.swap(newOverview);
+        // Som i din gamle kode tælles PLAYLIST ikke med.
+        musicoversigt_antal = static_cast<int>(musicoversigt.size()) - 1;
+        music_db_update_loader[0] = '\0';
+        printf("\nMusic scan done: %u directories, %u music files, %u new songs.\n", directoryCount, static_cast<unsigned int>(music_oversigt_loaded_nr),newSongCount);
+        write_logfile(logfile,(char*)"MUSIC Done update music directory.");
+        return 0;
+    }
+    catch (const std::exception& error) {
+      music_db_update_loader[0] = '\0';
+      fprintf(stderr,"Music scan failed: %s\n",error.what());
+      write_logfile(logfile,(char*)"MUSIC Error updating music directory.");
+      return 1;
+    }
+}
+
+
+
+
+
+
+
+
+
 
 // ****************************************************************************************
 //
@@ -1367,6 +1886,7 @@ void musicoversigt_class::opdatere_music_oversigt_icons() {
 
 void musicoversigt_class::clean_music_oversigt() {
   unsigned int i=0;
+  /*
   while (i<musicoversigt.size()) {
     strcpy(musicoversigt[i].album_name,"");
     strcpy(musicoversigt[i].album_path,"");
@@ -1379,6 +1899,7 @@ void musicoversigt_class::clean_music_oversigt() {
     musicoversigt[i].oversigttype=0;
     i++;
   }
+  */
   musicoversigt.clear();
   musicoversigt_antal=0;
   antal_music_oversigt=0;
@@ -1954,7 +2475,7 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    float x = startX + col * itemWidth + 20.0f;
+    float x = startX + col * itemWidth;
     float y = startY + row * rowHeight - subOff - 20.0f;
     float progress = 1.0f;
     if (!musicIntroFinished) {
@@ -1969,44 +2490,6 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
   }
 }
 
-
-// ****************************************************************************************
-//
-// Show music overview (not in use)
-//
-// ****************************************************************************************
-
-void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
-  // ---- KINETIC SCROLL ---------------------------------------
-  scrollVel *= friction;
-  scrollPos += scrollVel;
-  if (fabs(scrollVel) < 0.01f) scrollVel = 0;
-  int totalRows   = (int)ceil((float)musicoversigt.size() / itemsPerRow);
-  int visibleRows = viewHeight / rowHeight;
-  float maxScroll = std::max(0.0f, (float)(totalRows - visibleRows) * rowHeight);
-  if (scrollPos < 0) {
-    scrollPos = 0;
-    scrollVel = 0;
-  } else if (scrollPos > maxScroll) {
-    scrollPos = maxScroll;
-    scrollVel = 0;
-  }
-  // ---- CALC --------------------------------------------------
-  int firstRow   = (int)(scrollPos / rowHeight);
-  float subOff   = fmod(scrollPos, rowHeight);
-  int sofset     = firstRow * itemsPerRow;
-  int screenTop = startY;
-  int xof = startX;
-  int visibleItems = (visibleRows + 2) * itemsPerRow;
-  for (int i = 0; i < visibleItems && (sofset+i) < musicoversigt.size();i++) {
-    int index = sofset + i;
-    int col = i % itemsPerRow;
-    int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 20;
-    int y = startY + row * rowHeight - subOff - 20;
-    draw_music_item( x, y, index, normal_icon, normal_icon , back_icon, music_select_iconnr);
-  }
-}
 
 // ****************************************************************************************
 //
@@ -2093,7 +2576,7 @@ void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint 
     // Placeringen beregnes ud fra rækkefølgen i søgeresultaterne.
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 20;
+    int x = startX + col * itemWidth;
     int y = startY + row * rowHeight - subOff - 20;
     draw_music_search_item( x, y, index, normal_icon, normal_icon, back_icon, music_select_iconnr);
   }

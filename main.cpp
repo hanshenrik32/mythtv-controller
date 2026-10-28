@@ -2946,9 +2946,7 @@ void display() {
         GLuint radiotexture_2;        
         radiotexture_2=radiooversigt.get_texture(radiooversigt.playingstationnr-1);
         if (radiotexture_2) {
-          // renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
           renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_coverx,config_menu.config_radioplayer_covery,config_menu.config_radioplayer_cover_sizx, config_menu.config_radioplayer_cover_sizy, 1,1,1,1);
-
         } else {
           // renderer.AddTextureRect(0,normal_icon, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
         }
@@ -3875,6 +3873,7 @@ void display() {
     do_stop_radio = false;
     do_stop_music_all = true;
     radiooversigt.playingstationnr=-1;
+    radiooversigt.playing=false;                                 // set playing flag to stop
   }
 
   // check if we play. and set playing var to 1
@@ -6948,9 +6947,9 @@ void handleKeypress(unsigned char key, int x, int y) {
               //         break;
             }
           }
-        }
-        
+        }  
       }
+
       // stream
       if (vis_stream_oversigt) {
         if (keybufferindex<80) {
@@ -6967,18 +6966,30 @@ void handleKeypress(unsigned char key, int x, int y) {
         }
       }
 
-      if (do_show_setup_rss) {
+
+      if (do_show_setup_keys) {
+        if (key==13) {
+          std::string selected_filename;
+          if ((do_show_setup_select_linie % 2)==0)
+          selected_filename=select_exe_file();
+          if (selected_filename.length()>0) {
+            keybuffer1=selected_filename;
+          }
+        }
         if ((key!=13) && (key!=127)) {
           if (key!=8) {
-            // keybuffer[keybufferindex]=key;
+            keybuffer[keybufferindex]=key;
             keybufferindex++;
-            // keybuffer[keybufferindex]='\0';
+            keybuffer[keybufferindex]='\0';
             keybuffer1.push_back(key);
           }
           if (key==8) {
             if (keybuffer1.size()>0) keybuffer1.erase(keybuffer1.length()-1);
-          }
+          }        
         }
+      }
+
+      if (do_show_setup_rss) {
         switch(rssstreamoversigt.setup_select_linie) {
           case 0: rssstreamoversigt.set_stream_name(0+configrss_ofset,(char *) keybuffer1.c_str());
                   break;
@@ -7052,10 +7063,64 @@ void handleKeypress(unsigned char key, int x, int y) {
                   break;
           case 35:rssstreamoversigt.set_stream_url(17+configrss_ofset,(char *) keybuffer1.c_str());
                   break;
-          }
+        }
       }
       
-      
+      /*
+      if ((do_show_setup_keys) && (key>13)) {
+        keybuffer[keybufferindex]=key;
+        keybufferindex++;
+        keybuffer[keybufferindex]='\0';
+        keybuffer1.push_back(key);
+      }
+      */
+
+      if (do_show_setup_keys) {
+        switch(do_show_setup_select_linie) {
+          case 0: strcpy(configkeyslayout[0].cmdname,keybuffer1.c_str());
+                  break;
+          case 1: configkeyslayout[0].scrnr=atoi(keybuffer);
+                  break;
+          case 2: strcpy(configkeyslayout[1].cmdname,keybuffer1.c_str());
+                  break;
+          case 3: configkeyslayout[1].scrnr=atoi(keybuffer);
+                  break;
+          case 4: strcpy(configkeyslayout[2].cmdname,keybuffer1.c_str());
+                  break;
+          case 5: configkeyslayout[2].scrnr=atoi(keybuffer);
+                  break;
+          case 6: strcpy(configkeyslayout[3].cmdname,keybuffer1.c_str());
+                  break;
+          case 7: configkeyslayout[3].scrnr=atoi(keybuffer);
+                  break;
+          case 8: strcpy(configkeyslayout[4].cmdname,keybuffer1.c_str());
+                  break;
+          case 9: configkeyslayout[4].scrnr=atoi(keybuffer);
+                  break;
+          case 10: strcpy(configkeyslayout[5].cmdname,keybuffer1.c_str());
+                  break;
+          case 11: configkeyslayout[5].scrnr=atoi(keybuffer);
+                  break;
+          case 12: strcpy(configkeyslayout[6].cmdname,keybuffer1.c_str());
+                  break;
+          case 13: configkeyslayout[6].scrnr=atoi(keybuffer);
+                  break;
+          case 14: strcpy(configkeyslayout[7].cmdname,keybuffer1.c_str());
+                  break;
+          case 15: configkeyslayout[7].scrnr=atoi(keybuffer);
+                  break;
+          case 16: strcpy(configkeyslayout[8].cmdname,keybuffer1.c_str());
+                  break;
+          case 17: configkeyslayout[8].scrnr=atoi(keybuffer);
+                  break;
+          case 18: strcpy(configkeyslayout[9].cmdname,keybuffer1.c_str());
+                  break;
+          case 19: configkeyslayout[9].scrnr=atoi(keybuffer);
+                  break;
+        }
+      }
+
+
       if (do_show_setup_backend) {
         if ((key!=13) && (key!=127)) {
           if (key!=8) {
@@ -7511,14 +7576,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (tema>TEMA_ANTAL) tema=1;
               }
             }
-          } else if (do_show_setup_keys) {
-            if (key!=13) {
-              keybuffer[keybufferindex]=key;
-              keybufferindex++;
-              keybuffer[keybufferindex]='\0';	// else input key text in buffer
-              keybuffer1.push_back(key);
-            }
-            // rss editor
           } else if (do_show_setup_rss) {
             if (key!=13) {
               // keybuffer[keybufferindex]=key;
@@ -7778,26 +7835,23 @@ void handleKeypress(unsigned char key, int x, int y) {
           }
         }
         if (do_show_setup_spotify) {
-            switch(do_show_setup_select_linie) {
-              case 0: strcpy(spotify_oversigt.spotify_client_id,keybuffer);
-                      break;
-              case 1: strcpy(spotify_oversigt.spotify_secret_id,keybuffer);
-                      break;
-            }
+          switch(do_show_setup_select_linie) {
+            case 0: strcpy(spotify_oversigt.spotify_client_id,keybuffer);
+                    break;
+            case 1: strcpy(spotify_oversigt.spotify_secret_id,keybuffer);
+                    break;
+          }
         }
-
         
         if (do_show_setup_tidal) {
-            switch(do_show_setup_select_linie) {
-              case 0: strcpy(tidal_oversigt.client_id,keybuffer);
-                      break;
-              case 1: tidal_oversigt.client_secret=keybuffer;
-                      break;
-            }
+          switch(do_show_setup_select_linie) {
+            case 0: strcpy(tidal_oversigt.client_id,keybuffer);
+                    break;
+            case 1: tidal_oversigt.client_secret=keybuffer;
+                    break;
+          }
         }
-
-
-         if (do_show_setup_torrent) {
+        if (do_show_setup_torrent) {
              switch(do_show_setup_select_linie) {
                case 0: if (strcmp(keybuffer,"Y")) torrent_downloader.trash_torrent=true; else torrent_downloader.trash_torrent=false;
                        break;
@@ -7807,50 +7861,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                        break;
              }
          }
-         if (do_show_setup_keys) {
-            switch(do_show_setup_select_linie) {
-              case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
-                      break;
-              case 1: configkeyslayout[0].scrnr=atoi(keybuffer);
-                      break;
-              case 2: strcpy(configkeyslayout[1].cmdname,keybuffer);
-                      break;
-              case 3: configkeyslayout[1].scrnr=atoi(keybuffer);
-                      break;
-              case 4: strcpy(configkeyslayout[2].cmdname,keybuffer);
-                      break;
-              case 5: configkeyslayout[2].scrnr=atoi(keybuffer);
-                      break;
-              case 6: strcpy(configkeyslayout[3].cmdname,keybuffer);
-                      break;
-              case 7: configkeyslayout[3].scrnr=atoi(keybuffer);
-                      break;
-              case 8: strcpy(configkeyslayout[4].cmdname,keybuffer);
-                      break;
-              case 9: configkeyslayout[4].scrnr=atoi(keybuffer);
-                      break;
-              case 10: strcpy(configkeyslayout[5].cmdname,keybuffer);
-                      break;
-              case 11: configkeyslayout[5].scrnr=atoi(keybuffer);
-                      break;
-              case 12: strcpy(configkeyslayout[6].cmdname,keybuffer);
-                      break;
-              case 13: configkeyslayout[6].scrnr=atoi(keybuffer);
-                      break;
-              case 14: strcpy(configkeyslayout[7].cmdname,keybuffer);
-                      break;
-              case 15: configkeyslayout[7].scrnr=atoi(keybuffer);
-                      break;
-              case 16: strcpy(configkeyslayout[8].cmdname,keybuffer);
-                      break;
-              case 17: configkeyslayout[8].scrnr=atoi(keybuffer);
-                      break;
-              case 18: strcpy(configkeyslayout[9].cmdname,keybuffer);
-                      break;
-              case 19: configkeyslayout[9].scrnr=atoi(keybuffer);
-                      break;
-            }
-         } else if (do_show_videoplayer) {
+
+         if (do_show_videoplayer) {
             switch(do_show_setup_select_linie) {
                 case 0: strcpy(configdefaultplayer,keybuffer);
                         break;
@@ -8926,39 +8938,87 @@ void handlespeckeypress(int key,int x,int y) {
               }
               break;
       case 2: // F2 key
-              exit(2);
-              break;
-      case 3: // F3 key
-              do_show_torrent =! do_show_torrent;
-              break;
-      case 4: // F4 key
-              /*
               if (strlen(configkeyslayout[1].cmdname) > 0) {
                 // saveexitcommand(configkeyslayout[1]);
                 // doexitcommand();
                 do_system_call_with_timeout(configkeyslayout[1].cmdname, output, 2);
               } else {
-                tidal_oversigt.do_setup_tidal_start_entry = ! tidal_oversigt.do_setup_tidal_start_entry;
-                do_show_torrent = false;
+                exit(2);
               }
-              */
-              tidal_oversigt.do_setup_tidal_start_entry = ! tidal_oversigt.do_setup_tidal_start_entry;
+              break;
+      case 3: // F3 key
+              if (strlen(configkeyslayout[2].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[2].cmdname, output, 2);
+              } else {
+                do_show_torrent =! do_show_torrent;
+              }
+              break;
+      case 4: // F4 key
+              if (strlen(configkeyslayout[3].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[3].cmdname, output, 2);
+              } else {
+                tidal_oversigt.do_setup_tidal_start_entry = ! tidal_oversigt.do_setup_tidal_start_entry;
+              }
               break;
       case 5: // F5 key
+              if (strlen(configkeyslayout[4].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[4].cmdname, output, 2);
+              }
               break;
       case 6: // F6 key
+              if (strlen(configkeyslayout[5].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[5].cmdname, output, 2);
+              }
               break;
       case 7: // F7 key
+              if (strlen(configkeyslayout[6].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[6].cmdname, output, 2);
+              }
               break;
       case 8: // F8 key
+              if (strlen(configkeyslayout[7].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[7].cmdname, output, 2);
+              }
               break;
       case 9: // F9 key
+              if (strlen(configkeyslayout[8].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[8].cmdname, output, 2);
+              }
               break;
       case 10: // F10 key
+              if (strlen(configkeyslayout[9].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[9].cmdname, output, 2);
+              }
               break;
       case 11: // F11 key
+              if (strlen(configkeyslayout[10].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[10].cmdname, output, 2);
+              }
               break;
       case 12:  // F12 key
+              if (strlen(configkeyslayout[11].cmdname) > 0) {
+                // saveexitcommand(configkeyslayout[1]);
+                // doexitcommand();
+                do_system_call_with_timeout(configkeyslayout[11].cmdname, output, 2);
+              }
               break;
       case 100:  // Left key
               if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (tidal_oversigt.do_setup_tidal_start_entry==false)) {
@@ -9590,7 +9650,7 @@ void handlespeckeypress(int key,int x,int y) {
               }
 
               if (do_show_setup_keys) {
-                if (do_show_setup_select_linie<11) do_show_setup_select_linie++;
+                if (do_show_setup_select_linie<23) do_show_setup_select_linie++;
               }
 
               if (do_show_videoplayer) {

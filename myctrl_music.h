@@ -91,6 +91,7 @@ class musicoversigt_class {
     // load covers
     void opdatere_music_oversigt_icons();
     int opdatere_music_oversigt_nodb();
+    int opdatere_music_oversigt_nodb1();
     int opdatere_music_oversigt(unsigned int directory_id);
     int opdatere_music_oversigt_searchtxt(char *keybuffer,int type);
     // bruges til at finde kunstnere eller sange hvis art >0
@@ -101,8 +102,7 @@ class musicoversigt_class {
     int load_music_oversigt_playlists(char *playlistname);
     // load playliste find_dir_id
     int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
-    // show playlistes in opengl
-    // void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
+    void show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     void show_search_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     // henter playlist oversigt
     int opdatere_music_oversigt_playlists();
@@ -127,15 +127,11 @@ class musicoversigt_class {
     void draw_music_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon, int stream_key_selected);
     void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     void show_search_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
-
-
     bool musicIntroStarted = false;
     bool musicIntroFinished = false;
     float musicIntroScrollStart = 0.0f;
-    std::chrono::steady_clock::time_point musicIntroStart;
-    
+    std::chrono::steady_clock::time_point musicIntroStart;   
     void draw_music_item1(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon,int stream_key_selected,float introProgress,float pulse);
-    void show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
 };
 
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);

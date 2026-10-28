@@ -136,7 +136,7 @@ std::string select_screen_timeout();
 std::string select_screen_mode();
 std::string select_sound_output_device();
 bool SetOutputDevice(FMOD::System* system, int deviceId);    
-
+std::string select_exe_file();
 
 class ip_info {
   public:
