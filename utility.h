@@ -14,5 +14,6 @@ char *b64_encode(const unsigned char *in, size_t len);
 unsigned int countEntriesInDir(const char* dirname);
 bool do_system_call(std::string cmd);
 bool do_system_call_with_timeout(const std::string& cmd, std::string& output, int timeout_seconds);
+std::string getClipboardText();                                                     // get text from clipboard
 
 #endif

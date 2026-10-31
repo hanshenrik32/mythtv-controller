@@ -28,6 +28,8 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 
 LIBICAL := $(shell find /usr/lib/ -name 'libical.so')
 
+GTK := $(shell pkg-config --cflags --libs gtk+-3.0)
+
 ifeq ($(LBITS),64)
 	LIBFMT := $(shell find /usr/lib/x86_64-linux-gnu/ -name 'libfmt.so')
 else 
@@ -56,14 +58,14 @@ else
 	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
 
-OPTS = -I"/usr/include/mysql" -I/usr/include/libxml2 -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/lirc" -I/usr/include/freetype2 -I/usr/include/libpng16 $(LIBGLC) $(LIBFMOD) $(LIBICAL) $(LIBFMT) $(LIRCSOURCES) 
+OPTS = -I"/usr/include/mysql" -I/usr/include/libxml2 -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/lirc" -I/usr/include/freetype2 -I/usr/include/libpng16 $(LIBGLC) $(LIBFMOD) $(LIBICAL) $(LIBFMT) $(LIRCSOURCES) $(GTK)
 
 SRCS = main.cpp renderer.cpp shader.cpp utility.cpp readjpg.cpp myctrl_readwebfile.cpp myth_ttffont.cpp myctrl_stream.cpp myctrl_radio.cpp myth_setupsql.cpp myctrl_tidal2.cpp myctrl_mplaylist.cpp myctrl_music.cpp myctrl_movie.cpp myctrl_torrent.cpp myctrl_spotify.cpp myctrl_recorded.cpp myctrl_tvprg.cpp myth_vlcplayer.cpp myth_saver.cpp checknet.cpp myth_setup.cpp mongoose-master/mongoose.c json-parser/json.c
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp -lX11
+	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp -lX11 -lgtk-3 -lgdk-3
 endif
 
 all:
@@ -123,7 +125,7 @@ installtidal-dl:
 	@echo "you have to copy tidal-dl from you homedir to /usr/bin/
 
 install:
-	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
+	@echo "Installing mythtv-controller ver 0.50.x in /opt/mythtv-controller."
 	@mkdir -p /opt/mythtv-controller/images/radiostations
 	@mkdir -p /opt/mythtv-controller/convert/hires
 	@mkdir -p /opt/mythtv-controller/images/mythnetvision

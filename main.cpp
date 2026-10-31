@@ -5740,7 +5740,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               }
             }
           }
+          //
           // used in new movie overview
+          //
           if (vis_nyefilm_oversigt) {
             if (id>99) {
               printf("Vælg film \n");
@@ -5791,6 +5793,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               ask_open_dir_or_play_music=false;
               mknapnr=0;
               musicoversigt.opdatere_music_oversigt(0);  // hent list over mythtv playlistes
+            }
+            if ((id==100)  && (mknapnr>0) && (strcmp(musicoversigt.get_album_name(mknapnr-1),"PLAYLIST")==0)){
+              mknapnr=id-99;
             }
 
             if (ask_open_dir_or_play_music) {
@@ -8868,7 +8873,23 @@ void handlespeckeypress(int key,int x,int y) {
     snumbersoficonline=8;                               // antal i stream/spotify oversigt
     tnumbersoficonline=8;                               // antal i tidal oversigt
     time_t nut;
-  
+
+    // shift + insert key (to get buffer from system)
+    const int modifiers = glutGetModifiers();
+    if (key == GLUT_KEY_INSERT && (modifiers & GLUT_ACTIVE_SHIFT)) {
+      if (do_show_tidal_search_oversigt) {
+        printf("Shift + Insert trykket\n");
+        // gem tekst fra clipboard her.
+        keybuffer1 = getClipboardText();
+        strcpy(keybuffer,keybuffer1.c_str());
+        keybufferindex=keybuffer1.length();
+        if (keybufferindex>0) {
+          printf("buffer = %s \n",keybuffer1);
+        } else {
+          printf("buffer = "" \n");
+        }
+      }
+    }
 
     if ((multi_editor) && (textEditor.IsActive()==true)) {
       switch (key) {
@@ -11133,7 +11154,7 @@ void handlefrictionGeneric(T& o) {
 void mouseMotion(int x, int y) {
   int id;
   id = renderer.HitTest(x, y);
-  if (debugmode) printf("id = %d x=%d y=%d\n",id,x,y);
+  // if (debugmode) printf("id = %d x=%d y=%d\n",id,x,y);
   if (do_show_setup) {
     if (id==45) setup_icon_over=13;
     else if (id==39) setup_icon_over=9;   // tvguide

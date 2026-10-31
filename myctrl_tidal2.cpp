@@ -3430,7 +3430,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
                 gfxurl = "";
                 setimg = 0;
                 playlistid = "";
-                // stack.push_back(new_tidal_record);                                       // add to stack
+                // add to stack
                 stack_search.push_back(new_tidal_record);
               }
             }

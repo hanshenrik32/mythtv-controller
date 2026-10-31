@@ -19,8 +19,8 @@
 #include <unistd.h>
 #include "utility.h"
 #include <time.h>                       // have strftime
-
-
+#include <gtk/gtk.h>
+  
 unsigned int hourtounixtime(int hour) {
   time_t nutid;
   struct tm *tid;
@@ -346,4 +346,51 @@ char *b64_encode(const unsigned char *in, size_t len) {
 		}
 	}
 	return out;
+}
+
+// get clipboard data
+
+
+/*
+std::string getClipboardText() {
+  gtk_init(nullptr, nullptr);
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  gchar* text = gtk_clipboard_wait_for_text(clipboard);
+  std::string result;
+  if (text) {
+    result = text;
+    g_free(text);
+  }
+  return result;
+}
+*/
+
+std::string getClipboardText() {
+  // Kald funktionen fra GLUT's hovedtråd.
+  static bool initialized = false;
+  bool primary = false;
+  if (!initialized) {
+    gdk_set_allowed_backends("x11");
+    if (!gtk_init_check(nullptr, nullptr)) {
+      fprintf(stderr, "GTK: Kan ikke forbinde til display\n");
+      return {};
+    }
+    initialized = true;
+  }
+  GtkClipboard* clipboard = gtk_clipboard_get(
+      primary ? GDK_SELECTION_PRIMARY
+              : GDK_SELECTION_CLIPBOARD
+  );
+  if (!clipboard) {
+    fprintf(stderr, "GTK: Kan ikke hente clipboard\n");
+    return {};
+  }
+  gchar* text = gtk_clipboard_wait_for_text(clipboard);
+  if (!text) {
+    fprintf(stderr, "GTK: Clipboard indeholder ingen tilgængelig tekst\n");
+    return {};
+  }
+  std::string result(text);
+  g_free(text);
+  return result;
 }
