@@ -2777,7 +2777,7 @@ void display() {
     if (status_time_out_last==0) {
       status_time_out_last=status_time_out+3;
     }
-    printf("time %d \n",status_time_out);
+    printf("time %ld \n", status_time_out);
     if ((status_time_out_last>0) && (status_time_out_last>status_time_out)) {
       show_play_status_info=true;
     } else {
@@ -2938,10 +2938,11 @@ void display() {
           }
         }
         renderer.AddText(&myfont,config_menu.config_radioplayer_song_name_text_x+100, config_menu.config_radioplayer_song_name_text_y ,aktivsongname,1,1,1,1);
-
+        
         // renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(6*18) ,"Artist ",1,1,1,1);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_artist_text_x, config_menu.config_radioplayer_artist_text_y,"Artist ",1,1,1,1);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_artist_text_x+100, config_menu.config_radioplayer_artist_text_y ,aktivartistname,1,1,1,1);
+        // +40 temp error fix for text position
+        renderer.AddText(&myfont,config_menu.config_radioplayer_artist_text_x, config_menu.config_radioplayer_artist_text_y+40,"Artist ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_artist_text_x+100, config_menu.config_radioplayer_artist_text_y+40 ,aktivartistname,1,1,1,1);
         
         // renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(8*18) ,"Bit rate ",1,1,1,1);
         renderer.AddText(&myfont,config_menu.config_radioplayer_song_bitrate_text_x, config_menu.config_radioplayer_song_bitrate_text_y ,"Bit rate ",1,1,1,1);
@@ -2949,7 +2950,7 @@ void display() {
         int bbs=radiooversigt.get_kbps(radiooversigt.playingstationnr-1);
         std::string showbb=fmt::format("{} Kps.",bbs);
         renderer.AddText(&myfont,config_menu.config_radioplayer_song_bitrate_text_x+100, config_menu.config_radioplayer_song_bitrate_text_y ,showbb,1,1,1,1);
-
+        
         // Radio cover
         GLuint radiotexture_2;        
         radiotexture_2=radiooversigt.get_texture(radiooversigt.playingstationnr-1);
@@ -8912,7 +8913,7 @@ void handlespeckeypress(int key,int x,int y) {
         strcpy(keybuffer,keybuffer1.c_str());
         keybufferindex=keybuffer1.length();
         if (keybufferindex>0) {
-          printf("buffer = %s \n",keybuffer1);
+          printf("buffer = %s \n",keybuffer1.c_str());
         } else {
           printf("buffer = "" \n");
         }
@@ -11782,7 +11783,7 @@ int team_settings_load() {
   } catch (const std::exception &e) {
 
     printf("Error parsing team json file.\n");
-    write_logfile(logfile,"Error parsing team json file.");
+    write_logfile(logfile,(char *) "Error parsing team json file.");
 
     config_menu.config_tema_path="tema2/";
 
