@@ -11418,7 +11418,6 @@ void show_background() {
 
 
 int team_settings_load() {
-
   // load json file
   std::string temaname=fmt::format("tema{}.json", tema);
   std::ifstream temasettingsfile(temaname);
@@ -11704,10 +11703,6 @@ int team_settings_load() {
     config_menu.config_radioplayer_song_bitrate_text_y=(iRoot["tema1"]["icons"]["radioplayer_bitrate_text"].get("y","0").asInt());
     config_menu.config_radioplayer_song_time_text_x=(iRoot["tema1"]["icons"]["radioplayer_time_text"].get("x","0").asInt());
     config_menu.config_radioplayer_song_time_text_y=(iRoot["tema1"]["icons"]["radioplayer_time_text"].get("y","0").asInt());
-    config_menu.config_radioplayer_songs_antal_text_x=(iRoot["tema1"]["icons"]["radioplayer_songs_antal_text"].get("x","0").asInt());
-    config_menu.config_radioplayer_songs_antal_text_y=(iRoot["tema1"]["icons"]["radioplayer_songs_antal_text"].get("y","0").asInt());
-
-
 
     config_menu.config_mediaplayer_info_icon=(iRoot["tema1"]["icons"]["mediaplayer_info"].get("icon_path","0").asString());
     config_menu.config_mediaplayer_coverx=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("x","0").asInt());
@@ -11938,10 +11933,6 @@ int team_settings_load() {
     config_menu.config_exitx=0;
     config_menu.config_exity=0;
     config_menu.config_exit_icon="exit";
-
-    // config_menu.config_radio_or_music_oversigtx=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asInt());
-    // config_menu.config_radio_or_music_oversigty=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asInt());
-    // config_menu.config_radio_or_music_oversigt_icon=(iRoot["tema1"]["icons"]["radio_or_music"].get("icon_path","0").asString());
 
     config_menu.config_music_main_windowx=0;
     config_menu.config_music_main_windowy=0;

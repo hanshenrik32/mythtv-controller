@@ -299,8 +299,8 @@ class config_icons {
     int config_radioplayer_song_bitrate_text_y;
     int config_radioplayer_song_time_text_x;
     int config_radioplayer_song_time_text_y;
-    int config_radioplayer_songs_antal_text_x;
-    int config_radioplayer_songs_antal_text_y;
+    // int config_radioplayer_songs_antal_text_x;
+    // int config_radioplayer_songs_antal_text_y;
 
 
     int config_mediaplayer_infox;
@@ -688,8 +688,8 @@ class config_icons {
       config_radioplayer_song_bitrate_text_y=0;
       config_radioplayer_song_time_text_x=0;
       config_radioplayer_song_time_text_y=0;
-      config_radioplayer_songs_antal_text_x=0;
-      config_radioplayer_songs_antal_text_y=0;
+      // config_radioplayer_songs_antal_text_x=0;
+      // config_radioplayer_songs_antal_text_y=0;
 
       config_mediaplayer_infox = 480;
       config_mediaplayer_infoy = 320;

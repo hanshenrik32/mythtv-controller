@@ -248,7 +248,6 @@
                 "sizx": 220,
                 "sizy": 320
             },
-
             "radio_or_music": {
                 "icon_path": "musicplayer-info",
                 "x": 480,
@@ -290,29 +289,29 @@
             },
            "radioplayer_artist_text": {
                 "x": 550,
-                "y": 470
+                "y": 370
             },
             "radioplayer_song_name_text": {
                 "x": 550,
-                "y": 490
+                "y": 390
             },
             "radioplayer_album_name_text": {
                 "x": 550,
-                "y": 510
+                "y": 410
             },
             "radioplayer_bitrate_text": {
                 "x": 550,
-                "y": 530
+                "y": 430
             },
             "radioplayer_time_text": {
                 "x": 550,
-                "y": 560
+                "y": 460
             },
             "radioplayer_songs_antal_text": {
                 "x": 550,
-                "y": 580
+                "y": 480
             },
-             "musicplayer_play_button": {
+            "musicplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 50,
                 "y": 470,
