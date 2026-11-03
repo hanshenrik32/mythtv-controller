@@ -288,7 +288,31 @@
                 "sizx": 100,
                 "sizy": 100
             },
-            "musicplayer_play_button": {
+            "radioplayer_artist_text": {
+                "x": 550,
+                "y": 470
+            },
+            "radioplayer_song_name_text": {
+                "x": 550,
+                "y": 490
+            },
+            "radioplayer_album_name_text": {
+                "x": 550,
+                "y": 510
+            },
+            "radioplayer_bitrate_text": {
+                "x": 550,
+                "y": 530
+            },
+            "radioplayer_time_text": {
+                "x": 550,
+                "y": 560
+            },
+            "radioplayer_songs_antal_text": {
+                "x": 550,
+                "y": 580
+            },
+             "musicplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 50,
                 "y": 470,
@@ -321,6 +345,30 @@
                 "y": 480,
                 "sizx": 100,
                 "sizy": 100
+            },
+            "musicplayer_artist_text": {
+                "x": 550,
+                "y": 370
+            },
+            "musicplayer_song_name_text": {
+                "x": 550,
+                "y": 390
+            },
+            "musicplayer_album_name_text": {
+                "x": 550,
+                "y": 410
+            },
+            "musicplayer_bitrate_text": {
+                "x": 550,
+                "y": 430
+            },
+            "musicplayer_time_text": {
+                "x": 550,
+                "y": 460
+            },
+            "musicplayer_songs_antal_text": {
+                "x": 550,
+                "y": 480
             },
             "tidalplayer_play_button": {
                 "icon_path": "mplay",
@@ -355,6 +403,30 @@
                 "y": 480,
                 "sizx": 100,
                 "sizy": 100
+            },
+            "tidalplayer_artist_text": {
+                "x": 550,
+                "y": 370
+            },
+            "tidalplayer_song_name_text": {
+                "x": 550,
+                "y": 390
+            },
+            "tidalplayer_album_name_text": {
+                "x": 550,
+                "y": 410
+            },
+            "tidalplayer_bitrate_text": {
+                "x": 550,
+                "y": 430
+            },
+            "tidalplayer_time_text": {
+                "x": 550,
+                "y": 460
+            },
+            "tidalplayer_songs_antal_text": {
+                "x": 550,
+                "y": 480
             },
             "spotifyplayer_play_button": {
                 "icon_path": "mplay",

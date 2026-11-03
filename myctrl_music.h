@@ -71,13 +71,16 @@ class musicoversigt_class {
     const float accel = 2.0f;
 
     int itemsPerRow = 8;
-    int rowHeight   = 198+30;
+    int rowHeight   = 198+10;
     int itemWidth   = 198;
 
     int startX = 20;
     int startY = 60;               // 895;
     int viewHeight = 780;
     // end new scroll vars
+
+    int icon_sizex=180;
+    int icon_sizey=180;
 
     int search_startX = 20;
     int search_startY = 60+180; //  762;

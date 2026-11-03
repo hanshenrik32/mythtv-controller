@@ -201,31 +201,31 @@
             },
             "musicplayer_info": {
                 "icon_path": "musicplayer-info",
-                "x": 480,
-                "y": 300,
-                "sizx":512,
-                "sizy":320
+                "x": 20,
+                "y": 900,
+                "sizx":1620,
+                "sizy": 160
             },
             "spotifyplayer_info": {
                 "icon_path": "musicplayer-info",
-                "x": 480,
-                "y": 300,
-                "sizx":512,
-                "sizy":320
+                "x": 20,
+                "y": 900,
+                "sizx":1620,
+                "sizy": 160
             },
             "tidalplayer_info": {
                 "icon_path": "musicplayer-info",
-                "x": 480,
-                "y": 300,
-                "sizx":512,
-                "sizy":320
+                "x": 20,
+                "y": 900,
+                "sizx":1620,
+                "sizy": 160
             },
             "radioplayer_info": {
                 "icon_path": "musicplayer-info",
-                "x": 480,
-                "y": 300,
-                "sizx":512,
-                "sizy":320
+                "x": 20,
+                "y": 900,
+                "sizx":1620,
+                "sizy": 160
             },
             "mediaplayer_info": {
                 "icon_path": "musicplayer-info",
@@ -285,39 +285,87 @@
                 "sizx": 100,
                 "sizy": 100
             },
+            "radioplayer_artist_text": {
+                "x": 80,
+                "y": 940
+            },
+            "radioplayer_song_name_text": {
+                "x": 80,
+                "y": 960
+            },
+            "radioplayer_album_name_text": {
+                "x": 80,
+                "y": 980
+            },
+            "radioplayer_bitrate_text": {
+                "x": 80,
+                "y": 1000
+            },
+            "radioplayer_time_text": {
+                "x": 80,
+                "y": 1020
+            },
+            "radioplayer_songs_antal_text": {
+                "x": 80,
+                "y": 1040
+            },
             "musicplayer_play_button": {
                 "icon_path": "mplay",
-                "x": 50,
-                "y": 480,
+                "x": 700,
+                "y": 950,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_info_cover": {
-                "x": 338,
+                "x": 638,
                 "y": 410,
                 "sizx": 167,
                 "sizy": 119
             },
             "musicplayer_stop_button": {
                 "icon_path": "mplaystop",
-                "x": 150,
-                "y": 480,
+                "x": 750,
+                "y": 950,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_ff_button": {
                 "icon_path": "mplaynext",
-                "x": 250,
-                "y": 480,
+                "x": 800,
+                "y": 950,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_bw_button": {
                 "icon_path": "mplaylast",
-                "x": 350,
-                "y": 480,
+                "x": 850,
+                "y": 950,
                 "sizx": 100,
                 "sizy": 100
+            },
+            "musicplayer_artist_text": {
+                "x": 80,
+                "y": 940
+            },
+            "musicplayer_song_name_text": {
+                "x": 80,
+                "y": 960
+            },
+            "musicplayer_album_name_text": {
+                "x": 80,
+                "y": 980
+            },
+            "musicplayer_bitrate_text": {
+                "x": 80,
+                "y": 1000
+            },
+            "musicplayer_time_text": {
+                "x": 80,
+                "y": 1020
+            },
+            "musicplayer_songs_antal_text": {
+                "x": 80,
+                "y": 1040
             },
             "tidalplayer_play_button": {
                 "icon_path": "mplay",
@@ -352,6 +400,30 @@
                 "y": 480,
                 "sizx": 100,
                 "sizy": 100
+            },
+            "tidalplayer_artist_text": {
+                "x": 550,
+                "y": 370
+            },
+            "tidalplayer_song_name_text": {
+                "x": 550,
+                "y": 390
+            },
+            "tidalplayer_album_name_text": {
+                "x": 550,
+                "y": 410
+            },
+            "tidalplayer_bitrate_text": {
+                "x": 550,
+                "y": 430
+            },
+            "tidalplayer_time_text": {
+                "x": 550,
+                "y": 460
+            },
+            "tidalplayer_songs_antal_text": {
+                "x": 550,
+                "y": 480
             },
             "spotifyplayer_play_button": {
                 "icon_path": "mplay",

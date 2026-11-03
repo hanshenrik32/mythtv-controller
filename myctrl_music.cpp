@@ -2224,9 +2224,7 @@ void musicoversigt_class::draw_music_item1(float x,float y,int ii,GLuint normal_
   }
   // ---- GLID OP ---------------------------------------------
   float remaining = 1.0f - progress;
-  float animatedY =
-    y + 60.0f * remaining * remaining * remaining;
-
+  float animatedY = y + 60.0f * remaining * remaining * remaining;
   // ---- ZOOM ------------------------------------------------
   const float overshoot = 2.6f;
   float u = progress - 1.0f;
@@ -2287,42 +2285,42 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
   // Titel
   temprgtxt = fmt::format("{:^20}",musicoversigt[ii].album_name);
   temprgtxt.resize(20);
-  if (musicoversigt[ii].textureId ) texture = musicoversigt[ii].textureId; else texture = normal_icon;
+  if (musicoversigt[ii].textureId) texture = musicoversigt[ii].textureId; else texture = normal_icon;
   if (ii==0) {
     if (musicoversigt[ii].oversigttype!=-1) {
       if (ii == selected_icon_in_view-1) {
-        drawcover(x + 18, y + 18, 180+10 + sin(sinh)*4, 180+10 + sin(sinh)*4, back_icon , _textureId28, ii+100, highcolor);
+        drawcover(x + 18, y + 18, icon_sizex+10 + sin(sinh)*4, icon_sizey+10 + sin(sinh)*4, back_icon , _textureId28, ii+100, highcolor);
         renderer.AddText(&myfont,x + 20,y + 200 + 18 ,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
         sinh = sinh + 0.08f;
         if (sinh>(M_PI*2)) sinh=0.0f;
       } else {
-        drawcover(x + 18, y + 18, 180, 180, back_icon , _textureId28, ii+100, highcolor);
+        drawcover(x + 18, y + 18, icon_sizex, icon_sizey, back_icon , _textureId28, ii+100, highcolor);
         renderer.AddText(&myfont,x + 20,y + 200 + 28 ,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
       }
     } else {
       if (ii == selected_icon_in_view-1) {
-        drawcover(x + 18, y + 18, 180+10 + sin(sinh)*4, 180+10 + sin(sinh)*4, _textureId28 , _textureId28, ii+100, highcolor);
+        drawcover(x + 18, y + 18, icon_sizex+10 + sin(sinh)*4, icon_sizey+10 + sin(sinh)*4, _textureId28 , _textureId28, ii+100, highcolor);
         renderer.AddText(&myfont,x + 20,y + 200 + 18 ,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
         sinh = sinh + 0.08f;
         if (sinh>(M_PI*2)) sinh=0.0f;
       } else {
-        drawcover(x + 18, y + 18, 180, 180, _textureId28 , _textureId28, ii+100, highcolor);
+        drawcover(x + 18, y + 18, icon_sizex, icon_sizey, _textureId28 , _textureId28, ii+100, highcolor);
         renderer.AddText(&myfont,x + 20,y + 200 + 18 ,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
       }
     }
   } else {
     if (ii == selected_icon_in_view-1) {
-      drawcover(x + 20, y + 20, 180+10 + sin(sinh)*4, 180+10 + sin(sinh)*4, texture , normal_icon, ii+100, normalcolor);
+      drawcover(x + 20, y + 20, icon_sizex+10 + sin(sinh)*4, icon_sizey+10 + sin(sinh)*4, texture , normal_icon, ii+100, normalcolor);
       renderer.AddText(&myfont,x + 20,y + 200 + 18 ,temprgtxt,1,1,1,1);
       // drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 2);
       sinh = sinh + 0.08f;
       if (sinh>(M_PI*2)) sinh=0.0f;
     } else {
-      drawcover(x + 20, y + 20, 180, 180, texture , normal_icon, ii+100, normalcolor);
+      drawcover(x + 20, y + 20, icon_sizex, icon_sizey, texture , normal_icon, ii+100, normalcolor);
       renderer.AddText(&myfont,x + 20,y + 200 + 18 ,temprgtxt,1,1,1,1);
       // drawText(font12, temprgtxt.c_str(), x + 10, y + 6, fontsize, 0);
     }
@@ -2339,6 +2337,7 @@ void musicoversigt_class::draw_music_item(int x, int y,int ii,GLuint normal_icon
 
 
 void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon,GLuint back_icon, int stream_key_selected) {
+  const int startofsety=200;
   // Baggrund
   std::string temprgtxt;
   std::string gfxfilename;
@@ -2367,32 +2366,31 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
       if (ii==0) {
         if (musicoversigt[ii].oversigttype!=-1) {
           if (ii==music_icon_over-100) {
-            drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor_mouseover);
+            drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , back_icon, ii+100, highcolor_mouseover);
           } else {
-            drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor);
+            drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , back_icon, ii+100, highcolor);
           }
-          renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
+          renderer.AddText(&myfont,x + 18, y + 200 + startofsety+20,temprgtxt,1,1,1,1);
           // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
         } else {
           if (texture==0) texture=normal_icon;
           if (ii==music_icon_over-100) {
-            drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor_mouseover);
+            drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , back_icon, ii+100, highcolor_mouseover);
           } else {
-            drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor);
+            drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , back_icon, ii+100, highcolor);
           }
-          renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
-          // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+          renderer.AddText(&myfont,x + 18, y + 200 + startofsety+20,temprgtxt,1,1,1,1);
           // none
         }
       } else {
         if (musicoversigt[ii].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
         else glBindTexture(GL_TEXTURE_2D,musicoversigt[ii].textureId);
         if (ii==music_icon_over-100) {
-          drawcover(x + 18, y + 18, 180, 180, texture , normal_icon, ii+100, highcolor_mouseover);
+          drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , normal_icon, ii+100, highcolor_mouseover);
         } else {
-          drawcover(x + 18, y + 18, 180, 180, texture , normal_icon, ii+100, highcolor);
+          drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , normal_icon, ii+100, highcolor);
         }
-        renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
+        renderer.AddText(&myfont,x + 18, y + 200 + startofsety+20,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
       }
     }
@@ -2400,22 +2398,36 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
     if (ii==0) {
       if (y>search_startY-30) {
         if (ii==music_icon_over-100) {
-          drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor_mouseover);
+          drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , back_icon, ii+100, highcolor_mouseover);
         } else {
-          drawcover(x + 18, y + 18, 180, 180, texture , back_icon, ii+100, highcolor);
+          drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , back_icon, ii+100, highcolor);
         }
-        renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
+        renderer.AddText(&myfont,x + 18, y + 200 + startofsety+20,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 2);
+      } else {
+        // (back icon) (in submenu)
+        if (ii==music_icon_over-100) {
+          drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , back_icon, ii+100, highcolor_mouseover);
+        } else {
+          drawcover(x + 18, y + 18 + startofsety, icon_sizex, icon_sizey, texture , back_icon, ii+100, highcolor);
+        }
+        renderer.AddText(&myfont,x + 18, y + 200 + startofsety+20,temprgtxt,1,1,1,1);
+        // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
       }
     } else {
       if (y>search_startY-30) {
-        if (ii==music_icon_over-100) {
-          drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, highcolor_mouseover);
-        } else {
-          drawcover(x + 20, y + 20, 160, 160, texture , normal_icon, ii+100, normalcolor);
-        }
-        renderer.AddText(&myfont,x + 18, y + 200,temprgtxt,1,1,1,1);
+        if (ii==music_icon_over-100) 
+          drawcover(x + 20, y + 20 + startofsety, icon_sizex, icon_sizey, texture , normal_icon, ii+100, highcolor_mouseover);
+        else 
+          drawcover(x + 20, y + 20 + startofsety, icon_sizex, icon_sizey, texture , normal_icon, ii+100, normalcolor);
+        renderer.AddText(&myfont,x + 18, y + 200 + startofsety+20,temprgtxt,1,1,1,1);
         // drawText(font12, temprgtxt.c_str(), x + 10, y - 4, fontsize, 0);
+      } else {
+        if (ii==music_icon_over-100) 
+          drawcover(x + 20, y + 20 + startofsety, icon_sizex, icon_sizey, texture , normal_icon, ii+100, highcolor_mouseover);
+        else 
+          drawcover(x + 20, y + 20 + startofsety, icon_sizex, icon_sizey, texture , normal_icon, ii+100, normalcolor);
+        renderer.AddText(&myfont,x + 18, y + 200 + startofsety,temprgtxt,1,1,1,1);
       }
     }
   }
@@ -2521,6 +2533,22 @@ auto toLower = [](std::string text) {
 };
 
 
+
+bool matchesSearch(const std::string& text, const std::string& searchText) {
+  const std::string album = toLower(text);
+  const std::string search = toLower(searchText);
+  std::size_t pos = 0;
+  for (char ch : search) {
+    pos = album.find(ch, pos);
+    if (pos == std::string::npos) 
+      return false;
+    ++pos; // Søg efter næste tegn efter det fundne.
+  }
+  return true; // Tom søgetekst matcher også.
+}
+
+
+
 void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
   char searchstring[200];
   bool cursor=true;
@@ -2533,8 +2561,7 @@ void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint 
 
   const std::string search = toLower(keybuffer1);
   for (int i = 0; i < static_cast<int>(musicoversigt.size()); ++i) {
-    const std::string album = toLower(musicoversigt[i].album_name);
-    if (search.empty() || album.find(search) != std::string::npos) {
+    if (matchesSearch(musicoversigt[i].album_name, search)) {
       foundIndices.push_back(i);
     }
   }
@@ -2596,4 +2623,3 @@ void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint 
     draw_music_search_item( x, y, index, normal_icon, normal_icon, back_icon, music_select_iconnr);
   }
 }
-

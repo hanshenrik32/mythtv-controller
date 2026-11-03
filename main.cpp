@@ -2329,8 +2329,8 @@ void display() {
         tidal_oversigt.show_tidal_search_oversigt(_textureId_dir, _textureId_song, _textureIdback, _textureIdback, tidal_selected_startofset, tidalknapnr, keybuffer1);
       }
     }
-    if (vis_music_oversigt) {    
-      if (do_show_music_search_oversigt == false) {
+    if (vis_music_oversigt) {      
+      if ((do_show_music_search_oversigt == false) && (keybuffer1.length()==0)) {
         musicoversigt.show_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
       } else {
         musicoversigt.show_search_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
@@ -2348,7 +2348,7 @@ void display() {
     }
 
     // music select window for play or swap (id 20 play/22 swap)
-    if ((vis_music_oversigt) && (!(visur)) && (ask_open_dir_or_play_music) && (mknapnr>0)) {
+    if ((vis_music_oversigt || do_show_music_search_oversigt) && (!(visur)) && (ask_open_dir_or_play_music) && (mknapnr>0)) {
       if (dirmusic.numbersinlist()>0) {
         // window ask play ?
         renderer.AddTextureRect(0,_textureId9_askbox, 500 , 200, 800, 600,1,1,1,1);
@@ -2902,10 +2902,14 @@ void display() {
       std::string temptxt;
       if (vis_tidal_oversigt && radiooversigt.playing) radiooversigt.playing=false;
       if ((radiooversigt.playingstationnr>0) && (radiooversigt.playing)) {
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(4*18) ,"Station ",1,1,1,1);
+        // renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(4*18) ,"Station ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_artist_text_x, config_menu.config_radioplayer_artist_text_y ,"Station ",1,1,1,1);
+
         temptxt=radiooversigt.get_station_name(radiooversigt.playingstationnr-1);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(4*18) ,temptxt,1,1,1,1);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(5*18) ,"Song Name ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_artist_text_x+100, config_menu.config_radioplayer_artist_text_y ,temptxt,1,1,1,1);
+
+        // renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(5*18) ,"Song Name ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_song_name_text_x, config_menu.config_radioplayer_song_name_text_y ,"Song Name ",1,1,1,1);
         if ((channel) && (sound) && (snd)) {
           result = sound->getNumTags(&numtags, &numtagsupdated); 
           if (numtags) {
@@ -2933,14 +2937,18 @@ void display() {
             }
           }
         }
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(5*18) ,aktivsongname,1,1,1,1);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(6*18) ,"Artist ",1,1,1,1);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(6*18) ,aktivartistname,1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_song_name_text_x+100, config_menu.config_radioplayer_song_name_text_y ,aktivsongname,1,1,1,1);
+
+        // renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(6*18) ,"Artist ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_artist_text_x, config_menu.config_radioplayer_artist_text_y,"Artist ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_artist_text_x+100, config_menu.config_radioplayer_artist_text_y ,aktivartistname,1,1,1,1);
         
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(8*18) ,"Bit rate ",1,1,1,1);
+        // renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(8*18) ,"Bit rate ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_song_bitrate_text_x, config_menu.config_radioplayer_song_bitrate_text_y ,"Bit rate ",1,1,1,1);
+
         int bbs=radiooversigt.get_kbps(radiooversigt.playingstationnr-1);
         std::string showbb=fmt::format("{} Kps.",bbs);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(8*18) ,showbb,1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_radioplayer_song_bitrate_text_x+100, config_menu.config_radioplayer_song_bitrate_text_y ,showbb,1,1,1,1);
 
         // Radio cover
         GLuint radiotexture_2;        
@@ -2961,8 +2969,8 @@ void display() {
             radio_playtime_min=radio_playtime_min-(radio_playtime_hour*60);
             if (radio_playtime>0) {
               temptxt=fmt::format("{:02}:{:02}:{:02} ",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
-              renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(9*18) ,"Play time ",1,1,1,1);
-              renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(9*18) ,temptxt,1,1,1,1);
+              renderer.AddText(&myfont,config_menu.config_radioplayer_song_time_text_x, config_menu.config_radioplayer_song_time_text_y ,"Play time ",1,1,1,1);
+              renderer.AddText(&myfont,config_menu.config_radioplayer_song_time_text_x+100, config_menu.config_radioplayer_song_time_text_y ,temptxt,1,1,1,1);
             }
           }
         }
@@ -2972,15 +2980,18 @@ void display() {
     // Tidal show play stuf
     if (do_zoom_tidal_cover) {
       if (tidal_oversigt.antal_in_playlist()>0) {
-        renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(4*18) ,"Artist",1,1,1,1);
-        if (tidal_oversigt.get_tidal_artistname(tidalknapnr)) renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+120, config_menu.config_tidalplayer_infoy+(4*18) ,tidal_oversigt.get_tidal_artistname(tidalknapnr),1,1,1,1);
+        // renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(4*18) ,"Artist",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_tidalplayer_artist_text_x, config_menu.config_tidalplayer_artist_text_y ,"Artist",1,1,1,1);
+        if (tidal_oversigt.get_tidal_artistname(tidalknapnr)) renderer.AddText(&myfont,config_menu.config_tidalplayer_artist_text_x+100, config_menu.config_tidalplayer_artist_text_y ,tidal_oversigt.get_tidal_artistname(tidalknapnr),1,1,1,1);
 
-        renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(5*18) ,"Songname",1,1,1,1);
-        if (tidal_oversigt.tidal_aktiv_song_name()) renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+120, config_menu.config_tidalplayer_infoy+(5*18) ,tidal_oversigt.tidal_aktiv_song_name(),1,1,1,1);
+        // renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(5*18) ,"Songname",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_tidalplayer_song_name_text_x, config_menu.config_tidalplayer_song_name_text_y ,"Songname",1,1,1,1);
+        if (tidal_oversigt.tidal_aktiv_song_name()) renderer.AddText(&myfont,config_menu.config_tidalplayer_song_name_text_x+100, config_menu.config_tidalplayer_song_name_text_y ,tidal_oversigt.tidal_aktiv_song_name(),1,1,1,1);
 
         sprintf(temptxt,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs()+1);
-        renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(6*18) ,"song ",1,1,1,1);
-        renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+120, config_menu.config_tidalplayer_infoy+(6*18) ,temptxt,1,1,1,1);
+        // renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(6*18) ,"song ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_tidalplayer_songs_antal_text_x, config_menu.config_tidalplayer_songs_antal_text_y ,"song ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_tidalplayer_songs_antal_text_x+100, config_menu.config_tidalplayer_songs_antal_text_y ,temptxt,1,1,1,1);
         // icon
         if (tidal_oversigt.aktiv_song_tidal_icon) {
           renderer.AddTextureRect(0,tidal_oversigt.aktiv_song_tidal_icon, config_menu.config_tidalplayer_infox+346,config_menu.config_tidalplayer_play_button_posy-124, 168, 120,1,1,1,1);
@@ -2998,7 +3009,8 @@ void display() {
           ll=playtime_songlength/1000;
           // draw length metter
         }
-        renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(7*18) ,"playtime ",1,1,1,1);
+        // renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(7*18) ,"playtime ",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_tidalplayer_song_time_text_x, config_menu.config_tidalplayer_song_time_text_y ,"playtime ",1,1,1,1);
         if (y>0) {
           xxx = ((y/ll)*12);
         } else xxx=0;
@@ -3007,8 +3019,8 @@ void display() {
         }
         // show bitrate
         sprintf(temptxt,"%5.0f/%d Kbits",frequency,kbps);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+20, config_menu.config_radioplayer_infoy+(8*18) ,"Samplerate",1,1,1,1);
-        renderer.AddText(&myfont,config_menu.config_radioplayer_infox+120, config_menu.config_radioplayer_infoy+(8*18) ,temptxt,1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_tidalplayer_song_bitrate_text_x, config_menu.config_tidalplayer_song_bitrate_text_y ,"Samplerate",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_tidalplayer_song_bitrate_text_x+100, config_menu.config_tidalplayer_song_bitrate_text_y ,temptxt,1,1,1,1);
       }
     }
     
@@ -3028,11 +3040,12 @@ void display() {
       if (result!=FMOD_OK) {
         ERRCHECK(result,0);
       }
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(4*18) ,"Artist",1,1,1,1);
+      // renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(4*18) ,"Artist",1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_musicplayer_artist_text_x, config_menu.config_musicplayer_artist_text_y ,"Artist",1,1,1,1);
       aktiv_playlist.get_artistname(temptxt,do_play_music_aktiv_table_nr-1);
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(4*18) ,temptxt,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_musicplayer_artist_text_x+100, config_menu.config_musicplayer_artist_text_y ,temptxt,1,1,1,1);
 
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(5*18) ,"Song name",1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_musicplayer_song_name_text_x, config_menu.config_musicplayer_song_name_text_y ,"Song name",1,1,1,1);
       aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr-1);
       // remove path
       char *pos;
@@ -3046,8 +3059,9 @@ void display() {
         temptxt[pos-temptxt]='\0';
       }
       temptxt[40]=0;
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(5*18) ,temptxt,1,1,1,1);
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(6*18) ,"Album",1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_musicplayer_song_name_text_x+100, config_menu.config_musicplayer_song_name_text_y ,temptxt,1,1,1,1);
+
+      renderer.AddText(&myfont,config_menu.config_musicplayer_song_albumname_text_x, config_menu.config_musicplayer_song_albumname_text_y ,"Album",1,1,1,1);
       aktiv_playlist.get_albumname(temptxt,do_play_music_aktiv_table_nr-1);     
       // remove path
       pos=strrchr(temptxt,'/');
@@ -3060,12 +3074,19 @@ void display() {
         temptxt[pos-temptxt]='\0';
       }
       temptxt[40]=0;
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(6*18) ,temptxt,1,1,1,1);
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(7*18) ,"Bit rate",1,1,1,1);
+      // renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(6*18) ,temptxt,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_musicplayer_song_albumname_text_x+100, config_menu.config_musicplayer_song_albumname_text_y ,temptxt,1,1,1,1);
+      
+      // renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(7*18) ,"Bit rate",1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_musicplayer_song_bitrate_text_x, config_menu.config_musicplayer_song_bitrate_text_y ,"Bit rate",1,1,1,1);
+
       // show playlist info # of tracks
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(9*18) ,"Songs  ",1,1,1,1);
+      //renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(9*18) ,"Songs  ",1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_musicplayer_songs_antal_text_x, config_menu.config_musicplayer_songs_antal_text_y ,"Songs  ",1,1,1,1);
+
       sprintf(temptxt,"%d/%d", do_play_music_aktiv_table_nr  , aktiv_playlist.numbers_in_playlist());
-      renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(9*18) ,temptxt,1,1,1,1);
+      // renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(9*18) ,temptxt,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_musicplayer_songs_antal_text_x+100, config_menu.config_musicplayer_songs_antal_text_y ,temptxt,1,1,1,1);
     }
     if (snd) {
       // play position
@@ -3115,10 +3136,15 @@ void display() {
       // music
       if (do_zoom_music_cover) {
         std::string tt=std::to_string((int) frequency);
-        renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(7*18) ,tt,1,1,1,1);
-        renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(8*18) ,"Time",1,1,1,1);
+        // renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(7*18) ,tt,1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_musicplayer_song_bitrate_text_x+100, config_menu.config_musicplayer_song_bitrate_text_y ,tt,1,1,1,1);
+
+        // renderer.AddText(&myfont,config_menu.config_musicplayer_infox+20, config_menu.config_musicplayer_infoy+(8*18) ,"Time",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_musicplayer_song_time_text_x, config_menu.config_musicplayer_song_time_text_y ,"Time",1,1,1,1);
+
         std::string tt2=fmt::format("{:02}:{:02}:{:02} ",playtime_hour,playtime_min,playtime_sec);
-        renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(8*18) ,tt2,1,1,1,1);
+        // renderer.AddText(&myfont,config_menu.config_musicplayer_infox+120, config_menu.config_musicplayer_infoy+(8*18) ,tt2,1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_musicplayer_song_time_text_x+100, config_menu.config_musicplayer_song_time_text_y ,tt2,1,1,1,1);
       }
     }
   }
@@ -5777,8 +5803,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             do_zoom_music_cover =! do_zoom_music_cover;
             id=0;
           }
+
           // music select play stuf
-          if ((vis_music_oversigt) && (do_zoom_music_cover==false)) {
+          if ((vis_music_oversigt || do_show_music_search_oversigt) && (do_zoom_music_cover==false)) {
             if (id>99) {
               mknapnr=id-99;
               ask_open_dir_or_play_music=true;
@@ -5868,8 +5895,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           //
           // old ver if ((mknapnr>0) && (vis_music_oversigt) && (ask_open_dir_or_play_aopen==false) && (dirmusic.numbersinlist()==0)) {
 
-          if ((vis_music_oversigt) && (do_shift_song==false)) {
-            if ((mknapnr>0) && (vis_music_oversigt) && (ask_open_dir_or_play_aopen==false)) {
+          if ((vis_music_oversigt || do_show_music_search_oversigt) && (do_shift_song==false)) {
+            if ((mknapnr>0) && (vis_music_oversigt || do_show_music_search_oversigt) && (ask_open_dir_or_play_aopen==false)) {
               if (((mknapnr-1==0) || (musicoversigt.get_directory_id(mknapnr-1)!=0)) && (!(do_zoom_music_cover))) {
                 // normal song list
                 if (musicoversigt.get_album_type(mknapnr-1)==0) {
@@ -5938,7 +5965,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
 
           // auto open dir if dirid
-          if ((vis_music_oversigt) && (do_shift_song==false)) {
+          if ((vis_music_oversigt || do_show_music_search_oversigt) && (do_shift_song==false)) {
             // auto open dir
             if ((ask_open_dir_or_play_aopen && (musicoversigt.get_directory_id(mknapnr-1) > 0))) {
               ask_open_dir_or_play=false;
@@ -5964,7 +5991,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
                 // New ver
                 // hent fra db
-                if (do_show_music_search_oversigt==false) {
+                // denne test er disabled da vi altid vil hente fra db hvis der er et dirid/playlistid
+                // if (do_show_music_search_oversigt==false) {
                   if (musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1))>0) {
                     do_update_music_icons_now_in_thread=true;                                      // opdatere icons nu
                     // musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
@@ -5979,7 +6007,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       write_logfile(logfile,(char *) "No Music loaded/found by internal loader.");
                     }
                   }
-                }
+                // }
               }
               /// reset mouse/key pos in vis_music_oversigt
               mknapnr = 0;
@@ -11471,7 +11499,6 @@ int team_settings_load() {
     config_menu.config_moviestream_sizx=(iRoot["tema1"]["icons"]["moviestream"].get("sizx","0").asInt());
     config_menu.config_moviestream_sizy=(iRoot["tema1"]["icons"]["moviestream"].get("sizy","0").asInt());
 
-
     config_menu.config_moviex=(iRoot["tema1"]["icons"]["movie"].get("x","0").asInt());
     config_menu.config_moviey=(iRoot["tema1"]["icons"]["movie"].get("y","0").asInt());
     config_menu.config_movie_icon=(iRoot["tema1"]["icons"]["movie"].get("icon_path","0").asString());
@@ -11536,13 +11563,15 @@ int team_settings_load() {
     config_menu.config_search_active_sizx=(iRoot["tema1"]["icons"]["search"].get("sizx","0").asInt());
     config_menu.config_search_active_sizy=(iRoot["tema1"]["icons"]["search"].get("sizy","0").asInt());
 
-
+    // Musicplayer
     config_menu.config_musicplayer_coverx=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("x","0").asInt());
     config_menu.config_musicplayer_covery=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("y","0").asInt());
     config_menu.config_musicplayer_cover_sizx=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("sizx","0").asInt());
     config_menu.config_musicplayer_cover_sizy=(iRoot["tema1"]["icons"]["musicplayer_info_cover"].get("sizy","0").asInt());
     config_menu.config_musicplayer_infox=(iRoot["tema1"]["icons"]["musicplayer_info"].get("x","0").asInt());
     config_menu.config_musicplayer_infoy=(iRoot["tema1"]["icons"]["musicplayer_info"].get("y","0").asInt());
+    config_menu.config_musicplayer_sizx=(iRoot["tema1"]["icons"]["musicplayer_info"].get("sizx","0").asInt());
+    config_menu.config_musicplayer_sizy=(iRoot["tema1"]["icons"]["musicplayer_info"].get("sizy","0").asInt());
     config_menu.config_musicplayer_info_icon=(iRoot["tema1"]["icons"]["musicplayer_info"].get("icon_path","0").asString());
     config_menu.config_musicplayer_ff_button_posx=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("x","0").asInt());
     config_menu.config_musicplayer_ff_button_posy=(iRoot["tema1"]["icons"]["musicplayer_ff_button"].get("y","0").asInt());
@@ -11561,6 +11590,20 @@ int team_settings_load() {
     config_menu.config_musicplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("sizx","0").asInt());
     config_menu.config_musicplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["musicplayer_stop_button"].get("sizy","0").asInt());
 
+    config_menu.config_musicplayer_artist_text_x=(iRoot["tema1"]["icons"]["musicplayer_artist_text"].get("x","0").asInt());
+    config_menu.config_musicplayer_artist_text_y=(iRoot["tema1"]["icons"]["musicplayer_artist_text"].get("y","0").asInt());  
+    config_menu.config_musicplayer_song_name_text_x=(iRoot["tema1"]["icons"]["musicplayer_song_name_text"].get("x","0").asInt());
+    config_menu.config_musicplayer_song_name_text_y=(iRoot["tema1"]["icons"]["musicplayer_song_name_text"].get("y","0").asInt());
+    config_menu.config_musicplayer_song_albumname_text_x=(iRoot["tema1"]["icons"]["musicplayer_album_name_text"].get("x","0").asInt());
+    config_menu.config_musicplayer_song_albumname_text_y=(iRoot["tema1"]["icons"]["musicplayer_album_name_text"].get("y","0").asInt());
+    config_menu.config_musicplayer_song_bitrate_text_x=(iRoot["tema1"]["icons"]["musicplayer_bitrate_text"].get("x","0").asInt());
+    config_menu.config_musicplayer_song_bitrate_text_y=(iRoot["tema1"]["icons"]["musicplayer_bitrate_text"].get("y","0").asInt());
+    config_menu.config_musicplayer_song_time_text_x=(iRoot["tema1"]["icons"]["musicplayer_time_text"].get("x","0").asInt());
+    config_menu.config_musicplayer_song_time_text_y=(iRoot["tema1"]["icons"]["musicplayer_time_text"].get("y","0").asInt());
+    config_menu.config_musicplayer_songs_antal_text_x=(iRoot["tema1"]["icons"]["musicplayer_songs_antal_text"].get("x","0").asInt());
+    config_menu.config_musicplayer_songs_antal_text_y=(iRoot["tema1"]["icons"]["musicplayer_songs_antal_text"].get("y","0").asInt());
+    
+    // Spotifyplayer
     config_menu.config_spotifyplayer_infox=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("x","0").asInt());
     config_menu.config_spotifyplayer_infoy=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("y","0").asInt());
     config_menu.config_spotifyplayer_coverx=(iRoot["tema1"]["icons"]["spotifyplayer_info_cover"].get("x","0").asInt());
@@ -11585,6 +11628,7 @@ int team_settings_load() {
     config_menu.config_spotifyplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("sizx","0").asInt());
     config_menu.config_spotifyplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["spotifyplayer_stop_button"].get("sizy","0").asInt());
 
+    // Tidalplayer
     config_menu.config_tidalplayer_infox=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("x","0").asInt());
     config_menu.config_tidalplayer_infoy=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("y","0").asInt());
     config_menu.config_tidalplayer_info_icon=(iRoot["tema1"]["icons"]["tidalplayer_info"].get("icon_path","0").asString());
@@ -11609,6 +11653,21 @@ int team_settings_load() {
     config_menu.config_tidalplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("sizx","0").asInt());
     config_menu.config_tidalplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["tidalplayer_stop_button"].get("sizy","0").asInt());
 
+    config_menu.config_tidalplayer_artist_text_x=(iRoot["tema1"]["icons"]["tidalplayer_artist_text"].get("x","0").asInt());
+    config_menu.config_tidalplayer_artist_text_y=(iRoot["tema1"]["icons"]["tidalplayer_artist_text"].get("y","0").asInt());
+    config_menu.config_tidalplayer_song_name_text_x=(iRoot["tema1"]["icons"]["tidalplayer_song_name_text"].get("x","0").asInt());
+    config_menu.config_tidalplayer_song_name_text_y=(iRoot["tema1"]["icons"]["tidalplayer_song_name_text"].get("y","0").asInt());
+    config_menu.config_tidalplayer_song_albumname_text_x=(iRoot["tema1"]["icons"]["tidalplayer_album_name_text"].get("x","0").asInt());
+    config_menu.config_tidalplayer_song_albumname_text_y=(iRoot["tema1"]["icons"]["tidalplayer_album_name_text"].get("y","0").asInt());
+    config_menu.config_tidalplayer_song_bitrate_text_x=(iRoot["tema1"]["icons"]["tidalplayer_bitrate_text"].get("x","0").asInt());
+    config_menu.config_tidalplayer_song_bitrate_text_y=(iRoot["tema1"]["icons"]["tidalplayer_bitrate_text"].get("y","0").asInt());
+    config_menu.config_tidalplayer_song_time_text_x=(iRoot["tema1"]["icons"]["tidalplayer_time_text"].get("x","0").asInt());
+    config_menu.config_tidalplayer_song_time_text_y=(iRoot["tema1"]["icons"]["tidalplayer_time_text"].get("y","0").asInt());
+    config_menu.config_tidalplayer_songs_antal_text_x=(iRoot["tema1"]["icons"]["tidalplayer_songs_antal_text"].get("x","0").asInt());
+    config_menu.config_tidalplayer_songs_antal_text_y=(iRoot["tema1"]["icons"]["tidalplayer_songs_antal_text"].get("y","0").asInt());
+    
+
+    // Radioplayer
     config_menu.config_radioplayer_infox=(iRoot["tema1"]["icons"]["radioplayer_info"].get("x","0").asInt());
     config_menu.config_radioplayer_infoy=(iRoot["tema1"]["icons"]["radioplayer_info"].get("y","0").asInt());
     config_menu.config_radioplayer_info_icon=(iRoot["tema1"]["icons"]["radioplayer_info"].get("icon_path","0").asString());
@@ -11634,6 +11693,21 @@ int team_settings_load() {
     config_menu.config_radioplayer_stop_button_posy=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("y","0").asInt());
     config_menu.config_radioplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("sizx","0").asInt());
     config_menu.config_radioplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["radioplayer_stop_button"].get("sizy","0").asInt());
+
+    config_menu.config_radioplayer_artist_text_x=(iRoot["tema1"]["icons"]["radioplayer_artist_text"].get("x","0").asInt());
+    config_menu.config_radioplayer_artist_text_y=(iRoot["tema1"]["icons"]["radioplayer_artist_text"].get("y","0").asInt());
+    config_menu.config_radioplayer_song_name_text_x=(iRoot["tema1"]["icons"]["radioplayer_song_name_text"].get("x","0").asInt());
+    config_menu.config_radioplayer_song_name_text_y=(iRoot["tema1"]["icons"]["radioplayer_song_name_text"].get("y","0").asInt());
+    config_menu.config_radioplayer_song_albumname_text_x=(iRoot["tema1"]["icons"]["radioplayer_album_name_text"].get("x","0").asInt());
+    config_menu.config_radioplayer_song_albumname_text_y=(iRoot["tema1"]["icons"]["radioplayer_album_name_text"].get("y","0").asInt());
+    config_menu.config_radioplayer_song_bitrate_text_x=(iRoot["tema1"]["icons"]["radioplayer_bitrate_text"].get("x","0").asInt());
+    config_menu.config_radioplayer_song_bitrate_text_y=(iRoot["tema1"]["icons"]["radioplayer_bitrate_text"].get("y","0").asInt());
+    config_menu.config_radioplayer_song_time_text_x=(iRoot["tema1"]["icons"]["radioplayer_time_text"].get("x","0").asInt());
+    config_menu.config_radioplayer_song_time_text_y=(iRoot["tema1"]["icons"]["radioplayer_time_text"].get("y","0").asInt());
+    config_menu.config_radioplayer_songs_antal_text_x=(iRoot["tema1"]["icons"]["radioplayer_songs_antal_text"].get("x","0").asInt());
+    config_menu.config_radioplayer_songs_antal_text_y=(iRoot["tema1"]["icons"]["radioplayer_songs_antal_text"].get("y","0").asInt());
+
+
 
     config_menu.config_mediaplayer_info_icon=(iRoot["tema1"]["icons"]["mediaplayer_info"].get("icon_path","0").asString());
     config_menu.config_mediaplayer_coverx=(iRoot["tema1"]["icons"]["mediaplayer_info_cover"].get("x","0").asInt());
@@ -11718,47 +11792,47 @@ int team_settings_load() {
     config_menu.config_tema_path="tema2/";
 
     config_menu.config_tvguidex=1720;
-    config_menu.config_tvguidey=10;                    // 888
-    config_menu.config_tvguide_icon="tv";
+    config_menu.config_tvguidey=10;
+    config_menu.config_tvguide_icon="tv_button";
 
     config_menu.config_musicx=1720;
-    config_menu.config_musicy=220;    // 696;
+    config_menu.config_musicy=220;
     config_menu.config_music_icon="music_button1";
 
     config_menu.config_music_activex=1720;
-    config_menu.config_music_activey=220;       // 696;
+    config_menu.config_music_activey=220;
     config_menu.config_music_active_icon="music_button1";
 
     config_menu.config_mediax=1720;
-    config_menu.config_mediay=430;             // 696;
+    config_menu.config_mediay=430;
     config_menu.config_media_icon="stream_button";
 
     config_menu.config_media1x=1720;
-    config_menu.config_media1y=430;            // 696;
+    config_menu.config_media1y=430;
     config_menu.config_media1_icon="stream_button1";
 
     config_menu.config_spotifyx=1720;
-    config_menu.config_spotifyy=10;                // 888;
+    config_menu.config_spotifyy=10;
     config_menu.config_spotify_icon="spotify_button";
 
     config_menu.config_spotify1x=1720;
-    config_menu.config_spotify1y=220;                // 696;
+    config_menu.config_spotify1y=220;
     config_menu.config_spotify1_icon="spotify_button1";
 
     config_menu.config_tidalx=1720;
-    config_menu.config_tidaly=10+120;                  // 696;
+    config_menu.config_tidaly=10+120;
     config_menu.config_tidal_icon="tidal_button";
 
     config_menu.config_tidal1x=1720;
-    config_menu.config_tidal1y=220;                // 696;
+    config_menu.config_tidal1y=220;
     config_menu.config_tidal1_icon="tidal_button1";
 
     config_menu.config_radiox=1720;
-    config_menu.config_radioy=430;    // 504;
+    config_menu.config_radioy=430;
     config_menu.config_radio_icon="radio_button";
 
     config_menu.config_radio1x=1720;
-    config_menu.config_radio1y=220;         // 696;
+    config_menu.config_radio1y=220;
     config_menu.config_radio1_icon="radio_button1";
 
     config_menu.config_media_buttonx=1720;

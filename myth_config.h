@@ -167,6 +167,21 @@ class config_icons {
     int config_musicplayer_stop_button_posy;
     int config_musicplayer_stop_button_sizx;
     int config_musicplayer_stop_button_sizy;
+
+    int config_musicplayer_artist_text_x;
+    int config_musicplayer_artist_text_y;
+    int config_musicplayer_song_name_text_x;
+    int config_musicplayer_song_name_text_y;
+    int config_musicplayer_song_albumname_text_x;
+    int config_musicplayer_song_albumname_text_y;
+    int config_musicplayer_song_bitrate_text_x;
+    int config_musicplayer_song_bitrate_text_y;
+    int config_musicplayer_song_time_text_x;
+    int config_musicplayer_song_time_text_y;
+    int config_musicplayer_songs_antal_text_x;
+    int config_musicplayer_songs_antal_text_y;
+   
+
     std::string config_musicplayer_info_icon;
     int config_spotifyplayer_infox;
     int config_spotifyplayer_infoy;
@@ -193,6 +208,21 @@ class config_icons {
     int config_spotifyplayer_stop_button_sizx;
     int config_spotifyplayer_stop_button_sizy;
     std::string config_spotifyplayer_info_icon;
+
+    int config_spotifyplayer_artist_text_x;
+    int config_spotifyplayer_artist_text_y;
+    int config_spotifyplayer_song_name_text_x;
+    int config_spotifyplayer_song_name_text_y;
+    int config_spotifyplayer_song_albumname_text_x;
+    int config_spotifyplayer_song_albumname_text_y;
+    int config_spotifyplayer_song_bitrate_text_x;
+    int config_spotifyplayer_song_bitrate_text_y;
+    int config_spotifyplayer_song_time_text_x;
+    int config_spotifyplayer_song_time_text_y;
+    int config_spotifyplayer_songs_antal_text_x;
+    int config_spotifyplayer_songs_antal_text_y;
+
+
     int config_tidalplayer_infox;
     int config_tidalplayer_infoy;
     int config_tidalplayer_sizx;
@@ -219,6 +249,20 @@ class config_icons {
     int config_tidalplayer_stop_button_sizx;
     int config_tidalplayer_stop_button_sizy;
     std::string config_tidalplayer_info_icon;
+    int config_tidalplayer_artist_text_x;
+    int config_tidalplayer_artist_text_y;
+    int config_tidalplayer_song_name_text_x;
+    int config_tidalplayer_song_name_text_y;
+    int config_tidalplayer_song_albumname_text_x;
+    int config_tidalplayer_song_albumname_text_y;
+    int config_tidalplayer_song_bitrate_text_x;
+    int config_tidalplayer_song_bitrate_text_y;
+    int config_tidalplayer_song_time_text_x;
+    int config_tidalplayer_song_time_text_y;
+    int config_tidalplayer_songs_antal_text_x;
+    int config_tidalplayer_songs_antal_text_y;
+
+
     int config_radioplayer_infox;
     int config_radioplayer_infoy;
     int config_radioplayer_sizx;
@@ -245,6 +289,20 @@ class config_icons {
     int config_radioplayer_stop_button_sizx;
     int config_radioplayer_stop_button_sizy;
     std::string config_radioplayer_info_icon;
+    int config_radioplayer_artist_text_x;
+    int config_radioplayer_artist_text_y;
+    int config_radioplayer_song_name_text_x;
+    int config_radioplayer_song_name_text_y;
+    int config_radioplayer_song_albumname_text_x;
+    int config_radioplayer_song_albumname_text_y;
+    int config_radioplayer_song_bitrate_text_x;
+    int config_radioplayer_song_bitrate_text_y;
+    int config_radioplayer_song_time_text_x;
+    int config_radioplayer_song_time_text_y;
+    int config_radioplayer_songs_antal_text_x;
+    int config_radioplayer_songs_antal_text_y;
+
+
     int config_mediaplayer_infox;
     int config_mediaplayer_infoy;
     int config_mediaplayer_sizx;
@@ -524,6 +582,22 @@ class config_icons {
       config_musicplayer_stop_button_posy = 300;
       config_musicplayer_stop_button_sizx = 100;
       config_musicplayer_stop_button_sizy = 100;
+
+
+      config_musicplayer_artist_text_x=480+20;
+      config_musicplayer_artist_text_y=300+(4*18);
+      config_musicplayer_song_name_text_x=0;
+      config_musicplayer_song_name_text_y=0;
+      config_musicplayer_song_albumname_text_x=0;
+      config_musicplayer_song_albumname_text_y=0;
+      config_musicplayer_song_bitrate_text_x=0;
+      config_musicplayer_song_bitrate_text_y=0;
+      config_musicplayer_song_time_text_x=0;
+      config_musicplayer_song_time_text_y=0;
+      config_musicplayer_songs_antal_text_x=0;
+      config_musicplayer_songs_antal_text_y=0;
+
+
       config_musicplayer_info_icon = "musicplayer-info";
       config_spotifyplayer_infox = 480;
       config_spotifyplayer_infoy = 300;
@@ -604,6 +678,18 @@ class config_icons {
       config_radioplayer_stop_button_sizx = 100;
       config_radioplayer_stop_button_sizy = 100;
       config_radioplayer_info_icon = "musicplayer-info";
+      config_radioplayer_artist_text_x=480+20;
+      config_radioplayer_artist_text_y=300+(4*18);
+      config_radioplayer_song_name_text_x=0;
+      config_radioplayer_song_name_text_y=0;
+      config_radioplayer_song_albumname_text_x=0;
+      config_radioplayer_song_albumname_text_y=0;
+      config_radioplayer_song_bitrate_text_x=0;
+      config_radioplayer_song_bitrate_text_y=0;
+      config_radioplayer_song_time_text_x=0;
+      config_radioplayer_song_time_text_y=0;
+      config_radioplayer_songs_antal_text_x=0;
+      config_radioplayer_songs_antal_text_y=0;
 
       config_mediaplayer_infox = 480;
       config_mediaplayer_infoy = 320;
