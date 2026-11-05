@@ -492,6 +492,50 @@
                 "sizx": 100,
                 "sizy": 100
             },
+            "mediaplayer_genre_text": {
+                "x": 450,
+                "y": 468
+            },
+            "mediaplayer_title_text": {
+                "x": 450,
+                "y": 486
+            },
+            "mediaplayer_length_text": {
+                "x": 450,
+                "y": 504
+            },
+            "mediaplayer_year_text": {
+                "x": 450,
+                "y": 522
+            },
+            "mediaplayer_rating_text": {
+                "x": 450,
+                "y": 540
+            },
+            "mediaplayer_format_text": {
+                "x": 450,
+                "y": 558
+            },
+            "mediaplayer_wh_text": {
+                "x": 450,
+                "y": 576
+            },
+            "mediaplayer_size_text": {
+                "x": 450,
+                "y": 594
+            },
+            "mediaplayer_imdb_text": {
+                "x": 450,
+                "y": 612
+            },
+            "mediaplayer_cast_text": {
+                "x": 450,
+                "y": 630
+            },
+            "mediaplayer_desc_text": {
+                "x": 450,
+                "y": 668
+            },
             "music_main_window": {             
                 "window_x": 0,
                 "window_y": 0,

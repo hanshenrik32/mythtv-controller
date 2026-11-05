@@ -328,6 +328,28 @@ class config_icons {
     int config_mediaplayer_stop_button_sizx;
     int config_mediaplayer_stop_button_sizy;
     std::string config_mediaplayer_info_icon;
+    int config_mediaplayer_genre_text_x=450;
+    int config_mediaplayer_genre_text_y=468;
+    int config_mediaplayer_title_text_x=450;
+    int config_mediaplayer_title_text_y=486;
+    int config_mediaplayer_length_text_x=450;
+    int config_mediaplayer_length_text_y=504;
+    int config_mediaplayer_year_text_x=450;
+    int config_mediaplayer_year_text_y=522;
+    int config_mediaplayer_rating_text_x=450;
+    int config_mediaplayer_rating_text_y=540;
+    int config_mediaplayer_format_text_x=450;
+    int config_mediaplayer_format_text_y=558;
+    int config_mediaplayer_wh_text_x=450;
+    int config_mediaplayer_wh_text_y=576;
+    int config_mediaplayer_size_text_x=450;
+    int config_mediaplayer_size_text_y=594;
+    int config_mediaplayer_imdb_text_x=450;
+    int config_mediaplayer_imdb_text_y=612;
+    int config_mediaplayer_cast_text_x=450;
+    int config_mediaplayer_cast_text_y=630;
+    int config_mediaplayer_desc_text_x=450;
+    int config_mediaplayer_desc_text_y=648;
 
 
     int config_movieplayer_infox;
@@ -370,6 +392,7 @@ class config_icons {
     int config_stream_main_window_icon_sizex;
     int config_stream_main_window_icon_sizey;
 
+    
     int config_media_buttonx;
     int config_media_buttony;
     std::string config_media_button_icon;
@@ -707,15 +730,39 @@ class config_icons {
       config_mediaplayer_bw_button_posy = 330;
       config_mediaplayer_bw_button_sizx = 100;
       config_mediaplayer_bw_button_sizy = 100;
-      config_mediaplayer_play_button_posx = 50;
-      config_mediaplayer_play_button_posy = 330;
-      config_mediaplayer_play_button_sizx = 100;
-      config_mediaplayer_play_button_sizy = 100;
+      config_mediaplayer_play_button_posx = 420;
+      config_mediaplayer_play_button_posy = 830;
+      config_mediaplayer_play_button_sizx = 120;
+      config_mediaplayer_play_button_sizy = 120;
       config_mediaplayer_stop_button_posx = 150;
       config_mediaplayer_stop_button_posy = 330;
       config_mediaplayer_stop_button_sizx = 100;
       config_mediaplayer_stop_button_sizy = 100;
       config_mediaplayer_info_icon = "musicplayer-info";
+
+
+      config_mediaplayer_genre_text_x=450;
+      config_mediaplayer_genre_text_y=468;
+      config_mediaplayer_title_text_x=450;
+      config_mediaplayer_title_text_y=486;
+      config_mediaplayer_length_text_x=450;
+      config_mediaplayer_length_text_y=504;
+      config_mediaplayer_year_text_x=450;
+      config_mediaplayer_year_text_y=522;
+      config_mediaplayer_rating_text_x=450;
+      config_mediaplayer_rating_text_y=540;
+      config_mediaplayer_format_text_x=450;
+      config_mediaplayer_format_text_y=558;
+      config_mediaplayer_wh_text_x=450;
+      config_mediaplayer_wh_text_y=576;
+      config_mediaplayer_size_text_x=450;
+      config_mediaplayer_size_text_y=594;
+      config_mediaplayer_imdb_text_x=450;
+      config_mediaplayer_imdb_text_y=612;
+      config_mediaplayer_cast_text_x=450;
+      config_mediaplayer_cast_text_y=630;
+      config_mediaplayer_desc_text_x=450;
+      config_mediaplayer_desc_text_y=668;
 
       // Movie player info window
       config_movieplayer_infox = 400;

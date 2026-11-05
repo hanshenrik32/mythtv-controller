@@ -2534,15 +2534,15 @@ void display() {
     // draw window
     renderer.AddTextureRect(0,_texturemovieinfobox, config_menu.config_movieplayer_infox,config_menu.config_movieplayer_infoy, config_menu.config_movieplayer_sizx, config_menu.config_movieplayer_sizy,1,1,1,1);
     // play button
-    if (menu_icon_over==8) renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20     , 830, 120, 120,1,1,1,1);
-    else renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20, 830, 120, 120,0.85f,0.85f,0.85f,1);
+    if (menu_icon_over==8) renderer.AddTextureRect(PLAYBUTTON,_texturemplay, config_menu.config_mediaplayer_play_button_posx , config_menu.config_mediaplayer_play_button_posy, config_menu.config_mediaplayer_play_button_sizx, config_menu.config_mediaplayer_play_button_sizy,1,1,1,1);
+    else renderer.AddTextureRect(PLAYBUTTON,_texturemplay,config_menu.config_mediaplayer_play_button_posx , config_menu.config_mediaplayer_play_button_posy, config_menu.config_mediaplayer_play_button_sizx, config_menu.config_mediaplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
     // stop button
-    if (menu_icon_over==9) renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100 , 830, 120, 120,1,1,1,1);
-    else renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100, 830, 120, 120,0.85f,0.85f,0.85f,1);
+    if (menu_icon_over==9) renderer.AddTextureRect(STOPBUTTON,_texturemstop, config_menu.config_mediaplayer_stop_button_posx , config_menu.config_mediaplayer_stop_button_posy, config_menu.config_mediaplayer_stop_button_sizx, config_menu.config_mediaplayer_stop_button_sizy,1,1,1,1);
+    else renderer.AddTextureRect(STOPBUTTON,_texturemstop, config_menu.config_mediaplayer_stop_button_posx , config_menu.config_mediaplayer_stop_button_posy, config_menu.config_mediaplayer_stop_button_sizx, config_menu.config_mediaplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
     // back button
-    renderer.AddTextureRect(10,_texturemlast,         400+20+200, 830, 120, 120,1,1,1,1);
+    renderer.AddTextureRect(10,_texturemlast, config_menu.config_mediaplayer_bw_button_posx , config_menu.config_mediaplayer_bw_button_posy, config_menu.config_mediaplayer_bw_button_sizx, config_menu.config_mediaplayer_bw_button_sizy,1,1,1,1);
     // ff button
-    renderer.AddTextureRect(11,_texturemnext,         400+20+300, 830, 120, 120,1,1,1,1);
+    renderer.AddTextureRect(11,_texturemnext, config_menu.config_mediaplayer_ff_button_posx , config_menu.config_mediaplayer_ff_button_posy, config_menu.config_mediaplayer_ff_button_sizx, config_menu.config_mediaplayer_ff_button_sizy,1,1,1,1);
     // cover
     if (film_oversigt.editmode==2) {
       renderer.AddTextureRect(31,_defaultdvdcover, 896 , 600, 220+40, 320,1,1,1,1);
@@ -2570,108 +2570,108 @@ void display() {
       }
     }
 
-    renderer.AddText(&myfont,450,26*18,movie_genre[configland],1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_genre_text_x,config_menu.config_mediaplayer_genre_text_y,movie_genre[configland],1,1,1,1);
     if (film_oversigt.editmode==2) {
-      renderer.AddText(&myfont,450 + 120 ,26*18,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_genre_text_x + 120 ,config_menu.config_mediaplayer_genre_text_y,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre,1,1,1,1);
       strlength=renderer.GetTextWidth(&myfont, film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre);
       if (do_show_film_edit_select_linie==0) showcoursornow(450 + 120 + strlength,25*18,0);
     } else {
-      renderer.AddText(&myfont,450 + 120 ,26*18,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_genre_text_x + 120 ,config_menu.config_mediaplayer_genre_text_y,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre,1,1,1,1);
     }
 
 
-    renderer.AddText(&myfont,450,27*18,"Title",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_title_text_x,config_menu.config_mediaplayer_title_text_y,"Title",1,1,1,1);
     if (film_oversigt.editmode==2) {
-      renderer.AddText(&myfont,450 + 120 ,27*18,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle(),1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_title_text_x + 120 ,config_menu.config_mediaplayer_title_text_y,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle(),1,1,1,1);
       strlength=renderer.GetTextWidth(&myfont, film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle());
       if (do_show_film_edit_select_linie==1) showcoursornow(450 + 120 + strlength,26*18,0);
     } else {
-      renderer.AddText(&myfont,450 + 120 ,27*18,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle(),1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_title_text_x + 120 ,config_menu.config_mediaplayer_title_text_y,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle(),1,1,1,1);
     }
 
-    renderer.AddText(&myfont,450,28*18,"Length",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_length_text_x,config_menu.config_mediaplayer_length_text_y,"Length",1,1,1,1);
     if (film_oversigt.editmode==2) {
       temptxt2 = fmt::format("{}",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength()));
-      renderer.AddText(&myfont,450 + 120 ,28*18,temptxt2,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_length_text_x + 120 ,config_menu.config_mediaplayer_length_text_y,temptxt2,1,1,1,1);
       strlength=renderer.GetTextWidth(&myfont, temptxt2);
       if (do_show_film_edit_select_linie==2) showcoursornow(450 + 120 + strlength,27*18,0);
     } else {
       temptxt2 = fmt::format("{}",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength()));
-      renderer.AddText(&myfont,450 + 120 ,28*18,temptxt2,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_length_text_x + 120 ,config_menu.config_mediaplayer_length_text_y,temptxt2,1,1,1,1);
     }
 
-    renderer.AddText(&myfont,450,29*18,"Year",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_year_text_x,config_menu.config_mediaplayer_year_text_y,"Year",1,1,1,1);
     if (film_oversigt.editmode==2) {
       temptxt2 = fmt::format("{}",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar()));
-      renderer.AddText(&myfont,450 + 120 ,29*18,temptxt2,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_year_text_x + 120 ,config_menu.config_mediaplayer_year_text_y,temptxt2,1,1,1,1);
       strlength=renderer.GetTextWidth(&myfont, temptxt2);
-      if (do_show_film_edit_select_linie==3) showcoursornow(450 + 120 + strlength,28*18,0);
+      if (do_show_film_edit_select_linie==3) showcoursornow(config_menu.config_mediaplayer_year_text_x + 120 + strlength,config_menu.config_mediaplayer_year_text_y,0);
     } else {
       if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
         else strcpy(temptxt,"NONE");
-      renderer.AddText(&myfont,450 + 120 ,29*18,temptxt,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_year_text_x + 120 ,config_menu.config_mediaplayer_year_text_y,temptxt,1,1,1,1);
     }
 
-    renderer.AddText(&myfont,450,30*18,"Rating",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_rating_text_x,config_menu.config_mediaplayer_rating_text_y,"Rating",1,1,1,1);
     if (film_oversigt.editmode==2) {
       if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
         else strcpy(temptxt,"NONE");
-      renderer.AddText(&myfont,450 + 120 ,30*18,temptxt,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_rating_text_x + 120 ,config_menu.config_mediaplayer_rating_text_y,temptxt,1,1,1,1);
       strlength=strlen(temptxt);
-      if (do_show_film_edit_select_linie==4) showcoursornow(450 + 120 + strlength,29*18,0);
+      if (do_show_film_edit_select_linie==4) showcoursornow(config_menu.config_mediaplayer_rating_text_x + 120 + strlength,config_menu.config_mediaplayer_rating_text_y,0);
     } else {
       if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
         else strcpy(temptxt,"NONE");
-      renderer.AddText(&myfont,450 + 120 ,30*18,temptxt,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_rating_text_x + 120 ,config_menu.config_mediaplayer_rating_text_y,temptxt,1,1,1,1);
     }
 
-    renderer.AddText(&myfont,450,31*18,"Format",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_format_text_x,config_menu.config_mediaplayer_format_text_y,"Format",1,1,1,1);
     if (film_oversigt.editmode==2) {
-      renderer.AddText(&myfont,450 + 120 ,31*18,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(),1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_format_text_x + 120 ,config_menu.config_mediaplayer_format_text_y,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(),1,1,1,1);
       strlength=renderer.GetTextWidth(&myfont, film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat());
       if (do_show_film_edit_select_linie==5) showcoursornow(450 + 120 + strlength,30*18,0);
     } else {
-      renderer.AddText(&myfont,450 + 120 ,31*18,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(),1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_format_text_x + 120 ,config_menu.config_mediaplayer_format_text_y,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(),1,1,1,1);
     }
 
 
-    renderer.AddText(&myfont,450,32*18,"W/H",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_wh_text_x,config_menu.config_mediaplayer_wh_text_y,"W/H",1,1,1,1);
     if (film_oversigt.editmode==2) {
       temptxt2 = fmt::format("{}/{}",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getWidth(),film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getHigh());
-      renderer.AddText(&myfont,450 + 120 ,32*18,temptxt2,1,1,1,1);
-      if (do_show_film_edit_select_linie==6) showcoursornow(450 + 120 + strlength,31*18,0);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_wh_text_x + 120 ,config_menu.config_mediaplayer_wh_text_y,temptxt2,1,1,1,1);
+      if (do_show_film_edit_select_linie==6) showcoursornow(config_menu.config_mediaplayer_wh_text_x + 120 + strlength,config_menu.config_mediaplayer_wh_text_y,0);
     } else {
       temptxt2 = fmt::format("{}/{}",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getWidth(),film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getHigh());
-      renderer.AddText(&myfont,450 + 120 ,32*18,temptxt2,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_wh_text_x + 120 ,config_menu.config_mediaplayer_wh_text_y,temptxt2,1,1,1,1);
     }
 
-    renderer.AddText(&myfont,450,33*18,"Size",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_size_text_x,config_menu.config_mediaplayer_size_text_y,"Size",1,1,1,1);
     if (film_oversigt.editmode==2) {
       if ((film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024)>1) 
         temptxt2 = fmt::format("{} Gb",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024));
       else
         temptxt2 = fmt::format("{} Mb",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024));
-      renderer.AddText(&myfont,450 + 120 ,33*18,temptxt2,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_size_text_x + 120 ,config_menu.config_mediaplayer_size_text_y,temptxt2,1,1,1,1);
       strlength=renderer.GetTextWidth(&myfont, temptxt2);
-      if (do_show_film_edit_select_linie==7) showcoursornow(450 + 120 + strlength,32*18,0);
+      if (do_show_film_edit_select_linie==7) showcoursornow(config_menu.config_mediaplayer_size_text_x + 120 + strlength,config_menu.config_mediaplayer_size_text_y,0);
     } else {
       if ((film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024)>1) 
         temptxt2 = fmt::format("{} Gb",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024));
       else
         temptxt2 = fmt::format("{} Mb",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024));
-      renderer.AddText(&myfont,450 + 120 ,33*18,temptxt2,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_mediaplayer_size_text_x + 120 ,config_menu.config_mediaplayer_size_text_y,temptxt2,1,1,1,1);
     }
 
-    renderer.AddText(&myfont,450,34*18,"IMDB",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_imdb_text_x,config_menu.config_mediaplayer_imdb_text_y,"IMDB",1,1,1,1);
     if (film_oversigt.editmode==2) {
       strlength=0;
-      if (do_show_film_edit_select_linie==8) showcoursornow(450 + 120 + strlength,33*18,0);
+      if (do_show_film_edit_select_linie==8) showcoursornow(config_menu.config_mediaplayer_imdb_text_x + 120 + strlength,config_menu.config_mediaplayer_imdb_text_y,0);
     } else {
 
     }
-    renderer.AddText(&myfont,450,35*18,"Cast",1,1,1,1);
-    renderer.AddText(&myfont,450 + 120 ,35*18,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].cast[0],1,1,1,1);
-    renderer.AddText(&myfont2,450,38*18,"Description",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_cast_text_x,config_menu.config_mediaplayer_cast_text_y,"Cast",1,1,1,1);
+    renderer.AddText(&myfont,config_menu.config_mediaplayer_cast_text_x + 120 ,config_menu.config_mediaplayer_cast_text_y,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].cast[0],1,1,1,1);
+    renderer.AddText(&myfont2,config_menu.config_mediaplayer_desc_text_x,config_menu.config_mediaplayer_desc_text_y,"Description",1,1,1,1);
 
     if (film_oversigt.editmode==0) {
         renderer.AddText(&myfont,950, 580,"CTRL-E for edit mode.",1,1,1,1);
@@ -2885,7 +2885,7 @@ void display() {
         else renderer.AddTextureRect(11,_texturemnext, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_bw_button_posx,config_menu.config_musicplayer_bw_button_posy, config_menu.config_musicplayer_bw_button_sizx, config_menu.config_musicplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
         // music icon
         GLuint tmptexture=aktiv_playlist.get_textureid(1);
-        renderer.AddTextureRect(0,tmptexture,config_menu.config_musicplayer_infox+346, config_menu.config_musicplayer_infoy+57,168,120,1,1,1,1);
+        if (tmptexture) renderer.AddTextureRect(0,tmptexture,config_menu.config_musicplayer_coverx, config_menu.config_musicplayer_covery,config_menu.config_musicplayer_cover_sizx,config_menu.config_musicplayer_cover_sizy,1,1,1,1);
       } else if (do_zoom_spotify_cover) {
         if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,1,1,1,1);
         else renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
@@ -5416,6 +5416,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (id==45) {
               fprintf(stderr,"45 Button pressed \n");
             }
+
+            if (do_show_setup_tema) {
+              if (id==42) {
+                do_show_setup_tema=false;
+              }
+            }
           } 
         
 
@@ -5651,6 +5657,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               radiooversigt.onScroll(+11.25);
             }
           }
+
           
           // stream / movie v
           if (vis_stream_or_movie_oversigt) {

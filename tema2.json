@@ -315,7 +315,7 @@
                 "sizy": 100
             },
             "musicplayer_info_cover": {
-                "x": 348,
+                "x": 328,
                 "y": 400,
                 "sizx": 167,
                 "sizy": 119
@@ -459,10 +459,10 @@
             },
             "mediaplayer_play_button": {
                 "icon_path": "mplay",
-                "x": 50,
-                "y": 330,
-                "sizx": 100,
-                "sizy": 100
+                "x": 420,
+                "y": 830,
+                "sizx": 120,
+                "sizy": 120
             },
             "mediaplayer_info_cover": {
                 "x": 410,
@@ -472,24 +472,68 @@
             },
             "mediaplayer_stop_button": {
                 "icon_path": "mplaystop",
-                "x": 150,
-                "y": 330,
-                "sizx": 100,
-                "sizy": 100
+                "x": 520,
+                "y": 830,
+                "sizx": 120,
+                "sizy": 120
             },
             "mediaplayer_ff_button": {
                 "icon_path": "mplaynext",
-                "x": 250,
-                "y": 330,
-                "sizx": 100,
-                "sizy": 100
+                "x": 720,
+                "y": 830,
+                "sizx": 120,
+                "sizy": 120
             },
             "mediaplayer_bw_button": {
                 "icon_path": "mplaylast",
-                "x": 350,
-                "y": 330,
-                "sizx": 100,
-                "sizy": 100
+                "x": 620,
+                "y": 830,
+                "sizx": 120,
+                "sizy": 120
+            },
+            "mediaplayer_genre_text": {
+                "x": 450,
+                "y": 468
+            },
+            "mediaplayer_title_text": {
+                "x": 450,
+                "y": 486
+            },
+            "mediaplayer_length_text": {
+                "x": 450,
+                "y": 504
+            },
+            "mediaplayer_year_text": {
+                "x": 450,
+                "y": 522
+            },
+            "mediaplayer_rating_text": {
+                "x": 450,
+                "y": 540
+            },
+            "mediaplayer_format_text": {
+                "x": 450,
+                "y": 558
+            },
+            "mediaplayer_wh_text": {
+                "x": 450,
+                "y": 576
+            },
+            "mediaplayer_size_text": {
+                "x": 450,
+                "y": 594
+            },
+            "mediaplayer_imdb_text": {
+                "x": 450,
+                "y": 612
+            },
+            "mediaplayer_cast_text": {
+                "x": 450,
+                "y": 630
+            },
+            "mediaplayer_desc_text": {
+                "x": 450,
+                "y": 668
             },
             "music_main_window": {             
                 "window_x": 0,
