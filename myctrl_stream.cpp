@@ -1681,13 +1681,12 @@ void stream_class::draw_stream_item1(float x,float y,int ii,GLuint normal_icon,G
       renderer.AddThickLine( x + 202.0f, animatedY + 200.0f, x + 20.0f ,animatedY + 200.0f,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
       renderer.AddThickLine( x + 20.0f , animatedY + 200.0f, x + 20.0f ,animatedY + 18.0f ,3.0f, 0.0f, 0.0f, 1.0f, 1.0f);
   }
-
 }
 
 
 // ****************************************************************************************
 //
-// old
+// old not in use
 //
 // ****************************************************************************************
 
@@ -1799,7 +1798,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    float x = startX + col * itemWidth + 40.0f;
+    float x = startX + col * itemWidth + 10.0f;
     float y = startY + row * rowHeight - subOff - 20.0f;
     float progress = 1.0f;
     if (!streamIntroFinished) {
@@ -1817,7 +1816,11 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
 
 
 
-
+// ****************************************************************************************
+//
+// Draw stream overview in screen. (Not in use)
+//
+// ****************************************************************************************
 
 
 void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, int stream_key_selected) {
@@ -1849,7 +1852,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, i
     int index = sofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = startX + col * itemWidth + 40;
+    int x = startX + col * itemWidth + 20;
     int y = startY + row * rowHeight - subOff - 20;
     draw_stream_item(x, y, index , normal_icon, empty_icon, stream_key_selected);
   }
@@ -1857,7 +1860,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, i
     renderer.AddTextureRect(0,_textureIdloading, 200, 300, 80, 80,1,1,1,1);
   }
   // renderer.AddTextureRect(normal_icon, 200, 300, 80, 80,1,1,1,1);
-
 };
 
 #endif

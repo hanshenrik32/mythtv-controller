@@ -380,6 +380,26 @@ class config_icons {
     int config_radio_main_window_icon_sizex;
     int config_radio_main_window_icon_sizey;
 
+    int config_ask_open_dir_or_play_music_x;
+    int config_ask_open_dir_or_play_music_y;
+    int config_ask_open_dir_or_play_music_sizex;
+    int config_ask_open_dir_or_play_music_sizey;
+    int config_ask_open_dir_or_play_music_nr_of_songs_text_x;
+    int config_ask_open_dir_or_play_music_nr_of_songs_text_y;
+    int config_ask_open_dir_or_play_music_icon_x;
+    int config_ask_open_dir_or_play_music_icon_y;
+    int config_ask_open_dir_or_play_music_icon_sizex;
+    int config_ask_open_dir_or_play_music_icon_sizey;
+    int config_ask_open_dir_or_play_music_play_icon_x;
+    int config_ask_open_dir_or_play_music_play_icon_y;
+    int config_ask_open_dir_or_play_music_play_icon_sizex;
+    int config_ask_open_dir_or_play_music_play_icon_sizey;
+    int config_ask_open_dir_or_play_music_swap_icon_x;
+    int config_ask_open_dir_or_play_music_swap_icon_y;
+    int config_ask_open_dir_or_play_music_swap_icon_sizex;
+    int config_ask_open_dir_or_play_music_swap_icon_sizey;
+    std::string config_ask_open_dir_or_play_music_background;
+
     int config_radio_or_music_oversigtx;
     int config_radio_or_music_oversigty;
     std::string config_radio_or_music_oversigt_icon;
@@ -606,6 +626,26 @@ class config_icons {
       config_musicplayer_stop_button_sizx = 100;
       config_musicplayer_stop_button_sizy = 100;
 
+
+      config_ask_open_dir_or_play_music_x = 480;
+      config_ask_open_dir_or_play_music_y = 300;
+      config_ask_open_dir_or_play_music_sizex = 800;
+      config_ask_open_dir_or_play_music_sizey = 600;
+      config_ask_open_dir_or_play_music_nr_of_songs_text_x=520;
+      config_ask_open_dir_or_play_music_nr_of_songs_text_y=240;
+      config_ask_open_dir_or_play_music_icon_x=1000;
+      config_ask_open_dir_or_play_music_icon_y=480;
+      config_ask_open_dir_or_play_music_icon_sizex=200;
+      config_ask_open_dir_or_play_music_icon_sizey=200;
+      config_ask_open_dir_or_play_music_play_icon_x=520;
+      config_ask_open_dir_or_play_music_play_icon_y=680;
+      config_ask_open_dir_or_play_music_play_icon_sizex=100;
+      config_ask_open_dir_or_play_music_play_icon_sizey=100;
+      config_ask_open_dir_or_play_music_swap_icon_x=630;
+      config_ask_open_dir_or_play_music_swap_icon_y=680;
+      config_ask_open_dir_or_play_music_swap_icon_sizex=100;
+      config_ask_open_dir_or_play_music_swap_icon_sizey=100;
+      config_ask_open_dir_or_play_music_background="askbox";
 
       config_musicplayer_artist_text_x=480+20;
       config_musicplayer_artist_text_y=300+(4*18);

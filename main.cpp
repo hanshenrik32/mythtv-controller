@@ -2351,20 +2351,20 @@ void display() {
     if ((vis_music_oversigt || do_show_music_search_oversigt) && (!(visur)) && (ask_open_dir_or_play_music) && (mknapnr>0)) {
       if (dirmusic.numbersinlist()>0) {
         // window ask play ?
-        renderer.AddTextureRect(0,_textureId9_askbox, 500 , 200, 800, 600,1,1,1,1);
+        renderer.AddTextureRect(0,_textureId9_askbox, config_menu.config_ask_open_dir_or_play_music_x ,config_menu.config_ask_open_dir_or_play_music_y, config_menu.config_ask_open_dir_or_play_music_sizex, config_menu.config_ask_open_dir_or_play_music_sizey,1,1,1,1);
         // 20 = play button
-        if (menu_icon_over==20) renderer.AddTextureRect(20,_textureIdplayicon, 520 , 680, 100, 100,1,1,1,1);
-        else renderer.AddTextureRect(20,_textureIdplayicon, 520 , 680, 100, 100,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==20) renderer.AddTextureRect(20,_textureIdplayicon, config_menu.config_ask_open_dir_or_play_music_play_icon_x , config_menu.config_ask_open_dir_or_play_music_play_icon_y, config_menu.config_ask_open_dir_or_play_music_play_icon_sizex, config_menu.config_ask_open_dir_or_play_music_play_icon_sizey,1,1,1,1);
+        else renderer.AddTextureRect(20,_textureIdplayicon, config_menu.config_ask_open_dir_or_play_music_play_icon_x , config_menu.config_ask_open_dir_or_play_music_play_icon_y, config_menu.config_ask_open_dir_or_play_music_play_icon_sizex, config_menu.config_ask_open_dir_or_play_music_play_icon_sizey ,0.85f,0.85f,0.85f,1);
         // 22 = swap
-        if (menu_icon_over==22) renderer.AddTextureRect(22,_textureswap, 520+110 , 680, 100, 100,1,1,1,1);
-        else renderer.AddTextureRect(22,_textureswap, 520+110 , 680, 100, 100,0.85f,0.85f,0.85f,1);
+        if (menu_icon_over==22) renderer.AddTextureRect(22,_textureswap, config_menu.config_ask_open_dir_or_play_music_swap_icon_x , config_menu.config_ask_open_dir_or_play_music_swap_icon_y, config_menu.config_ask_open_dir_or_play_music_swap_icon_sizex, config_menu.config_ask_open_dir_or_play_music_swap_icon_sizey,1,1,1,1);
+        else renderer.AddTextureRect(22,_textureswap, config_menu.config_ask_open_dir_or_play_music_swap_icon_x , config_menu.config_ask_open_dir_or_play_music_swap_icon_y, config_menu.config_ask_open_dir_or_play_music_swap_icon_sizex, config_menu.config_ask_open_dir_or_play_music_swap_icon_sizey,0.85f,0.85f,0.85f,1);
         std::string temprgtxt;
         temprgtxt = fmt::format("Nr of songs : {:<8} {:<20}",dirmusic.numbersinlist(),musicoversigt.get_album_name(mknapnr-1));
-        renderer.AddText(&myfont, 500 + 20 , 200 + 40 ,temprgtxt,1,1,1,1);
+         renderer.AddText(&myfont, config_menu.config_ask_open_dir_or_play_music_nr_of_songs_text_x , config_menu.config_ask_open_dir_or_play_music_nr_of_songs_text_y ,temprgtxt,1,1,1,1);
         // music cover
         GLuint cc_cover=musicoversigt.get_textureId(mknapnr-1);
         if (cc_cover==0) cc_cover=0;
-        renderer.AddTextureRect(20,cc_cover , 1040 , 250, 200, 200,1,1,1,1);
+        renderer.AddTextureRect(20,cc_cover , config_menu.config_ask_open_dir_or_play_music_icon_x , config_menu.config_ask_open_dir_or_play_music_icon_y , 200, 200,1,1,1,1);
         // show song list
         int i=0;
         int dirmusiclistemax=20;
@@ -11609,6 +11609,29 @@ int team_settings_load() {
     config_menu.config_musicplayer_song_time_text_y=(iRoot["tema1"]["icons"]["musicplayer_time_text"].get("y","0").asInt());
     config_menu.config_musicplayer_songs_antal_text_x=(iRoot["tema1"]["icons"]["musicplayer_songs_antal_text"].get("x","0").asInt());
     config_menu.config_musicplayer_songs_antal_text_y=(iRoot["tema1"]["icons"]["musicplayer_songs_antal_text"].get("y","0").asInt());
+
+    // ask open dir or play music
+    config_menu.config_ask_open_dir_or_play_music_x=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music"].get("x","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_y=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music"].get("y","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_sizex=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music"].get("sizex","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_sizey==(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music"].get("sizey","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_nr_of_songs_text_x=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_nr_of_songs_text"].get("x","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_nr_of_songs_text_y=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_nr_of_songs_text"].get("y","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_icon_x=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_icon"].get("x","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_icon_y=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_icon"].get("y","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_icon_sizex=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_icon"].get("sizex","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_icon_sizey=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_icon"].get("sizey","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_play_icon_x=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_play_icon"].get("x","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_play_icon_y=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_play_icon"].get("y","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_play_icon_sizex=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_play_icon"].get("sizex","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_play_icon_sizey=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_play_icon"].get("sizey","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_swap_icon_x=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_swap_icon"].get("x","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_swap_icon_y=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_swap_icon"].get("y","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_swap_icon_sizex=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_swap_icon"].get("sizex","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_swap_icon_sizey=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music_swap_icon"].get("sizey","0").asInt());
+    config_menu.config_ask_open_dir_or_play_music_background=(iRoot["tema1"]["icons"]["ask_open_dir_or_play_music"].get("background","0").asString());
+    
+
     
     // Spotifyplayer
     config_menu.config_spotifyplayer_infox=(iRoot["tema1"]["icons"]["spotifyplayer_info"].get("x","0").asInt());

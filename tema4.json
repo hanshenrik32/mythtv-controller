@@ -367,6 +367,35 @@
                 "x": 80,
                 "y": 1040
             },
+            "ask_open_dir_or_play_music": {
+                "x": 500,
+                "y": 200,
+                "sizex": 800,
+                "sizey": 600,
+                "background": "askbox"
+            },
+            "ask_open_dir_or_play_music_nr_of_songs_text": {
+                "x": 580,
+                "y": 260
+            },
+            "ask_open_dir_or_play_music_icon": {
+                "x": 1000,
+                "y": 480,
+                "sizex": 100,
+                "sizey": 100
+            },
+            "ask_open_dir_or_play_music_play_icon": {
+                "x": 560,
+                "y": 640,
+                "sizex": 100,
+                "sizey": 100
+            },
+            "ask_open_dir_or_play_music_swap_icon": {
+                "x": 670,
+                "y": 640,
+                "sizex": 100,
+                "sizey": 100
+            },
             "tidalplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 700,

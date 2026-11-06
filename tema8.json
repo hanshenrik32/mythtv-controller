@@ -5,138 +5,139 @@
         "iconpath": "/opt/mythtv-controller/tema8/",
         "icons" : {
             "tvguide": {
-                "icon_path": "tv",
-                "x": 1720,
-                "y": 10,
-                "sizx": 200,
-                "sizy": 200
+                "icon_path": "tv_button",
+                "x": 1626,
+                "y": 210,
+                "sizx": 294,
+                "sizy": 106
             },
             "music": {
                 "icon_path": "music_button",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 320,
+                "sizx": 294,
+                "sizy": 106
             },
             "music_active": {
                 "icon_path": "music_button1",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 320,
+                "sizx": 294,
+                "sizy": 106
+
             },
             "media": {
                 "icon_path": "stream_button",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 320,
+                "sizx": 294,
+                "sizy": 106
             },
             "media1": {
                 "icon_path": "stream_button1",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 320,
+                "sizx": 294,
+                "sizy": 106
             },
             "spotify": {
                 "icon_path": "spotify_button",
-                "x": 1720,
-                "y": 10,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 210,
+                "sizx": 294,
+                "sizy": 106
             },
             "spotify1": {
                 "icon_path": "spotify_button1",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 210,
+                "sizx": 294,
+                "sizy": 106
             },
             "tidal": {
                 "icon_path": "tidal_button",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 320,
+                "sizx": 294,
+                "sizy": 106
             },
             "tidal1": {
                 "icon_path": "tidal_button1",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 320,
+                "sizx": 294,
+                "sizy": 106
             },
             "radio": {
                 "icon_path": "radio_button",
-                "x": 1720,
+                "x": 1626,
                 "y": 430,
-                "sizx": 200,
-                "sizy": 200
+                "sizx": 294,
+                "sizy": 106
             },
             "radio1": {
                 "icon_path": "radio_button1",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 320,
+                "sizx": 294,
+                "sizy": 106
             },
             "recorded": {
                 "icon_path": "recorded",
-                "x": 1720,
-                "y": 640,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 540,
+                "sizx": 294,
+                "sizy": 106
             },
             "recorded1": {
                 "icon_path": "recorded_selected",
-                "x": 1720,
-                "y": 640,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 540,
+                "sizx": 294,
+                "sizy": 106
+
             },
             "multimedia": {
                 "icon_path": "media_button",
-                "x": 1720,
+                "x": 1626,
                 "y": 504,
-                "sizx": 200,
-                "sizy": 200
-
+                "sizx": 294,
+                "sizy": 106
             },
             "moviestream": {
                 "icon_path": "media_button",
-                "x": 1720,
+                "x": 1626,
                 "y": 430,
-                "sizx": 200,
-                "sizy": 200
+                "sizx": 294,
+                "sizy": 106
             },
             "movie": {
                 "icon_path": "movie_button",
-                "x": 1720,
+                "x": 1626,
                 "y": 430,
-                "sizx": 200,
-                "sizy": 200
+                "sizx": 294,
+                "sizy": 106
             },
             "movie1": {
                 "icon_path": "movie_button1",
-                "x": 1720,
-                "y": 220,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 320,
+                "sizx": 294,
+                "sizy": 106
             },
             "closemain": {
                 "icon_path": "closemain",
-                "x": 1720,
+                "x": 1626,
                 "y": 312,
-                "sizx": 200,
-                "sizy": 200
+                "sizx": 294,
+                "sizy": 106
             },
             "setup": {
                 "icon_path": "setupmenu",
-                "x": 1720,
-                "y": 850,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 650,
+                "sizx": 294,
+                "sizy": 106
             },
             "exit": {
                 "icon_path": "exit",
@@ -168,33 +169,31 @@
             },
             "down": {
                 "icon_path": "pdown",
-                "x": 1720,
-                "y": 640,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 540,
+                "sizx": 294,
+                "sizy": 106
             },
             "up": {
                 "icon_path": "pup",
-                "x": 1720,
+                "x": 1626,
                 "y": 430,
-                "sizx": 200,
-                "sizy": 200
-
+                "sizx": 294,
+                "sizy": 106
             },
             "close": {
                 "icon_path": "close",
-                "x": 1720,
-                "y": 850,
-                "sizx": 200,
-                "sizy": 200
+                "x": 1626,
+                "y": 650,
+                "sizx": 294,
+                "sizy": 106
             },
             "search": {
                 "icon_path": "search",
-                "x": 1720,
-                "y": 850,
-                "sizx": 200,
-                "sizy": 200
-
+                "x": 1626,
+                "y": 650,
+                "sizx": 294,
+                "sizy": 106
             },
             "search_back": {
                 "icon_path": "search_back",
@@ -311,12 +310,12 @@
              "musicplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 50,
-                "y": 470,
+                "y": 510,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_info_cover": {
-                "x": 348,
+                "x": 808,
                 "y": 400,
                 "sizx": 167,
                 "sizy": 119
@@ -324,21 +323,21 @@
             "musicplayer_stop_button": {
                 "icon_path": "mplaystop",
                 "x": 150,
-                "y": 480,
+                "y": 510,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_ff_button": {
                 "icon_path": "mplaynext",
                 "x": 250,
-                "y": 480,
+                "y": 510,
                 "sizx": 100,
                 "sizy": 100
             },
             "musicplayer_bw_button": {
                 "icon_path": "mplaylast",
                 "x": 350,
-                "y": 480,
+                "y": 510,
                 "sizx": 100,
                 "sizy": 100
             },
@@ -365,6 +364,34 @@
             "musicplayer_songs_antal_text": {
                 "x": 550,
                 "y": 480
+            },
+            "ask_open_dir_or_play_music": {
+                "x": 500,
+                "y": 200,
+                "sizex": 800,
+                "sizey": 600
+            },
+            "ask_open_dir_or_play_music_nr_of_songs_text": {
+                "x": 520,
+                "y": 240
+            },
+            "ask_open_dir_or_play_music_icon": {
+                "x": 1000,
+                "y": 480,
+                "sizex": 100,
+                "sizey": 100
+            },
+            "ask_open_dir_or_play_music_play_icon": {
+                "x": 520,
+                "y": 640,
+                "sizex": 100,
+                "sizey": 100
+            },
+            "ask_open_dir_or_play_music_swap_icon": {
+                "x": 630,
+                "y": 640,
+                "sizex": 100,
+                "sizey": 100
             },
             "tidalplayer_play_button": {
                 "icon_path": "mplay",

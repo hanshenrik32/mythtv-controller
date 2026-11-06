@@ -5,7 +5,7 @@
         "iconpath": "/opt/mythtv-controller/tema3/",
         "icons" : {
             "tvguide": {
-                "icon_path": "tv",
+                "icon_path": "tv_button",
                 "x": 1720,
                 "y": 10,
                 "sizx": 200,
@@ -368,6 +368,34 @@
             "musicplayer_songs_antal_text": {
                 "x": 550,
                 "y": 480
+            },
+            "ask_open_dir_or_play_music": {
+                "x": 500,
+                "y": 200,
+                "sizex": 800,
+                "sizey": 600
+            },
+            "ask_open_dir_or_play_music_nr_of_songs_text": {
+                "x": 520,
+                "y": 240
+            },
+            "ask_open_dir_or_play_music_icon": {
+                "x": 1000,
+                "y": 480,
+                "sizex": 100,
+                "sizey": 100
+            },
+            "ask_open_dir_or_play_music_play_icon": {
+                "x": 520,
+                "y": 640,
+                "sizex": 100,
+                "sizey": 100
+            },
+            "ask_open_dir_or_play_music_swap_icon": {
+                "x": 630,
+                "y": 640,
+                "sizex": 100,
+                "sizey": 100
             },
             "tidalplayer_play_button": {
                 "icon_path": "mplay",
