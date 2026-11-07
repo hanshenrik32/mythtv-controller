@@ -5,7 +5,7 @@
         "iconpath": "/opt/mythtv-controller/tema6/",
         "icons" : {
            "tvguide": {
-                "icon_path": "tv",
+                "icon_path": "tv_button",
                 "x": 1626,
                 "y": 210,
                 "sizx": 294,
