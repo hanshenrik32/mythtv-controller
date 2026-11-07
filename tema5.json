@@ -486,6 +486,56 @@
                 "sizx": 100,
                 "sizy": 100
             },
+            "streamplayer_play_button": {
+                "icon_path": "mplay",
+                "x": 520,
+                "y": 600,
+                "sizx": 120,
+                "sizy": 120
+            },
+            "streamplayer_info_cover": {
+                "x": 875,
+                "y": 480,
+                "sizx": 220,
+                "sizy": 220
+            },
+            "streamplayer_stop_button": {
+                "icon_path": "mplaystop",
+                "x": 620,
+                "y": 600,
+                "sizx": 120,
+                "sizy": 120
+            },
+            "streamplayer_ff_button": {
+                "icon_path": "mplaynext",
+                "x": 820,
+                "y": 600,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "streamplayer_bw_button": {
+                "icon_path": "mplaylast",
+                "x": 720,
+                "y": 600,
+                "sizx": 100,
+                "sizy": 100
+            },
+            "streamplayer_name_text": {
+                "x": 520,
+                "y": 368
+            },
+            "streamplayer_desc_text": {
+                "x": 520,
+                "y": 404
+            },
+            "streamplayer_status_text": {
+                "x": 520,
+                "y": 422
+            },
+            "streamplayer_playtime_text": {
+                "x": 520,
+                "y": 440
+            },
             "mediaplayer_play_button": {
                 "icon_path": "mplay",
                 "x": 420,
@@ -563,6 +613,27 @@
             "mediaplayer_desc_text": {
                 "x": 450,
                 "y": 668
+            },
+            "recordedview_recordings_overview": {
+                "icon_path": "mplaylast",
+                "x": 200,
+                "y": 200,
+                "sizx": 400,
+                "sizy": 600
+            },
+            "recordedview_recordings_episodeview": {
+                "icon_path": "mplaylast",
+                "x": 610,
+                "y": 200,
+                "sizx": 800,
+                "sizy": 600
+            },
+            "recordedview_recordings_infoview": {
+                "icon_path": "mplaylast",
+                "x": 200,
+                "y": 810,
+                "sizx": 1210,
+                "sizy": 200
             },
             "music_main_window": {             
                 "window_x": 0,

@@ -357,3 +357,4 @@ class tidal_class {
 int tidal_sqldb_callback(void *data, int argc, char **argv, char **azColName);
 bool checkartistdbexist();
 std::string getArtistName(const std::string& json);
+void drawLinesOfTextfont(MFont *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center);

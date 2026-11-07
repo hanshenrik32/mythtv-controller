@@ -736,11 +736,11 @@ int debugmode=0;                                          // 64 = radio station 
 
 
 
-char keybuffer[512];                                    // keyboard buffer
-std::string keybuffer1;
-unsigned int keybufferindex=0;                          // keyboard buffer index
+char keybuffer[512];                                      // keyboard buffer
+std::string keybuffer1;                                   // new keyboard buffer used by multi line editor
+unsigned int keybufferindex=0;                            // keyboard buffer index
 bool keybufferopenwin=false;
-const int TEMA_ANTAL=10;                                                        // numbers of tema
+const int TEMA_ANTAL=15;                                  // numbers of tema
 bool do_show_torrent = false;
 bool do_show_torrent_options = false;
 bool do_show_torrent_options_move = false;
@@ -2421,25 +2421,28 @@ void display() {
     // ******************************************************************************************************************
     if ((vis_stream_oversigt) && (do_zoom_stream_cover) && (stream_playnr>0)) {
       // renderer.AddTextureRect(0,_texturemusicplayer, config_menu.config_mediaplayer_infox,config_menu.config_mediaplayer_infoy, config_menu.config_mediaplayer_sizx, config_menu.config_mediaplayer_sizy,1,1,1,1);
-      renderer.AddTextureRect(0,_texturemovieinfobox, config_menu.config_movieplayer_infox,config_menu.config_movieplayer_infoy, config_menu.config_movieplayer_sizx, config_menu.config_movieplayer_sizy,1,1,1,1);
+      renderer.AddTextureRect(0,_texturemovieinfobox, config_menu.config_mediaplayer_infox,config_menu.config_mediaplayer_infoy, config_menu.config_mediaplayer_sizx, config_menu.config_mediaplayer_sizy,1,1,1,1);
       // play button
-      if (menu_icon_over==8) renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20     , 830, 120, 120,1,1,1,1);
-      else renderer.AddTextureRect(PLAYBUTTON,_texturemplay, 400+20     , 830, 120, 120,0.85f,0.85f,0.85f,1);
+      if (menu_icon_over==8) renderer.AddTextureRect(PLAYBUTTON,_texturemplay,config_menu.config_streamplayer_play_button_posx,config_menu.config_streamplayer_play_button_posy, config_menu.config_streamplayer_play_button_sizx, config_menu.config_streamplayer_play_button_sizy,1,1,1,1);
+      else renderer.AddTextureRect(PLAYBUTTON,_texturemplay,config_menu.config_streamplayer_play_button_posx,config_menu.config_streamplayer_play_button_posy, config_menu.config_streamplayer_play_button_sizx, config_menu.config_streamplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
       // stop button
-      if (menu_icon_over==9) renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100 , 830, 120, 120,1,1,1,1);
-      else renderer.AddTextureRect(STOPBUTTON,_texturemstop, 400+20+100 , 830, 120, 120,0.85f,0.85f,0.85f,1);
-      renderer.AddText(&myfont,450,26*18,"Name ",1,1,1,1);
+      if (menu_icon_over==9) renderer.AddTextureRect(STOPBUTTON,_texturemstop, config_menu.config_streamplayer_stop_button_posx,config_menu.config_streamplayer_stop_button_posy, config_menu.config_streamplayer_stop_button_sizx, config_menu.config_streamplayer_stop_button_sizy,1,1,1,1);
+      else renderer.AddTextureRect(STOPBUTTON,_texturemstop, config_menu.config_streamplayer_stop_button_posx,config_menu.config_streamplayer_stop_button_posy, config_menu.config_streamplayer_stop_button_sizx, config_menu.config_streamplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
+      renderer.AddText(&myfont,config_menu.config_streamplayer_name_text_x,config_menu.config_streamplayer_name_text_y,"Name ",1,1,1,1);
       std::string tmptext;
       // show name
       tmptext=streamoversigt.get_stream_name(stream_playnr);
-      renderer.AddText(&myfont,450+120,26*18,tmptext,1,1,1,1);
+      
+      // renderer.AddText(&myfont,config_menu.config_streamplayer_name_text_x + 120,config_menu.config_streamplayer_name_text_y,tmptext,1,1,1,1);
+      drawLinesOfTextfont(&myfont,tmptext, config_menu.config_streamplayer_name_text_x + 120,config_menu.config_streamplayer_name_text_y, 18, 50, 2, 2, false);
+
       // show desc
-      renderer.AddText(&myfont,450,26*19,"Desc ",1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_streamplayer_desc_text_x,config_menu.config_streamplayer_desc_text_y,"Desc ",1,1,1,1);
       tmptext=streamoversigt.FeedCatalog[stream_playnr].feed_desc;
-      renderer.AddText(&myfont,450+120,26*19,tmptext,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_streamplayer_desc_text_x + 120,config_menu.config_streamplayer_desc_text_y,tmptext,1,1,1,1);
       // show texture
       if (streamoversigt.FeedCatalog[stream_playnr].textureId) {
-        renderer.AddTextureRect(0,streamoversigt.FeedCatalog[stream_playnr].textureId, config_menu.config_movieplayer_infox+540,config_menu.config_movieplayer_infoy+300, 220, 220,1,1,1,1);
+        renderer.AddTextureRect(0,streamoversigt.FeedCatalog[stream_playnr].textureId, config_menu.config_streamplayer_coverx,config_menu.config_streamplayer_covery, config_menu.config_streamplayer_cover_sizx,config_menu.config_streamplayer_cover_sizy ,1,1,1,1);
       }
       // show status
       int playstatsus=streamoversigt.get_play_status();
@@ -2461,8 +2464,8 @@ void display() {
                 txtplaystatus="Other error";
                 break;
       }
-      renderer.AddText(&myfont,450,26*20,"Status",1,1,1,1);
-      renderer.AddText(&myfont,450+120,26*20,txtplaystatus,1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_streamplayer_status_text_x,config_menu.config_streamplayer_status_text_y,"Status",1,1,1,1);
+      renderer.AddText(&myfont,config_menu.config_streamplayer_status_text_x + 120,config_menu.config_streamplayer_status_text_y,txtplaystatus,1,1,1,1);
       // if status playing
       if (playstatsus==3) {
         long length_in_ms;
@@ -2491,9 +2494,9 @@ void display() {
           play_inmin=(play_intotalsec % 3600) / 60;
           play_insec=(play_intotalsec % 60);
         }
-        renderer.AddText(&myfont,450,26*21,"Playlength",1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_streamplayer_playtime_text_x,config_menu.config_streamplayer_playtime_text_y,"Playlength",1,1,1,1);
         std::string play_intime=fmt::format("{:02}:{:02}:{:02}/{:02}:{:02}:{:02}",play_inhour,play_inmin,play_insec,inhour,inmin,insec);
-        renderer.AddText(&myfont,450+120,26*21,play_intime,1,1,1,1);
+        renderer.AddText(&myfont,config_menu.config_streamplayer_playtime_text_x + 120,config_menu.config_streamplayer_playtime_text_y,play_intime,1,1,1,1);
       }
     }
   }
@@ -11809,7 +11812,52 @@ int team_settings_load() {
     config_menu.config_tv_main_window_sizex=(iRoot["tema1"]["icons"]["tv_main_window"].get("window_sizex","0").asInt());
     config_menu.config_tv_main_window_sizey=(iRoot["tema1"]["icons"]["tv_main_window"].get("window_sizey","0").asInt());
 
+    config_menu.config_streamplayer_info_icon=(iRoot["tema1"]["icons"]["streamplayer_info"].get("icon_path","0").asString());
+    config_menu.config_streamplayer_coverx=(iRoot["tema1"]["icons"]["streamplayer_info_cover"].get("x","0").asInt());
+    config_menu.config_streamplayer_covery=(iRoot["tema1"]["icons"]["streamplayer_info_cover"].get("y","0").asInt());
+    config_menu.config_streamplayer_cover_sizx=(iRoot["tema1"]["icons"]["streamplayer_info_cover"].get("sizx","0").asInt());
+    config_menu.config_streamplayer_cover_sizy=(iRoot["tema1"]["icons"]["streamplayer_info_cover"].get("sizy","0").asInt());
+    config_menu.config_streamplayer_ff_button_posx=(iRoot["tema1"]["icons"]["streamplayer_ff_button"].get("x","0").asInt());
+    config_menu.config_streamplayer_ff_button_posy=(iRoot["tema1"]["icons"]["streamplayer_ff_button"].get("y","0").asInt());
+    config_menu.config_streamplayer_ff_button_sizx=(iRoot["tema1"]["icons"]["streamplayer_ff_button"].get("sizx","0").asInt());
+    config_menu.config_streamplayer_ff_button_sizy=(iRoot["tema1"]["icons"]["streamplayer_ff_button"].get("sizy","0").asInt());
+    config_menu.config_streamplayer_bw_button_posx=(iRoot["tema1"]["icons"]["streamplayer_bw_button"].get("x","0").asInt());
+    config_menu.config_streamplayer_bw_button_posy=(iRoot["tema1"]["icons"]["streamplayer_bw_button"].get("y","0").asInt());
+    config_menu.config_streamplayer_bw_button_sizx=(iRoot["tema1"]["icons"]["streamplayer_bw_button"].get("sizx","0").asInt());
+    config_menu.config_streamplayer_bw_button_sizy=(iRoot["tema1"]["icons"]["streamplayer_bw_button"].get("sizy","0").asInt());
+
+    config_menu.config_streamplayer_name_text_x=(iRoot["tema1"]["icons"]["streamplayer_name_text"].get("x","0").asInt());
+    config_menu.config_streamplayer_name_text_y=(iRoot["tema1"]["icons"]["streamplayer_name_text"].get("y","0").asInt());
+    config_menu.config_streamplayer_desc_text_x=(iRoot["tema1"]["icons"]["streamplayer_desc_text"].get("x","0").asInt());
+    config_menu.config_streamplayer_desc_text_y=(iRoot["tema1"]["icons"]["streamplayer_desc_text"].get("y","0").asInt());
+    config_menu.config_streamplayer_status_text_x=(iRoot["tema1"]["icons"]["streamplayer_status_text"].get("x","0").asInt());
+    config_menu.config_streamplayer_status_text_y=(iRoot["tema1"]["icons"]["streamplayer_status_text"].get("y","0").asInt());
+    config_menu.config_streamplayer_playtime_text_x=(iRoot["tema1"]["icons"]["streamplayer_playtime_text"].get("x","0").asInt());
+    config_menu.config_streamplayer_playtime_text_y=(iRoot["tema1"]["icons"]["streamplayer_playtime_text"].get("y","0").asInt());
+
     
+    config_menu.config_streamplayer_play_button_posx=(iRoot["tema1"]["icons"]["streamplayer_play_button"].get("x","0").asInt());
+    config_menu.config_streamplayer_play_button_posy=(iRoot["tema1"]["icons"]["streamplayer_play_button"].get("y","0").asInt());
+    config_menu.config_streamplayer_play_button_sizx=(iRoot["tema1"]["icons"]["streamplayer_play_button"].get("sizx","0").asInt());
+    config_menu.config_streamplayer_play_button_sizy=(iRoot["tema1"]["icons"]["streamplayer_play_button"].get("sizy","0").asInt());
+    config_menu.config_streamplayer_stop_button_posx=(iRoot["tema1"]["icons"]["streamplayer_stop_button"].get("x","0").asInt());
+    config_menu.config_streamplayer_stop_button_posy=(iRoot["tema1"]["icons"]["streamplayer_stop_button"].get("y","0").asInt());
+    config_menu.config_streamplayer_stop_button_sizx=(iRoot["tema1"]["icons"]["streamplayer_stop_button"].get("sizx","0").asInt());
+    config_menu.config_streamplayer_stop_button_sizy=(iRoot["tema1"]["icons"]["streamplayer_stop_button"].get("sizy","0").asInt());
+
+    config_menu.recordedview_recordings_overview_x=(iRoot["tema1"]["icons"]["recordedview_recordings_overview"].get("x","0").asInt());
+    config_menu.recordedview_recordings_overview_y=(iRoot["tema1"]["icons"]["recordedview_recordings_overview"].get("y","0").asInt());
+    config_menu.recordedview_recordings_overview_sizx=(iRoot["tema1"]["icons"]["recordedview_recordings_overview"].get("sizx","0").asInt());    
+    config_menu.recordedview_recordings_overview_sizy=(iRoot["tema1"]["icons"]["recordedview_recordings_overview"].get("sizy","0").asInt());
+    config_menu.recordedview_recordings_episodeview_x=(iRoot["tema1"]["icons"]["recordedview_recordings_episodeview"].get("x","0").asInt());
+    config_menu.recordedview_recordings_episodeview_y=(iRoot["tema1"]["icons"]["recordedview_recordings_episodeview"].get("y","0").asInt());
+    config_menu.recordedview_recordings_episodeview_sizx=(iRoot["tema1"]["icons"]["recordedview_recordings_episodeview"].get("sizx","0").asInt());
+    config_menu.recordedview_recordings_episodeview_sizy=(iRoot["tema1"]["icons"]["recordedview_recordings_episodeview"].get("sizy","0").asInt());
+    config_menu.recordedview_recordings_infoview_x=(iRoot["tema1"]["icons"]["recordedview_recordings_infoview"].get("x","0").asInt());
+    config_menu.recordedview_recordings_infoview_y=(iRoot["tema1"]["icons"]["recordedview_recordings_infoview"].get("y","0").asInt());
+    config_menu.recordedview_recordings_infoview_sizx=(iRoot["tema1"]["icons"]["recordedview_recordings_infoview"].get("sizx","0").asInt());
+    config_menu.recordedview_recordings_infoview_sizy=(iRoot["tema1"]["icons"]["recordedview_recordings_infoview"].get("sizy","0").asInt());
+
   } catch (const std::exception &e) {
 
     printf("Error parsing team json file.\n");
@@ -11961,6 +12009,20 @@ int team_settings_load() {
     config_menu.config_mediaplayer_sizy=320;
     config_menu.config_mediaplayer_info_icon="musicplayer-info";
 
+    // recorded view
+    config_menu.recordedview_recordings_overview_x=200;
+    config_menu.recordedview_recordings_overview_y=200;
+    config_menu.recordedview_recordings_overview_sizx=400;
+    config_menu.recordedview_recordings_overview_sizy=600;
+    config_menu.recordedview_recordings_episodeview_x=610;
+    config_menu.recordedview_recordings_episodeview_y=200;
+    config_menu.recordedview_recordings_episodeview_sizx=800;
+    config_menu.recordedview_recordings_episodeview_sizy=600;
+    config_menu.recordedview_recordings_infoview_x=200;
+    config_menu.recordedview_recordings_infoview_y=810;
+    config_menu.recordedview_recordings_infoview_sizx=1210;
+    config_menu.recordedview_recordings_infoview_sizy=200;
+
     config_menu.config_exitx=0;
     config_menu.config_exity=0;
     config_menu.config_exit_icon="exit";
@@ -12011,6 +12073,7 @@ int team_settings_load() {
     config_menu.config_tv_main_windowy=0;
     config_menu.config_tv_main_window_sizex=1920;
     config_menu.config_tv_main_window_sizey=1080;
+
     return 0;
   }
   return(1);
@@ -12029,7 +12092,7 @@ int team_settings_load() {
 void loadgfx() {
     unsigned int i;
     std::string temapath="";
-    printf ("Loading init graphic.\n");    
+    printf ("Loading init graphic.\n");
     if (tema == 1) temapath="/opt/mythtv-controller/tema1/"; else
     if (tema == 2) temapath="/opt/mythtv-controller/tema2/"; else
     if (tema == 3) temapath="/opt/mythtv-controller/tema3/"; else
@@ -12039,11 +12102,15 @@ void loadgfx() {
     if (tema == 7) temapath="/opt/mythtv-controller/tema7/"; else
     if (tema == 8) temapath="/opt/mythtv-controller/tema8/"; else
     if (tema == 9) temapath="/opt/mythtv-controller/tema9/"; else
-    if (tema == 10) temapath="/opt/mythtv-controller/tema10/"; else {
+    if (tema == 10) temapath="/opt/mythtv-controller/tema10/"; else 
+    if (tema == 11) temapath="/opt/mythtv-controller/tema11/"; else
+    if (tema == 12) temapath="/opt/mythtv-controller/tema12/"; else
+    if (tema == 13) temapath="/opt/mythtv-controller/tema13/"; else
+    if (tema == 14) temapath="/opt/mythtv-controller/tema14/"; else
+    if (tema == 15) temapath="/opt/mythtv-controller/tema15/"; else {
       // default tema
-      // strcpy(temapath,"tema1/");
-      temapath="tema1/";
-      tema=1;
+      temapath="/opt/mythtv-controller/tema2/";
+      tema=2;
     }
     _textureIdpup           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_up_icon.c_str());
     _textureIdpdown         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_down_icon.c_str());
@@ -12795,7 +12862,12 @@ int main(int argc,char** argv) {
     printf("Renderer: %s\n",glGetString(GL_RENDERER));
     printf("Build: %s\n",build_str);
     init_ttf_fonts();
-    team_settings_load();
+    if (team_settings_load()==1) {
+      printf("Team settings loaded.\n");
+    } else {
+      printf("Team settings not loaded.\n");
+      exit(0);
+    }
     loadgfx();
     // load fonts
     if (myfont.Load("/usr/share/fonts/truetype/roboto/unhinted/RobotoTTF/Roboto-Regular.ttf",16)==false) {
