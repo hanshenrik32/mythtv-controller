@@ -158,7 +158,7 @@ extern GLuint _textureclose;
 extern GLuint _textureselect;
 extern GLuint _texturetvgrabersetup;                //
 extern GLuint setupupdatebutton;
-extern GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,screenshot7,screenshot8,screenshot9,screenshot10;
+extern GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,screenshot7,screenshot8,screenshot9,screenshot10,screenshot11,screenshot12,screenshot13,screenshot14,screenshot15;
 extern int do_show_setup_select_linie;
 extern int tema;
 extern int screen_size;
@@ -859,15 +859,21 @@ void show_setup_tema() {
   int ypos=0;
   std::string tema_string;
   if (tema==1) tema_string="Tema 1";
-  if (tema==2) tema_string="Tema 2";
-  if (tema==3) tema_string="Tema 3";
-  if (tema==4) tema_string="Tema 4";
-  if (tema==5) tema_string="Tema 5";
-  if (tema==6) tema_string="Tema 6";
-  if (tema==7) tema_string="Tema 7";
-  if (tema==8) tema_string="Tema 8";
-  if (tema==9) tema_string="Tema 9";
-  if (tema==10) tema_string="Tema 10";
+  else if (tema==2) tema_string="Tema 2";
+  else if (tema==3) tema_string="Tema 3";
+  else if (tema==4) tema_string="Tema 4";
+  else if (tema==5) tema_string="Tema 5";
+  else if (tema==6) tema_string="Tema 6";
+  else if (tema==7) tema_string="Tema 7";
+  else if (tema==8) tema_string="Tema 8";
+  else if (tema==9) tema_string="Tema 9";
+  else if (tema==10) tema_string="Tema 10";
+  else if (tema==11) tema_string="Tema 11";
+  else if (tema==12) tema_string="Tema 12";
+  else if (tema==13) tema_string="Tema 13";
+  else if (tema==14) tema_string="Tema 14";
+  else if (tema==15) tema_string="Tema 15";
+  else tema_string="Tema 2";
   renderer.AddTextureRect(42,setupscreenback, 300, 300, 800, 650,1,1,1,1);
   renderer.AddText(&myfont2, 650, 330, tema_string ,1,1,1,1);
   switch(tema) {
@@ -900,6 +906,21 @@ void show_setup_tema() {
           break;
     case 10:
           renderer.AddTextureRect(41,screenshot10, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 11:
+          renderer.AddTextureRect(41,screenshot11, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 12:
+          renderer.AddTextureRect(41,screenshot12, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 13:
+          renderer.AddTextureRect(41,screenshot13, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 14:
+          renderer.AddTextureRect(41,screenshot14, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 15:
+          renderer.AddTextureRect(41,screenshot15, 350, 330, 650, 500,1,1,1,1);
           break;
   }
   // close

@@ -328,6 +328,11 @@ GLuint screenshot7;
 GLuint screenshot8;
 GLuint screenshot9;
 GLuint screenshot10;
+GLuint screenshot11;
+GLuint screenshot12;
+GLuint screenshot13;
+GLuint screenshot14;
+GLuint screenshot15;
 
 GLuint texturedot;
 GLuint gfxlande[80];                      // gfx lande array
@@ -11430,7 +11435,7 @@ void show_background() {
 
 int team_settings_load() {
   // load json file
-  std::string temaname=fmt::format("tema{}.json", tema);
+  std::string temaname=fmt::format("tema{}/tema{}.json",tema,tema);
   std::ifstream temasettingsfile(temaname);
   std::string temapath=fmt::format("/opt/mythtv-controller/tema{}/", tema);
   reader.parse(temasettingsfile, iRoot);
@@ -12191,6 +12196,11 @@ void loadgfx() {
     screenshot8           = loadTexture ((char *) "images/screenshot8.png");
     screenshot9           = loadTexture ((char *) "images/screenshot9.png");
     screenshot10          = loadTexture ((char *) "images/screenshot10.png");
+    screenshot11          = loadTexture ((char *) "images/screenshot11.png");
+    screenshot12          = loadTexture ((char *) "images/screenshot12.png");
+    screenshot13          = loadTexture ((char *) "images/screenshot13.png");
+    screenshot14          = loadTexture ((char *) "images/screenshot14.png");
+    screenshot15          = loadTexture ((char *) "images/screenshot15.png");
     _texturelock        	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "lock");
     setuptexture         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setup");
     texturedot            = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dot");
@@ -12351,6 +12361,11 @@ void freegfx() {
     glDeleteTextures(1, &screenshot8);
     glDeleteTextures(1, &screenshot9);
     glDeleteTextures(1, &screenshot10);
+    glDeleteTextures(1, &screenshot11);
+    glDeleteTextures(1, &screenshot12);
+    glDeleteTextures(1, &screenshot13);
+    glDeleteTextures(1, &screenshot14);
+    glDeleteTextures(1, &screenshot15);
     glDeleteTextures(1, &_texturelock);
     glDeleteTextures(1, &setuptexture);
     glDeleteTextures(1, &texturedot);
