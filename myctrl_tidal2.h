@@ -105,8 +105,7 @@ class tidal_class {
     int antal;					                       	                            // Antal songs in playlist
     int antal_search;                                 	                    // Antal songs in playlist search
     int antalplaylists_search;
-    int antalplaylists;                                                     // antal playlist in view
-    bool tidal_is_playing;                                                // do we play ?
+    int antalplaylists;                                                     // antal playlist in view    
     bool tidal_is_pause;                                                  // do we pause
 
     // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
@@ -129,6 +128,7 @@ class tidal_class {
     void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id, int stream_key_selected,Color4 color);
     void convert_m4a_to_flac(char *path,int tidalknapnr);
   public:
+    bool tidal_is_playing;                                                // do we play ?
     int tidal_icon_over=0;                      // used for mouse over
     std::string tiddl_path="";                 // ="~/.local/bin/tiddl"; path is found by function run_tidal_dl()
     int setup_select_linie=0;

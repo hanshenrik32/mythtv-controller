@@ -2846,58 +2846,68 @@ void display() {
   // ******************************************************************************************************************
   if ((visur==false) && ((do_zoom_tidal_cover) || (do_zoom_spotify_cover) || (do_zoom_music_cover) || (do_zoom_radio_cover))) {
     if (snd) {
-      // background
-      if (do_zoom_tidal_cover) {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_tidalplayer_infox, config_menu.config_tidalplayer_infoy, config_menu.config_tidalplayer_sizx, config_menu.config_tidalplayer_sizy,1,1,1,1);
-      } else if (do_zoom_spotify_cover) {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_spotifyplayer_infox, config_menu.config_spotifyplayer_infoy, config_menu.config_spotifyplayer_sizx, config_menu.config_spotifyplayer_sizy,1,1,1,1);
-      } else if (do_zoom_radio_cover) {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
-      } else if (do_zoom_music_cover) {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_musicplayer_infox, config_menu.config_musicplayer_infoy, config_menu.config_musicplayer_sizx, config_menu.config_musicplayer_sizy,1,1,1,1);
-      } else {
-        renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
+      // draw background + buttons
+      if (do_zoom_tidal_cover || do_zoom_spotify_cover || do_zoom_radio_cover || do_zoom_music_cover) {
+        if (radiooversigt.playing) {
+          // background
+          renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_radioplayer_infox, config_menu.config_radioplayer_infoy, config_menu.config_radioplayer_sizx, config_menu.config_radioplayer_sizy,1,1,1,1);
+
+          // play button + stop button
+          if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_radioplayer_play_button_posy, config_menu.config_radioplayer_play_button_sizx, config_menu.config_radioplayer_play_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(8,_texturemplay, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_radioplayer_play_button_posy, config_menu.config_radioplayer_play_button_sizx, config_menu.config_radioplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
+
+        } else if (musicoversigt.play()==true) {
+          // background
+          renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_musicplayer_infox, config_menu.config_musicplayer_infoy, config_menu.config_musicplayer_sizx, config_menu.config_musicplayer_sizy,1,1,1,1);
+
+          // play button + stop + fw + back button
+          if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_play_button_posx,config_menu.config_musicplayer_play_button_posy, config_menu.config_musicplayer_play_button_sizx, config_menu.config_musicplayer_play_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(8,_texturemplay, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_play_button_posx,config_menu.config_musicplayer_play_button_posy, config_menu.config_musicplayer_play_button_sizx, config_menu.config_musicplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_stop_button_posx,config_menu.config_musicplayer_stop_button_posy, config_menu.config_musicplayer_stop_button_sizx, config_menu.config_musicplayer_stop_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(9,_texturemstop, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_stop_button_posx,config_menu.config_musicplayer_stop_button_posy, config_menu.config_musicplayer_stop_button_sizx, config_menu.config_musicplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_ff_button_posx,config_menu.config_musicplayer_ff_button_posy, config_menu.config_musicplayer_ff_button_sizx, config_menu.config_musicplayer_ff_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(10,_texturemlast, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_ff_button_posx,config_menu.config_musicplayer_ff_button_posy, config_menu.config_musicplayer_ff_button_sizx, config_menu.config_musicplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_bw_button_posx,config_menu.config_musicplayer_bw_button_posy, config_menu.config_musicplayer_bw_button_sizx, config_menu.config_musicplayer_bw_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(11,_texturemnext, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_bw_button_posx,config_menu.config_musicplayer_bw_button_posy, config_menu.config_musicplayer_bw_button_sizx, config_menu.config_musicplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
+          // music icon
+          GLuint tmptexture=aktiv_playlist.get_textureid(1);
+          if (tmptexture) renderer.AddTextureRect(0,tmptexture,config_menu.config_musicplayer_coverx, config_menu.config_musicplayer_covery,config_menu.config_musicplayer_cover_sizx,config_menu.config_musicplayer_cover_sizy,1,1,1,1);
+
+        } else if (tidal_oversigt.tidal_is_playing) {
+          // background
+          renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_musicplayer_infox, config_menu.config_musicplayer_infoy, config_menu.config_musicplayer_sizx, config_menu.config_musicplayer_sizy,1,1,1,1);
+          
+          if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_stop_button_posx,config_menu.config_tidalplayer_stop_button_posy, config_menu.config_tidalplayer_stop_button_sizx, config_menu.config_tidalplayer_stop_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(9,_texturemstop, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_stop_button_posx,config_menu.config_tidalplayer_stop_button_posy, config_menu.config_tidalplayer_stop_button_sizx, config_menu.config_tidalplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_ff_button_posx,config_menu.config_tidalplayer_ff_button_posy, config_menu.config_tidalplayer_ff_button_sizx, config_menu.config_tidalplayer_ff_button_sizy,1,1,1,1);
+          else  renderer.AddTextureRect(10,_texturemlast, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_ff_button_posx,config_menu.config_tidalplayer_ff_button_posy, config_menu.config_tidalplayer_ff_button_sizx, config_menu.config_tidalplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_bw_button_posx,config_menu.config_tidalplayer_bw_button_posy, config_menu.config_tidalplayer_bw_button_sizx, config_menu.config_tidalplayer_bw_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(11,_texturemnext, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_bw_button_posx,config_menu.config_tidalplayer_bw_button_posy, config_menu.config_tidalplayer_bw_button_sizx, config_menu.config_tidalplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
+
+          if (tidal_oversigt.aktiv_song_tidal_icon) {
+            renderer.AddTextureRect(0,tidal_oversigt.aktiv_song_tidal_icon, config_menu.config_tidalplayer_coverx,config_menu.config_tidalplayer_covery, config_menu.config_tidalplayer_cover_sizx, config_menu.config_tidalplayer_cover_sizy,1,1,1,1);
+          } else {
+            renderer.AddTextureRect(0,normal_icon, config_menu.config_tidalplayer_coverx,config_menu.config_tidalplayer_covery, config_menu.config_tidalplayer_cover_sizx, config_menu.config_tidalplayer_cover_sizy,1,1,1,1);
+          }
+        } else if (spotify_oversigt.do_we_play()) {
+          // background
+          renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_spotifyplayer_infox, config_menu.config_spotifyplayer_infoy, config_menu.config_spotifyplayer_sizx, config_menu.config_spotifyplayer_sizy,1,1,1,1);          
+
+          if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_spotifyplayer_stop_button_posy, config_menu.config_spotifyplayer_stop_button_sizx, config_menu.config_spotifyplayer_stop_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(9,_texturemstop, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_spotifyplayer_stop_button_posy, config_menu.config_spotifyplayer_stop_button_sizx, config_menu.config_spotifyplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_ff_button_posx,config_menu.config_spotifyplayer_ff_button_posy, config_menu.config_spotifyplayer_ff_button_sizx, config_menu.config_spotifyplayer_ff_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(10,_texturemlast, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_ff_button_posx,config_menu.config_spotifyplayer_ff_button_posy, config_menu.config_spotifyplayer_ff_button_sizx, config_menu.config_spotifyplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
+          if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_bw_button_posx,config_menu.config_spotifyplayer_bw_button_posy, config_menu.config_spotifyplayer_bw_button_sizx, config_menu.config_spotifyplayer_bw_button_sizy,1,1,1,1);
+          else renderer.AddTextureRect(11,_texturemnext, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_bw_button_posx,config_menu.config_spotifyplayer_bw_button_posy, config_menu.config_spotifyplayer_bw_button_sizx, config_menu.config_spotifyplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
+        }
       }
-      // buttons
-      // play/stop and other
-      if (do_zoom_tidal_cover) {
-        if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(8,_texturemplay, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_play_button_posx,config_menu.config_tidalplayer_play_button_posy, config_menu.config_tidalplayer_play_button_sizx, config_menu.config_tidalplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_stop_button_posx,config_menu.config_tidalplayer_stop_button_posy, config_menu.config_tidalplayer_stop_button_sizx, config_menu.config_tidalplayer_stop_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(9,_texturemstop, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_stop_button_posx,config_menu.config_tidalplayer_stop_button_posy, config_menu.config_tidalplayer_stop_button_sizx, config_menu.config_tidalplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_ff_button_posx,config_menu.config_tidalplayer_ff_button_posy, config_menu.config_tidalplayer_ff_button_sizx, config_menu.config_tidalplayer_ff_button_sizy,1,1,1,1);
-        else  renderer.AddTextureRect(10,_texturemlast, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_ff_button_posx,config_menu.config_tidalplayer_ff_button_posy, config_menu.config_tidalplayer_ff_button_sizx, config_menu.config_tidalplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_bw_button_posx,config_menu.config_tidalplayer_bw_button_posy, config_menu.config_tidalplayer_bw_button_sizx, config_menu.config_tidalplayer_bw_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(11,_texturemnext, config_menu.config_tidalplayer_infox+config_menu.config_tidalplayer_bw_button_posx,config_menu.config_tidalplayer_bw_button_posy, config_menu.config_tidalplayer_bw_button_sizx, config_menu.config_tidalplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
-      } else if (do_zoom_radio_cover) {
-        // play button + stop button
-        if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_radioplayer_play_button_posy, config_menu.config_radioplayer_play_button_sizx, config_menu.config_radioplayer_play_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(8,_texturemplay, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_radioplayer_play_button_posy, config_menu.config_radioplayer_play_button_sizx, config_menu.config_radioplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
-      } else if (do_zoom_music_cover) {
-        // play button + stop + fw + back button
-        if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_play_button_posx,config_menu.config_musicplayer_play_button_posy, config_menu.config_musicplayer_play_button_sizx, config_menu.config_musicplayer_play_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(8,_texturemplay, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_play_button_posx,config_menu.config_musicplayer_play_button_posy, config_menu.config_musicplayer_play_button_sizx, config_menu.config_musicplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_stop_button_posx,config_menu.config_musicplayer_stop_button_posy, config_menu.config_musicplayer_stop_button_sizx, config_menu.config_musicplayer_stop_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(9,_texturemstop, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_stop_button_posx,config_menu.config_musicplayer_stop_button_posy, config_menu.config_musicplayer_stop_button_sizx, config_menu.config_musicplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_ff_button_posx,config_menu.config_musicplayer_ff_button_posy, config_menu.config_musicplayer_ff_button_sizx, config_menu.config_musicplayer_ff_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(10,_texturemlast, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_ff_button_posx,config_menu.config_musicplayer_ff_button_posy, config_menu.config_musicplayer_ff_button_sizx, config_menu.config_musicplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_bw_button_posx,config_menu.config_musicplayer_bw_button_posy, config_menu.config_musicplayer_bw_button_sizx, config_menu.config_musicplayer_bw_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(11,_texturemnext, config_menu.config_musicplayer_infox+config_menu.config_musicplayer_bw_button_posx,config_menu.config_musicplayer_bw_button_posy, config_menu.config_musicplayer_bw_button_sizx, config_menu.config_musicplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
-        // music icon
-        GLuint tmptexture=aktiv_playlist.get_textureid(1);
-        if (tmptexture) renderer.AddTextureRect(0,tmptexture,config_menu.config_musicplayer_coverx, config_menu.config_musicplayer_covery,config_menu.config_musicplayer_cover_sizx,config_menu.config_musicplayer_cover_sizy,1,1,1,1);
-      } else if (do_zoom_spotify_cover) {
-        if (menu_icon_over==8) renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(8,_texturemplay, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_play_button_posx,config_menu.config_spotifyplayer_play_button_posy, config_menu.config_spotifyplayer_play_button_sizx, config_menu.config_spotifyplayer_play_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_spotifyplayer_stop_button_posy, config_menu.config_spotifyplayer_stop_button_sizx, config_menu.config_spotifyplayer_stop_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(9,_texturemstop, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_spotifyplayer_stop_button_posy, config_menu.config_spotifyplayer_stop_button_sizx, config_menu.config_spotifyplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==10) renderer.AddTextureRect(10,_texturemlast, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_ff_button_posx,config_menu.config_spotifyplayer_ff_button_posy, config_menu.config_spotifyplayer_ff_button_sizx, config_menu.config_spotifyplayer_ff_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(10,_texturemlast, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_ff_button_posx,config_menu.config_spotifyplayer_ff_button_posy, config_menu.config_spotifyplayer_ff_button_sizx, config_menu.config_spotifyplayer_ff_button_sizy,0.85f,0.85f,0.85f,1);
-        if (menu_icon_over==11) renderer.AddTextureRect(11,_texturemnext, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_bw_button_posx,config_menu.config_spotifyplayer_bw_button_posy, config_menu.config_spotifyplayer_bw_button_sizx, config_menu.config_spotifyplayer_bw_button_sizy,1,1,1,1);
-        else renderer.AddTextureRect(11,_texturemnext, config_menu.config_spotifyplayer_infox+config_menu.config_radioplayer_bw_button_posx,config_menu.config_spotifyplayer_bw_button_posy, config_menu.config_spotifyplayer_bw_button_sizx, config_menu.config_spotifyplayer_bw_button_sizy,0.85f,0.85f,0.85f,1);
-      }
+
     }
     // show radio info
     if (radiooversigt.playing) {
@@ -2995,12 +3005,14 @@ void display() {
         // renderer.AddText(&myfont,config_menu.config_tidalplayer_infox+20, config_menu.config_tidalplayer_infoy+(6*18) ,"song ",1,1,1,1);
         renderer.AddText(&myfont,config_menu.config_tidalplayer_songs_antal_text_x, config_menu.config_tidalplayer_songs_antal_text_y ,"song ",1,1,1,1);
         renderer.AddText(&myfont,config_menu.config_tidalplayer_songs_antal_text_x+100, config_menu.config_tidalplayer_songs_antal_text_y ,temptxt,1,1,1,1);
+        /*
         // icon
         if (tidal_oversigt.aktiv_song_tidal_icon) {
           renderer.AddTextureRect(0,tidal_oversigt.aktiv_song_tidal_icon, config_menu.config_tidalplayer_infox+346,config_menu.config_tidalplayer_play_button_posy-124, 168, 120,1,1,1,1);
         } else {
           renderer.AddTextureRect(0,normal_icon, config_menu.config_tidalplayer_infox+346,config_menu.config_tidalplayer_play_button_posy-124, 168, 120,1,1,1,1);
         }
+        */
         result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
         if ((result == FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
           result=sound->getLength(&playtime_songlength,FMOD_TIMEUNIT_MS);
@@ -3349,6 +3361,7 @@ void display() {
               musicoversigt.set_music_is_playing(false);
               antal_i_tidal_playlist = tidal_oversigt.tidal_play_now_album((char *) tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
               tidal_oversigt.set_tidal_playing_flag(true);                          // set playing flag
+              tidal_oversigt.tidal_is_playing=true;
               snd = 1;                                // set play new flag
               if (antal_i_tidal_playlist) {
                 tidal_oversigt.tidal_set_aktiv_song(0);
@@ -4096,7 +4109,7 @@ void display() {
   }
 
   
-  if ((visur==false) && (((vis_radio_oversigt) && (do_zoom_radio_cover)) ||  ((vis_music_oversigt) && (do_zoom_music_cover))) && (tema==4)) {
+  if ((visur==false) && ((do_zoom_radio_cover) || (do_zoom_music_cover) || (do_zoom_tidal_cover)) && (tema==4)) {
     // vis uv in corner
     int high;
     int uvxpos=1300;
