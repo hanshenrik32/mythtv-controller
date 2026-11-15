@@ -67,6 +67,8 @@ recorded_oversigt_type::recorded_oversigt_type() {
   start_prg_image="";
 }
 
+
+
 // ****************************************************************************************
 //
 // ****************************************************************************************
@@ -143,6 +145,28 @@ void recorded_overigt_class::get_recorded_filepath(char *filepath,int valgtnr,in
   strcpy(filepath,temptxt);
 }
 
+// ****************************************************************************************
+//
+// Constructor
+//
+// ****************************************************************************************
+
+recorded_overigt_class::recorded_overigt_class() {
+  title_antal=0;  
+}
+
+// ****************************************************************************************
+//
+// Destructor
+//
+// ****************************************************************************************
+
+
+recorded_overigt_class::~recorded_overigt_class() {
+  if (_textureId22) glDeleteTextures(1, &_textureId22);
+  if (_textureId23) glDeleteTextures(1, &_textureId23);
+  if (_textureId24) glDeleteTextures(1, &_textureId24);
+}
 
 // ****************************************************************************************
 //
@@ -299,6 +323,35 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
 //
 // ****************************************************************************************
 
+
+// ****************************************************************************************
+//
+// load img file
+//
+// ****************************************************************************************
+
+GLuint loadgfxfile_rec(char *temapath,char *dir,char *file) {
+    GLuint gl_img=0;
+    std::string fileload="";
+    fileload=fileload + temapath;
+    fileload=fileload + dir;
+    fileload=fileload + file;              // filename - type
+    fileload=fileload + ".png";            // add png
+    if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+    else {
+      // check if file exist af .jpg file      
+      fileload=fileload + temapath;
+      fileload=fileload + dir;
+      fileload=fileload + file;              // filename - type
+      fileload=fileload + ".jpg";            // add jpg
+      if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+      else gl_img = 0;
+    }
+    if (gl_img == 0) fprintf(stderr,"GFXFILE %s in dir %s NOT FOUND \n",fileload.c_str(),dir);
+    return(gl_img);
+}
+
+
 void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   static GLuint texture=0;
   unsigned int i=0;
@@ -325,6 +378,12 @@ void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) 
     valgtnr=10;
   } else startofset=0;
   // boxes
+  std::string temapath=config_menu.config_tema_path;
+  if (!(_textureId22)) {
+    _textureId22	= loadgfxfile_rec((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox1");
+    _textureId23	= loadgfxfile_rec((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox2");
+    _textureId24	= loadgfxfile_rec((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox3");
+  }
   renderer.AddTextureRect(0,_textureId23, config_menu.recordedview_recordings_overview_x, config_menu.recordedview_recordings_overview_y, config_menu.recordedview_recordings_overview_sizx, config_menu.recordedview_recordings_overview_sizy,1,1,1,1);
   renderer.AddTextureRect(0,_textureId24, config_menu.recordedview_recordings_episodeview_x, config_menu.recordedview_recordings_episodeview_y, config_menu.recordedview_recordings_episodeview_sizx, config_menu.recordedview_recordings_episodeview_sizy,1,1,1,1);
   renderer.AddTextureRect(0,_textureId22, config_menu.recordedview_recordings_infoview_x, config_menu.recordedview_recordings_infoview_y, config_menu.recordedview_recordings_infoview_sizx, config_menu.recordedview_recordings_infoview_sizy,1,1,1,1);

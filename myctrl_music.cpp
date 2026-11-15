@@ -98,7 +98,7 @@ extern unsigned int musicoversigt_antal;
 extern int music_select_iconnr;
 extern int do_music_icon_anim_icon_ofset;
 extern GLuint _textureIdback1;
-extern GLuint _textureId28;
+// extern GLuint _textureId28;
 extern GLuint _textureId28_1;
 extern GLuint _textureId29_1;
 extern GLuint _textureIdloading;
@@ -421,6 +421,11 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
 }
 
 
+
+musicoversigt_class::~musicoversigt_class() {
+  if (_textureId28) glDeleteTextures(1, &_textureId28);
+  if (_textureId_dir) glDeleteTextures(1, &_textureId_dir);
+}
 
 // ****************************************************************************************
 //
@@ -1995,7 +2000,7 @@ int musicoversigt_class::opdatere_music_oversigt_playlists() {
 //
 // ****************************************************************************************
 
-
+/*
 void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
   int buttonsize=180;
   int buttonsizey=180;
@@ -2122,8 +2127,7 @@ void musicoversigt_class::show_search_music_oversigt(GLuint normal_icon,GLuint b
     // drawText(font12, temptxt, (orgwinsizex/3)+30, 275.0f, 0.4f,1);
   }
 }
-
-
+*/
 
 // ****************************************************************************************
 //
@@ -2434,13 +2438,46 @@ void musicoversigt_class::draw_music_search_item(int x, int y,int ii,GLuint norm
 }
 
 
+
+// ****************************************************************************************
+//
+// load img file
+//
+// ****************************************************************************************
+
+GLuint loadgfxfile_music(char *temapath,char *dir,char *file) {
+    GLuint gl_img=0;
+    std::string fileload="";
+    fileload=fileload + temapath;
+    fileload=fileload + dir;
+    fileload=fileload + file;              // filename - type
+    fileload=fileload + ".png";            // add png
+    if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+    else {
+      // check if file exist af .jpg file      
+      fileload=fileload + temapath;
+      fileload=fileload + dir;
+      fileload=fileload + file;              // filename - type
+      fileload=fileload + ".jpg";            // add jpg
+      if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+      else gl_img = 0;
+    }
+    if (gl_img == 0) fprintf(stderr,"GFXFILE %s in dir %s NOT FOUND \n",fileload.c_str(),dir);
+    return(gl_img);
+}
+
+
 // ****************************************************************************************
 //
 // Show music overview new version 3
 //
 // ****************************************************************************************
 
-void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
+void musicoversigt_class::show_music_oversigt(int music_key_selected) {
+  GLuint dirplaylist_icon =_textureId28;
+  if (_textureId_dir==0) _textureId_dir=loadTexture((char *) "gfx/dirplaylist.png");
+  if (normal_icon==0) normal_icon = loadgfxfile_music((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) "dir1");
+  if (back_icon==0) back_icon = loadgfxfile_music((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) "back-icon");
   if (itemsPerRow <= 0 || rowHeight <= 0 || viewHeight <= 0)
     return;
   // ---- KINETIC SCROLL ---------------------------------------
@@ -2517,14 +2554,6 @@ void musicoversigt_class::show_music_oversigt1(GLuint normal_icon,GLuint back_ic
   }
 }
 
-
-// ****************************************************************************************
-//
-// Show music overview new version 2
-//
-// ****************************************************************************************
-
-
 auto toLower = [](std::string text) {
   std::transform(text.begin(), text.end(), text.begin(),[](unsigned char c) {
     return static_cast<char>(std::tolower(c));
@@ -2548,13 +2577,24 @@ bool matchesSearch(const std::string& text, const std::string& searchText) {
 }
 
 
+// ****************************************************************************************
+//
+// Show search music overview
+//
+// ****************************************************************************************
 
-void musicoversigt_class::show_search_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected) {
+void musicoversigt_class::show_search_music_oversigt(int music_key_selected) {
   char searchstring[200];
   bool cursor=true;
   int buttonsize=180;
   float yof_top=orgwinsizey-(rowHeight*1)+20;                               // start ypos
   float xof_top=((orgwinsizex-itemWidth)/2)-(1200/2);
+  GLuint dirplaylist_icon=_textureId28;
+
+
+  if (normal_icon==0) normal_icon = loadgfxfile_music((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) "dir1");
+  if (back_icon==0) back_icon = loadgfxfile_music((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) "back-icon");
+
   // Find alle albums, som matcher søgningen.
   std::vector<int> foundIndices;
   foundIndices.reserve(musicoversigt.size());

@@ -24,7 +24,7 @@
 #include "utility.h"
 #include "myctrl_stream.h"
 #include "readjpg.h"
-
+#include "myth_config.h"
 
 extern MFont myfont;
 extern MFont myfont2;
@@ -41,7 +41,7 @@ extern char configmysqlhost[256];                              //
 extern char configmusicpath[256];
 extern char localuserhomedir[4096];                                    // user homedir set in main
 
-extern class config_icons config_menu; // config icons used in menu
+extern config_icons config_menu; // config icons used in menu
 
 extern MFont arial;
 
@@ -319,15 +319,15 @@ std::vector<std::string> sql_podcast_array={
 //
 // ****************************************************************************************
 void stream_class::clean_stream_oversigt() {
-    // startup_loaded=false;				// set radio station loaded in
-    for(int i=1;i<antal;i++) {
-      if (FeedCatalog[i].textureId) glDeleteTextures(1, &FeedCatalog[i].textureId);	// delete stream texture
-    }
-    FeedCatalog.clear();
-    antal=0;
-    stream_oversigt_loaded=false;			// set load icon texture again
-    stream_oversigt_loaded_nr=0;
-    stream_oversigt_nowloading=0;
+  // startup_loaded=false;				// set radio station loaded in
+  for(int i=1;i<antal;i++) {
+    if (FeedCatalog[i].textureId) glDeleteTextures(1, &FeedCatalog[i].textureId);	// delete stream texture
+  }
+  FeedCatalog.clear();
+  antal=0;
+  stream_oversigt_loaded=false;			// set load icon texture again
+  stream_oversigt_loaded_nr=0;
+  stream_oversigt_nowloading=0;
 }
 
 
@@ -339,16 +339,16 @@ void stream_class::clean_stream_oversigt() {
 // ****************************************************************************************
 
 stream_class::stream_class() : antal(0) {
-    int i;
-    stream_optionselect=0;							// selected line in stream options
-    stream_oversigt_loaded=false;
-    stream_oversigt_loaded_nr=0;
-    antal=0;
-    stream_is_playing=false;    // is we playing any media
-    stream_is_pause=false;      // is player on pause
-    rss_search_podcast_string="";
-    FeedCatalog_search_view.clear();
-    toplevel=true;
+  int i;
+  stream_optionselect=0;							// selected line in stream options
+  stream_oversigt_loaded=false;
+  stream_oversigt_loaded_nr=0;
+  antal=0;
+  stream_is_playing=false;    // is we playing any media
+  stream_is_pause=false;      // is player on pause
+  rss_search_podcast_string="";
+  FeedCatalog_search_view.clear();
+  toplevel=true;
 }
 
 
@@ -361,7 +361,8 @@ stream_class::stream_class() : antal(0) {
 // ****************************************************************************************
 
 stream_class::~stream_class() {
-    clean_stream_oversigt();
+  if (normal_icon) glDeleteTextures(1, &normal_icon);
+  clean_stream_oversigt();
 }
 
 
@@ -1724,6 +1725,36 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
 }
 
 
+
+
+// ****************************************************************************************
+//
+// load img file
+//
+// ****************************************************************************************
+
+GLuint loadgfxfile_stream(char *temapath,char *dir,char *file) {
+    GLuint gl_img=0;
+    std::string fileload="";
+    fileload=fileload + temapath;
+    fileload=fileload + dir;
+    fileload=fileload + file;              // filename - type
+    fileload=fileload + ".png";            // add png
+    if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+    else {
+      // check if file exist af .jpg file      
+      fileload=fileload + temapath;
+      fileload=fileload + dir;
+      fileload=fileload + file;              // filename - type
+      fileload=fileload + ".jpg";            // add jpg
+      if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+      else gl_img = 0;
+    }
+    if (gl_img == 0) fprintf(stderr,"GFXFILE %s in dir %s NOT FOUND \n",fileload.c_str(),dir);
+    return(gl_img);
+}
+
+
 // ****************************************************************************************
 //
 // Funktion to draw stream overview in screen.
@@ -1731,7 +1762,11 @@ void stream_class::draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuin
 // ****************************************************************************************
 
 
-void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int stream_key_selected) {
+void stream_class::show_stream_oversigt1(int stream_key_selected) {
+  if (normal_icon==0) normal_icon = loadgfxfile_stream((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) "dvdcover");
+  
+  empty_icon = normal_icon;
+
   // ---- TOM OVERSIGT ----------------------------------------
   if (FeedCatalog.empty()) {
     // Næste indhold får en ny intro.

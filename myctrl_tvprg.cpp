@@ -874,6 +874,7 @@ int tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysq
   tv_oversigt_pr_kanal ny_kanal;
   DRProgram nyt_program;
   // Connect to database
+  int omgang=0;
   mconn=mysql_init(NULL);
   if (mconn) {
     mysql_real_connect(mconn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
@@ -897,7 +898,7 @@ int tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysq
     mysql_query(mconn,sql.c_str());
     res = mysql_store_result(mconn);
     if (res) {
-      int omgang=0;
+      omgang=0;
       while ((row = mysql_fetch_row(res)) != NULL) {
         nyt_program.broadcastChannel=row[0];
         nyt_program.title=row[1];
@@ -924,15 +925,13 @@ int tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysq
         }
         ny_kanal.programs.push_back(nyt_program);
         omgang++;
-
-        printf("Total programe antal = %d\n",omgang);
-
       }
       if (omgang>0) {
         tvkanaler.push_back(ny_kanal);
         kanal_antal++;
       }
     }
+    printf("Total programe antal = %d\n",omgang);
     mysql_close(mconn);
   }
   return(1);
@@ -989,7 +988,6 @@ void tv_oversigt::cleartvguide() {
 tv_oversigt_pr_kanal::tv_oversigt_pr_kanal() {
     programantal=0;
     chanid=0;
-    // strcpy(chanel_name,"");
 }
 
 
@@ -1015,23 +1013,23 @@ tv_oversigt_pr_kanal::~tv_oversigt_pr_kanal() {
 // ****************************************************************************************
 
 tv_oversigt::tv_oversigt() {
-    time_t rawtime;
-    struct tm *timelist;
-    kanal_antal=0;
-    strcpy(mysqllhost,"");
-    strcpy(mysqlluser,"");
-    strcpy(mysqllpass,"");
-    strcpy(loadinginfotxt,"");
-    lastupdated=0;
-    vistvguidecolors=true;
-    vis_kanal_antal=8;                                                        // default nr of channels to display (will change if no room to show all the channels)
-    // get time now
-    time(&rawtime);
-    // convert clovk to localtime
-    timelist=localtime(&rawtime);
-    vistvguidekl=timelist->tm_hour;
-    if (vistvguidekl>24) vistvguidekl=0;
-    visdato_unixtime=time(nullptr);                           // setr now time
+  time_t rawtime;
+  struct tm *timelist;
+  kanal_antal=0;
+  strcpy(mysqllhost,"");
+  strcpy(mysqlluser,"");
+  strcpy(mysqllpass,"");
+  strcpy(loadinginfotxt,"");
+  lastupdated=0;
+  vistvguidecolors=true;
+  vis_kanal_antal=8;                                                        // default nr of channels to display (will change if no room to show all the channels)
+  // get time now
+  time(&rawtime);
+  // convert clovk to localtime
+  timelist=localtime(&rawtime);
+  vistvguidekl=timelist->tm_hour;
+  if (vistvguidekl>24) vistvguidekl=0;
+  visdato_unixtime=time(nullptr);                           // setr now time
 }
 
 
@@ -1083,31 +1081,31 @@ int tv_oversigt::cleanchannels() {
 // ****************************************************************************************
 
 int tv_oversigt::tvprgrecordedbefore(char *ftitle,unsigned int fchannelid) {
-    // mysql vars
-    MYSQL *conn;
-    MYSQL_RES *res;
-    MYSQL_ROW row;
-    // mysql stuf
-    static int recantal=0;
-    char *database = (char *) "mythtvcontroller";
-    bool fundet=false;
-    char sqlselect[200];
-    sprintf(sqlselect,"SELECT count(title) FROM recorded where chanid=%d and title=\"%s\"",fchannelid,ftitle);
-    conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
-        fundet=true;
-        recantal=atoi(row[0]);
-      }
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  // mysql stuf
+  static int recantal=0;
+  char *database = (char *) "mythtvcontroller";
+  bool fundet=false;
+  char sqlselect[200];
+  sprintf(sqlselect,"SELECT count(title) FROM recorded where chanid=%d and title=\"%s\"",fchannelid,ftitle);
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
+  mysql_query(conn,"set NAMES 'utf8'");
+  res = mysql_store_result(conn);
+  mysql_query(conn,sqlselect);
+  res = mysql_store_result(conn);
+  if (res) {
+    while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
+      fundet=true;
+      recantal=atoi(row[0]);
     }
-    mysql_close(conn);
-    if (fundet) return(recantal); else return(0);
+  }
+  mysql_close(conn);
+  if (fundet) return(recantal); else return(0);
 }
 
 
@@ -1118,31 +1116,31 @@ int tv_oversigt::tvprgrecordedbefore(char *ftitle,unsigned int fchannelid) {
 // ****************************************************************************************
 
 int tv_oversigt::tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid) {
-    // mysql vars
-    MYSQL *conn;
-    MYSQL_RES *res;
-    MYSQL_ROW row;
-    // mysql stuf
-    static int rectype=0;
-    char *database = (char *) "mythtvcontroller";
-    bool fundet=false;
-    char sqlselect[400];
-    sprintf(sqlselect,"SELECT type FROM record where (chanid=%s and title=\"%s\" and starttime='%s') or (chanid=%s and title=\"%s\" and type=10)",fchannelid,ftitle,fstarttime,fchannelid,ftitle);
-    conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
-            fundet=true;
-            rectype=atoi(row[0]);
-        }
-    }
-    mysql_close(conn);
-    if (fundet) return(rectype); else return(0);
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  // mysql stuf
+  static int rectype=0;
+  char *database = (char *) "mythtvcontroller";
+  bool fundet=false;
+  char sqlselect[400];
+  sprintf(sqlselect,"SELECT type FROM record where (chanid=%s and title=\"%s\" and starttime='%s') or (chanid=%s and title=\"%s\" and type=10)",fchannelid,ftitle,fstarttime,fchannelid,ftitle);
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
+  mysql_query(conn,"set NAMES 'utf8'");
+  res = mysql_store_result(conn);
+  mysql_query(conn,sqlselect);
+  res = mysql_store_result(conn);
+  if (res) {
+      while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
+          fundet=true;
+          rectype=atoi(row[0]);
+      }
+  }
+  mysql_close(conn);
+  if (fundet) return(rectype); else return(0);
 }
 
 // ****************************************************************************************
@@ -1152,30 +1150,30 @@ int tv_oversigt::tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid) {
 // ****************************************************************************************
 
 int tv_oversigt::removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid) {
-    // mysql vars
-    MYSQL *conn;
-    MYSQL_RES *res;
-    MYSQL_ROW row;
-    // mysql stuf
-    static int rectype=0;
-    char *database = (char *) "mythtvcontroller";
-    bool fundet=false;
-    char sqlselect[200];
-    sprintf(sqlselect,"DELETE FROM record where chanid=%s and title=\"%s\" and starttime='%s'",fchannelid,ftitle,fstarttime);
-    conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
-        fundet=true;
-      }
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  // mysql stuf
+  static int rectype=0;
+  char *database = (char *) "mythtvcontroller";
+  bool fundet=false;
+  char sqlselect[200];
+  sprintf(sqlselect,"DELETE FROM record where chanid=%s and title=\"%s\" and starttime='%s'",fchannelid,ftitle,fstarttime);
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
+  mysql_query(conn,"set NAMES 'utf8'");
+  res = mysql_store_result(conn);
+  mysql_query(conn,sqlselect);
+  res = mysql_store_result(conn);
+  if (res) {
+    while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
+      fundet=true;
     }
-    mysql_close(conn);
-    if (fundet) return(rectype); else return(0);
+  }
+  mysql_close(conn);
+  if (fundet) return(rectype); else return(0);
 }
 
 // ****************************************************************************************
@@ -1185,58 +1183,58 @@ int tv_oversigt::removetvprgrecorded(char *fstarttime,char *ftitle,char *fchanne
 // ****************************************************************************************
 
 int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) {
-    // mysql vars
-    MYSQL *conn;
-    MYSQL *conn1;
-    MYSQL_RES *res;
-    MYSQL_RES *res1;
-    MYSQL_ROW row;
-    char *sqlselect;
-    sqlselect=new char[40000];
-    // mysql stuf
-//    static int rectype=0;
-    char *database = (char *) "mythtvcontroller";
-    bool doneok=false;
-    time_t aktueltid;
-    time_t prgtid;
-    time(&aktueltid);					// hent hvad klokken er
-    struct tm *timeinfo;
-    struct tm prgtidinfo;
-    timeinfo=localtime(&aktueltid);				// convert to localtime
-    if (strptime(tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].start.c_str(),"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
-      printf("DO INSERT RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
-    }
-    // lav tv proram starttid om til time_t format
-    prgtid=mktime(&prgtidinfo);
-    if ((difftime(aktueltid,prgtid)<=0) && (sqlselect)) {
-      sprintf(sqlselect,"SELECT channel.name as channelname, TIME(starttime) as starttime,DATE(starttime) as startdate,TIME(endtime) as endtime,DATE(endtime) as enddate,NOW() as datenu, program.chanid, program.category from program left join channel on program.chanid=channel.chanid where program.title='%s' and program.starttime='%s' and program.endtime='%s'",tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].title.c_str(),tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].start.c_str(),tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].end.c_str());
-      conn=mysql_init(NULL);
-      conn1=mysql_init(NULL);
-      // Connect to databases
-      mysql_real_connect(conn, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
-      mysql_real_connect(conn1, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-      mysql_query(conn1,"set NAMES 'utf8'");
-      res1 = mysql_store_result(conn1);
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (doneok==false)) {
-          //tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn
-          // sprintf(sqlselect,"INSERT INTO record values (0,1,%s,'12:00:00','2018-01-02','12:00:00','2018-01-02',\"%s\",\"%s\",\"%s\",11,12,\"%s\",'pro',15,16,17,18,19,20,'Default',22,23,'station','serid','prgid','intref',28,29,30,31,32,33,34,35,36,'12:00:12',38,39,40,41,'playgroup',43,'2017-01-02 12:00:00','2017-01-02 12:00:00','2017-01-02 12:00:00','storegrp',48,49)",row[6],tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description,row[8]);
-          sprintf(sqlselect,"INSERT INTO record values (0,1,%s,'12:00:00','2018-01-02','12:00:00','2018-01-02',\"%s\",\"%s\",\"%s\",11,12,\"%s\",'pro',15,16,17,18,19,20,'Default',22,23,'station','serid','prgid','intref',28,29,30,31,32,33,34,35,36,'12:00:12',38,39,40,41,'playgroup',43,'2017-01-02 12:00:00','2017-01-02 12:00:00','2017-01-02 12:00:00','storegrp',48,49)",row[6],tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].title.c_str(), tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].title.c_str(),tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].description.c_str(),row[8]);
-          if (debugmode & 256) printf("sql record is %s\n",sqlselect);
-          mysql_query(conn1,sqlselect);
-          res1 = mysql_store_result(conn1);
-          doneok=true;
-        }
+  // mysql vars
+  MYSQL *conn;
+  MYSQL *conn1;
+  MYSQL_RES *res;
+  MYSQL_RES *res1;
+  MYSQL_ROW row;
+  char *sqlselect;
+  sqlselect=new char[40000];
+  // mysql stuf
+  // static int rectype=0;
+  char *database = (char *) "mythtvcontroller";
+  bool doneok=false;
+  time_t aktueltid;
+  time_t prgtid;
+  time(&aktueltid);					// hent hvad klokken er
+  struct tm *timeinfo;
+  struct tm prgtidinfo;
+  timeinfo=localtime(&aktueltid);				// convert to localtime
+  if (strptime(tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].start.c_str(),"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
+    printf("DO INSERT RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
+  }
+  // lav tv proram starttid om til time_t format
+  prgtid=mktime(&prgtidinfo);
+  if ((difftime(aktueltid,prgtid)<=0) && (sqlselect)) {
+    sprintf(sqlselect,"SELECT channel.name as channelname, TIME(starttime) as starttime,DATE(starttime) as startdate,TIME(endtime) as endtime,DATE(endtime) as enddate,NOW() as datenu, program.chanid, program.category from program left join channel on program.chanid=channel.chanid where program.title='%s' and program.starttime='%s' and program.endtime='%s'",tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].title.c_str(),tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].start.c_str(),tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].end.c_str());
+    conn=mysql_init(NULL);
+    conn1=mysql_init(NULL);
+    // Connect to databases
+    mysql_real_connect(conn, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
+    mysql_real_connect(conn1, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    mysql_query(conn1,"set NAMES 'utf8'");
+    res1 = mysql_store_result(conn1);
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    if (res) {
+      while (((row = mysql_fetch_row(res)) != NULL) && (doneok==false)) {
+        //tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn
+        // sprintf(sqlselect,"INSERT INTO record values (0,1,%s,'12:00:00','2018-01-02','12:00:00','2018-01-02',\"%s\",\"%s\",\"%s\",11,12,\"%s\",'pro',15,16,17,18,19,20,'Default',22,23,'station','serid','prgid','intref',28,29,30,31,32,33,34,35,36,'12:00:12',38,39,40,41,'playgroup',43,'2017-01-02 12:00:00','2017-01-02 12:00:00','2017-01-02 12:00:00','storegrp',48,49)",row[6],tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description,row[8]);
+        sprintf(sqlselect,"INSERT INTO record values (0,1,%s,'12:00:00','2018-01-02','12:00:00','2018-01-02',\"%s\",\"%s\",\"%s\",11,12,\"%s\",'pro',15,16,17,18,19,20,'Default',22,23,'station','serid','prgid','intref',28,29,30,31,32,33,34,35,36,'12:00:12',38,39,40,41,'playgroup',43,'2017-01-02 12:00:00','2017-01-02 12:00:00','2017-01-02 12:00:00','storegrp',48,49)",row[6],tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].title.c_str(), tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].title.c_str(),tvkanaler[tvvalgtrecordnr].programs[tvsubvalgtrecordnr].description.c_str(),row[8]);
+        if (debugmode & 256) printf("sql record is %s\n",sqlselect);
+        mysql_query(conn1,sqlselect);
+        res1 = mysql_store_result(conn1);
+        doneok=true;
       }
-      mysql_close(conn);
-      mysql_close(conn1);
-      delete sqlselect;
     }
-    return(doneok);
+    mysql_close(conn);
+    mysql_close(conn1);
+    delete sqlselect;
+  }
+  return(doneok);
 }
 
 
@@ -1248,7 +1246,7 @@ int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
 // ****************************************************************************************
 
 time_t tv_oversigt::hentprgstartklint(int kanalnr,int prgnr) {
-    if ((kanalnr>=0) && (kanalnr<kanal_antal)) return(tvkanaler[kanalnr].programs[prgnr].starttime_unix); else return(0);
+  if ((kanalnr>=0) && (kanalnr<kanal_antal)) return(tvkanaler[kanalnr].programs[prgnr].starttime_unix); else return(0);
 }
 
 

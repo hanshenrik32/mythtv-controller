@@ -74,6 +74,7 @@ extern MFont myfont;
 extern MFont myfont2;
 
 extern char avalible_device[10][256];			                    // sound system devises list
+extern int setup_icon_over;
 
 // controll rss
 //
@@ -924,7 +925,11 @@ void show_setup_tema() {
           break;
   }
   // close
-  renderer.AddTextureRect(42,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  if (setup_icon_over==42) {
+    renderer.AddTextureRect(42,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(42,_textureclose, 600, 840, 188, 81,1,1,1,0.8f);
+  }
 }
 
 
@@ -944,7 +949,12 @@ void show_setup_font(int aktiv) {
   if (aktiv>18) startofset=(aktiv-18);
   renderer.AddTextureRect(0,setupfontback, 300, 300, 800, 650,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,1);  
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,0.8f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,1);
   renderer.AddTextureRect(41,_textureselect, 500, 800, 188, 81,1,1,1,1);
   visantal=aktivfont.mastercount;
   if (visantal>20) visantal=20;
@@ -1097,7 +1107,12 @@ void show_setup_network() {
   // background
   renderer.AddTextureRect(0,setupnetworkback, 300, 300, 800, 650,1,1,1,1);
   // close button
-  renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,0.8f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
 
   renderer.AddText(&myfont,340, 500,"Hostname",1,1,1,1);
   renderer.AddText(&myfont,340+120, 500,confighostname,1,1,1,1);
@@ -1391,7 +1406,12 @@ bool SetOutputDevice(FMOD::System* system, int deviceId) {
 void show_setup_sound() {
    renderer.AddTextureRect(0,setupsoundback, 400, 300, 800, 500,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,0.8f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
   renderer.AddText(&myfont,500,400+(0*18),"Output device",1,1,1,1);
   renderer.AddText(&myfont,650,400+(0*18),configmythsoundsystem,1,1,1,1);
   if (do_show_setup_select_linie==0) {
@@ -1427,7 +1447,12 @@ void show_setup_sql() {
   // background
   renderer.AddTextureRect(0,setupsqlback, 400, 300, 800, 500,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,0.8f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,1);
   if (strcmp(configbackend,"mythtv")==0) {
     if (configmythtvver==1264) mythver=0.24f;
     if (configmythtvver) {
@@ -1604,7 +1629,12 @@ void show_setup_keys() {
   SampleFont.Load("/usr/share/fonts/truetype/ubuntu/UbuntuMono[wght].ttf",18);
   renderer.AddTextureRect(0,setupkeysback, 400, 300, 800, 630,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.8f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
   renderer.AddText(&myfont,520, 450,"Command to execute.                                                   ScrNr",1,1,1,1);
   for(int i=0;i<12;i++) {
     tmptxt=fmt::format("{:>7}  - {:<70} ",fkeysname[i], configkeyslayout[i].cmdname);
@@ -1734,7 +1764,12 @@ void show_setup_rss(unsigned int startofset) {
   float r_color,g_color,b_color;
   renderer.AddTextureRect(0,setuprssback, 300, 100, 1300, 850,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.8f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
   for (int n=0;n<19;n++) {
     if (n+startofset==rssstreamoversigt.setup_select_linie/2+startofset) {
       r_color=1.0;
@@ -2672,8 +2707,10 @@ void show_setup_torrent() {
   renderer.AddTextureRect(0,setuptorrent_background, 400, 300, 750, 650,1,1,1,1);
   renderer.AddText(&myfont2,650, 350 ,"Torrent settings",1,1,1,1);
   // close button
-  renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
-
+  if (setup_icon_over==40) 
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  else
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.8f);
   renderer.AddText(&myfont,450 , 400,"Trash torrent file.....................: ",1,1,1,1);
   if (torrent_downloader.automove_to_movie_path) {
     renderer.AddText(&myfont,450+230 , 400,"N ",1,1,1,1);

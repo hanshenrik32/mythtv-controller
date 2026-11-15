@@ -42,6 +42,8 @@ class stream_class : public vlc_controller {
   private:
     int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
     int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
+    GLuint normal_icon=0;
+    GLuint empty_icon=0;
   public:
     int stream_icon_over=0;                                                 // used by mouse over
     bool toplevel;
@@ -143,7 +145,7 @@ class stream_class : public vlc_controller {
     std::chrono::steady_clock::time_point streamIntroStart;
 
     void draw_stream_item1(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress = 1.0f);
-    void show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int stream_key_selected);
+    void show_stream_oversigt1(int stream_key_selected);
 
 
 };

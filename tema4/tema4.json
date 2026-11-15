@@ -259,7 +259,7 @@
                 "sizy": 100
             },
             "radioplayer_info_cover": {
-                "x": 1410,
+                "x": 1120,
                 "y": 920,
                 "sizx": 162,
                 "sizy": 126
@@ -317,7 +317,7 @@
                 "sizy": 100
             },
             "musicplayer_info_cover": {
-                "x": 1410,
+                "x": 1120,
                 "y": 920,
                 "sizx": 162,
                 "sizy": 126
@@ -404,10 +404,10 @@
                 "sizy": 100
             },
             "tidalplayer_info_cover": {
-                "x": 638,
-                "y": 410,
-                "sizx": 167,
-                "sizy": 119
+                "x": 1120,
+                "y": 920,
+                "sizx": 162,
+                "sizy": 126
             },
             "tidalplayer_stop_button": {
                 "icon_path": "mplaystop",

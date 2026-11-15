@@ -207,8 +207,6 @@ float uvcolortable2[]={0.8,0.0,0.8, \
                       0.8,0.0,0.1};
 // (top of uv)
 
-
-
 #endif
 
 

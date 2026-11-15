@@ -705,9 +705,8 @@ class config_icons {
       config_musicplayer_song_time_text_y=0;
       config_musicplayer_songs_antal_text_x=0;
       config_musicplayer_songs_antal_text_y=0;
-
-
       config_musicplayer_info_icon = "musicplayer-info";
+      
       config_spotifyplayer_infox = 480;
       config_spotifyplayer_infoy = 300;
       config_spotifyplayer_sizx = 540;
@@ -732,9 +731,8 @@ class config_icons {
       config_spotifyplayer_stop_button_posy = 300;
       config_spotifyplayer_stop_button_sizx = 100;
       config_spotifyplayer_stop_button_sizy = 100;
-
-
       config_spotifyplayer_info_icon = "musicplayer-info";
+
       config_tidalplayer_infox = 480;
       config_tidalplayer_infoy = 300;
       config_tidalplayer_sizx = 540;
@@ -759,9 +757,8 @@ class config_icons {
       config_tidalplayer_stop_button_posy = 300;
       config_tidalplayer_stop_button_sizx = 100;
       config_tidalplayer_stop_button_sizy = 100;
-
-
       config_tidalplayer_info_icon = "musicplayer-info";
+
       config_radioplayer_infox = 480;
       config_radioplayer_infoy = 320;
       config_radioplayer_sizx = 540;

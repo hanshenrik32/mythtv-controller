@@ -267,7 +267,6 @@ GLuint _textureIdplayinfo;
 GLuint _textureIdtv;
 GLuint _textureIdfilm_aktiv;
 GLuint moviebutton_2;
-GLuint streambutton_2;
 GLuint radiobutton1;
 GLuint _textureIdmusic;
 GLuint _textureIdmusic_aktiv;
@@ -293,7 +292,7 @@ GLuint _texturempause;
 GLuint _texturelock;
 GLuint setuptexture;
 
-GLuint _textureId28; 	                    // dir playlist_icon
+// GLuint _textureId28; 	                    // dir playlist_icon
 GLuint music_big_search_bar_artist;       // big search bar used by tidal search
 GLuint music_big_search_bar_track;         // big search bar used by tidal search
 GLuint music_big_search_bar_album;
@@ -349,11 +348,6 @@ GLuint _defaultdvdcover_mask;
 GLuint _textureloadfile;
 GLuint spotify_askplay;
 GLuint spotify_askopen;
-
-GLuint _textureId22;
-GLuint _textureId23;
-GLuint _textureId24;
-
 GLuint analog_clock_background;
 
 GLuint _textureId9_askbox;
@@ -2320,7 +2314,7 @@ void display() {
   if (visur==false) {
     if (vis_stream_oversigt) {
       // printf("vis_stream_oversigt\n");
-      streamoversigt.show_stream_oversigt1(normal_icon, 0, 1);
+      streamoversigt.show_stream_oversigt1(1);
     }
     if (vis_radio_oversigt) {
       radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , onlineradio320 , 0);
@@ -2336,9 +2330,9 @@ void display() {
     }
     if (vis_music_oversigt) {      
       if ((do_show_music_search_oversigt == false) && (keybuffer1.length()==0)) {
-        musicoversigt.show_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+        musicoversigt.show_music_oversigt(music_key_selected);
       } else {
-        musicoversigt.show_search_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+        musicoversigt.show_search_music_oversigt(music_key_selected);
       }
     } else if (vis_film_oversigt) {
       if (do_show_movie_search_oversigt==false) {
@@ -4045,7 +4039,7 @@ void display() {
     }
   }
 
-  if (visur==false) {
+  if ((visur==false) && (tema!=4)) {
     // vis uv in corner
     int high;
     int uvxpos=1650;
@@ -4100,7 +4094,63 @@ void display() {
       }
     }
   }
+
   
+  if ((visur==false) && (((vis_radio_oversigt) && (do_zoom_radio_cover)) ||  ((vis_music_oversigt) && (do_zoom_music_cover))) && (tema==4)) {
+    // vis uv in corner
+    int high;
+    int uvxpos=1300;
+    if (vis_uv_meter) {
+      if ((configuvmeter==1) || (configuvmeter==4)) {
+        for(int qq=0;qq<28;qq++) {
+          int yypos = 1020;
+          float decay = 0.8f;        // 0.05f
+          static float barHeights[45] = {0}; // persistent for smoothing
+          // old float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
+          // float target = log1pf(spectrum[qq] * 64.0f) * 4.0f;
+          float target = fastSpectrumTarget(spectrum[qq]);
+          if (target > barHeights[qq]) {
+            barHeights[qq] = target;
+          } else {
+            barHeights[qq] -= decay;
+            if (barHeights[qq] < 0) barHeights[qq] = 0;
+          }
+          high = barHeights[qq]/4;
+          // if (vis_tidal_oversigt) 
+          if (high>9) high=9;
+          for(int i=0;i<high;i++) {
+            renderer.AddTextureRect(0,texturedot, uvxpos, yypos, 20, 20,1,1,1,1);
+            yypos = yypos - 14;  // 16
+          }
+          uvxpos += 10;
+        }
+      }
+      if ((configuvmeter==2) || (configuvmeter==3)) {
+        for(int qq=0;qq<28;qq++) {
+          int yypos = 1020;
+          float decay = 0.8f;        // 0.05f
+          static float barHeights[45] = {0}; // persistent for smoothing
+          // old float target = sqrtf(spectrum[qq] * 8.0f) * 2.0f;
+          // slow float target = log1pf(spectrum[qq] * 64.0f) * 4.0f;
+          float target = fastSpectrumTarget(spectrum[qq]);
+          if (target > barHeights[qq]) {
+            barHeights[qq] = target;
+          } else {
+            barHeights[qq] -= decay;
+            if (barHeights[qq] < 0) barHeights[qq] = 0;
+          }
+          high = barHeights[qq]/4;
+          if (high>9) high=9;
+          for(int i=0;i<high;i++) {
+            renderer.AddTextureRect(0,texturedot, uvxpos, yypos, 20, 20,1,1,1,1);
+            yypos = yypos - 14;  // 16
+          }
+          uvxpos += 10;
+        }
+      }
+    }
+  }
+
   // reset tidal (reload playlists)
   if (tidal_oversigt.do_setup_tidal_start_entry) {
     tidal_oversigt.setup_tidal_start_entry();
@@ -8921,7 +8971,31 @@ void handlespeckeypress(int key,int x,int y) {
     // shift + insert key (to get buffer from system)
     const int modifiers = glutGetModifiers();
     if (key == GLUT_KEY_INSERT && (modifiers & GLUT_ACTIVE_SHIFT)) {
-      if (do_show_tidal_search_oversigt) {
+      if (do_show_tidal_search_oversigt || do_show_music_search_oversigt || do_show_setup_keys) {
+        printf("Shift + Insert trykket\n");
+        // gem tekst fra clipboard her.
+        keybuffer1 = getClipboardText();
+        strcpy(keybuffer,keybuffer1.c_str());
+        keybufferindex=keybuffer1.length();
+        if (keybufferindex>0) {
+          printf("buffer = %s \n",keybuffer1.c_str());
+        } else {
+          printf("buffer = "" \n");
+        }
+      }
+      if (do_show_music_search_oversigt) {
+        printf("Shift + Insert trykket\n");
+        // gem tekst fra clipboard her.
+        keybuffer1 = getClipboardText();
+        strcpy(keybuffer,keybuffer1.c_str());
+        keybufferindex=keybuffer1.length();
+        if (keybufferindex>0) {
+          printf("buffer = %s \n",keybuffer1.c_str());
+        } else {
+          printf("buffer = "" \n");
+        }
+      }
+      if (do_show_setup_torrent || do_show_setup_rss) {
         printf("Shift + Insert trykket\n");
         // gem tekst fra clipboard her.
         keybuffer1 = getClipboardText();
@@ -11198,7 +11272,7 @@ void handlefrictionGeneric(T& o) {
 void mouseMotion(int x, int y) {
   int id;
   id = renderer.HitTest(x, y);
-  // if (debugmode) printf("id = %d x=%d y=%d\n",id,x,y);
+  printf("id = %d x=%d y=%d\n",id,x,y);
   if (do_show_setup) {
     if (id==45) setup_icon_over=13;
     else if (id==39) setup_icon_over=9;   // tvguide
@@ -11435,7 +11509,7 @@ void show_background() {
 
 int team_settings_load() {
   // load json file
-  std::string temaname=fmt::format("tema{}/tema{}.json",tema,tema);
+  std::string temaname=fmt::format("/opt/mythtv-controller/tema{}/tema{}.json",tema,tema);
   std::ifstream temasettingsfile(temaname);
   std::string temapath=fmt::format("/opt/mythtv-controller/tema{}/", tema);
   reader.parse(temasettingsfile, iRoot);
@@ -11862,7 +11936,6 @@ int team_settings_load() {
     config_menu.recordedview_recordings_infoview_y=(iRoot["tema1"]["icons"]["recordedview_recordings_infoview"].get("y","0").asInt());
     config_menu.recordedview_recordings_infoview_sizx=(iRoot["tema1"]["icons"]["recordedview_recordings_infoview"].get("sizx","0").asInt());
     config_menu.recordedview_recordings_infoview_sizy=(iRoot["tema1"]["icons"]["recordedview_recordings_infoview"].get("sizy","0").asInt());
-
   } catch (const std::exception &e) {
 
     printf("Error parsing team json file.\n");
@@ -12135,7 +12208,7 @@ void loadgfx() {
     moviebutton_2           = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_media_button_icon.c_str() );
     _texturesetupmenu   	  = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_setup_icon.c_str());
     _texturesetupmenu_select= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_setup_selected_icon.c_str());
-    streambutton_2          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) "stream_button1"); // "stream_button");
+    // streambutton_2          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) "stream_button1"); // "stream_button");
     radiobutton1            = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_radio1_icon.c_str());
     _textureIdmusic         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());
     _textureIdmusic_aktiv   = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_active_icon.c_str());
@@ -12149,7 +12222,7 @@ void loadgfx() {
     playing_tidal_icon_texture = loadTexture((char *) config_playing_record_icon.c_str());
     _texturetidalplayer     = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_tidalplayer_info_icon.c_str());  //
     _textureradioplayer     = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_tidalplayer_info_icon.c_str());  //
-    _textureId28          	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dirplaylist");
+    // _textureId28          	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dirplaylist");
     big_search_bar          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "big_search_bar");
     music_big_search_bar_artist = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_artist");
     music_big_search_bar_album = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidal_big_search_bar_album");
@@ -12227,10 +12300,8 @@ void loadgfx() {
     _texturetidalloading    = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tidalplayer-loading");
     spotify_search          = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_search_icon.c_str());     // "search");
     spotify_search_back     = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_search_back_icon.c_str());     // "search_back");
-
     setupsoundback      	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setup-soundback");
     setupsqlback        	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupsqlback");
-    setuptorrent_background = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptorrent_background");
     setuptemaback       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptemaback");
     setupnetworkback    	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupnetworkback");
     setupnetworkwlanback  = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupnetworkwlanback");
@@ -12240,10 +12311,6 @@ void loadgfx() {
     setuprssback         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuprssback");
     torrent_background   	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "torrent_background");
     setuptidalback       	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptidalscreen");
-    // recorded stuf
-    _textureId22         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox1");
-    _textureId23         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox2");
-    _textureId24         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox3");
     screensaverbox        = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "3d_brix");
     // main background
     _textureIdback_main   = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "background_main");
@@ -12263,7 +12330,6 @@ void loadgfx() {
     _textureId9_askbox   	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "askbox");
     _textureIdplayicon   	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "play");
     _textureopen         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "open");
-    _textureclose        	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "close");
     _textureselect      	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "select");
     _texturetidalwait    	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "wait");
     _textureswap         	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "swap");
@@ -12301,7 +12367,7 @@ void freegfx() {
     glDeleteTextures(1, &_textureIdfilm_aktiv);
     glDeleteTextures(1, &moviebutton_2);
     glDeleteTextures(1, &_texturesetupmenu);
-    glDeleteTextures(1, &streambutton_2);
+    // glDeleteTextures(1, &streambutton_2);
     glDeleteTextures(1, &radiobutton1);
     glDeleteTextures(1, &_textureIdmusic);
     glDeleteTextures(1, &_textureIdmusic_aktiv);
@@ -12315,7 +12381,7 @@ void freegfx() {
     glDeleteTextures(1, &playing_tidal_icon_texture);
     glDeleteTextures(1, &_texturetidalplayer);
     glDeleteTextures(1, &_textureradioplayer);
-    glDeleteTextures(1, &_textureId28);
+    // glDeleteTextures(1, &_textureId28);
     glDeleteTextures(1, &music_big_search_bar_artist);       // big search bar used by tidal search
     glDeleteTextures(1, &music_big_search_bar_track);         // big search bar used by tidal search
     glDeleteTextures(1, &music_big_search_bar_album);
@@ -12406,9 +12472,6 @@ void freegfx() {
     glDeleteTextures(1, &torrent_background);
     glDeleteTextures(1, &setuptidalback);
 
-    glDeleteTextures(1, &_textureId22);
-    glDeleteTextures(1, &_textureId23);
-    glDeleteTextures(1, &_textureId24);
     glDeleteTextures(1, &screensaverbox);
     glDeleteTextures(1, &_textureIdback_main);
     // music oversigt background
