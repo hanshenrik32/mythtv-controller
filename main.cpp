@@ -2858,6 +2858,12 @@ void display() {
           if (menu_icon_over==9) renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,1,1,1,1);
           else renderer.AddTextureRect(9,_texturemstop, config_menu.config_radioplayer_infox+config_menu.config_radioplayer_stop_button_posx,config_menu.config_radioplayer_stop_button_posy, config_menu.config_radioplayer_stop_button_sizx, config_menu.config_radioplayer_stop_button_sizy,0.85f,0.85f,0.85f,1);
 
+          // Playing radio cover
+          GLuint radiotexture_2;
+          radiotexture_2=radiooversigt.get_texture(radiooversigt.playingstationnr-1);
+          if (radiotexture_2) {
+            renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_coverx,config_menu.config_radioplayer_covery,config_menu.config_radioplayer_cover_sizx, config_menu.config_radioplayer_cover_sizy, 1,1,1,1);
+          }
         } else if (musicoversigt.play()==true) {
           // background
           renderer.AddTextureRect(0,_texturetidalplayer, config_menu.config_musicplayer_infox, config_menu.config_musicplayer_infoy, config_menu.config_musicplayer_sizx, config_menu.config_musicplayer_sizy,1,1,1,1);
@@ -2963,14 +2969,6 @@ void display() {
         std::string showbb=fmt::format("{} Kps.",bbs);
         renderer.AddText(&myfont,config_menu.config_radioplayer_song_bitrate_text_x+100, config_menu.config_radioplayer_song_bitrate_text_y ,showbb,1,1,1,1);
         
-        // Radio cover
-        GLuint radiotexture_2;        
-        radiotexture_2=radiooversigt.get_texture(radiooversigt.playingstationnr-1);
-        if (radiotexture_2) {
-          renderer.AddTextureRect(0,radiotexture_2, config_menu.config_radioplayer_coverx,config_menu.config_radioplayer_covery,config_menu.config_radioplayer_cover_sizx, config_menu.config_radioplayer_cover_sizy, 1,1,1,1);
-        } else {
-          // renderer.AddTextureRect(0,normal_icon, config_menu.config_radioplayer_infox+346,config_menu.config_radioplayer_play_button_posy-114, 168, 120,1,1,1,1);
-        }
         result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
         if ((result == FMOD_OK) && (ms>0)) {
           result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
@@ -4193,10 +4191,10 @@ void display() {
       renderer.AddTextureRect(0,volume_window, xof, yof, buttonsizex, buttonsizey,1,1,1,1);
       if (configsoundvolume>0) {
         xof = (1920.0f/2.0)-(248.0f/2.0f) + 60.0f;
-        yof = 922.0f;
+        yof = 926.0f;
         buttonsizex = (configsoundvolume*168.0f);
-        buttonsizey = 14.0f;
-        renderer.AddTextureRect(0,volume_window, xof, yof, buttonsizex, buttonsizey,1,1,1,1);
+        buttonsizey = 4.0f;
+        renderer.AddTextureRect(0,0, xof, yof, buttonsizex, buttonsizey,0.8f,0.8f,0.8f,1.0f);
       }
     } else show_volume_info=false;
   }
