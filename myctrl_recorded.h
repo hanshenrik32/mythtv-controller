@@ -43,8 +43,12 @@ class recorded_overigt_class {
         recorded_top_type programs[40];
         recorded_top_type **programsp;
         unsigned int title_antal;
+        GLuint _textureId22=0;
+        GLuint _textureId23=0;
+        GLuint _textureId24=0;
     public:
-        recorded_overigt_class() { title_antal=0; }
+        recorded_overigt_class();
+        ~recorded_overigt_class();
         unsigned int programs_type_antal(int nr) { return(programs[nr].prg_antal); }
         int opdatere_recorded_oversigt();
         void show_recorded_oversigt(int valgtnr,int subvalgtnr);

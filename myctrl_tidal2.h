@@ -105,8 +105,7 @@ class tidal_class {
     int antal;					                       	                            // Antal songs in playlist
     int antal_search;                                 	                    // Antal songs in playlist search
     int antalplaylists_search;
-    int antalplaylists;                                                     // antal playlist in view
-    bool tidal_is_playing;                                                // do we play ?
+    int antalplaylists;                                                     // antal playlist in view    
     bool tidal_is_pause;                                                  // do we pause
 
     // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
@@ -127,7 +126,9 @@ class tidal_class {
     int tidal_get_artists_all_albums(char *artistid,bool force,bool create_db_records,bool search_artist_name);
     int update_song_playcount(const char *playpath);    
     void drawcover(int x, int y, int w, int h, GLuint textureId, GLuint textureId2,int id, int stream_key_selected,Color4 color);
+    void convert_m4a_to_flac(char *path,int tidalknapnr);
   public:
+    bool tidal_is_playing;                                                // do we play ?
     int tidal_icon_over=0;                      // used for mouse over
     std::string tiddl_path="";                 // ="~/.local/bin/tiddl"; path is found by function run_tidal_dl()
     int setup_select_linie=0;
@@ -340,7 +341,6 @@ class tidal_class {
     void draw_tidal_search_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
     void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,std::string searchstring);
     int update_playlist_playcount(const char *playid);
-    void convert_m4a_to_flac(char *path,int tidalknapnr);
     int antal_in_playlist() { return tidal_aktiv_song.size(); }
     int delete_stack_element(int nr);
     bool tidalIntroStarted = false;
@@ -357,3 +357,4 @@ class tidal_class {
 int tidal_sqldb_callback(void *data, int argc, char **argv, char **azColName);
 bool checkartistdbexist();
 std::string getArtistName(const std::string& json);
+void drawLinesOfTextfont(MFont *font,const std::string& text, float x, float y, float scale,int maxWidth,int maxlines,int color,bool center);

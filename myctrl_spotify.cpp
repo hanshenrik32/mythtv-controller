@@ -43,6 +43,7 @@ extern config_icons config_menu;
 extern Renderer renderer;
 extern MFont myfont;
 extern MFont myfont2;
+extern int setup_icon_over;
 
 // web port
 static const char *s_http_port = "8000";
@@ -4898,8 +4899,12 @@ void spotify_class::show_setup_spotify() {
   // background
   renderer.AddTextureRect(0,setuprssback, xpos, ypos, winsizx, winsizy,1,1,1,1);
   // close button
-  renderer.AddTextureRect(40,_textureclose, xpos+((winsizx/2)-(188/2)) , (ypos+winsizy)-100, 188, 81,1,1,1,1);
-  
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, xpos+((winsizx/2)-(188/2)) , (ypos+winsizy)-100, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, xpos+((winsizx/2)-(188/2)) , (ypos+winsizy)-100, 188, 81,1,1,1,0.5f);
+  }
+
   strcpy(spotify_device[0].name,"Unknown");
   strcpy(spotify_device[1].name,"Smartphone");
   strcpy(spotify_device[2].name,"Computer");

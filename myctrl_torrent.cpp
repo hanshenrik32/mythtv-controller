@@ -775,8 +775,6 @@ void torrent_loader::opdate_torrent() {
 // ****************************************************************************************
 
 bool torrent_loader::save_torrent_file_to_db(int nr, bool active, bool is_finished, const std::string& torrent_file_name, int size) {
-  // This function is a placeholder for saving torrent file information to a database.
-  // Implementation details would depend on the specific database and schema used.
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;

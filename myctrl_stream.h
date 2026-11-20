@@ -42,6 +42,8 @@ class stream_class : public vlc_controller {
   private:
     int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
     int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
+    GLuint normal_icon=0;
+    GLuint empty_icon=0;
   public:
     int stream_icon_over=0;                                                 // used by mouse over
     bool toplevel;
@@ -100,8 +102,6 @@ class stream_class : public vlc_controller {
     ~stream_class();
     int streamantal() { return(antal); }
     void clean_stream_oversigt();
-    void draw_stream_item(int x, int y,int ii,GLuint normal_icon,GLuint empty_icon, int stream_key_selected);
-    void show_stream_oversigt(GLuint normal_icon, GLuint empty_icon, int stream_key_selected);
     void playstream(char *url);
     int update_search_podcast_stream_view();
     void onScroll(float delta) { scrollVel += delta * accel; }
@@ -142,9 +142,10 @@ class stream_class : public vlc_controller {
 
     std::chrono::steady_clock::time_point streamIntroStart;
 
-    void draw_stream_item1(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress = 1.0f);
-    void show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int stream_key_selected);
-
-
+    void draw_stream_item(float x, float y, int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress = 1.0f);
+    void draw_stream_item_search(float x,float y,int ii,GLuint normal_icon,GLuint empty_icon,int stream_key_selected,float introProgress = 1.0f);
+    void show_stream_oversigt(int stream_key_selected);
+    void opdatere_stream_oversigt_search(std::string searchstring);
 };
+
 

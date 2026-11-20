@@ -68,12 +68,12 @@ extern GLuint _textureId28;
 extern GLuint _textureId_cursor;
 
 extern FMOD::System    *sndsystem;
-extern int setup_icon_over;
 
 extern MFont myfont;
 extern MFont myfont2;
 
 extern char avalible_device[10][256];			                    // sound system devises list
+extern int setup_icon_over;
 
 // controll rss
 //
@@ -158,7 +158,7 @@ extern GLuint _textureclose;
 extern GLuint _textureselect;
 extern GLuint _texturetvgrabersetup;                //
 extern GLuint setupupdatebutton;
-extern GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,screenshot7,screenshot8,screenshot9,screenshot10;
+extern GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,screenshot7,screenshot8,screenshot9,screenshot10,screenshot11,screenshot12,screenshot13,screenshot14,screenshot15;
 extern int do_show_setup_select_linie;
 extern int tema;
 extern int screen_size;
@@ -412,6 +412,11 @@ rss_stream_class::~rss_stream_class() {
 }
 
 
+// ***************************************************************************************
+//
+// return name
+//
+// ***************************************************************************************
 
 std::string rss_stream_class::get_stream_name_std(int nr) { 
   if ((nr>=0) && (nr < rss_source_feed_vector.size())) {
@@ -420,6 +425,11 @@ std::string rss_stream_class::get_stream_name_std(int nr) {
   return "";
 }
 
+// ***************************************************************************************
+//
+// return url
+//
+// ***************************************************************************************
 
 std::string rss_stream_class::get_stream_url_std(int nr) { 
   if ((nr>=0) && (nr < rss_source_feed_vector.size())) {
@@ -469,6 +479,7 @@ int rss_stream_class::load_rss_data() {
   } else write_logfile(logfile,(char *) "Error connect to mysql.");
   return(rss_source_feed_vector.size());
 }
+
 
 // ****************************************************************************************
 //
@@ -626,12 +637,12 @@ std::string select_system_resolution() {
   return(filename);
 }
 
-// ************************************************************************************************
-//
-//
-//
-// ************************************************************************************************
 
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
 
 std::string select_language() {
   char filenamepath[1024];
@@ -691,7 +702,6 @@ std::string select_screen_timeout() {
 //
 // ************************************************************************************************
 
-
 std::string select_screen_mode() {
   char filenamepath[1024];
   strcpy(filenamepath,"");
@@ -729,7 +739,8 @@ void show_setup_screen() {
 
   renderer.AddTextureRect(0,setupscreenback, 300, 300, 850, 500,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  else renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,0.5f);
 
   switch(screen_size) {
       case 1: sprintf(resl,"1024 x 768 (720p)  ");
@@ -802,7 +813,12 @@ void show_setup_video() {
   // background
   renderer.AddTextureRect(0,setupscreenback, 300, 300, winsizx, winsizy,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, xpos+300, ypos + 400, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, xpos+300, ypos + 400, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, xpos+300, ypos + 400, 188, 81,1,1,1,0.5f);
+  }
+
   renderer.AddText(&myfont2,xpos + 270 ,ypos + 50 ,"Player settings",1,1,1,1);
   // setup
   renderer.AddText(&myfont,xpos + 100 ,ypos + 150 ,"Videoplayer",1,1,1,1);
@@ -859,15 +875,21 @@ void show_setup_tema() {
   int ypos=0;
   std::string tema_string;
   if (tema==1) tema_string="Tema 1";
-  if (tema==2) tema_string="Tema 2";
-  if (tema==3) tema_string="Tema 3";
-  if (tema==4) tema_string="Tema 4";
-  if (tema==5) tema_string="Tema 5";
-  if (tema==6) tema_string="Tema 6";
-  if (tema==7) tema_string="Tema 7";
-  if (tema==8) tema_string="Tema 8";
-  if (tema==9) tema_string="Tema 9";
-  if (tema==10) tema_string="Tema 10";
+  else if (tema==2) tema_string="Tema 2";
+  else if (tema==3) tema_string="Tema 3";
+  else if (tema==4) tema_string="Tema 4";
+  else if (tema==5) tema_string="Tema 5";
+  else if (tema==6) tema_string="Tema 6";
+  else if (tema==7) tema_string="Tema 7";
+  else if (tema==8) tema_string="Tema 8";
+  else if (tema==9) tema_string="Tema 9";
+  else if (tema==10) tema_string="Tema 10";
+  else if (tema==11) tema_string="Tema 11";
+  else if (tema==12) tema_string="Tema 12";
+  else if (tema==13) tema_string="Tema 13";
+  else if (tema==14) tema_string="Tema 14";
+  else if (tema==15) tema_string="Tema 15";
+  else tema_string="Tema 2";
   renderer.AddTextureRect(42,setupscreenback, 300, 300, 800, 650,1,1,1,1);
   renderer.AddText(&myfont2, 650, 330, tema_string ,1,1,1,1);
   switch(tema) {
@@ -901,9 +923,28 @@ void show_setup_tema() {
     case 10:
           renderer.AddTextureRect(41,screenshot10, 350, 330, 650, 500,1,1,1,1);
           break;
+    case 11:
+          renderer.AddTextureRect(41,screenshot11, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 12:
+          renderer.AddTextureRect(41,screenshot12, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 13:
+          renderer.AddTextureRect(41,screenshot13, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 14:
+          renderer.AddTextureRect(41,screenshot14, 350, 330, 650, 500,1,1,1,1);
+          break;
+    case 15:
+          renderer.AddTextureRect(41,screenshot15, 350, 330, 650, 500,1,1,1,1);
+          break;
   }
   // close
-  renderer.AddTextureRect(42,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,0.5f);
+  }
 }
 
 
@@ -920,11 +961,19 @@ void show_setup_font(int aktiv) {
   int visantal;
   static MFont SampleFont;
   int startofset=0;
-  if (aktiv>18) startofset=(aktiv-18);
+  if (aktiv>18) startofset=(aktiv-18);  
   renderer.AddTextureRect(0,setupfontback, 300, 300, 800, 650,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,1);
-  renderer.AddTextureRect(41,_textureselect, 500, 800, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,1);  
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,0.5f);
+  }
+  if (setup_icon_over==41) {
+    renderer.AddTextureRect(41,_textureselect, 500, 800, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(41,_textureselect, 500, 800, 188, 81,1,1,1,0.5f);
+  }
   visantal=aktivfont.mastercount;
   if (visantal>20) visantal=20;
   for (i=0;i<visantal;i++) {
@@ -1076,7 +1125,12 @@ void show_setup_network() {
   // background
   renderer.AddTextureRect(0,setupnetworkback, 300, 300, 800, 650,1,1,1,1);
   // close button
-  renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,0.5f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
 
   renderer.AddText(&myfont,340, 500,"Hostname",1,1,1,1);
   renderer.AddText(&myfont,340+120, 500,confighostname,1,1,1,1);
@@ -1370,7 +1424,12 @@ bool SetOutputDevice(FMOD::System* system, int deviceId) {
 void show_setup_sound() {
    renderer.AddTextureRect(0,setupsoundback, 400, 300, 800, 500,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,0.5f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
   renderer.AddText(&myfont,500,400+(0*18),"Output device",1,1,1,1);
   renderer.AddText(&myfont,650,400+(0*18),configmythsoundsystem,1,1,1,1);
   if (do_show_setup_select_linie==0) {
@@ -1406,7 +1465,12 @@ void show_setup_sql() {
   // background
   renderer.AddTextureRect(0,setupsqlback, 400, 300, 800, 500,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,0.5f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,1);
   if (strcmp(configbackend,"mythtv")==0) {
     if (configmythtvver==1264) mythver=0.24f;
     if (configmythtvver) {
@@ -1534,6 +1598,39 @@ void select_exe_functions_keys_name() {
 
 
 
+// ****************************************************************************************
+//
+// select file for functions keys setup
+//
+// ****************************************************************************************
+
+std::string select_exe_file() {
+  char filenamepath[65535];
+  strcpy(filenamepath,"");
+  std::string filenamepath1;
+  std::string filename="";
+  // std::string tmp;
+  // std::string dest_file="";
+  // std::string realpath="";
+  // std::ofstream torrentfile;
+  FILE* f = popen("find -L /snap/bin /usr/bin /usr/sbin -type f -executable -printf '%f\\n%p\\n' 2>/dev/null | /usr/bin/zenity --list --column=\"Program\" --column=\"Sti\" --hide-column=2 --print-column=2 --modal  --title=\"Select program file.\" --width=900 --height=600 2>/dev/null","r");
+  if (!f) {
+    return "";
+  }
+  if (!fgets(filenamepath, sizeof(filenamepath), f)) {
+    pclose(f);
+    return ""; // Annulleret eller intet valgt
+  }
+  pclose(f);
+  // Fjern afsluttende linjeskift
+  filenamepath[strcspn(filenamepath, "\r\n")] = '\0';if (strlen(filenamepath)>0) {
+    filename = filenamepath;
+    filename.erase(std::remove(filename.begin(), filename.end(), '\n'), filename.cend());
+  }
+  return(filename);
+}
+
+
 
 // ****************************************************************************************
 //
@@ -1550,546 +1647,104 @@ void show_setup_keys() {
   SampleFont.Load("/usr/share/fonts/truetype/ubuntu/UbuntuMono[wght].ttf",18);
   renderer.AddTextureRect(0,setupkeysback, 400, 300, 800, 630,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.5f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
   renderer.AddText(&myfont,520, 450,"Command to execute.                                                   ScrNr",1,1,1,1);
   for(int i=0;i<12;i++) {
     tmptxt=fmt::format("{:>7}  - {:<70} ",fkeysname[i], configkeyslayout[i].cmdname);
-    renderer.AddTextureRect(0,setupkeysbar1, 474+60, 468+((i)*22), 23*18, 20 ,1,1,1,1);
+    // renderer.AddTextureRect(0,setupkeysbar1, 474+60, 468+((i)*22), 23*18, 20 ,1,1,1,1);
     renderer.AddText(&myfont,478, 465+((i+1)*22),tmptxt,1,1,1,1);
     tmptxt=fmt::format("{:<4}",configkeyslayout[i].scrnr);
     renderer.AddText(&myfont,508+(26*18), 465+((i+1)*22),tmptxt,1,1,1,1);
   }
+  std::string keybuffer2;
+  if (do_show_setup_select_linie==0) keybuffer2=configkeyslayout[do_show_setup_select_linie % 2].cmdname;
+  else keybuffer2=configkeyslayout[do_show_setup_select_linie % 2].scrnr;
   switch (do_show_setup_select_linie) {
-    case 0: showcoursornow(578,465+(0*22),strlen(keybuffer));
+    case 0: keybuffer2=configkeyslayout[0].cmdname;
+            showcoursornow(518,470+(0*22),keybuffer2.length());
             break;
-    case 1: showcoursornow(578,465+(1*22),strlen(keybuffer));
+    case 1: keybuffer2=configkeyslayout[0].scrnr;
+            showcoursornow(578+402,465+(0*22),keybuffer2.length());
             break;
-    case 2: showcoursornow(578,465+(2*22),strlen(keybuffer));
+    case 2: keybuffer2=configkeyslayout[1].cmdname;
+            showcoursornow(518,470+(1*22),keybuffer2.length());
             break;
-    case 3: showcoursornow(578,465+(3*22),strlen(keybuffer));
+    case 3: keybuffer2=configkeyslayout[1].scrnr;
+            showcoursornow(578+402,465+(1*22),keybuffer2.length());
             break;
-    case 4: showcoursornow(578,465+(4*22),strlen(keybuffer));
+    case 4: keybuffer2=configkeyslayout[2].cmdname;
+            showcoursornow(518,470+(2*22),keybuffer2.length());
             break;
-    case 5: showcoursornow(578,465+(5*22),strlen(keybuffer));
+    case 5: keybuffer2=configkeyslayout[2].scrnr;
+            showcoursornow(578+402,465+(2*22),keybuffer2.length());
             break;
-    case 6: showcoursornow(578,465+(6*22),strlen(keybuffer));
+    case 6: keybuffer2=configkeyslayout[3].cmdname;
+            showcoursornow(518,470+(3*22),keybuffer2.length());
             break;
-    case 7: showcoursornow(578,465+(7*22),strlen(keybuffer));
+    case 7: keybuffer2=configkeyslayout[3].scrnr;
+            showcoursornow(578+402,465+(3*22),keybuffer2.length());
             break;
-    case 8: showcoursornow(578,465+(8*22),strlen(keybuffer));
+    case 8: keybuffer2=configkeyslayout[4].cmdname;
+            showcoursornow(518,470+(4*22),keybuffer2.length());
             break;
-    case 9: showcoursornow(578,465+(9*22),strlen(keybuffer));
+    case 9: keybuffer2=configkeyslayout[4].scrnr;
+            showcoursornow(578+402,465+(4*22),keybuffer2.length());
             break;
-    case 10: showcoursornow(578,465+(10*22),strlen(keybuffer));
+    case 10:keybuffer2=configkeyslayout[5].cmdname;
+            showcoursornow(518,470+(5*22),keybuffer2.length());
             break;
-    case 11: showcoursornow(578,465+(11*22),strlen(keybuffer));
+    case 11:keybuffer2=configkeyslayout[5].scrnr;
+            showcoursornow(578+402,465+(5*22),keybuffer2.length());
             break;
-    case 12: showcoursornow(578,465+(12*22),strlen(keybuffer));
+    case 12:keybuffer2=configkeyslayout[6].cmdname;
+            showcoursornow(518,470+(6*22),keybuffer2.length());
             break;
-  }
-  
-  /*  
-  // start af input felter
-  // text input background F3
-  glPushMatrix();
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=500;
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=450;
-  // text input background F4
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  // text input background F5
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=400;
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  // text input background F6
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=350;
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  // text input background F7
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=300;
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=250;
-  // text input background F8
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  // text input background F9
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=200;
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  // text input background F10
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=150;
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  // text input background F11
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=100;
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  // text input background F12
-  winsizx=500;
-  winsizy=30;
-  xpos=300;
-  ypos=150;
-  glEnable(GL_TEXTURE_2D);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  glPopMatrix();
-  /*
-  glPushMatrix();
-  xpos=810;
-  ypos=100;
-  winsizx=50;
-  winsizy=30;
-  
-  for(int i=0;i<9;i++) {
-    glEnable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glDisable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBindTexture(GL_TEXTURE_2D,setupkeysbar2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+(i*50)+((orgwinsizey/2)-(800/2)) , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+(i*50)+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+(i*50)+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+(i*50)+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd();
-  }
-  glPopMatrix();
-  
-  
-  
-  // line 0
-  glDisable(GL_TEXTURE_2D);
-  glPushMatrix();
-  glTranslatef(680 , 650 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
+    case 13:keybuffer2=configkeyslayout[6].scrnr;
+            showcoursornow(578+402,465+(6*22),keybuffer2.length());
+            break;
+    case 14:keybuffer2=configkeyslayout[7].cmdname;
+            showcoursornow(518,470+(7*22),keybuffer2.length());
+            break;
+    case 15:keybuffer2=configkeyslayout[7].scrnr;
+            showcoursornow(578+402,465+(7*22),keybuffer2.length());
+            break;
+    case 16:keybuffer2=configkeyslayout[8].cmdname;
+            showcoursornow(518,470+(8*22),keybuffer2.length());
+            break;
+    case 17:keybuffer2=configkeyslayout[8].scrnr;
+            showcoursornow(578+402,465+(8*22),keybuffer2.length());
+            break;
+    case 18:keybuffer2=configkeyslayout[9].cmdname;
+            showcoursornow(518,470+(9*22),keybuffer2.length());
+            break;
+    case 19:keybuffer2=configkeyslayout[9].scrnr;
+            showcoursornow(578+402,465+(9*22),keybuffer2.length());
+            break;
+    case 20:keybuffer2=configkeyslayout[10].cmdname;
+            showcoursornow(518,470+(10*22),keybuffer2.length());
+            break;
+    case 21:keybuffer2=configkeyslayout[10].scrnr;
+            showcoursornow(578+402,465+(10*22),keybuffer2.length());
+            break;
+    case 22:keybuffer2=configkeyslayout[11].cmdname;
+            showcoursornow(518,470+(11*22),keybuffer2.length());
+            break;
+    case 23:keybuffer2=configkeyslayout[11].scrnr;
+            showcoursornow(578+402,465+(11*22),keybuffer2.length());
+            break;
+    case 24:keybuffer2=configkeyslayout[12].cmdname;
+            showcoursornow(518,470+(12*22),keybuffer2.length());
+            break;
+    case 25:keybuffer2=configkeyslayout[12].scrnr;
+            showcoursornow(578+402,465+(12*22),keybuffer2.length());
+            break;
 
-  std::string tmpstr=configkeyslayout[0].cmdname;
-
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  if ((onlyfname.length() > 0) && (!(fs::path(tmpstr).empty()))) onlyfname = "/.../" + onlyfname;
-  strcpy(keybuffer, onlyfname.c_str());
-  if (do_show_setup_select_linie==0) {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
   }
-  glPopMatrix();
-  if (do_show_setup_select_linie==0) showcoursornow(311,500,strlen(keybuffer));
-  // line 0
-  glPushMatrix();
-  glTranslatef(1180 , 650 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==1) {
-    sprintf(keybuffer,"%d",configkeyslayout[0].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[0].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==1) showcoursornow(812,500,strlen(keybuffer));
-
-
-  // line 1
-  glPushMatrix();
-  glTranslatef(680 , 600 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-
-  tmpstr=configkeyslayout[1].cmdname;
-
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  if ((onlyfname.length() > 0) && (!(fs::path(tmpstr).empty()))) onlyfname = "/.../" + onlyfname;
-  strcpy(keybuffer, onlyfname.c_str());
-  if (do_show_setup_select_linie==2) {
-    if (strlen(configkeyslayout[1].cmdname) > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    if (strlen(configkeyslayout[1].cmdname) > 0) myglprint4((char *) onlyfname.c_str());
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==2) showcoursornow(311,450,strlen(keybuffer));
-  // line 1
-  glPushMatrix();
-  glTranslatef(1180 , 600 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==3) {
-    sprintf(keybuffer,"%d",configkeyslayout[1].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[1].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==3) showcoursornow(812,450,strlen(keybuffer));
-  // line 2
-  glPushMatrix();
-  glTranslatef(680 , 550 , 0.0f);
-  glRasterPos2f(0.8f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-
-  tmpstr=configkeyslayout[2].cmdname;
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  if ((onlyfname.length() > 0) && (!(fs::path(tmpstr).empty()))) onlyfname = "/.../" + onlyfname;
-  strcpy(keybuffer, onlyfname.c_str());
-  if (do_show_setup_select_linie==4) {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==4) showcoursornow(311,400,strlen(keybuffer));
-  // line 2
-  glPushMatrix();
-  glTranslatef(1180 , 550 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==5) {
-    sprintf(keybuffer,"%d",configkeyslayout[2].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[2].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==5) showcoursornow(812,400,strlen(keybuffer));
-  // line 3
-  glPushMatrix();
-  glTranslatef(680 , 500 , 0.0f);
-  glRasterPos2f(0.8f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  tmpstr=configkeyslayout[3].cmdname;
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  if (fs::path(tmpstr).has_parent_path()) onlyfname = "/.../" + onlyfname;
-  strcpy(keybuffer, onlyfname.c_str());
-  keybufferindex=onlyfname.length();
-  if (do_show_setup_select_linie==6) {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==6) showcoursornow(311,350,strlen(keybuffer));
-  // line 3
-  glPushMatrix();
-  glTranslatef(1180 , 500 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==7) {
-    sprintf(keybuffer,"%d",configkeyslayout[3].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[3].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==7) showcoursornow(812,350,strlen(keybuffer));
-  // line 4
-  glPushMatrix();
-  glTranslatef(680 , 450 , 0.0f);
-  glRasterPos2f(0.8f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  tmpstr=configkeyslayout[4].cmdname;
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
-  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;
-  strcpy(keybuffer, onlyfname.c_str());
-  if (do_show_setup_select_linie==8) {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    glColor3f(1.0f,1.0f,1.0f);
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==8) showcoursornow(311,300,strlen(keybuffer));
-  // line 4
-  glPushMatrix();
-  glTranslatef(1180 , 450 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==9) {
-    sprintf(keybuffer,"%d",configkeyslayout[4].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[4].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==9) showcoursornow(812,300,strlen(keybuffer));
-  // line 5
-  glPushMatrix();
-  glTranslatef(680 , 400 , 0.0f);
-  glRasterPos2f(0.8f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  tmpstr=configkeyslayout[5].cmdname;
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
-  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
-  if (do_show_setup_select_linie==10) {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    glColor3f(1.0f,1.0f,1.0f);
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==10) showcoursornow(311,250,strlen(keybuffer));
-  // line 5
-  glPushMatrix();
-  glTranslatef(1180 , 400 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==11) {
-    sprintf(keybuffer,"%d",configkeyslayout[5].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[5].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==11) showcoursornow(812,250,strlen(keybuffer));
-  // line 6
-  glPushMatrix();
-  glTranslatef(680 , 350 , 0.0f);
-  glRasterPos2f(0.8f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  tmpstr=configkeyslayout[6].cmdname;
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
-  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
-  strcpy(keybuffer, onlyfname.c_str());
-  if (do_show_setup_select_linie==12) {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    glColor3f(1.0f,1.0f,1.0f);
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==12) showcoursornow(311,200,strlen(keybuffer));
-  // line 6
-  glPushMatrix();
-  glTranslatef(1180 , 350 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==13) {
-    sprintf(keybuffer,"%d",configkeyslayout[6].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[6].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==13) showcoursornow(812,200,strlen(keybuffer));
-  // line 7
-  glPushMatrix();
-  glTranslatef(680 , 300 , 0.0f);
-  glRasterPos2f(0.8f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  tmpstr=configkeyslayout[7].cmdname;
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
-  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
-  strcpy(keybuffer, onlyfname.c_str());
-  if (do_show_setup_select_linie==14) {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    glColor3f(1.0f,1.0f,1.0f);
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==14) showcoursornow(311,150,strlen(keybuffer));
-  // line 7
-  glPushMatrix();
-  glTranslatef(1180 , 300 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==15) {
-    sprintf(keybuffer,"%d",configkeyslayout[7].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[7].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==15) showcoursornow(812,150,strlen(keybuffer));
-  // line 8
-  glPushMatrix();
-  glTranslatef(680 , 250 , 0.0f);
-  glRasterPos2f(0.8f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  tmpstr=configkeyslayout[8].cmdname;
-  onlyfname=fs::path(tmpstr).filename();          // return filename with extension.
-  onlypname=fs::path(tmpstr).parent_path();      // return path without filename.
-  if ((onlyfname.length() > 0) && (!onlypname.empty())) onlyfname = "/.../" + onlyfname;  strcpy(keybuffer, onlyfname.c_str());
-  strcpy(keybuffer, onlyfname.c_str());
-  if (do_show_setup_select_linie==16) {
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  } else {
-    glColor3f(1.0f,1.0f,1.0f);
-    if (onlyfname.length() > 0) myglprint4((char *) onlyfname.c_str());
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==16) showcoursornow(311,100,strlen(keybuffer));
-  // line 9
-  glPushMatrix();
-  glTranslatef(1180 , 250 , 0.0f);
-  glRasterPos2f(0.0f, 0.0f);
-  glColor3f(1.0f,1.0f,1.0f);
-  if (do_show_setup_select_linie==17) {
-    sprintf(keybuffer,"%d",configkeyslayout[8].scrnr);
-    myglprint4((char *) keybuffer);   // keybuffer
-  } else {
-    sprintf(text,"%d",configkeyslayout[8].scrnr);
-    myglprint4((char *) text);
-  }
-  glPopMatrix();
-  if (do_show_setup_select_linie==17) {
-    sprintf(text,"%d",configkeyslayout[8].scrnr);
-    showcoursornow(812,100,strlen(text));
-  }
-  */
 }
 
 // ****************************************************************************************
@@ -2127,7 +1782,12 @@ void show_setup_rss(unsigned int startofset) {
   float r_color,g_color,b_color;
   renderer.AddTextureRect(0,setuprssback, 300, 100, 1300, 850,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.5f);
+  }
+  // renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
   for (int n=0;n<19;n++) {
     if (n+startofset==rssstreamoversigt.setup_select_linie/2+startofset) {
       r_color=1.0;
@@ -2992,7 +2652,10 @@ void show_setup_tv_graber(int startofset) {
   }
   renderer.AddTextureRect(0,setuptvgraberback, winxpos, winypos, winxsize, winysize,1,1,1,1);
   // close button
-  renderer.AddTextureRect(40,_textureclose, ((winxsize-188)/2)+(188/2), winysize+100, 188, 81,1,1,1,1);
+
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, ((winxsize-188)/2)+(188/2), winysize+100, 188, 81,1,1,1,1);
+  } else renderer.AddTextureRect(40,_textureclose, ((winxsize-188)/2)+(188/2), winysize+100, 188, 81,1.0f,1.0f,1.0f,0.5f);
   xmlupdatelasttime=localtime(&configtvguidelastupdate);
   //
   // Sprog struktur. (date format)
@@ -3065,8 +2728,10 @@ void show_setup_torrent() {
   renderer.AddTextureRect(0,setuptorrent_background, 400, 300, 750, 650,1,1,1,1);
   renderer.AddText(&myfont2,650, 350 ,"Torrent settings",1,1,1,1);
   // close button
-  renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
-
+  if (setup_icon_over==40) 
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
+  else
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.8f);
   renderer.AddText(&myfont,450 , 400,"Trash torrent file.....................: ",1,1,1,1);
   if (torrent_downloader.automove_to_movie_path) {
     renderer.AddText(&myfont,450+230 , 400,"N ",1,1,1,1);

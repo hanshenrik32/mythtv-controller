@@ -28,6 +28,8 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 
 LIBICAL := $(shell find /usr/lib/ -name 'libical.so')
 
+GTK := $(shell pkg-config --cflags --libs gtk+-3.0)
+
 ifeq ($(LBITS),64)
 	LIBFMT := $(shell find /usr/lib/x86_64-linux-gnu/ -name 'libfmt.so')
 else 
@@ -56,14 +58,17 @@ else
 	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
 
-OPTS = -I"/usr/include/mysql" -I/usr/include/libxml2 -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/lirc" -I/usr/include/freetype2 -I/usr/include/libpng16 $(LIBGLC) $(LIBFMOD) $(LIBICAL) $(LIBFMT) $(LIRCSOURCES) 
+CPPFLAGS += $(shell pkg-config --cflags icu-uc icu-i18n)
+LDLIBS   += $(shell pkg-config --libs icu-uc icu-i18n)
+
+OPTS = -I"/usr/include/mysql" -I/usr/include/libxml2 -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/lirc" -I/usr/include/freetype2 -I/usr/include/libpng16 $(LIBGLC) $(LIBFMOD) $(LIBICAL) $(LIBFMT) $(LIRCSOURCES) $(GTK)
 
 SRCS = main.cpp renderer.cpp shader.cpp utility.cpp readjpg.cpp myctrl_readwebfile.cpp myth_ttffont.cpp myctrl_stream.cpp myctrl_radio.cpp myth_setupsql.cpp myctrl_tidal2.cpp myctrl_mplaylist.cpp myctrl_music.cpp myctrl_movie.cpp myctrl_torrent.cpp myctrl_spotify.cpp myctrl_recorded.cpp myctrl_tvprg.cpp myth_vlcplayer.cpp myth_saver.cpp checknet.cpp myth_setup.cpp mongoose-master/mongoose.c json-parser/json.c
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp -lX11
+	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp -lX11 -lgtk-3 -lgdk-3 -licui18n -licuuc -licudata
 endif
 
 all:
@@ -123,13 +128,13 @@ installtidal-dl:
 	@echo "you have to copy tidal-dl from you homedir to /usr/bin/
 
 install:
-	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
+	@echo "Installing mythtv-controller ver 0.50.x in /opt/mythtv-controller."
 	@mkdir -p /opt/mythtv-controller/images/radiostations
 	@mkdir -p /opt/mythtv-controller/convert/hires
 	@mkdir -p /opt/mythtv-controller/images/mythnetvision
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
-	@cp -r -p images tema1 tema1.json tema2 tema2.json tema3 tema3.json tema4 tema4.json tema5 tema5.json tema6 tema6.json tema7 tema7.json tema8 tema8.json tema9 tema9.json tema10 tema10.json $(DESTDIR)
+	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 tema11 tema12 tema13 tema14 tema15  $(DESTDIR)
 	#@cp -r xmltv_config $(DESTDIR)	
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png

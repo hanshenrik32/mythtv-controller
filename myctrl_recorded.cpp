@@ -24,10 +24,13 @@ using namespace std;
 #include "utility.h"
 #include "myctrl_recorded.h"
 #include "myctrl_storagedef.h"
+#include "myth_config.h"
 // #include "myctrl_glprint.h"
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                  // used by log system
+
+extern config_icons config_menu; // config icons used in menu
 
 extern int fonttype;
 extern char configmysqluser[256];                              //
@@ -44,12 +47,8 @@ extern GLuint _textureId24;    // movie open info box3
 extern int screen_size;
 extern int visvalgtnrtype;
 extern bool do_sqlite;
-
 extern MFont myfont;
 extern MFont myfont2;
-
-
-
 extern Renderer renderer;
 
 // ****************************************************************************************
@@ -67,6 +66,8 @@ recorded_oversigt_type::recorded_oversigt_type() {
   strcpy(description,"");
   start_prg_image="";
 }
+
+
 
 // ****************************************************************************************
 //
@@ -144,6 +145,28 @@ void recorded_overigt_class::get_recorded_filepath(char *filepath,int valgtnr,in
   strcpy(filepath,temptxt);
 }
 
+// ****************************************************************************************
+//
+// Constructor
+//
+// ****************************************************************************************
+
+recorded_overigt_class::recorded_overigt_class() {
+  title_antal=0;  
+}
+
+// ****************************************************************************************
+//
+// Destructor
+//
+// ****************************************************************************************
+
+
+recorded_overigt_class::~recorded_overigt_class() {
+  if (_textureId22) glDeleteTextures(1, &_textureId22);
+  if (_textureId23) glDeleteTextures(1, &_textureId23);
+  if (_textureId24) glDeleteTextures(1, &_textureId24);
+}
 
 // ****************************************************************************************
 //
@@ -294,13 +317,40 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
 
 // ****************************************************************************************
 //
-// In use
-//
 // Viser recorded programer
 // valgtnr= den valgte som skal vises med mark
 // subvalgtnr = den valgte som skal vises i under liste
 //
 // ****************************************************************************************
+
+
+// ****************************************************************************************
+//
+// load img file
+//
+// ****************************************************************************************
+
+GLuint loadgfxfile_rec(char *temapath,char *dir,char *file) {
+    GLuint gl_img=0;
+    std::string fileload="";
+    fileload=fileload + temapath;
+    fileload=fileload + dir;
+    fileload=fileload + file;              // filename - type
+    fileload=fileload + ".png";            // add png
+    if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+    else {
+      // check if file exist af .jpg file      
+      fileload=fileload + temapath;
+      fileload=fileload + dir;
+      fileload=fileload + file;              // filename - type
+      fileload=fileload + ".jpg";            // add jpg
+      if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+      else gl_img = 0;
+    }
+    if (gl_img == 0) fprintf(stderr,"GFXFILE %s in dir %s NOT FOUND \n",fileload.c_str(),dir);
+    return(gl_img);
+}
+
 
 void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   static GLuint texture=0;
@@ -328,9 +378,15 @@ void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) 
     valgtnr=10;
   } else startofset=0;
   // boxes
-  renderer.AddTextureRect(0,_textureId23, 200, 200, 400, 600,1,1,1,1);
-  renderer.AddTextureRect(0,_textureId24, 610, 200, 800, 600,1,1,1,1);
-  renderer.AddTextureRect(0,_textureId22, 200, 810, 1210, 200,1,1,1,1);
+  std::string temapath=config_menu.config_tema_path;
+  if (!(_textureId22)) {
+    _textureId22	= loadgfxfile_rec((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox1");
+    _textureId23	= loadgfxfile_rec((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox2");
+    _textureId24	= loadgfxfile_rec((char *) temapath.c_str(),(char *) "images/",(char *) "recordedbox3");
+  }
+  renderer.AddTextureRect(0,_textureId23, config_menu.recordedview_recordings_overview_x, config_menu.recordedview_recordings_overview_y, config_menu.recordedview_recordings_overview_sizx, config_menu.recordedview_recordings_overview_sizy,1,1,1,1);
+  renderer.AddTextureRect(0,_textureId24, config_menu.recordedview_recordings_episodeview_x, config_menu.recordedview_recordings_episodeview_y, config_menu.recordedview_recordings_episodeview_sizx, config_menu.recordedview_recordings_episodeview_sizy,1,1,1,1);
+  renderer.AddTextureRect(0,_textureId22, config_menu.recordedview_recordings_infoview_x, config_menu.recordedview_recordings_infoview_y, config_menu.recordedview_recordings_infoview_sizx, config_menu.recordedview_recordings_infoview_sizy,1,1,1,1);
   // main start off text in window
   while ((i<=top_antal()) && (i<11)) {
     programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc,channel);
@@ -358,7 +414,7 @@ void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) 
       }
       strcat(temptxt," ");
       strcat(temptxt,title);
-      renderer.AddText(&myfont, 220 ,282.0f+(i*18.0f),temptxt,1,1,1,1);
+      renderer.AddText(&myfont, config_menu.recordedview_recordings_overview_x + 20 ,config_menu.recordedview_recordings_overview_y + 82.0f+(i*18.0f),temptxt,1,1,1,1);
     }
     i++;
   }
@@ -369,9 +425,9 @@ void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) 
     strcpy(temptxt,subtitle);					// get sub title
     if (strcmp(temptxt,"")==0) strcpy(temptxt,desc);                // Hvis der ikke er nogle subtitle bruge description i stedet
     if (i+startofset==subvalgtnr+startofset) {
-      renderer.AddText(&myfont, 620 ,282.0f+(i*18.0f),temptxt,1,1,0,1);
+      renderer.AddText(&myfont, config_menu.recordedview_recordings_episodeview_x + 20 ,config_menu.recordedview_recordings_episodeview_y + 82.0f+(i*18.0f),temptxt,1,1,0,1);
     } else {
-      renderer.AddText(&myfont, 620 ,282.0f+(i*18.0f),temptxt,1,1,1,1);
+      renderer.AddText(&myfont, config_menu.recordedview_recordings_episodeview_x + 20 ,config_menu.recordedview_recordings_episodeview_y + 82.0f+(i*18.0f),temptxt,1,1,1,1);
     }
     i++;
   }
@@ -380,12 +436,12 @@ void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) 
   // show prg start date
   strcpy(temptxt,startdato);
   temptxt[10]=0;
-  renderer.AddText(&myfont, 220 ,840.0f,"Date...:",1,1,1,1);
-  renderer.AddText(&myfont, 220+70 ,840.0f,temptxt,1,1,1,1);
-  renderer.AddText(&myfont, 220+190 ,840.0f,"KL : ",1,1,1,1);
+  renderer.AddText(&myfont, config_menu.recordedview_recordings_infoview_x + 20 ,config_menu.recordedview_recordings_infoview_y + 20.0f,"Date...:",1,1,1,1);
+  renderer.AddText(&myfont, config_menu.recordedview_recordings_infoview_x + 20+70 ,config_menu.recordedview_recordings_infoview_y + 20.0f,temptxt,1,1,1,1);
+  renderer.AddText(&myfont, config_menu.recordedview_recordings_infoview_x + 20+190 ,config_menu.recordedview_recordings_infoview_y + 20.0f,"KL : ",1,1,1,1);
   strcpy(temptxt,startdato+11);
   temptxt[5]=0;
-  renderer.AddText(&myfont, 220+230 ,840.0f,temptxt,1,1,1,1);
+  renderer.AddText(&myfont,config_menu.recordedview_recordings_infoview_x + 20+230 , config_menu.recordedview_recordings_infoview_y + 20.0f,temptxt,1,1,1,1);
   static time_t tm;				// this time (now)
   struct tm *nutid;
   struct tm prgstarttid;
@@ -402,9 +458,9 @@ void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) 
   time_t et=mktime(&prgsluttid);
   if ((tm>st) && (tm<et)) {				// er tiden inden for nu så hvis at vi optager live nu
     flipflop++;
-    if (flipflop<24) renderer.AddText(&myfont, 220 +290 ,840.0f,"Recording now",1,1,1,1);   
-    if (flipflop>48) flipflop=0;  
-  }  
+    if (flipflop<24) renderer.AddText(&myfont, config_menu.recordedview_recordings_infoview_x + 20 +290 ,config_menu.recordedview_recordings_infoview_y + 40.0f,"Recording now",1,1,1,1);   
+    if (flipflop>48) flipflop=0;
+  }
   // show desc
   renderer.AddText(&myfont, 750 ,840.0f+(i*18.0f),desc1,1,1,1,1);
   // drawLinesOfText(desc1.c_str(), 700.0f, 290.0f, 1.0f,68,5,1,false);
@@ -412,5 +468,5 @@ void recorded_overigt_class::show_recorded_oversigt(int valgtnr,int subvalgtnr) 
   // show image from recorded if exist
   if (programs[valgtnr].recorded_programs->start_prg_image.length()>0) {
     renderer.AddTextureRect(0,_textureId23, 220.0f ,860.0f, 260, 140,1,1,1,1);
-  }  
+  }
 }

@@ -47,6 +47,11 @@ cmake --build build -j"$(nproc)"
 # Install mythtv-controller in /opt/mythtv-controller
 sudo cmake --install build
 
+### Rember to install mariadb and change settings in /etc/mythtv-controller.conf
+
+### CREATE USER 'mythtv'@'localhost' IDENTIFIED BY 'password';
+### FLUSH PRIVILEGES;
+### create database mythtvcontroller;
 
 # Version history.
 
