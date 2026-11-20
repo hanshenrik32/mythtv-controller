@@ -68,7 +68,6 @@ extern GLuint _textureId28;
 extern GLuint _textureId_cursor;
 
 extern FMOD::System    *sndsystem;
-extern int setup_icon_over;
 
 extern MFont myfont;
 extern MFont myfont2;
@@ -413,6 +412,11 @@ rss_stream_class::~rss_stream_class() {
 }
 
 
+// ***************************************************************************************
+//
+// return name
+//
+// ***************************************************************************************
 
 std::string rss_stream_class::get_stream_name_std(int nr) { 
   if ((nr>=0) && (nr < rss_source_feed_vector.size())) {
@@ -421,6 +425,11 @@ std::string rss_stream_class::get_stream_name_std(int nr) {
   return "";
 }
 
+// ***************************************************************************************
+//
+// return url
+//
+// ***************************************************************************************
 
 std::string rss_stream_class::get_stream_url_std(int nr) { 
   if ((nr>=0) && (nr < rss_source_feed_vector.size())) {
@@ -470,6 +479,7 @@ int rss_stream_class::load_rss_data() {
   } else write_logfile(logfile,(char *) "Error connect to mysql.");
   return(rss_source_feed_vector.size());
 }
+
 
 // ****************************************************************************************
 //
@@ -627,12 +637,12 @@ std::string select_system_resolution() {
   return(filename);
 }
 
-// ************************************************************************************************
-//
-//
-//
-// ************************************************************************************************
 
+// ************************************************************************************************
+//
+//
+//
+// ************************************************************************************************
 
 std::string select_language() {
   char filenamepath[1024];
@@ -692,7 +702,6 @@ std::string select_screen_timeout() {
 //
 // ************************************************************************************************
 
-
 std::string select_screen_mode() {
   char filenamepath[1024];
   strcpy(filenamepath,"");
@@ -730,7 +739,8 @@ void show_setup_screen() {
 
   renderer.AddTextureRect(0,setupscreenback, 300, 300, 850, 500,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  else renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,0.5f);
 
   switch(screen_size) {
       case 1: sprintf(resl,"1024 x 768 (720p)  ");
@@ -803,7 +813,12 @@ void show_setup_video() {
   // background
   renderer.AddTextureRect(0,setupscreenback, 300, 300, winsizx, winsizy,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, xpos+300, ypos + 400, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, xpos+300, ypos + 400, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, xpos+300, ypos + 400, 188, 81,1,1,1,0.5f);
+  }
+
   renderer.AddText(&myfont2,xpos + 270 ,ypos + 50 ,"Player settings",1,1,1,1);
   // setup
   renderer.AddText(&myfont,xpos + 100 ,ypos + 150 ,"Videoplayer",1,1,1,1);
@@ -925,10 +940,10 @@ void show_setup_tema() {
           break;
   }
   // close
-  if (setup_icon_over==42) {
-    renderer.AddTextureRect(42,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
   } else {
-    renderer.AddTextureRect(42,_textureclose, 600, 840, 188, 81,1,1,1,0.8f);
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,0.5f);
   }
 }
 
@@ -946,16 +961,19 @@ void show_setup_font(int aktiv) {
   int visantal;
   static MFont SampleFont;
   int startofset=0;
-  if (aktiv>18) startofset=(aktiv-18);
+  if (aktiv>18) startofset=(aktiv-18);  
   renderer.AddTextureRect(0,setupfontback, 300, 300, 800, 650,1,1,1,1);
   // close
   if (setup_icon_over==40) {
     renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,1);  
   } else {
-    renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,0.8f);
+    renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,0.5f);
   }
-  // renderer.AddTextureRect(40,_textureclose, 700, 800, 188, 81,1,1,1,1);
-  renderer.AddTextureRect(41,_textureselect, 500, 800, 188, 81,1,1,1,1);
+  if (setup_icon_over==41) {
+    renderer.AddTextureRect(41,_textureselect, 500, 800, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(41,_textureselect, 500, 800, 188, 81,1,1,1,0.5f);
+  }
   visantal=aktivfont.mastercount;
   if (visantal>20) visantal=20;
   for (i=0;i<visantal;i++) {
@@ -1110,7 +1128,7 @@ void show_setup_network() {
   if (setup_icon_over==40) {
     renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
   } else {
-    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,0.8f);
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,0.5f);
   }
   // renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
 
@@ -1409,7 +1427,7 @@ void show_setup_sound() {
   if (setup_icon_over==40) {
     renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
   } else {
-    renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,0.8f);
+    renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,0.5f);
   }
   // renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
   renderer.AddText(&myfont,500,400+(0*18),"Output device",1,1,1,1);
@@ -1450,7 +1468,7 @@ void show_setup_sql() {
   if (setup_icon_over==40) {
     renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,1);
   } else {
-    renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,0.8f);
+    renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,0.5f);
   }
   // renderer.AddTextureRect(40,_textureclose, 700, 700, 188, 81,1,1,1,1);
   if (strcmp(configbackend,"mythtv")==0) {
@@ -1632,7 +1650,7 @@ void show_setup_keys() {
   if (setup_icon_over==40) {
     renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
   } else {
-    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.8f);
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.5f);
   }
   // renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
   renderer.AddText(&myfont,520, 450,"Command to execute.                                                   ScrNr",1,1,1,1);
@@ -1767,7 +1785,7 @@ void show_setup_rss(unsigned int startofset) {
   if (setup_icon_over==40) {
     renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
   } else {
-    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.8f);
+    renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,0.5f);
   }
   // renderer.AddTextureRect(40,_textureclose, 670, 800, 188, 81,1,1,1,1);
   for (int n=0;n<19;n++) {
@@ -2634,7 +2652,10 @@ void show_setup_tv_graber(int startofset) {
   }
   renderer.AddTextureRect(0,setuptvgraberback, winxpos, winypos, winxsize, winysize,1,1,1,1);
   // close button
-  renderer.AddTextureRect(40,_textureclose, ((winxsize-188)/2)+(188/2), winysize+100, 188, 81,1,1,1,1);
+
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, ((winxsize-188)/2)+(188/2), winysize+100, 188, 81,1,1,1,1);
+  } else renderer.AddTextureRect(40,_textureclose, ((winxsize-188)/2)+(188/2), winysize+100, 188, 81,1.0f,1.0f,1.0f,0.5f);
   xmlupdatelasttime=localtime(&configtvguidelastupdate);
   //
   // Sprog struktur. (date format)

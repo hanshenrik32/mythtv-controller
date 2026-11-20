@@ -75,6 +75,7 @@ extern MFont myfont;
 extern MFont myfont2;
 extern MFont myfont_search_bar;
 
+extern int setup_icon_over;
 
 extern GLuint playing_tidal_icon_texture;
 extern GLuint onlineradio_empty;
@@ -5871,6 +5872,24 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
 
 
 
+// ****************************************************************************************
+//
+// Draw cursor (used in search view)
+//
+// ****************************************************************************************
+
+void Drawcursor_tidal(int x,int y,std::string tekst) {
+  using Clock = std::chrono::steady_clock;
+  const auto now = Clock::now().time_since_epoch();
+  const auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+  // Cursoren vises 500 ms og skjules 500 ms
+  if (((milliseconds / 500) % 2) == 0)
+    return;
+  int textstringsize;
+  textstringsize=renderer.GetTextWidth(&myfont_search_bar,tekst);
+  renderer.AddTextureRect(0,0, x+(textstringsize+16), y+18, 6, 38,1,1,1,1);
+}
+
 // ************************************************************************************************************************
 //
 // Show search tidal view
@@ -5917,7 +5936,6 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     cursor=!cursor;
     last_rawtime=rawtime;
   }
-
   // ---- CALC --------------------------------------------------
   int firstRow   = (int)(scrollPos / rowHeight);
   float subOff   = fmod(scrollPos, rowHeight);
@@ -5925,7 +5943,6 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   int screenTop = search_startY;
   int xof = search_startX;
   int visibleItems = (visibleRows + 2) * itemsPerRow;
-  //
   switch (searchtype) {
     case 0: renderer.AddTextureRect(0,tidal_big_search_bar_album, 360, 10, 1200, 180,1,1,1,1);
             break;
@@ -5939,8 +5956,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   // show tidal search string
   if (searchstring!="") {
     renderer.AddText(&myfont_search_bar, 400, 120 ,searchstring,1,1,1,1);
-    // float textWidth = getTextWidth(font24, searchstring, 1.2f);
-    // if (cursor) drawText(font24,"_", 300.0f+textWidth, 980.0f, 1.2f, 0);
+    Drawcursor_tidal(384  ,70,searchstring);
   }
   if (search_loaded==false) doneloadsearch=false;
   if ((search_loaded==true) && (doneloadsearch==false)) {
@@ -6036,7 +6052,8 @@ void tidal_class::show_setup_tidal() {
   ypos=0;
   renderer.AddTextureRect(0,setuptidalback, 400, 300, 600, 500,1,1,1,1);
   // close
-  renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  if (setup_icon_over==40) renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,1);
+  else renderer.AddTextureRect(40,_textureclose, 600, 700, 188, 81,1,1,1,0.5f);
   renderer.AddText(&myfont,450 ,450 ,"Email address ",1,1,1,1);
   renderer.AddText(&myfont,450 ,450+18 ,"Passwords ",1,1,1,1);
   renderer.AddText(&myfont,450 ,450+(4*18) ,"You have to config tiddl for now. If not done.",1,1,1,1);

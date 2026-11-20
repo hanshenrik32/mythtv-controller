@@ -58,6 +58,9 @@ else
 	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
 
+CPPFLAGS += $(shell pkg-config --cflags icu-uc icu-i18n)
+LDLIBS   += $(shell pkg-config --libs icu-uc icu-i18n)
+
 OPTS = -I"/usr/include/mysql" -I/usr/include/libxml2 -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/lirc" -I/usr/include/freetype2 -I/usr/include/libpng16 $(LIBGLC) $(LIBFMOD) $(LIBICAL) $(LIBFMT) $(LIRCSOURCES) $(GTK)
 
 SRCS = main.cpp renderer.cpp shader.cpp utility.cpp readjpg.cpp myctrl_readwebfile.cpp myth_ttffont.cpp myctrl_stream.cpp myctrl_radio.cpp myth_setupsql.cpp myctrl_tidal2.cpp myctrl_mplaylist.cpp myctrl_music.cpp myctrl_movie.cpp myctrl_torrent.cpp myctrl_spotify.cpp myctrl_recorded.cpp myctrl_tvprg.cpp myth_vlcplayer.cpp myth_saver.cpp checknet.cpp myth_setup.cpp mongoose-master/mongoose.c json-parser/json.c
@@ -65,7 +68,7 @@ SRCS = main.cpp renderer.cpp shader.cpp utility.cpp readjpg.cpp myctrl_readwebfi
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp -lX11 -lgtk-3 -lgdk-3
+	LIBS =  -lGLEW -lGL -lglut -lGLU -lSDL -lIL -lSDL_image -lpthread -lxml2 `sdl-config --libs` -lSDL_image -lfmt -lmysqlclient -lcurl -lfreetype -ljsoncpp -lm -lmediainfo -lfmt -ltorrent-rasterbar -lvlc -ljsoncpp -lX11 -lgtk-3 -lgdk-3 -licui18n -licuuc -licudata
 endif
 
 all:

@@ -22,6 +22,7 @@ find_package(GLEW REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(X11 REQUIRED)
 find_package(fmt REQUIRED)
+find_package(ICU 70 REQUIRED COMPONENTS uc i18n)
 
 pkg_check_modules(GTK3 REQUIRED IMPORTED_TARGET gtk+-3.0)
 pkg_check_modules(SDL REQUIRED IMPORTED_TARGET sdl)
@@ -126,6 +127,8 @@ add_executable(mythtv-controller ${SOURCES})
 
 # add gtk3.0
 target_link_libraries(mythtv-controller PRIVATE PkgConfig::GTK3)
+# add ICU support
+target_link_libraries(mythtv-controller PRIVATE ICU::uc ICU::i18n)
 
 target_include_directories(mythtv-controller PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
