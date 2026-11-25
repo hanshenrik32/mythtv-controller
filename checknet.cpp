@@ -7,9 +7,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-
 #include <netdb.h>
 #include <ifaddrs.h>
+#include <string>
+#include <cstdio>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
 #include "checknet.h"
 #include "utility.h"
 
@@ -18,21 +24,6 @@ extern char confighostwlanname[256];
 
 // name = interface name
 // ip the ip in long
-
-/*
-static int set_ip_using(const char *name, int c, unsigned long ip) {
-      struct ifreq ifr;
-      struct sockaddr_in sin;
-      safe_strncpy(ifr.ifr_name, name, IFNAMSIZ);
-      memset(&sin, 0, sizeof(struct sockaddr));
-      sin.sin_family = AF_INET;
-      sin.sin_addr.s_addr = ip;
-      memcpy(&ifr.ifr_addr, &sin, sizeof(struct sockaddr));
-      if (ioctl(skfd, c, &ifr) < 0) return -1;
-      return 0;
-}
-*/
-
 
 wifinetid::wifinetid() {
       strcpy(hadd,"");    // hardware adress
@@ -74,18 +65,10 @@ void wifinetid::get_pass(char *p) {
 // constructor
 
 wifinetdef::wifinetdef() {
-      wifinetantal=0;
-      strcpy(interfacename,"");
-      create_wifilist();			// create list of wifinets in range
-      printf("Wifinet found %d \n",wifinetantal);
+  wifinetantal=0;
+  strcpy(interfacename,"");
 }
 
-
-// update wifi net list
-void wifinetdef::update_wifi_netlist() {
-      wifinetantal=0;
-      create_wifilist();			// create list of wifinets in range
-}
 
 
 // find wifi network interface name
@@ -125,106 +108,91 @@ void wifinetdef::find_interfacenames() {
 
 
 
-// load wifi net list from OS
+// *****************************************************************************************
+//
+// get active wifi network
+//
+// *****************************************************************************************
 
-int wifinetdef::create_wifilist() {
-      FILE *fp=NULL;
-      char *sted;				// bruges til string search
-      //int status;
-      int maxlength=20000;
-      char result[20000];
-      char tmptxt[80];
-      char hadd[18];                  // hardware adress
-      char essid[80];                 // network id
-      char foundinterfacename[200];
-      int signal=0;
-      int encrypt=0;
-      int finish=0;
-      fprintf(stderr,"Scanning for wifi networks.\n");
-      write_logfile(logfile,(char *) "Scanning for wifi networks.");
-      find_interfacenames();                      // get interface names and select wifi networks
-      strcpy(foundinterfacename,"/sbin/iwlist ");
-      strcat(foundinterfacename,this->interfacename);       // add found interface name found by find_interfacenames
-      strcat(foundinterfacename," scan");
-      fp=popen(foundinterfacename,"r");
-      sleep(3);                                           // wait for scan
-      if (fp) pclose(fp);
-      fp=popen(foundinterfacename,"r");
-      if (fp) {
-            while(fgets(result,maxlength-1,fp)!=NULL) {
-                  if ((sted=strstr(result,"Address:"))) {
-                        strcpy(hadd,sted+9);
-                        hadd[17]=0;
-                  }
-                  if ((sted=strstr(result,"ESSID:"))) {
-                        strcpy(essid,sted+6+1);
-                        int l=strlen(essid);
-                        if (l>2) essid[l-2]=0;
-                        if (l==2) strcpy(essid,"Hidden");
-                  }
-                  if ((sted=strstr(result,"Encryption key"))) {
-                        if (strncmp(sted+15,"off",3)==0) encrypt=0; else encrypt=1;
-                  }
-                  if ((sted=strstr(result,"level="))) {
-                        strcpy(tmptxt,sted+6);
-                        if (strlen(tmptxt)>3) tmptxt[strlen(tmptxt)-3]=0;
-                        signal=atoi(tmptxt);
-                  }
-                  if ((sted=strstr(result,"Mode"))) finish=1; else finish=0;
-                  if (finish) {
-                        if (wifinetantal==0) strcpy(confighostwlanname,essid);		// det default essid
-                        // save net info array
-                        wifilist[wifinetantal].put_wifiid(hadd,essid,signal,encrypt);
-                        wifinetantal++;
-                        finish=0;
-                  }
-            }
-      } else {
-        write_logfile(logfile,(char *) "ERROR loading wifi network list by missing command /sbin/iwlist");
-        fprintf(stderr,"ERROR loading wifi network list by missing command /sbin/iwlist\n");
+std::string getActiveWifiSSID() {
+  FILE* pipe = popen("nmcli --colors no -t -e no -f IN-USE,SSID device wifi list --rescan no", "r");
+  if (!pipe) {
+    // throw std::runtime_error("Kunne ikke starte nmcli");
+  }
+  std::string ssid;
+  char line[1024];
+  while (fgets(line, sizeof(line), pipe)) {
+    if (line[0] == '*' && line[1] == ':') {
+      ssid = line + 2;  // Bevarer mellemrum og kolon i navnet
+        if (ssid.empty() && ssid.back() == '\n') {
+          ssid.pop_back();
+        }
       }
-      if (fp) pclose(fp);
-      return(wifinetantal);
+  }
+  if (pclose(pipe) != 0) {
+    // throw std::runtime_error("nmcli kunne ikke hente Wi-Fi-status");
+  }
+  return ssid;
 }
 
 
-// get aktiv essid from iwconfig
 
-int wifinetdef::findaktiv_wifi(char *aktivhardwareadress) {
-      FILE *fp;
-      char *sted;				// bruges til string search
-//      int status;
-      int maxlength=10000;
-      char result[10000];
-      bool finish=false;
-      char hard[18];
-      fp=popen("iwconfig","r");
-      if (fp) {
-            while(fgets(result,maxlength-1,fp)!=NULL) {
-                  if ((sted=strstr(result,"Access Point:"))) {
-                        strcpy(aktivhardwareadress,sted+14);
-                        finish=true;
-                  }
-            }
-      } else {
-        fprintf(stderr,"Warning no wifi interface found,\n");
-        write_logfile(logfile,(char *) "Warning no wifi interface found,");
+// load wifi net list from OS
+
+
+bool wifinetdef::scanWifiNetworks() {
+    wifinetid network;
+    // SSID står sidst, så et kolon i netværksnavnet bevares.
+    const char* command = "nmcli --colors no --terse --escape no --fields SIGNAL,SECURITY,SSID device wifi list --rescan yes";
+    FILE* pipe = popen(command, "r");
+    if (!pipe) {
+      // throw std::runtime_error("Kunne ikke starte Wi-Fi-scanningen");
+    }
+    std::vector<wifinetdef> wifinetid;
+    char buffer[1024];
+    while (fgets(buffer, sizeof(buffer), pipe)) {
+      std::string line(buffer);
+      if (!line.empty() && line.back() == '\n') {
+      line.pop_back();
       }
-      if (fp) {
-            pclose(fp);
-            if (finish) {
-                  for(int i=0;i<wifinetantal;i++) {
-                        if (get_networkhardwareadress(i,hard)) return(i);
-                  }
-            }
-      }
-      return(0);
+
+      const auto first = line.find(':');
+      if (first == std::string::npos) continue;
+
+      const auto second = line.find(':', first + 1);
+      if (second == std::string::npos) continue;
+      
+      network.signal = std::atoi(line.substr(0, first).c_str());
+      network.security = line.substr(first + 1, second - first - 1);
+      network.ssid = line.substr(second + 1);
+      wifinetantal++;
+      networks.push_back(network);
+    }
+    if (pclose(pipe) != 0) {
+      // throw std::runtime_error("nmcli kunne ikke gennemføre Wi-Fi-scanningen");
+    }
+    active_wifinetwork_name=getActiveWifiSSID();
+    return true;
+}
+
+
+
+// update wifi net list
+
+void wifinetdef::update_wifi_netlist() {
+  wifinetantal=0;
+  scanWifiNetworks();
+  std::cout << "Active Wifi networks : " << active_wifinetwork_name << "\n";
+  std::cout << "Wifi networks found." << "\n";
+  for (int i=0;i<wifinetantal;i++) {
+    printf("%20s   %2d   %s \n",(networks.at(i).ssid.c_str()),networks.at(i).signal,networks.at(i).security.c_str());
+  }
 }
 
 
 int wifinetdef::get_encryptstatus(int nr) {
       int crypt;
-      if (nr<=wifinetantal) crypt=wifilist[nr].get_encrypt();
+      // if (nr<=wifinetantal) crypt=wifilist[nr].get_encrypt();
       return(crypt);
 }
 
@@ -234,7 +202,7 @@ int wifinetdef::get_networkid(int nr,char *id) {
       int sign;
       int crypt;
       if (nr<=wifinetantal)
-            wifilist[nr].get_wifiid(hardware,id,&sign,&crypt);
+            // wifilist[nr].get_wifiid(hardware,id,&sign,&crypt);
       return(1);
 }
 
@@ -242,8 +210,7 @@ int wifinetdef::get_networkhardwareadress(int nr,char *hardware) {
       int sign;
       int crypt;
       char id[80];
-      if (nr<=wifinetantal)
-            wifilist[nr].get_wifiid(hardware,id,&sign,&crypt);
+      // if (nr<=wifinetantal)wifilist[nr].get_wifiid(hardware,id,&sign,&crypt);
       return(1);
 }
 
@@ -254,17 +221,17 @@ int wifinetdef::get_networksign(int nr,int *si) {
       int sign;
       int crypt;
       if (nr<=wifinetantal) {
-            wifilist[nr].get_wifiid(hardware,id,&sign,&crypt);
+            // wifilist[nr].get_wifiid(hardware,id,&sign,&crypt);
             *si=sign;
       } else *si=-1;
       return(1);
 }
 
 void wifinetdef::get_wifipass(int n,char *p) {
-      if (n<=wifinetantal) wifilist[n].get_pass(p);
+      // if (n<=wifinetantal) wifilist[n].get_pass(p);
 }
 
 
 void wifinetdef::put_wifipass(int n,char *p) {
-      if (n<=wifinetantal) wifilist[n].put_pass(p);
+      // if (n<=wifinetantal) wifilist[n].put_pass(p);
 }

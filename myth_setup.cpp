@@ -38,7 +38,7 @@
 
 extern Renderer renderer;
 extern FT_Face face;
-
+extern wifinetdef wifinets;                            // wifi net class
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -66,6 +66,7 @@ extern char localuserhomedir[4096];
 extern GLuint textureId_uv2;
 extern GLuint _textureId28;
 extern GLuint _textureId_cursor;
+
 
 extern FMOD::System    *sndsystem;
 
@@ -148,6 +149,8 @@ extern GLuint setupnetworkback;
 extern GLuint setupnetworkwlanback;
 extern GLuint setupscreenback;
 extern GLuint setupbackend;
+extern GLuint _texturesetupwifi;
+
 extern GLuint setuptemaback;                        //
 extern GLuint setupfontback;                        //
 extern GLuint setupkeysback;                        //
@@ -1106,6 +1109,50 @@ void show_wlan_networks(int valgtnr) {
   glEnd();
   glPopMatrix();
   */
+}
+
+
+void show_setup_wifi() {
+  // background
+  renderer.AddTextureRect(0,setupnetworkback, 300, 300, 800, 650,1,1,1,1);
+  // close button
+  if (setup_icon_over==40) {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,1);
+  } else {
+    renderer.AddTextureRect(40,_textureclose, 600, 840, 188, 81,1,1,1,0.5f);  
+  }
+  if (wifinets.active_wifinetwork_name.length()>0) {
+    renderer.AddText(&myfont,540, 400,"Default connected : ",1,1,1,1);
+    renderer.AddText(&myfont,690, 400, wifinets.active_wifinetwork_name ,1,1,1,1);
+  } else {
+    renderer.AddText(&myfont,540, 400,"Not connected to wifi.",1,1,1,1);
+  }
+  renderer.AddText(&myfont,340, 450,"SSID",1,1,1,1);
+  renderer.AddText(&myfont,640, 450,"SIGNAL",1,1,1,1);
+  renderer.AddText(&myfont,740, 450,"SECURE",1,1,1,1);
+  int antal_wifi=wifinets.networks.size();
+  if (antal_wifi>20) antal_wifi=20;
+  if (antal_wifi>0) {
+    for(int i=0;i<antal_wifi;i++) {
+      std::string wifiinfo_text;
+      float rcolor,gcolor,bcolor;
+      if (i==do_show_setup_select_linie) {
+        rcolor=0.8f;
+        gcolor=0.8f;
+        bcolor=0.0f;
+      } else {
+        rcolor=0.8f;
+        gcolor=0.8f;
+        bcolor=0.8f;
+      }
+      wifiinfo_text=fmt::format("{:<32}",wifinets.networks.at(i).ssid);
+      renderer.AddText(&myfont,340, 470+(i*18),wifiinfo_text,rcolor,gcolor,bcolor,1);
+      wifiinfo_text=fmt::format("{:>3}",wifinets.networks.at(i).signal);
+      renderer.AddText(&myfont,640, 470+(i*18),wifiinfo_text,rcolor,gcolor,bcolor,1);
+      wifiinfo_text=fmt::format("{}",wifinets.networks.at(i).security);
+      renderer.AddText(&myfont,740, 470+(i*18),wifiinfo_text,rcolor,gcolor,bcolor,1);
+    }
+  }
 }
 
 // ****************************************************************************************
@@ -2843,6 +2890,11 @@ void show_setup_interface() {
   ypos=200+100;
   if (setup_icon_over==13) renderer.AddTextureRect(45,setupbackend, xpos, ypos, winsizx, winsizy,1,1,1,1);
   else renderer.AddTextureRect(45,setupbackend, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
+  // setup wifi
+  xpos=300+0; // 1000
+  ypos=200+300;
+  if (setup_icon_over==46) renderer.AddTextureRect(46,_texturesetupwifi, xpos, ypos, winsizx, winsizy,1,1,1,1);
+  else renderer.AddTextureRect(46,_texturesetupwifi, xpos, ypos, winsizx, winsizy,1,1,1,0.5f);
   // close button
   xpos=200+400;
   ypos=900+10;

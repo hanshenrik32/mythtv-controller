@@ -119,6 +119,7 @@ void show_setup_tema();
 void show_setup_network();
 void show_setup_font(int aktiv);
 void show_setup_keys();
+void show_setup_wifi();
 void show_setup_tv_graber(int startofset);
 void show_setup_rss(unsigned int startofset);                                   // rss reader setup
 void show_wlan_networks(int valgtnr);

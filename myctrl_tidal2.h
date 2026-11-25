@@ -213,12 +213,12 @@ class tidal_class {
     int itemsPerRow = 8;
     int rowHeight   = 198;
     int itemWidth   = 198;
-    int startX = 20;
+    int startX = 10;
     int startY = 60;
     int viewHeight = 978;  // 780;
     // end new scroll vars
     // search vars
-    int search_startX = 20;
+    int search_startX = 10;
     int search_startY = 60+180;
     int search_viewHeight = 660;
     tidal_class();
