@@ -42,6 +42,7 @@ sudo cmake --build build --target installsound
 # After fmod api install build app.
 
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+
 cmake --build build -j"$(nproc)"
 
 # Install mythtv-controller in /opt/mythtv-controller
