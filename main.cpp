@@ -253,6 +253,7 @@ GLuint streambutton;
 GLuint spotify_search;
 GLuint spotify_search_back;
 GLuint _textureIdloading;
+GLuint _textureIdwifistatus;
 
 GLuint _textureId_song; 	                // folder image
 GLuint _textureIdpup;
@@ -4204,6 +4205,31 @@ void display() {
     } else show_volume_info=false;
   }
 
+  // show wifi connection staus 
+  float wxof = 50;
+  float wyof = 50.0f;
+  float wbuttonsizex = 213.0f;
+  float wbuttonsizey = 100.0f;
+ 
+  if (wifinets.wifi_ops_running) {
+    renderer.AddTextureRect(0,_textureIdwifistatus, wxof, wyof, wbuttonsizex, wbuttonsizey,1,1,1,1);
+    if (wifinets.wifi_ops_running_timeout==0) renderer.AddText(&myfont,wxof+(2*18.0f), wyof+58 ,"Wifi Connecting.",1,1,1,1);
+  }
+  if ((wifinets.wifi_ops_running==false) && (wifinets.wifi_ops_running_timeout>0) && (wifinets.wifi_ops_running_timeout<201)) {
+    renderer.AddTextureRect(0,_textureIdwifistatus, wxof, wyof, wbuttonsizex, wbuttonsizey,1,1,1,1);
+    if (wifinets.active_wifinetwork_fault==false) 
+      renderer.AddText(&myfont,wxof+(2*18.0f), wyof+58 ,"Wifi connected.",1,1,1,1);
+    else 
+      renderer.AddText(&myfont,wxof+(2*18.0f), wyof+58 ,"Wifi fault.",1,1,1,1);
+    if (wifinets.wifi_ops_running_timeout>200) {
+      wifinets.wifi_ops_running_timeout=0;
+      wifinets.wifi_ops_running=false;
+    }
+    wifinets.wifi_ops_running_timeout = wifinets.wifi_ops_running_timeout + 1;
+  }
+  // end - show wifi connection staus 
+
+
   // save config
   if (do_save_config) {
     do_save_config = false;
@@ -5043,7 +5069,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
   if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
     id = renderer.HitTest(mousex, mousey);
     if (id != -1) {
-      // printf("Klik på id=%d\n", id);
+      printf("Klik på id=%d\n", id);
       saver_irq=true;                                                         // stop screen saver
     }
   }
@@ -5399,7 +5425,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
 
             // test for tema setup/info
-            if ((id==TEMA_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema) && (do_show_setup_wifi))  {
+            if ((id==TEMA_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema) && (do_show_setup_wifi==false))  {
               // next tema
               tema++;
               if (tema>TEMA_ANTAL) tema = 1;
@@ -5408,7 +5434,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             
 
             // test for select rss setup
-            if ((id==RSS_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_wifi)) {
+            if ((id==RSS_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_wifi==false)) {
               // close  all show setup windows
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -5428,7 +5454,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
 
             // test for select rss setup
-            if ((id==SETUP_BACKEND) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_wifi)) {
+            if ((id==SETUP_BACKEND) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_wifi==false)) {
               // close  all show setup windows
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -5449,7 +5475,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
 
             // test for select spotify setup
-            if ((id==SPOTIFY_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false) && (do_show_setup_wifi)) {
+            if ((id==SPOTIFY_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false) && (do_show_setup_wifi==false)) {
               // close  all show setup windows
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -8748,6 +8774,43 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
             }
+
+
+            if (do_show_setup_wifi) {
+              if (key==13) {
+                key=0;
+                printf("Call connect to wifi network.\n");
+                if (do_show_setup_select_linie<wifinets.networks.size()) {
+                  wifinets.connect_to_wifinetwork_name=wifinets.networks.at(do_show_setup_select_linie).ssid;
+                  std::string connect_to_wifi_pass=wifinets.ask_wifi_pass(wifinets.connect_to_wifinetwork_name);
+                  if (!connect_to_wifi_pass.empty() && connect_to_wifi_pass.back() == '\n') {
+                    connect_to_wifi_pass.pop_back();
+                    if (!connect_to_wifi_pass.empty() && connect_to_wifi_pass.back() == '\r')
+                        connect_to_wifi_pass.pop_back();
+                  }
+                  if (connect_to_wifi_pass.length()>7) {
+                    wifinets.networks.at(do_show_setup_select_linie).ssid_password=connect_to_wifi_pass;
+
+                    /*
+                    int connected=wifinets.connectWifi(wifinets.connect_to_wifinetwork_name ,connect_to_wifi_pass);
+                    if (connected == 0) {
+                      // connected ok
+                      wifinets.active_wifinetwork_name=wifinets.networks.at(do_show_setup_select_linie).ssid;
+                      wifinets.save_wifi_networks_list();
+                    */
+                    std::thread t3(&wifinetdef::connect_to_selected_wifi_thread, &wifinets, connect_to_wifi_pass);
+                    t3.detach();
+                    do_show_setup_wifi=false;
+                    printf("Connected to wifi ssid '%s'\n",wifinets.active_wifinetwork_name.c_str());                   
+                    wifinets.active_wifinetwork_name="";
+                    wifinets.connect_to_wifinetwork_name="";
+                  } else {
+                    printf("Error connected to wifi ssid '%s' password is to short. min 8 charts long \n",wifinets.connect_to_wifinetwork_name.c_str());
+                  }
+                }
+              }
+            }
+
             //
             // screen setup
             //
@@ -12320,6 +12383,7 @@ void loadgfx() {
     _textureIdmusic         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());
     _textureIdmusic_aktiv   = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_active_icon.c_str());
     _textureIdloading       = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_loading_icon.c_str()); //
+    _textureIdwifistatus    = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) "wifi_status_win"); //
     _textureId_dir          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dir1");
     _textureId_dir_radio    = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dir5");
     _textureIdback          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "back-icon");
@@ -12481,6 +12545,7 @@ void freegfx() {
     glDeleteTextures(1, &_textureIdmusic);
     glDeleteTextures(1, &_textureIdmusic_aktiv);
     glDeleteTextures(1, &_textureIdloading);
+    glDeleteTextures(1, &_textureIdwifistatus);
     glDeleteTextures(1, &_textureId_dir);				      // cd/dir icon in music oversigt (hvis ingen cd cover findes)
     glDeleteTextures(1, &_textureId_dir_radio);
     glDeleteTextures(1, &_textureIdback);

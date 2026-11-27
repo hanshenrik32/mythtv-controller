@@ -8,6 +8,9 @@ class wifinetid {
     int encrypt;
   public:
     std::string ssid;
+    std::string bssid;
+    std::string rate;
+    std::string ssid_password;   // wifi
     int signal;             // 0-100
     std::string security;
     wifinetid();
@@ -27,17 +30,23 @@ class wifinetdef {
     void find_interfacenames();
   public:
     std::string active_wifinetwork_name;
+    std::string connect_to_wifinetwork_name;
     std::vector<wifinetid> networks;
+    bool wifi_ops_running;
+    int wifi_ops_running_timeout;
+    bool active_wifinetwork_fault;
     wifinetdef();
     void update_wifi_netlist();
-    int get_networkhardwareadress(int nr,char *hardwadress);
-    int get_networkid(int nr,char *id);
     int get_networksign(int nr,int *si);
-    int get_encryptstatus(int nr);
     int antal() { return wifinetantal; }
     void get_wifipass(int n,char *p);
     void put_wifipass(int n,char *p);
     bool scanWifiNetworks();
-};
+    int connectWifi(std::string ssid, std::string password);
+    std::string ask_wifi_pass(std::string ssid);
+    bool save_wifi_networks_list();
+    bool load_wifi_networks_list();
 
+    void connect_to_selected_wifi_thread(std::string connect_to_wifi_pass);
+};
 

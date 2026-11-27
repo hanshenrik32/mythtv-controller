@@ -1010,107 +1010,15 @@ void show_wlan_networks(int valgtnr) {
   int xpos=0;
   int ypos=0;
   // background
-  /*
-  glPushMatrix();
-  glTranslatef(0.0f, 0.0f, 0.0f);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,setupnetworkwlanback);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4),200 , 0.0);
-  glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),800 , 0.0);
-  glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+800,800 , 0.0);
-  glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,200 , 0.0);
-  glEnd();
-  glPopMatrix();
-  winsizx=200;
-  winsizy=30;
-  xpos=300;
-  ypos=400;
-  i=0;
-  while ((i<wifinets.antal()) && (i<12)) {
-    if (i==valgtnr) {
-      glPushMatrix();
-      glTranslatef(600.0f, 400.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f+(i*20.0f));
-      glColor3f(0.0f, 0.0f, 1.0f);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glEnd();
-      glPopMatrix();
-    }
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(600.0f, 400.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f+(i*20.0f));
-    wifinets.get_networkid(i,tmptxt);        	// get wlan name
-    myglprint4((char *) tmptxt);
-    glPopMatrix();
-    glPushMatrix();
-    wifinets.get_networksign(i,&si);        	// get wlan signal styrke
-    sprintf(tmptxt,"%d db",si);
-    //glRasterPos2f(6.0f, 0.8-(i*0.4f));
-    glTranslatef(600.0f, 400.0f, 0.0f);
-    glRasterPos2f(250.0f, 0.0f+(i*20.0f));
-    myglprint4((char *) tmptxt);
-    glPopMatrix();
-    winsizx=20;
-    winsizy=20;
-    xpos=0;
-    ypos=0;
-    if (wifinets.get_encryptstatus(i)==true) {
-      //glLoadIdentity();
-      glPushMatrix();
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D,_texturelock);
-      //glTranslatef(1.2f, 2.4f-(i*0.4f),-14.8f);
-      glTranslatef(550.0f, 260.0f+(i*20), 0.0f);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glEnd();
-      glPopMatrix();
-    }
-    i++;
-  }
-  if (wifinets.antal()==0) {
-    glDisable(GL_TEXTURE_2D);
-    myglprint4((char *) "No wifi networks avable.");
-  }
-  glPushMatrix();
-  // close buttons
-  glEnable(GL_TEXTURE_2D);
-  //glBlendFunc(GL_ONE, GL_ONE);
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glColor3f(1.0f, 1.0f, 1.0f);
-//    glTranslatef(0.0f, 0.0f, 0.0f);
-  glBindTexture(GL_TEXTURE_2D,_textureclose);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  winsizx=188;
-  winsizy=81;
-  xpos=430;
-  ypos=90;
-  glLoadName(40);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-  glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-  glEnd();
-  glPopMatrix();
-  */
 }
 
+
+
+// **********************************************************************************************
+//
+// Wifi setup view.
+//
+// **********************************************************************************************
 
 void show_setup_wifi() {
   // background
@@ -1130,6 +1038,7 @@ void show_setup_wifi() {
   renderer.AddText(&myfont,340, 450,"SSID",1,1,1,1);
   renderer.AddText(&myfont,640, 450,"SIGNAL",1,1,1,1);
   renderer.AddText(&myfont,740, 450,"SECURE",1,1,1,1);
+  renderer.AddText(&myfont,840, 450,"SPEED",1,1,1,1);
   int antal_wifi=wifinets.networks.size();
   if (antal_wifi>20) antal_wifi=20;
   if (antal_wifi>0) {
@@ -1151,9 +1060,13 @@ void show_setup_wifi() {
       renderer.AddText(&myfont,640, 470+(i*18),wifiinfo_text,rcolor,gcolor,bcolor,1);
       wifiinfo_text=fmt::format("{}",wifinets.networks.at(i).security);
       renderer.AddText(&myfont,740, 470+(i*18),wifiinfo_text,rcolor,gcolor,bcolor,1);
+      wifiinfo_text=fmt::format("{}",wifinets.networks.at(i).rate);
+      renderer.AddText(&myfont,840, 470+(i*18),wifiinfo_text,rcolor,gcolor,bcolor,1);
     }
   }
 }
+
+
 
 // ****************************************************************************************
 //
