@@ -1771,7 +1771,7 @@ int tidal_class::get_users_album(char *albumid) {
         }
         //
         // insert record created if not exist ( song name )
-        //  
+        //
         if (playlistsongexist==false) {
           snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)",(char *) stack[tt].feed_showtxt.c_str() ,(char *) stack[tt].feed_gfx_url.c_str() , (char *) stack[tt].feed_gfx_url.c_str() ,(char *) stack[tt].playlisturl.c_str(), albumid ,(char *) stack[tt].feed_artist.c_str() , 0 );
           if (mysql_query(conn,sql)!=0) {
@@ -1783,8 +1783,18 @@ int tidal_class::get_users_album(char *albumid) {
         //
         // insert record created playlist if not exist ( playlist name )
         //  
-        if (playlistexist==false) {            
-          snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid, play_count, nr_of_songs, lastplayed ,id) values (\"%s\",'%s','%s','%s','%s',%d,0,now(),%d)", (char *) stack[tt].feed_showtxt.c_str() ,(char *) stack[tt].feed_gfx_url.c_str(), albumid,(char *) stack[tt].feed_release_date.c_str(),(char *) stack[tt].feed_artist.c_str(), 0 , stack[tt].numberOfTracks, 0);
+        if (playlistexist==false) {
+          snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist "
+          "(playlistname,paththumb,playlistid,release_date,artistid, play_count, nr_of_songs, lastplayed ,id) "
+          "values (\"%s\",'%s','%s','%s','%s',%d,0,now(),%d)", 
+          (char *) stack[tt].feed_showtxt.c_str() ,
+          (char *) stack[tt].feed_gfx_url.c_str(), 
+          albumid,
+          (char *) stack[tt].feed_release_date.c_str(),
+          (char *) stack[tt].feed_artist.c_str(),
+          0 , 
+          stack[tt].numberOfTracks);
+
           //fprintf(stdout,"SQL : %s\n",sql);
           if (mysql_query(conn,sql)!=0) {
             write_logfile(logfile,(char *) "mysql create table error.");
@@ -1850,43 +1860,51 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
     userfilename = userfilename + "tidal_artist_playlist_";
     userfilename = userfilename + artistid;
     userfilename = userfilename + ".json";
-    // use libcurl
-    curl_global_init(CURL_GLOBAL_ALL);
-    CURL *curl = curl_easy_init();
-    if ((curl) && (strlen(auth_kode.c_str())>0)) {
-      // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
-      header = curl_slist_append(header, auth_kode.c_str());
-      header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
-      curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-      // ask libcurl to use TLS version 1.3 or later
-      curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
-      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
-      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-      curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-      curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
-      curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
-      curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
-      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-      curl_easy_setopt(curl, CURLOPT_POST, 0);
-      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-      userfile=fopen(userfilename.c_str(),"w");
-      if (userfile) {
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
-        res = curl_easy_perform(curl);
-        fclose(userfile);
-      }
-      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);                   // get result in httpCode
-      if (res != CURLE_OK) {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-      }
-      // always cleanup
-      curl_easy_cleanup(curl);
-      curl_global_cleanup();
-      if (httpCode == 200) {
-        return(200);
+    
+    if (!(std::filesystem::is_regular_file(userfilename.c_str()))) {
+      // use libcurl
+      curl_global_init(CURL_GLOBAL_ALL);
+      CURL *curl = curl_easy_init();
+      if ((curl) && (strlen(auth_kode.c_str())>0)) {
+        // header = curl_slist_append(header, "accept: application/vnd.tidal.v1+json");
+        header = curl_slist_append(header, auth_kode.c_str());
+        header = curl_slist_append(header, "Content-Type: application/vnd.tidal.v1+json");
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        // ask libcurl to use TLS version 1.3 or later
+        curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+        curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+        curl_easy_setopt(curl, CURLOPT_POST, 0);
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+        userfile=fopen(userfilename.c_str(),"w");
+        if (userfile) {
+          curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+          res = curl_easy_perform(curl);
+          fclose(userfile);
+        }
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);                   // get result in httpCode
+        if (res != CURLE_OK) {
+          fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+        }
+        // always cleanup
+        curl_easy_cleanup(curl);
+        curl_global_cleanup();
+        if (httpCode == 200) {
+          return(200);
+        }
+      } else {
+        write_logfile(logfile,(char *) "Tidal curl fault");
       }
     } else {
-      write_logfile(logfile,(char *) "Tidal curl fault");
+      // file exist.
+      // check if file size is ok.
+      const auto bytes = std::filesystem::file_size(userfilename, ec);
+      if (bytes>0) httpCode=200; else  httpCode=-1;
     }
   }
   return(httpCode);
@@ -2184,7 +2202,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force,bool cre
           transform(tolow_fundetartist.begin(),tolow_fundetartist.end(),tolow_fundetartist.begin(),::tolower);
 
           if ((!tolow_keybuffer.empty()) && (tolow_fundetartist.find(tolow_keybuffer) != std::string::npos)) {
-            printf("Keybuffer = %s     fundet artist in json = %s \n",keybuffer1.c_str(),fundetartist);
+            printf("Keybuffer = %s fundet artist in json = %s \n",keybuffer1.c_str(),fundetartist.c_str());
             loadartist = true;
           }
         }
@@ -4174,6 +4192,8 @@ std::string exec(const char* cmd) {
   return result;
 }
 
+
+
 // **************************************************************************************
 //
 // downloader
@@ -5812,7 +5832,7 @@ void tidal_class::show_tidal_oversigt1(GLuint normal_icon,GLuint song_icon,GLuin
     int index = firstIndex + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    float x = startX + col * itemWidth + 40.0f;
+    float x = startX + col * itemWidth + 20.0f;
     float y = startY + row * rowHeight - subOff - 20.0f;
     float progress = 1.0f;
     if (!tidalIntroFinished) {
@@ -5968,16 +5988,16 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     int index = ssofset + i;
     int col = i % itemsPerRow;
     int row = i / itemsPerRow;
-    int x = search_startX + col * itemWidth + 40;
+    int x = search_startX + col * itemWidth + 20;
     int y = search_startY + row * rowHeight - subOff - 10;
     draw_tidal_search_item(x,y,index, normal_icon, normal_icon, stream_key_selected);
   }
+  /*
   if (strlen(overview_show_band_name)>0) {
     std::string txt = "Artist : ";
     txt = txt + overview_show_band_name;
-    // int aa=getTextWidth(txt,1.0f);
-    // drawLinesOfText(txt, (1920/2)-(float(aa/2)), 5, 1.0f, 22, 2, 15, true);
   }
+  */
 }
 
 

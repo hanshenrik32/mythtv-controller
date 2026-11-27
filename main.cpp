@@ -253,6 +253,7 @@ GLuint streambutton;
 GLuint spotify_search;
 GLuint spotify_search_back;
 GLuint _textureIdloading;
+GLuint _textureIdwifistatus;
 
 GLuint _textureId_song; 	                // folder image
 GLuint _textureIdpup;
@@ -272,6 +273,7 @@ GLuint _textureIdmusic;
 GLuint _textureIdmusic_aktiv;
 GLuint _textureIdback; 	                  //
 GLuint _textureId_dir; 	                  // folder image
+GLuint _textureId_dir_radio; 	                  // folder image
 GLuint onlineradio320;                    //
 GLuint onlineradio_empty;
 GLuint tidal_big_search_bar_artist;       // big search bar used by tidal search
@@ -619,6 +621,7 @@ GLuint torrent_background;
 GLuint setuptorrent_background;
 GLuint setuptidalback;
 GLuint setupbackend;
+GLuint _texturesetupwifi;
 GLuint textureId_uv2;
 
 
@@ -715,6 +718,7 @@ int swknapnr=0;                                           //
 
 bool do_show_setup_screen = false;                        // Show screen setuo view
 bool do_show_setup_tema = false;                          // show tema setup view
+bool do_show_setup_wifi = false;
 bool do_show_setup_sound = false;                         // Show sound setup view
 
 bool firsttime_xmltvupdate = true;                      // update tvguide xml files first start (force)
@@ -2318,7 +2322,7 @@ void display() {
       streamoversigt.show_stream_oversigt(1);
     }
     if (vis_radio_oversigt) {
-      radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , onlineradio320 , 0);
+      radiooversigt.show_radio_oversigt1( _textureId_dir_radio , 0 , _textureIdback , onlineradio320 , 0);
     }
     // tidal stuf
     if (vis_tidal_oversigt) {
@@ -3869,6 +3873,7 @@ void display() {
     if (do_show_setup_spotify) spotify_oversigt.show_setup_spotify();
     if (do_show_setup_torrent) show_setup_torrent();                    // torrent setup
     if (do_show_setup_tema) show_setup_tema();                          // tema
+    if (do_show_setup_wifi) show_setup_wifi();                          // tema
     if (do_show_setup_rss) show_setup_rss(configrss_ofset);
     if (do_show_setup_keys) show_setup_keys();
     if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);   // tv graber
@@ -4199,6 +4204,31 @@ void display() {
       }
     } else show_volume_info=false;
   }
+
+  // show wifi connection staus 
+  float wxof = 50;
+  float wyof = 50.0f;
+  float wbuttonsizex = 213.0f;
+  float wbuttonsizey = 100.0f;
+ 
+  if (wifinets.wifi_ops_running) {
+    renderer.AddTextureRect(0,_textureIdwifistatus, wxof, wyof, wbuttonsizex, wbuttonsizey,1,1,1,1);
+    if (wifinets.wifi_ops_running_timeout==0) renderer.AddText(&myfont,wxof+(2*18.0f), wyof+58 ,"Wifi Connecting.",1,1,1,1);
+  }
+  if ((wifinets.wifi_ops_running==false) && (wifinets.wifi_ops_running_timeout>0) && (wifinets.wifi_ops_running_timeout<201)) {
+    renderer.AddTextureRect(0,_textureIdwifistatus, wxof, wyof, wbuttonsizex, wbuttonsizey,1,1,1,1);
+    if (wifinets.active_wifinetwork_fault==false) 
+      renderer.AddText(&myfont,wxof+(2*18.0f), wyof+58 ,"Wifi connected.",1,1,1,1);
+    else 
+      renderer.AddText(&myfont,wxof+(2*18.0f), wyof+58 ,"Wifi fault.",1,1,1,1);
+    if (wifinets.wifi_ops_running_timeout>200) {
+      wifinets.wifi_ops_running_timeout=0;
+      wifinets.wifi_ops_running=false;
+    }
+    wifinets.wifi_ops_running_timeout = wifinets.wifi_ops_running_timeout + 1;
+  }
+  // end - show wifi connection staus 
+
 
   // save config
   if (do_save_config) {
@@ -5039,7 +5069,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
   if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
     id = renderer.HitTest(mousex, mousey);
     if (id != -1) {
-      // printf("Klik på id=%d\n", id);
+      printf("Klik på id=%d\n", id);
       saver_irq=true;                                                         // stop screen saver
     }
   }
@@ -5162,13 +5192,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // in setup menu
           if (do_show_setup) {
             // test for setup menu sound
-            if ((id==SOUND_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+            if ((id==SOUND_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)  && (do_show_setup_wifi==false)) {
               do_show_setup_sound = true;
               // do_show_setup_sql = false;
               do_show_setup_backend = false;
               do_show_setup_network = false;
               do_show_setup_screen = false;
               do_show_setup_tema = false;
+              do_show_setup_wifi = false;
               do_show_setup_font = false;
               do_show_setup_keys = false;
               do_show_videoplayer = false;
@@ -5180,13 +5211,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               strcpy(keybuffer,"");
             }
             // test NETWORK setup
-            if ((id==NETWORK_SETUP_OVERVIEW)  && (do_show_setup_backend==false) && (do_show_setup_sound==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
+            if ((id==NETWORK_SETUP_OVERVIEW)  && (do_show_setup_backend==false) && (do_show_setup_sound==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false) && (do_show_setup_wifi==false)) {
               do_show_setup_sound = false;
               do_show_setup_screen = false;
               // do_show_setup_sql = false;
               do_show_setup_backend = false;
               do_show_setup_network = true;
               do_show_setup_tema = false;
+              do_show_setup_wifi = false;
               do_show_setup_font = false;
               do_show_setup_keys = false;
               do_show_videoplayer = false;
@@ -5195,7 +5227,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               do_show_setup_torrent = false;
             }
             // test for gfx opløsning
-            if ((id==GFX_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
+            if ((id==GFX_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false) && (do_show_setup_wifi==false)) {
               do_show_setup_sound = false;
               do_show_setup_screen = false;
               // do_show_setup_sql = false;
@@ -5203,6 +5235,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               do_show_setup_network = false;
               do_show_setup_font = false;
               do_show_setup_tema = true;
+              do_show_setup_wifi = false;
               do_show_setup_keys = false;
               do_show_videoplayer = false;
               do_show_tvgraber = false;
@@ -5210,13 +5243,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               do_show_setup_torrent = false;
             }
             // test for screen setup
-            if ((id==SCREEN_SETUP_OVERVIEW)  && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
+            if ((id==SCREEN_SETUP_OVERVIEW)  && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false) && (do_show_setup_wifi==false)) {
               do_show_setup_sound = false;
               do_show_setup_screen = true;
               // do_show_setup_sql = false;
               do_show_setup_backend = false;
               do_show_setup_network = false;
               do_show_setup_tema = false;
+              do_show_setup_wifi = false;
               do_show_setup_font = false;
               do_show_setup_keys = false;
               do_show_videoplayer = false;
@@ -5225,7 +5259,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               do_show_setup_torrent = false;
             }
             // test for torrent setup/info
-            if ((id==TORRENT_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+            if ((id==TORRENT_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false) && (do_show_setup_wifi==false)) {
               do_show_setup_sound = false;
               do_show_setup_screen = false;
               do_show_setup_backend = false;
@@ -5240,7 +5274,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
             }
             // test for ttffont setup/info
-            if ((id==TTF_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+            if ((id==TTF_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false) && (do_show_setup_wifi==false)) {
               do_show_setup_sound = false;
               do_show_setup_screen = false;
               // do_show_setup_sql = false;
@@ -5256,7 +5290,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
             }
             // test for F keys setup/info
-            if ((id==FKEYS_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+            if ((id==FKEYS_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false) && (do_show_setup_wifi==false)) {
               do_show_setup_sound = false;
               do_show_setup_screen = false;
               // do_show_setup_sql = false;
@@ -5272,7 +5306,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
             }
             // test for setupclose
-            if ((id==CLOSE_SETUP_OVERVIEW) && (do_show_setup_rss==false) && (do_show_setup_spotify==false) && (do_show_setup_tidal==false) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
+            if ((id==CLOSE_SETUP_OVERVIEW) && (do_show_setup_rss==false) && (do_show_setup_spotify==false) && (do_show_setup_tidal==false) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false) && (do_show_setup_wifi==false)) {
               do_show_setup_sound = false;
               do_show_setup_screen = false;
               // do_show_setup_sql = false;
@@ -5288,7 +5322,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               do_show_setup_torrent = false;
               do_save_config = true;             // save setup now
             }
-            if ((id==VIDEO_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+            if ((id==VIDEO_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_wifi==false)) {
               do_show_videoplayer = true;
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -5304,7 +5338,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
             }
             // do_show_tvgraber
-            if ((id==TVGRABER_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+            if ((id==TVGRABER_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_wifi==false)) {
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
               do_show_setup_backend = false;
@@ -5319,14 +5353,32 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               do_show_setup_torrent = false;
 
             }
+
+             
+            if ((id==46) && (do_show_setup_backend==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+              do_show_setup_wifi = true;
+              do_show_setup_sound = false;
+              do_show_setup_backend = false;
+              do_show_setup_network = false;
+              do_show_setup_screen = false;
+              do_show_setup_tema = false;
+              do_show_setup_font = false;
+              do_show_setup_keys = false;
+              do_show_videoplayer = false;
+              do_show_tvgraber = false;
+              do_show_setup_tidal = false;
+              do_show_setup_torrent = false;
+            }
+
             // test for close windows again icon for all other windows in setup glLoadName(40)
-            if ((id==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_backend) || (do_show_setup_torrent) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_setup_rss) || (do_show_tvgraber))) {
+            if ((id==40) && ((do_show_setup_tidal) || (do_show_setup_spotify) || (do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_backend) || (do_show_setup_torrent) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_setup_rss) || (do_show_tvgraber) || (do_show_setup_wifi))) {
               do_show_setup_sound = false;
               do_show_setup_screen = false;
               // do_show_setup_sql = false;
               do_show_setup_backend = false;
               do_show_setup_network = false;
               do_show_setup_tema = false;
+              do_show_setup_wifi = false;
               do_show_setup_keys = false;
               do_show_videoplayer = false;
               do_show_setup_spotify = false;
@@ -5358,6 +5410,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               }
             }
 
+            
             if (do_show_setup_font) {
               if (id==41) {
                 fprintf(stderr,"Set aktiv font to '%s' \n",aktivfont.typeinfo[aktivfont.selected_font_nr].fontname);
@@ -5372,7 +5425,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
 
             // test for tema setup/info
-            if ((id==TEMA_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema))  {
+            if ((id==TEMA_SETUP_OVERVIEW) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema) && (do_show_setup_wifi==false))  {
               // next tema
               tema++;
               if (tema>TEMA_ANTAL) tema = 1;
@@ -5381,7 +5434,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             
 
             // test for select rss setup
-            if ((id==RSS_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+            if ((id==RSS_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_wifi==false)) {
               // close  all show setup windows
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -5401,7 +5454,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
 
             // test for select rss setup
-            if ((id==SETUP_BACKEND) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+            if ((id==SETUP_BACKEND) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_wifi==false)) {
               // close  all show setup windows
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -5422,7 +5475,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
 
             // test for select spotify setup
-            if ((id==SPOTIFY_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false)) {
+            if ((id==SPOTIFY_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false) && (do_show_setup_wifi==false)) {
               // close  all show setup windows
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -5441,7 +5494,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               do_show_setup_torrent = false;
             }
             // test for tidal select setup
-            if ((id==TIDAL_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false && (do_show_setup_spotify==false))) {
+            if ((id==TIDAL_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false && (do_show_setup_spotify==false) && (do_show_setup_wifi==false))) {
               // close  all show setup windows
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -5461,7 +5514,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
 
             // test for select network setup
-            if ((id==NETWORK_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+            if ((id==NETWORK_SETUP_OVERVIEW) && (do_show_setup_backend==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup==false)) {
               // close  all show setup windows
               do_show_setup_sound = false;
               // do_show_setup_sql = false;
@@ -5485,6 +5538,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             //
             if (id==45) {
               fprintf(stderr,"45 Button pressed \n");
+            }
+
+            if (id==46) {
+              fprintf(stderr,"46 Button pressed (Wifi netsetup)\n");
             }
 
             if (do_show_setup_tema) {
@@ -8717,6 +8774,43 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
             }
+
+
+            if (do_show_setup_wifi) {
+              if (key==13) {
+                key=0;
+                printf("Call connect to wifi network.\n");
+                if (do_show_setup_select_linie<wifinets.networks.size()) {
+                  wifinets.connect_to_wifinetwork_name=wifinets.networks.at(do_show_setup_select_linie).ssid;
+                  std::string connect_to_wifi_pass=wifinets.ask_wifi_pass(wifinets.connect_to_wifinetwork_name);
+                  if (!connect_to_wifi_pass.empty() && connect_to_wifi_pass.back() == '\n') {
+                    connect_to_wifi_pass.pop_back();
+                    if (!connect_to_wifi_pass.empty() && connect_to_wifi_pass.back() == '\r')
+                        connect_to_wifi_pass.pop_back();
+                  }
+                  if (connect_to_wifi_pass.length()>7) {
+                    wifinets.networks.at(do_show_setup_select_linie).ssid_password=connect_to_wifi_pass;
+
+                    /*
+                    int connected=wifinets.connectWifi(wifinets.connect_to_wifinetwork_name ,connect_to_wifi_pass);
+                    if (connected == 0) {
+                      // connected ok
+                      wifinets.active_wifinetwork_name=wifinets.networks.at(do_show_setup_select_linie).ssid;
+                      wifinets.save_wifi_networks_list();
+                    */
+                    std::thread t3(&wifinetdef::connect_to_selected_wifi_thread, &wifinets, connect_to_wifi_pass);
+                    t3.detach();
+                    do_show_setup_wifi=false;
+                    printf("Connected to wifi ssid '%s'\n",wifinets.active_wifinetwork_name.c_str());                   
+                    wifinets.active_wifinetwork_name="";
+                    wifinets.connect_to_wifinetwork_name="";
+                  } else {
+                    printf("Error connected to wifi ssid '%s' password is to short. min 8 charts long \n",wifinets.connect_to_wifinetwork_name.c_str());
+                  }
+                }
+              }
+            }
+
             //
             // screen setup
             //
@@ -9861,6 +9955,13 @@ void handlespeckeypress(int key,int x,int y) {
                 if (do_show_setup_select_linie<3) do_show_setup_select_linie++;
               }
 
+              if (do_show_setup_wifi) {
+                if (wifinets.networks.size()>0) {
+                  if (do_show_setup_select_linie<wifinets.networks.size()-1) do_show_setup_select_linie++;
+                }
+              }
+
+
               // rss setup
               // setup rss source window
               if (do_show_setup_rss) {
@@ -10131,6 +10232,9 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 if (do_show_setup_screen) {
+                  if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                }
+                if (do_show_setup_wifi) {
                   if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                 }
 
@@ -11352,6 +11456,7 @@ void mouseMotion(int x, int y) {
     else if (id==40) setup_icon_over=40; // close button
     else if (id==41) setup_icon_over=41; // close button
     else if (id==42) setup_icon_over=42; // close button
+    else if (id==46) setup_icon_over=46; // close button
     else setup_icon_over=0;
     
   } else {
@@ -11483,24 +11588,25 @@ void doexitcommand() {
 // ****************************************************************************************
 
 GLuint loadgfxfile(char *temapath,char *dir,char *file) {
-    GLuint gl_img=0;
-    std::string fileload="";
+  GLuint gl_img=0;
+  std::string fileload="";
+  fileload=fileload + temapath;
+  fileload=fileload + dir;
+  fileload=fileload + file;              // filename - type
+  fileload=fileload + ".png";            // add png
+  if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
+  else {
+    // check if file exist af .jpg file      
+    fileload="";
     fileload=fileload + temapath;
     fileload=fileload + dir;
     fileload=fileload + file;              // filename - type
-    fileload=fileload + ".png";            // add png
+    fileload=fileload + ".jpg";            // add jpg
     if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
-    else {
-      // check if file exist af .jpg file      
-      fileload=fileload + temapath;
-      fileload=fileload + dir;
-      fileload=fileload + file;              // filename - type
-      fileload=fileload + ".jpg";            // add jpg
-      if (file_exists(fileload.c_str())) gl_img = loadTexture ((char *) fileload.c_str());
-      else gl_img = 0;
-    }
-    if (gl_img == 0) fprintf(stderr,"GFXFILE %s in dir %s NOT FOUND \n",fileload.c_str(),dir);
-    return(gl_img);
+    else gl_img = 0;
+  }
+  if (gl_img == 0) fprintf(stderr,"GFXFILE %s NOT FOUND \n",fileload.c_str());
+  return(gl_img);
 }
 
 
@@ -12277,7 +12383,9 @@ void loadgfx() {
     _textureIdmusic         = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_icon.c_str());
     _textureIdmusic_aktiv   = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "buttons/",(char *) config_menu.config_music_active_icon.c_str());
     _textureIdloading       = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_loading_icon.c_str()); //
+    _textureIdwifistatus    = loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) "wifi_status_win"); //
     _textureId_dir          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dir1");
+    _textureId_dir_radio    = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "dir5");
     _textureIdback          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "back-icon");
     onlineradio320          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "onlineradio320");
     _textureclosemain      	= loadgfxfile((char *) config_menu.config_tema_path.c_str(),(char *) "images/",(char *) config_menu.config_closemain_icon.c_str()); // "closemain");
@@ -12407,6 +12515,7 @@ void loadgfx() {
 
     setuptvgraberback    	= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setuptvgraberback");
     setupbackend          = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupbackend");
+    _texturesetupwifi     = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "setupwifi");
     tvguide_last_hour_icon= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvguide_last_hour_icon");
     tvguide_next_hour_icon= loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "tvguide_next_hour_icon");
     ring_background       = loadgfxfile((char *) temapath.c_str(),(char *) "images/",(char *) "ring_background");
@@ -12436,7 +12545,9 @@ void freegfx() {
     glDeleteTextures(1, &_textureIdmusic);
     glDeleteTextures(1, &_textureIdmusic_aktiv);
     glDeleteTextures(1, &_textureIdloading);
+    glDeleteTextures(1, &_textureIdwifistatus);
     glDeleteTextures(1, &_textureId_dir);				      // cd/dir icon in music oversigt (hvis ingen cd cover findes)
+    glDeleteTextures(1, &_textureId_dir_radio);
     glDeleteTextures(1, &_textureIdback);
     glDeleteTextures(1, &onlineradio320);
     glDeleteTextures(1, &_textureclosemain);
@@ -12560,6 +12671,7 @@ void freegfx() {
     glDeleteTextures(1, &_tvrecordbutton);
     glDeleteTextures(1, &setuptvgraberback);
     glDeleteTextures(1, &setupbackend);
+    glDeleteTextures(1, &_texturesetupwifi);
     glDeleteTextures(1, &tvguide_last_hour_icon);
     glDeleteTextures(1, &tvguide_next_hour_icon);
     glDeleteTextures(1, &ring_background);
@@ -13056,6 +13168,9 @@ int main(int argc,char** argv) {
     thread t1(opdate_threadfunction); // start thread to update torrent
     // thread for tidal update from the tidal api
     thread t2(datainfoloader_webserver_v2);
+
+
+    wifinets.update_wifi_netlist();
 
     if (full_screen) {
       glutFullScreen();                                // set full screen mode

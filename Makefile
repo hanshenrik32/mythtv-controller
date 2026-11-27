@@ -83,7 +83,7 @@ all:
 
 
 compile: $(PROG)
-	@if [ -f build-number.txt ]; then touch build-number.txt; fi
+	@if [ ! -e build-number.txt ]; then touch build-number.txt; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
@@ -148,8 +148,8 @@ install:
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \
 	  cp lirc/mythtv-controller* ~/.lirc/; fi
-	# create random password
-	PASSWDDB="$(openssl rand -base64 12)"
 	# replace "-" with "_" for database username
 	MAINDB="mythtvcontroller"
+	./createdb.sh mythtvcontroller
+
 
